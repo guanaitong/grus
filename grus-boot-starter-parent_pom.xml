@@ -4,16 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!--  NOTE: SPRING_BOOT_VERSION and GRUS_VERSION will be replaced -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.12.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <version>SPRING_BOOT_VERSION</version>
     </parent>
 
     <groupId>com.ciicgat.grus.boot</groupId>
     <artifactId>grus-boot-starter-parent</artifactId>
-    <version>2021.2.0-SNAPSHOT</version>
+    <version>GRUS_VERSION</version>
     <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
