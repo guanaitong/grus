@@ -12,9 +12,7 @@ function deploy_parent() {
    mvn deploy -f tmp/.flattened-pom.xml -Dmaven.test.skip=true
 }
 
-if [[ $GIT_BRANCH =~ "feature" ]]; then
-  echo "end"
-else
-   mvn deploy -Dmaven.test.skip=true
-   deploy_parent
+if [[ $GIT_BRANCH =~ "master" ]]; then
+  mvn deploy -Dmaven.test.skip=true
+  deploy_parent
 fi
