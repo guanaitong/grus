@@ -1,0 +1,4 @@
+# SpringApplicationListener
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.ciicgat.grus.boot.velocity.GrusVelocityAutoConfiguration
+

@@ -1,0 +1,52 @@
+/*
+ * Copyright 2007-2020, CIIC Guanaitong, Co., Ltd.
+ * All rights reserved.
+ */
+
+package com.ciicgat.grus.boot.autoconfigure.zk;
+
+import com.ciicgat.grus.idgen.IdGenerator;
+import com.ciicgat.grus.lock.DistLock;
+import com.ciicgat.grus.lock.DistLockFactory;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Created by August.Zhou on 2019-04-08 13:44.
+ */
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
+        properties = {"spring.application.name=grus-demo", "grus.idgen.dateFormat=yyMMdd", "grus.zk.serverLists=app-zk.servers.dev.ofc:2181", "grus.zk.namespace=grus-test-job"})
+public class ZKConfigurationTests {
+
+    @Autowired
+    private IdGenerator idGenerator;
+
+    @Autowired
+    private DistLockFactory distLockFactory;
+
+    @Test
+    public void testIdGen() {
+        String orderNo = idGenerator.makeNo();
+        Assert.assertNotNull(orderNo);
+
+        long id = idGenerator.makeId();
+        Assert.assertTrue(id > 0);
+    }
+
+    @Test
+    public void testLock() {
+        DistLock distLock = distLockFactory.buildLock("unit-test");
+        distLock.acquire();
+        distLock.release();
+        boolean result = distLock.tryAcquire(1, TimeUnit.SECONDS);
+        Assert.assertTrue(result);
+        distLock.release();
+    }
+}

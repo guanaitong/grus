@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sqls>
+
+    <sql id="insertAll">
+        INSERT INTO `@{tableName}` (@{fieldsString})
+        VALUES
+        (@{fieldsParamString})
+    </sql>
+
+    <sql id="insert">
+        <![CDATA[
+        INSERT INTO `@{tableName}`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            @{conditionalFieldsString}
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            @{conditionalFieldsParamString}
+        </trim>
+        ]]>
+    </sql>
+
+    <sql id="batchInsert">
+        <![CDATA[
+        INSERT INTO `@{tableName}` (@{fieldsString})
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (@{itemFieldsParamString})
+        </foreach>
+        ]]>
+    </sql>
+
+    <!--可通过@sql{exampleWhereClause}方式来进行嵌入到其他sql中-->
+    <sql id="exampleWhereClause">
+        <![CDATA[
+        <where>
+          <foreach collection="example.oredCriteria" item="criteria" separator="OR ">
+            <if test="criteria.valid">
+              <trim prefix="(" prefixOverrides="and" suffix=")">
+                <foreach collection="criteria.criteria" item="criterion">
+                  <choose>
+                    <when test="criterion.noValue">
+                      and ${criterion.condition}
+                    </when>
+                    <when test="criterion.singleValue">
+                      and ${criterion.condition} #{criterion.value}
+                    </when>
+                    <when test="criterion.likeValue">
+                      and ${criterion.condition}
+                      <choose>
+                        <when test="criterion.sqlLike.name == 'LEFT'">
+                          CONCAT('%',#{criterion.value})
+                        </when>
+                        <when test="criterion.sqlLike.name == 'RIGHT'">
+                          CONCAT(#{criterion.value},'%')
+                        </when>
+                        <otherwise>
+                          CONCAT('%',#{criterion.value},'%')
+                        </otherwise>
+                       </choose>
+                    </when>
+                    <when test="criterion.betweenValue">
+                      and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                    </when>
+                    <when test="criterion.listValue">
+                      and ${criterion.condition}
+                      <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                        #{listItem}
+                      </foreach>
+                    </when>
+                  </choose>
+                </foreach>
+              </trim>
+            </if>
+          </foreach>
+        </where>
+        ]]>
+    </sql>
+
+    <sql id="list">
+        <![CDATA[
+            SELECT
+            <if test="example.distinct">
+              DISTINCT
+            </if>
+            @{allFieldsString}
+            FROM `@{tableName}`
+            <if test="_parameter != null">
+              @sql{exampleWhereClause}
+            </if>
+            <if test="example.orderByClause != null">
+              ORDER BY <trim prefixOverrides=",">${example.orderByClause}</trim>
+            </if>
+            <if test="example.limitEnd > 0">
+              LIMIT #{example.limitStart,jdbcType=INTEGER}  , #{example.limitEnd,jdbcType=INTEGER}
+            </if>
+        ]]>
+    </sql>
+
+    <sql id="update">
+        <![CDATA[
+        UPDATE `@{tableName}`
+        <set>
+            @{conditionalSetFieldsString}
+        </set>
+        WHERE `id` = #{entity.id}
+        ]]>
+    </sql>
+
+    <sql id="updateAll">
+        UPDATE `@{tableName}`
+        SET
+        @{setFieldsString}
+        WHERE `id` = #{entity.id}
+    </sql>
+
+    <sql id="updateByExample">
+        <![CDATA[
+        UPDATE `@{tableName}`
+        <set>
+            @{conditionalSetFieldsString}
+        </set>
+        <if test="_parameter != null">
+           @sql{exampleWhereClause}
+        </if>
+        ]]>
+    </sql>
+
+    <sql id="updateByExampleAll">
+        UPDATE `@{tableName}`
+        SET
+        @{setFieldsString}
+        <if test="_parameter != null">
+            @sql{exampleWhereClause}
+        </if>
+    </sql>
+
+    <sql id="delete">
+        DELETE FROM `@{tableName}`
+        WHERE `id` = #{id}
+    </sql>
+
+    <sql id="batchDelete">
+        <![CDATA[
+        DELETE FROM `@{tableName}`
+        WHERE `id` IN (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+        ]]>
+    </sql>
+
+    <sql id="deleteByExample">
+        DELETE FROM `@{tableName}`
+        <if test="_parameter != null">
+            @sql{exampleWhereClause}
+        </if>
+    </sql>
+
+    <sql id="get">
+        SELECT @{allFieldsString}
+        FROM `@{tableName}`
+        WHERE `id` = #{id}
+    </sql>
+
+    <sql id="batchGet">
+        <![CDATA[
+        SELECT @{allFieldsString}
+        FROM `@{tableName}`
+        WHERE `id` IN (
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+        ]]>
+    </sql>
+
+    <sql id="getByExample">
+        SELECT @{allFieldsString}
+        FROM `@{tableName}`
+        <if test="_parameter != null">
+            @sql{exampleWhereClause}
+        </if>
+        ORDER BY `id` DESC
+        LIMIT 1
+    </sql>
+
+    <sql id="count">
+        SELECT COUNT(*)
+        FROM `@{tableName}`
+        <if test="_parameter != null">
+            @sql{exampleWhereClause}
+        </if>
+    </sql>
+
+</sqls>

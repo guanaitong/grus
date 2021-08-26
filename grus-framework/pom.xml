@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2007-2020, CIIC Guanaitong, Co., Ltd.
+  ~ All rights reserved.
+  -->
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>grus-build</artifactId>
+        <groupId>com.ciicgat.grus</groupId>
+        <version>${revision}</version>
+        <relativePath>../grus-build</relativePath>
+    </parent>
+
+    <artifactId>grus-framework</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>grus-core</module>
+        <module>grus-gconf</module>
+        <module>grus-gfs</module>
+        <module>grus-redis</module>
+        <module>grus-rabbitmq</module>
+        <module>grus-job</module>
+        <module>grus-servlet</module>
+        <module>grus-feign</module>
+        <module>grus-data</module>
+        <module>grus-validator</module>
+        <module>grus-elasticsearch</module>
+        <module>grus-zk</module>
+        <module>grus-kafka</module>
+    </modules>
+
+</project>

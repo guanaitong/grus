@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright 2007-2020, CIIC Guanaitong, Co., Ltd.
+  ~ All rights reserved.
+  -->
+
+<configuration>
+
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>^V^ [%p] [%d{yyyy-MM-dd HH:mm:ss.SSS}] [%t] [%c:%L] [%X{traceId}:%X{spanId}:%X{parentId}] [%X{req.xRequestId}] %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.apache.http" level="TRACE"/>
+
+
+    <root level="TRACE">
+        <appender-ref ref="stdout"/>
+    </root>
+
+</configuration>

@@ -1,0 +1,24 @@
+# SpringApplicationListener
+org.springframework.context.ApplicationContextInitializer=\
+  com.ciicgat.grus.boot.autoconfigure.core.GrusCoreContextInitializer,\
+  com.ciicgat.grus.boot.autoconfigure.gconf.GconfContextInitializer
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.ciicgat.grus.boot.autoconfigure.core.GrusCoreAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.gconf.GconfAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.meter.MeterAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.opentracing.OpenTracingAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.feign.FeignAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.web.GrusWebAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.data.GrusDataAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.data.GrusMybatisAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.data.GrusPageHelperAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.swagger.SwaggerAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.validation.ValidationAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.validation.GrusValidationAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.job.ElasticJobAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.gfs.GfsClientAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.elasticsearch.ElasticsearchAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.zk.ZKAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.redis.GrusRedisAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.cache.GrusRedisSpringCacheAutoConfiguration
+

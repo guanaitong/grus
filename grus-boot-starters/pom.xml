@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2007-2020, CIIC Guanaitong, Co., Ltd.
+  ~ All rights reserved.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>grus-build</artifactId>
+        <groupId>com.ciicgat.grus</groupId>
+        <version>${revision}</version>
+        <relativePath>../grus-build</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>grus-boot-starters</artifactId>
+    <groupId>com.ciicgat.grus.boot</groupId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>grus-boot-starter</module>
+        <module>grus-boot-starter-gconf</module>
+        <module>grus-boot-starter-opentracing</module>
+        <module>grus-boot-starter-fegin</module>
+        <module>grus-boot-starter-gfs</module>
+        <module>grus-boot-starter-rabbitmq</module>
+        <module>grus-boot-starter-redis</module>
+        <module>grus-boot-starter-elasticsearch</module>
+        <module>grus-boot-starter-data</module>
+        <module>grus-boot-starter-validator</module>
+        <module>grus-boot-starter-job</module>
+        <module>grus-boot-starter-web</module>
+        <module>grus-boot-starter-server-minor</module>
+        <module>grus-boot-starter-server-general</module>
+        <module>grus-boot-starter-server-service</module>
+        <module>grus-boot-starter-server-web</module>
+        <module>grus-boot-starter-server-frigate</module>
+        <module>grus-boot-starter-velocity</module>
+        <module>grus-boot-starter-zk</module>
+        <module>grus-boot-starter-pagehelper</module>
+    </modules>
+
+
+</project>
