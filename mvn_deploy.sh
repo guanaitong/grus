@@ -12,7 +12,8 @@ function deploy_parent() {
    mvn deploy -f tmp/.flattened-pom.xml -Dmaven.test.skip=true
 }
 
-if [[ $GIT_BRANCH =~ "master" ]]; then
+# deploy for branches of master or release
+if [[ $GIT_BRANCH =~ "master" ]] || [[ $GIT_BRANCH =~ "release" ]] ; then
   mvn deploy -Dmaven.test.skip=true
   deploy_parent
 fi
