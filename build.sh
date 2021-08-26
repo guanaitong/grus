@@ -2,8 +2,11 @@
 
 set -ex
 
+mvn clean package sonar:sonar
+
 if [[ $GIT_BRANCH =~ "feature" ]]; then
-   mvn clean package -U  sonar:sonar
+  echo "end"
 else
-   mvn clean deploy -U sonar:sonar
+   mvn -Dmaven.test.skip=true deploy
+   mvn -f grus-boot-starter-parent_pom.xml -Dmaven.test.skip=true deploy
 fi
