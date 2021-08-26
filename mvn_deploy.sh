@@ -9,7 +9,7 @@ function deploy_parent() {
    SPRING_BOOT_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=spring-boot.version -q -DforceStdout)
    sed -i "s/GRUS_VERSION/$GRUS_VERSION/g" tmp/.flattened-pom.xml
    sed -i "s/SPRING_BOOT_VERSION/$SPRING_BOOT_VERSION/g" tmp/.flattened-pom.xml
-   mvn install -f tmp/.flattened-pom.xml -Dmaven.test.skip=true
+   mvn deploy -f tmp/.flattened-pom.xml -Dmaven.test.skip=true
 }
 
 if [[ $GIT_BRANCH =~ "feature" ]]; then
