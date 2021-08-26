@@ -107,7 +107,7 @@
         <connection>scm:git:git://gitlab.wuxingdev.cn/java/framework/grus.git</connection>
         <developerConnection>scm:git:ssh://git@gitlab.wuxingdev.cn/java/framework/grus.git
         </developerConnection>
-        <url>http://gitlab.wuxingdev.cn/java/framework/grus</url>
+        <url>https://gitlab.wuxingdev.cn/java/framework/grus</url>
     </scm>
     <developers>
         <developer>
