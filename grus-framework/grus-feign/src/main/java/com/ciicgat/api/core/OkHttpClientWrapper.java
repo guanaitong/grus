@@ -250,7 +250,9 @@ public final class OkHttpClientWrapper implements Client {
                 }
             }
             LOGGER.warn("throw error");
-            throw ioException;
+            if (ioException != null) {
+                throw ioException;
+            }
         }
         Request okHttpRequest = toOkHttpRequest(input, false, null);
         okhttp3.OkHttpClient realClient = delegate.newBuilder()
