@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2007-2020, CIIC Guanaitong, Co., Ltd.
+  ~ Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
   ~ All rights reserved.
   -->
 
@@ -13,6 +13,49 @@
     <artifactId>grus</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
+
+    <url>https://java.guide.wuxingdev.cn/</url>
+    <description>Guanaitong Grus Java Framework</description>
+    <scm>
+        <connection>scm:git:git://gitlab.wuxingdev.cn/java/grus.git</connection>
+        <developerConnection>scm:git:ssh://git@gitlab.wuxingdev.cn/java/grus.git</developerConnection>
+        <url>https://gitlab.wuxingdev.cn/java/grus</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>August Zhou</name>
+            <email>august.zhou@guanaitong.com</email>
+            <organization>www.guanaitong.com</organization>
+        </developer>
+        <developer>
+            <name>Albert Sun</name>
+            <email>albert.sun@guanaitong.com</email>
+            <organization>www.guanaitong.com</organization>
+        </developer>
+        <developer>
+            <name>Wan Chongyang</name>
+            <email>chongyang.wan@guanaitong.com</email>
+            <organization>www.guanaitong.com</organization>
+        </developer>
+        <developer>
+            <name>Stanley</name>
+            <email>stanley.shen@guanaitong.com</email>
+            <organization>www.guanaitong.com</organization>
+        </developer>
+        <developer>
+            <name>Jiaju Wei</name>
+            <email>jiaju.wei@guanaitong.com</email>
+            <organization>www.guanaitong.com</organization>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
 
     <modules>
         <module>grus-boot-autoconfigure</module>
@@ -27,7 +70,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!--@see https://maven.apache.org/maven-ci-friendly.html-->
-        <revision>2021.2.0-SNAPSHOT</revision>
+        <revision>2021.1.8-SNAPSHOT</revision>
         <java.version>11</java.version>
         <resource.delimiter>@</resource.delimiter>
         <spring-boot.version>2.3.12.RELEASE</spring-boot.version>
@@ -84,20 +127,6 @@
 
     </properties>
 
-    <scm>
-        <connection>scm:git:git://gitlab.wuxingdev.cn/java/grus.git</connection>
-        <developerConnection>scm:git:ssh://git@gitlab.wuxingdev.cn/java/grus.git</developerConnection>
-        <url>https://gitlab.wuxingdev.cn/java/grus</url>
-    </scm>
-    <developers>
-        <developer>
-            <name>August.Zhou</name>
-            <email>august.zhou@guanaitong.com</email>
-            <organization>www.guanaitong.com</organization>
-        </developer>
-    </developers>
-
-    <url>https://gitlab.wuxingdev.cn/java/grus</url>
     <build>
         <pluginManagement>
             <plugins>

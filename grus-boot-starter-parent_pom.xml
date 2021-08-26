@@ -3,8 +3,6 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <!--  NOTE: SPRING_BOOT_VERSION and GRUS_VERSION will be replaced -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -15,6 +13,49 @@
     <artifactId>grus-boot-starter-parent</artifactId>
     <version>GRUS_VERSION</version>
     <packaging>pom</packaging>
+
+    <url>https://java.guide.wuxingdev.cn/</url>
+    <description>Guanaitong Grus Java Framework</description>
+    <scm>
+        <connection>scm:git:git://gitlab.wuxingdev.cn/java/grus.git</connection>
+        <developerConnection>scm:git:ssh://git@gitlab.wuxingdev.cn/java/grus.git</developerConnection>
+        <url>https://gitlab.wuxingdev.cn/java/grus</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>August Zhou</name>
+            <email>august.zhou@guanaitong.com</email>
+            <organization>www.guanaitong.com</organization>
+        </developer>
+        <developer>
+            <name>Albert Sun</name>
+            <email>albert.sun@guanaitong.com</email>
+            <organization>www.guanaitong.com</organization>
+        </developer>
+        <developer>
+            <name>Wan Chongyang</name>
+            <email>chongyang.wan@guanaitong.com</email>
+            <organization>www.guanaitong.com</organization>
+        </developer>
+        <developer>
+            <name>Stanley</name>
+            <email>stanley.shen@guanaitong.com</email>
+            <organization>www.guanaitong.com</organization>
+        </developer>
+        <developer>
+            <name>Jiaju Wei</name>
+            <email>jiaju.wei@guanaitong.com</email>
+            <organization>www.guanaitong.com</organization>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
@@ -101,21 +142,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-
-    <scm>
-        <connection>scm:git:git://gitlab.wuxingdev.cn/java/framework/grus.git</connection>
-        <developerConnection>scm:git:ssh://git@gitlab.wuxingdev.cn/java/framework/grus.git
-        </developerConnection>
-        <url>https://gitlab.wuxingdev.cn/java/framework/grus</url>
-    </scm>
-    <developers>
-        <developer>
-            <name>August.Zhou</name>
-            <email>august.zhou@guanaitong.com</email>
-            <organization>www.guanaitong.com</organization>
-        </developer>
-    </developers>
 
 
     <build>
