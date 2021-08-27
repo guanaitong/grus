@@ -169,6 +169,7 @@ public class ExcelUtilsTest {
 
         Assert.assertEquals(4, list.size());
         Assert.assertEquals("张三", list.get(0).getName());
+        Assert.assertEquals(null, list.get(3).getName()); // 允许将空单元格读出来
         Assert.assertEquals(25, list.get(1).getAge());
         Assert.assertEquals(true, list.get(1).getParty());
         Assert.assertEquals(DateUtils.parseDate("1991-11-10 10:00:13", "yyyy-MM-dd HH:mm:ss"), list.get(2).getBirth());

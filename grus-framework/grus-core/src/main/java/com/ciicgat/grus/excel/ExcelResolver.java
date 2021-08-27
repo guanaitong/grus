@@ -69,7 +69,7 @@ public class ExcelResolver<T> {
                 Row row = sheet.getRow(i);
                 Cell cell = row.getCell(entry.getKey());
 
-                Object val = entry.getValue().converter.read(cell);
+                Object val = Objects.isNull(cell) ? null : entry.getValue().converter.read(cell);
                 Field field = entry.getValue().field;
                 field.set(readResult, val);
             }
