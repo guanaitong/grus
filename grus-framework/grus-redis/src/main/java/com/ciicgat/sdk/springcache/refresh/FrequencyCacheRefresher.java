@@ -36,20 +36,22 @@ public class FrequencyCacheRefresher extends AbstractCacheRefresher {
 
     public FrequencyCacheRefresher(int frequencySeconds) {
         super();
-        this.localCache = Caffeine.newBuilder()
-                .expireAfterWrite(Math.max(60, frequencySeconds / 2), TimeUnit.SECONDS)
-                .maximumSize(409600L)
-                .build();
+        this.localCache = newLocalCache(frequencySeconds);
         this.expiration = Expiration.from(frequencySeconds, TimeUnit.SECONDS);
     }
 
     public FrequencyCacheRefresher(Executor executor, int frequencySeconds) {
         super(executor);
-        this.localCache = Caffeine.newBuilder()
-                .expireAfterWrite(Math.max(60, frequencySeconds / 2), TimeUnit.SECONDS)
-                .maximumSize(409600L)
-                .build();
+        this.localCache = newLocalCache(frequencySeconds);
         this.expiration = Expiration.from(frequencySeconds, TimeUnit.SECONDS);
+    }
+
+    private com.github.benmanes.caffeine.cache.Cache<String, Boolean> newLocalCache(int frequencySeconds) {
+        return Caffeine.newBuilder()
+                .expireAfterWrite(Math.max(60, frequencySeconds / 2), TimeUnit.SECONDS)
+                .initialCapacity(1024)
+                .maximumSize(102400L)
+                .build();
     }
 
 

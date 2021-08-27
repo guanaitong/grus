@@ -14,6 +14,11 @@ import org.springframework.cache.Cache;
  * @date 2021/1/15 11:05 下午
  */
 public abstract class CacheConfig {
+
+    private static final int DEFAULT_LOCAL_INIT_SIZE = 128;
+    private static final int DEFAULT_LOCAL_EXPIRE_SECONDS = 3600;
+    private static final long DEFAULT_LOCAL_MAX_SIZE = 40960L;
+
     public static Local local() {
         return new Local();
     }
@@ -41,17 +46,17 @@ public abstract class CacheConfig {
         /**
          * 缓存最大值
          */
-        private long maximumSize = 102400L;
+        private long maximumSize = DEFAULT_LOCAL_MAX_SIZE;
 
         /**
          * 过期时间，单位s
          */
-        private int expireSeconds = 600;
+        private int expireSeconds = DEFAULT_LOCAL_EXPIRE_SECONDS;
 
         /**
          * 初始化大小
          */
-        private int initialCapacity = 10240;
+        private int initialCapacity = DEFAULT_LOCAL_INIT_SIZE;
 
         Local() {
         }
@@ -154,17 +159,17 @@ public abstract class CacheConfig {
         /**
          * 缓存最大值
          */
-        private long maximumSize = 102400L;
+        private long maximumSize = DEFAULT_LOCAL_MAX_SIZE;
 
         /**
          * local cache过期时间，单位s
          */
-        private int localExpireSeconds = 3600;
+        private int localExpireSeconds = DEFAULT_LOCAL_EXPIRE_SECONDS;
 
         /**
          * 初始化大小
          */
-        private int initialCapacity = 10240;
+        private int initialCapacity = DEFAULT_LOCAL_INIT_SIZE;
 
         LocalRedis() {
         }

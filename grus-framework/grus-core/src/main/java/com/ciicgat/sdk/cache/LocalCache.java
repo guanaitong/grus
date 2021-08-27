@@ -20,7 +20,7 @@ public class LocalCache {
     private static final Object NULL = new Object();
 
     public LocalCache(int expiredSecond) {
-        this(expiredSecond, 409600L);
+        this(expiredSecond, 40960L);
     }
 
     public LocalCache(int expiredSecond, long maximumSize) {
