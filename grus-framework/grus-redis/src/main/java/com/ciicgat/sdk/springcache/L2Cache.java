@@ -50,14 +50,18 @@ public class L2Cache extends RedisCache<CacheConfig.LocalRedis> implements ILoca
             if (redisValue != null) {
                 saveLocalCache(key, redisValue);
             }
-
             return redisValue;
         } else if (localValue == NULL) {
             return localValue;
         }
         if (this.config.isSerialize()) {
             byte[] bytesValue = (byte[]) localValue;
-            return valueSerializer.deserialize(bytesValue);
+            try {
+                return valueSerializer.deserialize(bytesValue);
+            } catch (Exception e) {
+                LOGGER.warn("deserialize error,name= " + name + ",key=" + key, e);
+                return null;
+            }
         } else {
             return localValue;
         }
@@ -68,7 +72,11 @@ public class L2Cache extends RedisCache<CacheConfig.LocalRedis> implements ILoca
             return;
         }
         if (this.config.isSerialize()) {
-            localCache.put(key, valueSerializer.serialize(value));
+            try {
+                localCache.put(key, valueSerializer.serialize(value));
+            } catch (Exception e) {
+                LOGGER.warn("serialize error,name= " + name + ",key=" + key, e);
+            }
         } else {
             localCache.put(key, value);
         }

@@ -70,7 +70,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!--@see https://maven.apache.org/maven-ci-friendly.html-->
-        <revision>2021.1.8-SNAPSHOT</revision>
+        <revision>2021.1.8</revision>
         <java.version>11</java.version>
         <resource.delimiter>@</resource.delimiter>
         <spring-boot.version>2.3.12.RELEASE</spring-boot.version>

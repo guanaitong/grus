@@ -61,7 +61,12 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
 
         if (this.config.isSerialize()) {
             byte[] bytesValue = (byte[]) localValue;
-            return valueSerializer.deserialize(bytesValue);
+            try {
+                return valueSerializer.deserialize(bytesValue);
+            } catch (Exception e) {
+                LOGGER.warn("deserialize error,name= " + name + ",key=" + key, e);
+                return null;
+            }
         } else {
             return localValue;
         }
@@ -73,7 +78,11 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
             return;
         }
         if (this.config.isSerialize()) {
-            localCache.put(key, valueSerializer.serialize(value));
+            try {
+                localCache.put(key, valueSerializer.serialize(value));
+            } catch (Exception e) {
+                LOGGER.warn("serialize error,name= " + name + ",key=" + key, e);
+            }
         } else {
             localCache.put(key, value);
         }
