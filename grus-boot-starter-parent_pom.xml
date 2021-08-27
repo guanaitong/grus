@@ -73,7 +73,7 @@
             <dependency>
                 <groupId>com.ciicgat.grus</groupId>
                 <artifactId>grus-build</artifactId>
-                <version>${project.version}</version>
+                <version>GRUS_VERSION</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

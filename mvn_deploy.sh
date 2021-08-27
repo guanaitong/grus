@@ -11,7 +11,7 @@ function deploy_parent() {
    sed -i "s/SPRING_BOOT_VERSION/$SPRING_BOOT_VERSION/g" tmp/.flattened-pom.xml
    mvn deploy -f tmp/.flattened-pom.xml -Dmaven.test.skip=true
 }
-
+echo "branch is " $GIT_BRANCH
 # deploy for branches of master or release
 if [[ $GIT_BRANCH =~ "master" ]] || [[ $GIT_BRANCH =~ "release" ]] ; then
   mvn deploy -Dmaven.test.skip=true
