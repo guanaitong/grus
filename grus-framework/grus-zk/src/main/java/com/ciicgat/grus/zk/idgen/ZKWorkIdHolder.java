@@ -8,7 +8,7 @@ package com.ciicgat.grus.zk.idgen;
 import com.ciicgat.grus.idgen.WorkIdHolder;
 import com.ciicgat.grus.zk.ZKConstants;
 import com.ciicgat.grus.zk.ZKUtils;
-import com.ciicgat.sdk.lang.exception.ZKException;
+import com.ciicgat.sdk.lang.exception.ZKRuntimeException;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.CreateMode;
@@ -29,7 +29,7 @@ public class ZKWorkIdHolder implements WorkIdHolder {
 
     private long workValue;
 
-    public ZKWorkIdHolder(String connectString, String appName) throws ZKException {
+    public ZKWorkIdHolder(String connectString, String appName)  {
         workValue = init(connectString, appName);
     }
 
@@ -43,7 +43,7 @@ public class ZKWorkIdHolder implements WorkIdHolder {
         return workValue % maxId;
     }
 
-    private long init(String connectString, String appName) throws ZKException {
+    private long init(String connectString, String appName)  {
         CuratorFramework curator = ZKUtils.init(connectString);
 
         try {
@@ -57,7 +57,7 @@ public class ZKWorkIdHolder implements WorkIdHolder {
             return workValue;
         } catch (Exception e) {
             LOGGER.error("ZK_INIT ERROR", e);
-            throw new ZKException("序号生成器获取机器ID失败，程序终止启动", e);
+            throw new ZKRuntimeException("序号生成器获取机器ID失败，程序终止启动", e);
         } finally {
             if (curator != null) {
                 curator.close();

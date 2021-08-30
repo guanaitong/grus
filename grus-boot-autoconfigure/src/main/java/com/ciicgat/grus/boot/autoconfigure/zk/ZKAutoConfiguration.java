@@ -14,7 +14,6 @@ import com.ciicgat.grus.lock.DistLockFactory;
 import com.ciicgat.grus.zk.ZKUtils;
 import com.ciicgat.grus.zk.idgen.ZKWorkIdHolder;
 import com.ciicgat.grus.zk.lock.ZKDistLockFactory;
-import com.ciicgat.sdk.lang.exception.ZKException;
 import com.ciicgat.sdk.util.system.Systems;
 import org.apache.curator.framework.CuratorFramework;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -41,7 +40,7 @@ public class ZKAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = "workIdHolder")
-    public WorkIdHolder workIdHolder(ZKProperties zkProperties) throws ZKException {
+    public WorkIdHolder workIdHolder(ZKProperties zkProperties) {
         Objects.requireNonNull(zkProperties.getServerLists());
 
         return new ZKWorkIdHolder(zkProperties.getServerLists(), Systems.APP_NAME);
