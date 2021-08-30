@@ -19,7 +19,6 @@ import java.util.concurrent.ThreadLocalRandom;
  * @Description: 基于雪花算法的序列生成器，字符串类型，序列长度24位
  */
 public class SnowflakeIdGenerator implements IdGenerator {
-
     private final int workIdBits = 10;
     private final int secondsBits = 17;
     private final int sequenceBits = 17;
@@ -35,16 +34,18 @@ public class SnowflakeIdGenerator implements IdGenerator {
 
     private WorkIdHolder workIdHolder;
     private DateTimeFormatter dateTimeFormatter;
+    private long workId;
 
     public SnowflakeIdGenerator(WorkIdHolder workIdHolder, String dateFormat) {
         this.workIdHolder = workIdHolder;
         this.dateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat);
+        workId = workIdHolder.getId(maxWorkId);
     }
 
     @Override
     public String makeNo() {
         LocalDateTime time = LocalDateTime.now();
-        long workId = workIdHolder.getId(maxWorkId);
+
         long seconds = time.getHour() * 3600L + time.getMinute() * 60L + time.getSecond();
         long random = ThreadLocalRandom.current().nextInt(maxRandom);
         long sequence = loopAtomicNo.loopGet();
@@ -64,7 +65,6 @@ public class SnowflakeIdGenerator implements IdGenerator {
     @Override
     public long makeId() {
         LocalDateTime time = LocalDateTime.now();
-        long workId = workIdHolder.getId(maxWorkId);
         long days = Duration.between(baseDate, time).toDays();
         long seconds = time.getHour() * 3600L + time.getMinute() * 60L + time.getSecond();
         long sequence = loopAtomicId.loopGet();
