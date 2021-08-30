@@ -14,7 +14,7 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
 
-    <url>https://java.guide.wuxingdev.cn/</url>
+    <url>https://gitlab.wuxingdev.cn/java/grus</url>
     <description>Guanaitong Grus Java Framework</description>
     <scm>
         <connection>scm:git:git://gitlab.wuxingdev.cn/java/grus.git</connection>
