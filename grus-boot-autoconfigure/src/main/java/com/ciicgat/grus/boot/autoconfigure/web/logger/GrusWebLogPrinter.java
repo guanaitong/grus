@@ -107,10 +107,7 @@ public class GrusWebLogPrinter {
         private final boolean logResp;
 
         MethodPrinter() {
-            this.log = false;
-            this.requestLogParameterIndex = new int[0];
-            this.logReq = false;
-            this.logResp = false;
+            this(new int[0], false, false);
         }
 
         MethodPrinter(int[] requestLogParameterIndex, boolean logReq, boolean logResp) {
@@ -139,7 +136,7 @@ public class GrusWebLogPrinter {
         String methodName = signature.getDeclaringType().getSimpleName() + "." + targetMethod.getName();
 
         if (methodPrinter.logReq) {
-            List<Object> toPrintParamsList = new ArrayList<>();
+            List<Object> toPrintParamsList = new ArrayList<>(methodPrinter.requestLogParameterIndex.length);
             for (int i = 0, len = methodPrinter.requestLogParameterIndex.length; i < len; i++) {
                 toPrintParamsList.add(params[i]);
             }

@@ -22,5 +22,8 @@ public class TestReadResourceUtils {
 
         Assert.assertEquals("456", properties.getProperty("age"));
         Assert.assertEquals("August", properties.getProperty("name"));
+        Properties properties2 = ReadResourceUtils.getPropertyFile("test.properties");
+        Assert.assertEquals("456", properties2.getProperty("age"));
+        Assert.assertEquals("August", properties2.getProperty("name"));
     }
 }
