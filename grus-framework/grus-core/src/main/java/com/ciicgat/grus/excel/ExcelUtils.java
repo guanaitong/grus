@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +27,7 @@ import java.util.Map;
  * @Description:
  */
 public class ExcelUtils {
-    private final static Map<Class<?>, ExcelResolver<?>> EXCEL_RESOLVER_MAP = new HashMap<>();
+    private final static Map<Class<?>, ExcelResolver<?>> EXCEL_RESOLVER_MAP = new IdentityHashMap<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelUtils.class);
 
@@ -125,15 +125,7 @@ public class ExcelUtils {
             LOGGER.error("EXCEL_READ_ERR", e);
             throw e;
         }
-        ExcelResolver<T> excelResolver;
-        synchronized (ExcelUtils.class) {
-            excelResolver = (ExcelResolver<T>) EXCEL_RESOLVER_MAP.get(dstClass);
-            if (excelResolver == null) {
-                excelResolver = new ExcelResolver<>(dstClass);
-                EXCEL_RESOLVER_MAP.put(dstClass, excelResolver);
-            }
-        }
-
+        ExcelResolver excelResolver = getExcelResolver(dstClass);
         return excelResolver.read(sheet);
     }
 
@@ -145,16 +137,22 @@ public class ExcelUtils {
             sheet = wb.createSheet(excelSheet.name());
         }
 
-        ExcelResolver excelResolver;
-        synchronized (ExcelUtils.class) {
-            excelResolver = EXCEL_RESOLVER_MAP.get(dstClass);
-            if (excelResolver == null) {
-                excelResolver = new ExcelResolver(dstClass);
-                EXCEL_RESOLVER_MAP.put(dstClass, excelResolver);
-            }
-        }
+        ExcelResolver excelResolver = getExcelResolver(dstClass);
 
         excelResolver.write(sheet, dataList);
     }
 
+    private static ExcelResolver getExcelResolver(Class<?> dstClass) {
+        ExcelResolver excelResolver = EXCEL_RESOLVER_MAP.get(dstClass);
+        if (excelResolver == null) {
+            synchronized (ExcelUtils.class) {
+                excelResolver = EXCEL_RESOLVER_MAP.get(dstClass);
+                if (excelResolver == null) {
+                    excelResolver = new ExcelResolver(dstClass);
+                    EXCEL_RESOLVER_MAP.put(dstClass, excelResolver);
+                }
+            }
+        }
+        return excelResolver;
+    }
 }
