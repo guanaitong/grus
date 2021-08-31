@@ -34,7 +34,7 @@ public class ElasticsearchAutoConfiguration {
     @ConditionalOnMissingBean
     public RestHighLevelClient restHighLevelClient(ElasticsearchProperties elasticsearchProperties) {
         LOGGER.info("开始建立es连接............");
-        List<HttpHost> httpHosts = new ArrayList<>();
+        List<HttpHost> httpHosts = new ArrayList<>(elasticsearchProperties.getNodes().size());
         for (String node : elasticsearchProperties.getNodes()) {
             String[] s = node.split(":");
             httpHosts.add(new HttpHost(s[0], Integer.parseInt(s[1])));
