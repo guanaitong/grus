@@ -49,8 +49,7 @@ public class MessagePacket {
 
         StringBuilder messageBody = new StringBuilder();
 
-        messageBody.append("{");
-        messageBody.append("\"").append("msgtype").append("\"").append(":").append("\"").append(msgtype).append("\"").append(",");
+        messageBody.append('{').append("\"").append("msgtype").append("\"").append(":").append("\"").append(msgtype).append("\"").append(",");
 
         if (null != text) {
             messageBody.append("\"").append("text").append("\"").append(":");

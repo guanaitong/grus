@@ -35,7 +35,7 @@ public class Masker {
                 if ((i & 1) == 0) {
                     sb.append(name.charAt(i));
                 } else {
-                    sb.append("*");
+                    sb.append('*');
                 }
             }
             return sb.toString();
@@ -72,7 +72,7 @@ public class Masker {
         if (StringUtils.isEmpty(email)) {
             return email;
         }
-        int index = email.indexOf("@");
+        int index = email.indexOf('@');
         if (index == -1) {
             return email;
         }
@@ -83,19 +83,19 @@ public class Masker {
         if (length > 6) {
             sb.append(emailHead, 0, 2);
             for (int i = 2; i < length - 2; i++) {
-                sb.append("*");
+                sb.append('*');
             }
             sb.append(emailHead, length - 2, length);
         } else if (length > 4) {
             sb.append(emailHead, 0, 2);
             for (int i = 2; i < length - 1; i++) {
-                sb.append("*");
+                sb.append('*');
             }
             sb.append(emailHead, length - 1, length);
         } else {
             sb.append(emailHead, 0, 1);
             for (int i = 1; i < length; i++) {
-                sb.append("*");
+                sb.append('*');
             }
         }
         sb.append(emailLast);

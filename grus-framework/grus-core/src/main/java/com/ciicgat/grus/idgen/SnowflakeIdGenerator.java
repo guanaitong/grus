@@ -32,12 +32,10 @@ public class SnowflakeIdGenerator implements IdGenerator {
     private final LoopAtomicLong loopAtomicNo = new LoopAtomicLong(maxSequence);
     private final LoopAtomicLong loopAtomicId = new LoopAtomicLong(maxSequence);
 
-    private WorkIdHolder workIdHolder;
     private DateTimeFormatter dateTimeFormatter;
     private long workId;
 
     public SnowflakeIdGenerator(WorkIdHolder workIdHolder, String dateFormat) {
-        this.workIdHolder = workIdHolder;
         this.dateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat);
         workId = workIdHolder.getId(maxWorkId);
     }

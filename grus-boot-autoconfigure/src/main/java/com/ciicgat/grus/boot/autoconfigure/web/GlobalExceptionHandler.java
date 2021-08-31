@@ -157,9 +157,9 @@ public class GlobalExceptionHandler {
             StringBuilder stringBuilder = new StringBuilder();
             for (ObjectError error : bindingResult.getAllErrors()) {
                 if (error instanceof FieldError && webProperties.isShowFieldNameInError()) {
-                    stringBuilder.append(((FieldError) error).getField()).append(" ").append(error.getDefaultMessage()).append(" ");
+                    stringBuilder.append(((FieldError) error).getField()).append(' ').append(error.getDefaultMessage()).append(' ');
                 } else {
-                    stringBuilder.append(error.getDefaultMessage()).append(" ");
+                    stringBuilder.append(error.getDefaultMessage()).append(' ');
                 }
             }
             if (stringBuilder.length() > 1) {
@@ -183,7 +183,7 @@ public class GlobalExceptionHandler {
         Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
         StringBuilder stringBuilder = new StringBuilder();
         for (ConstraintViolation<?> item : violations) {
-            stringBuilder.append(item.getMessage()).append(" ");
+            stringBuilder.append(item.getMessage()).append(' ');
         }
         if (stringBuilder.length() > 1) {
             stringBuilder.deleteCharAt(stringBuilder.length() - 1);
@@ -202,8 +202,8 @@ public class GlobalExceptionHandler {
 
         StringBuffer requestInfo = request.getRequestURL();
         requestInfo.append("，params=>");
-        request.getParameterMap().forEach((key, value) -> requestInfo.append(key).append(":").append(Arrays.toString(value)));
-        String msg = "发生异常，请求信息为：" + requestInfo.toString();
+        request.getParameterMap().forEach((key, value) -> requestInfo.append(key).append(':').append(Arrays.toString(value)));
+        String msg = "发生异常，请求信息为：" + requestInfo;
         FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, Module.SERVLET, msg, throwable);
         LOGGER.error(msg, throwable);
         String errorMsg = "系统异常";
