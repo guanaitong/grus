@@ -107,8 +107,8 @@ public class GconfContextInitializer implements ApplicationContextInitializer<Co
     private void initSwagger(ConfigurableEnvironment environment) {
         // 根据环境和配置，判断是否启用 swagger
         boolean enabledEnv = WorkRegion.getCurrentWorkRegion().isDevelopOrTest();
-        boolean grusSwaggerEnabled = environment.getProperty("grus.swagger.enabled", Boolean.class, true);
-        boolean enableSwagger = enabledEnv && grusSwaggerEnabled;
+        Boolean grusSwaggerEnabled = environment.getProperty("grus.swagger.enabled", Boolean.class, Boolean.TRUE);
+        boolean enableSwagger = enabledEnv && grusSwaggerEnabled.booleanValue();
 
         Map<String, Object> paramMap = Map.of("springfox.documentation.enabled", enableSwagger, "grus.swagger.enabled", enableSwagger);
         PropertySource<Map<String, Object>> swaggerProperties = new MapPropertySource("swaggerProperties", paramMap);

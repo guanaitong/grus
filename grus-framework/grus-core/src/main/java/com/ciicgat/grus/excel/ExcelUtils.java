@@ -42,10 +42,8 @@ public class ExcelUtils {
 
     @SuppressWarnings("unchecked")
     public static List<List<?>> readExcelMultiSheets(InputStream inputStream, List<Class<?>> dstClasses) throws Exception {
-        List<List<?>> resultList;
+        List<List<?>> resultList = new ArrayList<>(dstClasses.size());
         try (Workbook workbook = WorkbookFactory.create(inputStream)) {
-
-            resultList = new ArrayList<>();
             for (Class<?> clz : dstClasses) {
                 ExcelSheet excelSheet = checkAndGetSheet(clz);
                 List<?> result = readOneList(workbook, excelSheet, clz);
@@ -104,7 +102,7 @@ public class ExcelUtils {
 
     private static Workbook getWorkBook(ExcelSheet excelSheet) {
         Workbook wb;
-        if (excelSheet.type().equals(ExcelType.XLS)) {
+        if (excelSheet.type() == ExcelType.XLS) {
             wb = new HSSFWorkbook();
         } else {
             wb = new XSSFWorkbook();
