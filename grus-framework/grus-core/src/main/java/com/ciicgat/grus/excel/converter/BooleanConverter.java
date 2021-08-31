@@ -17,9 +17,9 @@ public class BooleanConverter implements Converter<Boolean> {
             case STRING:
                 String val = cell.getStringCellValue();
                 if ("true".equals(val)) {
-                    return true;
+                    return Boolean.TRUE;
                 } else if ("false".equals(val)) {
-                    return false;
+                    return Boolean.FALSE;
                 } else {
                     return null;
                 }
@@ -27,9 +27,9 @@ public class BooleanConverter implements Converter<Boolean> {
                 Number number = cell.getNumericCellValue();
                 Integer result = number.intValue();
                 if (GatBoolean.isTrue(result)) {
-                    return true;
+                    return Boolean.TRUE;
                 } else if (GatBoolean.isFalse(result)) {
-                    return false;
+                    return Boolean.FALSE;
                 } else {
                     return null;
                 }

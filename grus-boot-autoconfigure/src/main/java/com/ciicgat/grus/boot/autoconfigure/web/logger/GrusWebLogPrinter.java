@@ -43,24 +43,24 @@ public class GrusWebLogPrinter {
 
     private static final List<Class<?>> EXCLUDE_PARAM_TYPES = Arrays.asList(ServletRequest.class, ServletResponse.class, MultipartFile.class);
 
-    private ConcurrentMap<Method, MethodPrinter> cache = new ConcurrentHashMap<>();
+    private ConcurrentMap<Method, MethodPrintConfig> cache = new ConcurrentHashMap<>();
 
-    private MethodPrinter getMethodPrinter(Signature signature, Method method) {
-        MethodPrinter methodPrinter = cache.get(method);
-        if (methodPrinter == null) {
-            return cache.computeIfAbsent(method, method1 -> getMethodPrinter0(signature, method1));
+    private MethodPrintConfig getMethodPrintConfig(Signature signature, Method method) {
+        MethodPrintConfig MethodPrintConfig = cache.get(method);
+        if (MethodPrintConfig == null) {
+            return cache.computeIfAbsent(method, method1 -> getMethodPrintConfig0(signature, method1));
         } else {
-            return methodPrinter;
+            return MethodPrintConfig;
         }
     }
 
-    private MethodPrinter getMethodPrinter0(Signature signature, Method method) {
+    private MethodPrintConfig getMethodPrintConfig0(Signature signature, Method method) {
         if ("isLive".equals(method.getName())) {
-            return new MethodPrinter();
+            return new MethodPrintConfig();
         }
         ResponseBody responseBody = findMergedAnnotation(method, ResponseBody.class);
         if (Objects.isNull(responseBody)) {
-            return new MethodPrinter();
+            return new MethodPrintConfig();
         }
         var clazz = signature.getDeclaringType();
         LogExclude logExclude = method.getAnnotation(LogExclude.class);
@@ -88,34 +88,16 @@ public class GrusWebLogPrinter {
                 }
             }
             if (indexList.isEmpty()) {
-                return new MethodPrinter(new int[0], false, logResp);
+                return new MethodPrintConfig(new int[0], false, logResp);
             } else {
                 int[] requestLogParameterIndex = new int[indexList.size()];
                 for (int i = 0; i < indexList.size(); i++) {
                     requestLogParameterIndex[i] = indexList.get(i).intValue();
                 }
-                return new MethodPrinter(requestLogParameterIndex, true, logResp);
+                return new MethodPrintConfig(requestLogParameterIndex, true, logResp);
             }
         }
-        return new MethodPrinter(new int[0], false, logResp);
-    }
-
-    private static final class MethodPrinter {
-        private final boolean log;
-        private final int[] requestLogParameterIndex;
-        private final boolean logReq;
-        private final boolean logResp;
-
-        MethodPrinter() {
-            this(new int[0], false, false);
-        }
-
-        MethodPrinter(int[] requestLogParameterIndex, boolean logReq, boolean logResp) {
-            this.log = logReq || logReq;
-            this.requestLogParameterIndex = requestLogParameterIndex;
-            this.logReq = logReq;
-            this.logResp = logResp;
-        }
+        return new MethodPrintConfig(new int[0], false, logResp);
     }
 
 
@@ -128,23 +110,25 @@ public class GrusWebLogPrinter {
         Method targetMethod = ((MethodSignature) signature).getMethod();
 
         Object[] params = joinPoint.getArgs();
-        MethodPrinter methodPrinter = getMethodPrinter(signature, targetMethod);
-        if (!methodPrinter.log) {
+        MethodPrintConfig methodPrintConfig = getMethodPrintConfig(signature, targetMethod);
+        if (!methodPrintConfig.isLog()) {
             // 不需要打印日志
             return joinPoint.proceed(params);
         }
         String methodName = signature.getDeclaringType().getSimpleName() + "." + targetMethod.getName();
 
-        if (methodPrinter.logReq) {
-            List<Object> toPrintParamsList = new ArrayList<>(methodPrinter.requestLogParameterIndex.length);
-            for (int i = 0, len = methodPrinter.requestLogParameterIndex.length; i < len; i++) {
-                toPrintParamsList.add(params[i]);
+        if (methodPrintConfig.isLogReq()) {
+            int[] requestLogParameterIndex = methodPrintConfig.getRequestLogParameterIndex();
+            List<Object> toPrintParamsList = new ArrayList<>(requestLogParameterIndex.length);
+            for (int i = 0, len = requestLogParameterIndex.length; i < len; i++) {
+                int index = requestLogParameterIndex[i];
+                toPrintParamsList.add(params[index]);
             }
             LOGGER.info("WEB_REQ METHOD: {} PARAM: {}", methodName, LogUtil.truncate(JSON.toJSONString(toPrintParamsList)));
         }
         try {
             Object resp = joinPoint.proceed(params);
-            if (methodPrinter.logResp) {
+            if (methodPrintConfig.isLogResp()) {
                 LOGGER.info("WEB_RSP METHOD: {} RESULT: {}", methodName, LogUtil.truncate(JSON.toJSONString(resp)));
             }
             return resp;
