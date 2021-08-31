@@ -49,25 +49,25 @@ public class MessagePacket {
 
         StringBuilder messageBody = new StringBuilder();
 
-        messageBody.append('{').append("\"").append("msgtype").append("\"").append(":").append("\"").append(msgtype).append("\"").append(",");
+        messageBody.append('{').append("\"").append("msgtype").append("\"").append(':').append("\"").append(msgtype).append("\"").append(",");
 
         if (null != text) {
-            messageBody.append("\"").append("text").append("\"").append(":");
-            messageBody.append("{")
-                    .append("\"").append("content").append("\"").append(":").append("\"").append(text.getContent()).append("\"").append(",")
-                    .append("\"").append("mentioned_list").append("\"").append(":").append("[\"").append("@all").append("\"]")
-                    .append("}");
+            messageBody.append("\"").append("text").append("\"").append(':');
+            messageBody.append('{')
+                    .append("\"").append("content").append("\"").append(':').append("\"").append(text.getContent()).append("\"").append(",")
+                    .append("\"").append("mentioned_list").append("\"").append(':').append("[\"").append("@all").append("\"]")
+                    .append('}');
         }
 
         if (null != markdown) {
-            messageBody.append("\"").append("markdown").append("\"").append(":");
-            messageBody.append("{")
-                    .append("\"").append("content").append("\"").append(":").append("\"").append(markdown.getContent()).append("\"")
-                    .append("}");
+            messageBody.append("\"").append("markdown").append("\"").append(':');
+            messageBody.append('{')
+                    .append("\"").append("content").append("\"").append(':').append("\"").append(markdown.getContent()).append("\"")
+                    .append('}');
         }
 
 
-        messageBody.append("}");
+        messageBody.append('}');
         return messageBody.toString();
     }
 

@@ -140,7 +140,7 @@ public abstract class ImageFormatUtil {
         if (fileName == null || fileName.isBlank()) {
             return null;
         }
-        int lastDotIndex = fileName.lastIndexOf(".");
+        int lastDotIndex = fileName.lastIndexOf('.');
         if (lastDotIndex == -1) {
             return null;
         }

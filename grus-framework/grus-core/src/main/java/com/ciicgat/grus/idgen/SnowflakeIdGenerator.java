@@ -19,25 +19,25 @@ import java.util.concurrent.ThreadLocalRandom;
  * @Description: 基于雪花算法的序列生成器，字符串类型，序列长度24位
  */
 public class SnowflakeIdGenerator implements IdGenerator {
-    private final int workIdBits = 10;
-    private final int secondsBits = 17;
-    private final int sequenceBits = 17;
-    private final int randomBits = 8;
+    private static final int WORK_ID_BITS = 10;
+    private static final int SECONDS_BITS = 17;
+    private static final int SEQUENCE_BITS = 17;
+    private static final int RANDOM_BITS = 8;
 
-    private final int maxWorkId = 1 << workIdBits;
-    private final int maxSequence = 1 << sequenceBits;
-    private final int maxRandom = 1 << randomBits;
-    private final LocalDateTime baseDate = LocalDateTime.of(2020, 1, 1, 0, 0);
+    private static final int MAX_WORK_ID = 1 << WORK_ID_BITS;
+    private static final int MAX_SEQUENCE = 1 << SEQUENCE_BITS;
+    private static final int MAX_RANDOM = 1 << RANDOM_BITS;
+    private static final LocalDateTime BASE_DATE = LocalDateTime.of(2020, 1, 1, 0, 0);
 
-    private final LoopAtomicLong loopAtomicNo = new LoopAtomicLong(maxSequence);
-    private final LoopAtomicLong loopAtomicId = new LoopAtomicLong(maxSequence);
+    private final LoopAtomicLong loopAtomicNo = new LoopAtomicLong(MAX_SEQUENCE);
+    private final LoopAtomicLong loopAtomicId = new LoopAtomicLong(MAX_SEQUENCE);
 
     private DateTimeFormatter dateTimeFormatter;
     private long workId;
 
     public SnowflakeIdGenerator(WorkIdHolder workIdHolder, String dateFormat) {
         this.dateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat);
-        workId = workIdHolder.getId(maxWorkId);
+        workId = workIdHolder.getId(MAX_WORK_ID);
     }
 
     @Override
@@ -45,13 +45,13 @@ public class SnowflakeIdGenerator implements IdGenerator {
         LocalDateTime time = LocalDateTime.now();
 
         long seconds = time.getHour() * 3600L + time.getMinute() * 60L + time.getSecond();
-        long random = ThreadLocalRandom.current().nextInt(maxRandom);
+        long random = ThreadLocalRandom.current().nextInt(MAX_RANDOM);
         long sequence = loopAtomicNo.loopGet();
 
         // 机器码 10位 + 天秒数 17位 + 循环自增序列 17bit + 随机数 8bit = 52bit   16位整数
-        long id = (workId << (secondsBits + sequenceBits + randomBits))
-                | (seconds << (sequenceBits + randomBits))
-                | (sequence << randomBits)
+        long id = (workId << (SECONDS_BITS + SEQUENCE_BITS + RANDOM_BITS))
+                | (seconds << (SEQUENCE_BITS + RANDOM_BITS))
+                | (sequence << RANDOM_BITS)
                 | random;
 
         String resultNo = time.format(dateTimeFormatter);
@@ -63,14 +63,14 @@ public class SnowflakeIdGenerator implements IdGenerator {
     @Override
     public long makeId() {
         LocalDateTime time = LocalDateTime.now();
-        long days = Duration.between(baseDate, time).toDays();
+        long days = Duration.between(BASE_DATE, time).toDays();
         long seconds = time.getHour() * 3600L + time.getMinute() * 60L + time.getSecond();
         long sequence = loopAtomicId.loopGet();
 
         // 天数 20位 + 天秒数 17位 + 机器码 10位 + 循环自增序列 17bit = 64bit
-        long id = (days << (secondsBits + workIdBits + sequenceBits))
-                | (seconds << (workIdBits + sequenceBits))
-                | (workId << sequenceBits)
+        long id = (days << (SECONDS_BITS + WORK_ID_BITS + SEQUENCE_BITS))
+                | (seconds << (WORK_ID_BITS + SEQUENCE_BITS))
+                | (workId << SEQUENCE_BITS)
                 | sequence;
         return id;
     }
