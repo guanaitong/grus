@@ -50,16 +50,16 @@ public class JdbcUrlBuilder {
     public static String build(String host, String port, final String dbName, Map<String, String> extParams) {
         StringBuilder sb = new StringBuilder(String.format(JDBC_TPL, host, port));
         if (StringUtils.isNoneBlank(dbName)) {
-            sb.append("/").append(dbName);
+            sb.append('/').append(dbName);
         }
         Map<String, String> params = new HashMap<>(DEFAULT_PARAMS);
         //保证外部的参数会覆盖默认参数
         if (extParams != null) {
             params.putAll(extParams);
         }
-        sb.append("?");
+        sb.append('?');
         for (Map.Entry<String, String> entry : params.entrySet()) {
-            sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+            sb.append(entry.getKey()).append('=').append(entry.getValue()).append('&');
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();

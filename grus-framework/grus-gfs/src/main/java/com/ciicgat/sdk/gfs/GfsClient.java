@@ -223,7 +223,7 @@ public class GfsClient {
                                      boolean tmpFlag,
                                      String contentType) {
 
-        String tmpOssFileKey = tmpFlag ? "tmp/" + Systems.APP_NAME + "/" + customOssFileKey : customOssFileKey;
+        String tmpOssFileKey = tmpFlag ? "tmp/" + Systems.APP_NAME + '/' + customOssFileKey : customOssFileKey;
 
         String signedUrl;
 
@@ -428,11 +428,11 @@ public class GfsClient {
     private String defaultOssFileKey(byte[] data, String originalFileName) {
 
         StringBuffer gfsDefaultBuffer = new StringBuffer("grus-gfs");
-        gfsDefaultBuffer.append("/").append(Systems.WORK_ENV);
-        gfsDefaultBuffer.append("/").append(mergeAdBlock(Systems.APP_NAME));
-        gfsDefaultBuffer.append("/").append("by-days"); // 默认存储逻辑为：按日期切分
-        gfsDefaultBuffer.append("/").append(LocalDateTime.now().format(DATE_TIME_FORMATTER));
-        gfsDefaultBuffer.append("/").append(DigestUtils.md5Hex(data));
+        gfsDefaultBuffer.append('/').append(Systems.WORK_ENV);
+        gfsDefaultBuffer.append('/').append(mergeAdBlock(Systems.APP_NAME));
+        gfsDefaultBuffer.append('/').append("by-days"); // 默认存储逻辑为：按日期切分
+        gfsDefaultBuffer.append('/').append(LocalDateTime.now().format(DATE_TIME_FORMATTER));
+        gfsDefaultBuffer.append('/').append(DigestUtils.md5Hex(data));
         gfsDefaultBuffer.append(getSuffix(originalFileName));
         return gfsDefaultBuffer.toString();
 
