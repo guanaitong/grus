@@ -113,8 +113,8 @@ public class TracingFilterTest {
         testData.setIntData(12);
 
         MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post("/testJson?abc=1")
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(JSON.toJSONString(testData))
-                .accept(MediaType.APPLICATION_JSON_UTF8_VALUE);
+                .contentType(MediaType.APPLICATION_JSON).content(JSON.toJSONString(testData))
+                .accept(MediaType.APPLICATION_JSON);
 
         MockHttpServletResponse httpResp = mockMvc.perform(post).andReturn().getResponse();
         Assert.assertEquals(HttpStatus.OK.value(), httpResp.getStatus());

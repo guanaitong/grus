@@ -8,8 +8,6 @@ package com.ciicgat.grus.boot.autoconfigure.web.logger;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.logger.LogExclude;
 import com.ciicgat.grus.logger.LogUtil;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -23,11 +21,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
 /**
  * @author Wei Jiaju
@@ -40,28 +43,81 @@ public class GrusWebLogPrinter {
 
     private static final List<Class<?>> EXCLUDE_PARAM_TYPES = Arrays.asList(ServletRequest.class, ServletResponse.class, MultipartFile.class);
 
-    private Pair<Boolean, LogExclude> checkIsPrintLog(Signature signature, Method targetMethod) {
-        if ("isLive".equals(targetMethod.getName())) {
-            return new ImmutablePair<>(false, null);
-        }
+    private ConcurrentMap<Method, MethodPrinter> cache = new ConcurrentHashMap<>();
 
-        var clazz = signature.getDeclaringType();
-        Annotation clazzRespBody = AnnotationUtils.getAnnotation(clazz, ResponseBody.class);
-        Annotation methodRespBody = targetMethod.getAnnotation(ResponseBody.class);
-        if (clazzRespBody == null && methodRespBody == null) {
-            return new ImmutablePair<>(false, null);
-        }
-
-        LogExclude clazzLogExclude = AnnotationUtils.getAnnotation(clazz, LogExclude.class);
-        LogExclude logExclude = targetMethod.getAnnotation(LogExclude.class);
-        if (clazzLogExclude == null && logExclude == null) {
-            return new ImmutablePair<>(true, null);
-        }
-        LogExclude targetLogExclude = logExclude == null ? clazzLogExclude : logExclude;
-        if (targetLogExclude.excludeReq() && targetLogExclude.excludeResp()) {
-            return new ImmutablePair<>(false, null);
+    private MethodPrinter getMethodPrinter(Signature signature, Method method) {
+        MethodPrinter methodPrinter = cache.get(method);
+        if (methodPrinter == null) {
+            return cache.computeIfAbsent(method, method1 -> getMethodPrinter0(signature, method1));
         } else {
-            return new ImmutablePair<>(true, targetLogExclude);
+            return methodPrinter;
+        }
+    }
+
+    private MethodPrinter getMethodPrinter0(Signature signature, Method method) {
+        if ("isLive".equals(method.getName())) {
+            return new MethodPrinter();
+        }
+        ResponseBody responseBody = findMergedAnnotation(method, ResponseBody.class);
+        if (Objects.isNull(responseBody)) {
+            return new MethodPrinter();
+        }
+        var clazz = signature.getDeclaringType();
+        LogExclude logExclude = method.getAnnotation(LogExclude.class);
+        if (Objects.isNull(logExclude)) {
+            logExclude = AnnotationUtils.getAnnotation(clazz, LogExclude.class);
+        }
+        boolean logReq = true;
+        boolean logResp = true;
+        if (Objects.nonNull(logExclude)) {
+            logReq = !logExclude.excludeReq();
+            logResp = !logExclude.excludeResp();
+        }
+        if (logReq) {
+            Parameter[] parameters = method.getParameters();
+            List<Integer> indexList = new ArrayList<>(parameters.length);
+            for (int i = 0; i < parameters.length; i++) {
+                Parameter parameter = parameters[i];
+                LogExclude exclude = AnnotationUtils.getAnnotation(parameter, LogExclude.class);
+                if (Objects.isNull(exclude)) {
+                    for (Class<?> excludeParamType : EXCLUDE_PARAM_TYPES) {
+                        if (excludeParamType.isAssignableFrom(parameter.getType())) {
+                            indexList.add(Integer.valueOf(i));
+                        }
+                    }
+                }
+            }
+            if (indexList.isEmpty()) {
+                return new MethodPrinter(new int[0], false, logResp);
+            } else {
+                int[] requestLogParameterIndex = new int[indexList.size()];
+                for (int i = 0; i < indexList.size(); i++) {
+                    requestLogParameterIndex[i] = indexList.get(i).intValue();
+                }
+                return new MethodPrinter(requestLogParameterIndex, true, logResp);
+            }
+        }
+        return new MethodPrinter(new int[0], false, logResp);
+    }
+
+    private static final class MethodPrinter {
+        private final boolean log;
+        private final int[] requestLogParameterIndex;
+        private final boolean logReq;
+        private final boolean logResp;
+
+        MethodPrinter() {
+            this.log = false;
+            this.requestLogParameterIndex = new int[0];
+            this.logReq = false;
+            this.logResp = false;
+        }
+
+        MethodPrinter(int[] requestLogParameterIndex, boolean logReq, boolean logResp) {
+            this.log = logReq || logReq;
+            this.requestLogParameterIndex = requestLogParameterIndex;
+            this.logReq = logReq;
+            this.logResp = logResp;
         }
     }
 
@@ -75,36 +131,28 @@ public class GrusWebLogPrinter {
         Method targetMethod = ((MethodSignature) signature).getMethod();
 
         Object[] params = joinPoint.getArgs();
-        Pair<Boolean, LogExclude> logExcludePair = checkIsPrintLog(signature, targetMethod);
-        if (!logExcludePair.getLeft()) {
+        MethodPrinter methodPrinter = getMethodPrinter(signature, targetMethod);
+        if (!methodPrinter.log) {
             // 不需要打印日志
             return joinPoint.proceed(params);
         }
-        // 需要打印日志
-        LogExclude logExclude = logExcludePair.getRight();
         String methodName = signature.getDeclaringType().getSimpleName() + "." + targetMethod.getName();
 
-        if (LogUtil.checkPrintReq(logExclude)) {
-            List<Object> paramsList = Arrays.asList(params);
-            paramsList = paramsList.stream().filter(obj -> {
-                        for (var excludeType : EXCLUDE_PARAM_TYPES) {
-                            if (excludeType.isInstance(obj)) {
-                                return false;
-                            }
-                        }
-                        return true;
-                    }
-            ).collect(Collectors.toList());
-            LOGGER.info("WEB_REQ METHOD: {} PARAM: {}", methodName, LogUtil.truncate(JSON.toJSONString(paramsList)));
+        if (methodPrinter.logReq) {
+            List<Object> toPrintParamsList = new ArrayList<>();
+            for (int i = 0, len = methodPrinter.requestLogParameterIndex.length; i < len; i++) {
+                toPrintParamsList.add(params[i]);
+            }
+            LOGGER.info("WEB_REQ METHOD: {} PARAM: {}", methodName, LogUtil.truncate(JSON.toJSONString(toPrintParamsList)));
         }
         try {
             Object resp = joinPoint.proceed(params);
-            if (LogUtil.checkPrintResp(logExclude)) {
+            if (methodPrinter.logResp) {
                 LOGGER.info("WEB_RSP METHOD: {} RESULT: {}", methodName, LogUtil.truncate(JSON.toJSONString(resp)));
             }
             return resp;
         } catch (Throwable e) {
-            LOGGER.error("WEB_EX METHOD: {} ERROR:", methodName, e);
+            LOGGER.error(String.format("WEB_EX METHOD: %s ERROR", methodName), e);
             throw e;
         }
     }

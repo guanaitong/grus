@@ -66,8 +66,6 @@ public class GrusMybatisAutoConfiguration implements InitializingBean {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrusMybatisAutoConfiguration.class);
 
-    private final DbProperties dbProperties;
-
     private final MybatisProperties properties;
 
     private final Interceptor[] interceptors;
@@ -79,12 +77,11 @@ public class GrusMybatisAutoConfiguration implements InitializingBean {
     private final List<ConfigurationCustomizer> configurationCustomizers;
 
 
-    public GrusMybatisAutoConfiguration(DbProperties dbProperties, MybatisProperties properties,
+    public GrusMybatisAutoConfiguration(MybatisProperties properties,
                                         ObjectProvider<Interceptor[]> interceptorsProvider,
                                         ResourceLoader resourceLoader,
                                         ObjectProvider<DatabaseIdProvider> databaseIdProvider,
                                         ObjectProvider<List<ConfigurationCustomizer>> configurationCustomizersProvider) {
-        this.dbProperties = dbProperties;
         this.properties = properties;
         this.interceptors = interceptorsProvider.getIfAvailable();
         this.resourceLoader = resourceLoader;

@@ -50,8 +50,7 @@ public class DbProperties {
         return dataSourceExtParams;
     }
 
-    public DbProperties setDataSourceExtParams(Map<String, String> dataSourceExtParams) {
+    public void setDataSourceExtParams(Map<String, String> dataSourceExtParams) {
         this.dataSourceExtParams = dataSourceExtParams;
-        return this;
     }
 }

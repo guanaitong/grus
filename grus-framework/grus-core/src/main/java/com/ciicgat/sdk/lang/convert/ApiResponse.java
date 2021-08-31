@@ -105,8 +105,7 @@ public class ApiResponse<T> implements Serializable {
     public int hashCode() {
         int result = code;
         result = 31 * result + (msg != null ? msg.hashCode() : 0);
-        result = 31 * result + (data != null ? data.hashCode() : 0);
-        return result;
+        return 31 * result + (data != null ? data.hashCode() : 0);
     }
 
 

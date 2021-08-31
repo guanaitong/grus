@@ -13,9 +13,8 @@ public interface Converter<T> {
     T newOne();
 
     default T toAnother() {
-        T t = newOne();
         //TODO 基于原生JDK 进行copy BeanUtils.copyProperties(t, this);
-        return t;
+        return newOne();
     }
 
 }

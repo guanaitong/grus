@@ -52,8 +52,7 @@ public class BaseErrorCode implements ErrorCode {
     @Override
     public int hashCode() {
         int result = getErrorCode();
-        result = 31 * result + (errorMsg != null ? errorMsg.hashCode() : 0);
-        return result;
+        return 31 * result + (errorMsg != null ? errorMsg.hashCode() : 0);
     }
 
     @Override

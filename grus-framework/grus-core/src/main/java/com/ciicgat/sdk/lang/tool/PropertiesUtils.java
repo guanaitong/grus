@@ -18,7 +18,7 @@ import java.util.Properties;
  */
 public class PropertiesUtils {
     public static final String SUFFIX = "properties";
-    protected static final Logger LOGGER = LoggerFactory.getLogger(PropertiesUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesUtils.class);
 
     public static final Properties readFromText(String text) {
         Properties p = new Properties();

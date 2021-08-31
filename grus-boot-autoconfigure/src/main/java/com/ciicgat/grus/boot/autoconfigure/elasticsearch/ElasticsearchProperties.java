@@ -7,6 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.elasticsearch;
 
 import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -25,8 +26,8 @@ public class ElasticsearchProperties {
     private List<String> nodes;
 
     @PostConstruct
-    public void init() {
-        if (nodes == null || nodes.size() == 0) {
+    void init() {
+        if (CollectionUtils.isEmpty(nodes)) {
             String esServerLists = GlobalGconfConfig.getConfig().getProperties("address.properties").getProperty("esServerLists");
             this.setNodes(List.of(esServerLists.split(",")));
         }

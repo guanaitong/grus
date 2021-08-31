@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 /**
  * @author Stanley Shen
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface LogExclude {

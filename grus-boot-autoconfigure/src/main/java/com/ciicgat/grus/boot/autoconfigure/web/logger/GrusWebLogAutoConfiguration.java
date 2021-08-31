@@ -14,7 +14,6 @@ public class GrusWebLogAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public GrusWebLogPrinter grusWebLogPrinter() {
-
         return new GrusWebLogPrinter();
     }
 }

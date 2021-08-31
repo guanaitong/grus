@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
  * @date 2019-05-08 16:40
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnProperty(prefix = PageHelperProperties.PAGEHELPER_PREFIX, value = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = PageHelperProperties.PAGE_HELPER_PREFIX, value = "enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class, PageInterceptor.class})
 @EnableConfigurationProperties(PageHelperProperties.class)
 @AutoConfigureBefore(GrusMybatisAutoConfiguration.class)
@@ -32,7 +32,7 @@ public class GrusPageHelperAutoConfiguration {
     @ConditionalOnMissingBean
     public PageInterceptor pageInterceptor(PageHelperProperties pageHelperProperties) {
         PageInterceptor interceptor = new PageInterceptor();
-        interceptor.setProperties(pageHelperProperties.getProperties());
+        interceptor.setProperties(pageHelperProperties.toProperties());
         return interceptor;
     }
 }

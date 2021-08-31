@@ -6,7 +6,6 @@
 package com.ciicgat.grus.json;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
@@ -21,7 +20,7 @@ public class GMTPlus8Deserializer extends JsonDeserializer<Date> {
     private static final long OFFSET_TIME = 8 * 3600 * 1000L;
 
     @Override
-    public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JsonProcessingException {
+    public Date deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         return new Date(jsonParser.getLongValue() - OFFSET_TIME);
     }
 }

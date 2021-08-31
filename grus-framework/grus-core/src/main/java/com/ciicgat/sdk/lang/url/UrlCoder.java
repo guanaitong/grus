@@ -28,12 +28,12 @@ public class UrlCoder {
         }
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(url);
-        stringBuilder.append("?");
+        stringBuilder.append('?');
         for (Map.Entry<String, String> entry : params.entrySet()) {
             stringBuilder.append(entry.getKey());
-            stringBuilder.append("=");
+            stringBuilder.append('=');
             stringBuilder.append(entry.getValue());
-            stringBuilder.append("&");
+            stringBuilder.append('&');
         }
         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
         return stringBuilder.toString();

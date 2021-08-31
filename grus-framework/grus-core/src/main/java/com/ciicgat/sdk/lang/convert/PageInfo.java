@@ -121,10 +121,6 @@ public class PageInfo<T> implements Serializable, Cloneable {
     @SuppressWarnings("unchecked")
     @Override
     public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-        }
         PageInfo pageInfo = new PageInfo(this.page, this.perPage);
         pageInfo.setOrderBy(this.orderBy);
         pageInfo.setOrder(this.order);

@@ -7,12 +7,14 @@ package com.ciicgat.grus.boot.autoconfigure.data;
 
 import com.ciicgat.grus.boot.autoconfigure.core.GrusCoreContextInitializer;
 import com.zaxxer.hikari.HikariDataSource;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.Test;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import java.util.Map;
 
+import static com.ciicgat.grus.boot.autoconfigure.test.TestConstants.TEST_APP_PAIRS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -25,9 +27,9 @@ public class GrusDataAutoConfigurationTests {
             .withUserConfiguration(GrusDataAutoConfiguration.class, GrusMybatisAutoConfiguration.class);
 
     @Test
-    public void test1() {
-        this.contextRunner
-                .withPropertyValues("spring.application.name=grus-demo")
+    public void testReadWriteSeparationFalse() {
+        contextRunner
+                .withPropertyValues(TEST_APP_PAIRS)
                 .run(context -> {
                     Object masterDataSource = context.getBean("masterDataSource");
                     assertThat(masterDataSource).isInstanceOf(HikariDataSource.class);
@@ -41,14 +43,20 @@ public class GrusDataAutoConfigurationTests {
                     Map<String, SqlSessionTemplate> beansOfType2 = context.getBeansOfType(SqlSessionTemplate.class);
 
                     assertThat(beansOfType2.size()).isEqualTo(1);
+
+                    Object writeSqlSessionFactory = context.getBean("writeSqlSessionFactory");
+                    assertThat(writeSqlSessionFactory).isInstanceOf(SqlSessionFactory.class);
+                    Map<String, SqlSessionFactory> beansOfType3 = context.getBeansOfType(SqlSessionFactory.class);
+                    assertThat(beansOfType3.size()).isEqualTo(1);
+
                 });
     }
 
 
     @Test
-    public void test2() {
+    public void testReadWriteSeparationTrue() {
         this.contextRunner
-                .withPropertyValues("spring.application.name=grus-demo", "grus.db.readWriteSeparation=true")
+                .withPropertyValues(TEST_APP_PAIRS, "grus.db.readWriteSeparation=true")
                 .run(context -> {
                     Object masterDataSource = context.getBean("masterDataSource");
                     assertThat(masterDataSource).isInstanceOf(HikariDataSource.class);
@@ -69,27 +77,28 @@ public class GrusDataAutoConfigurationTests {
                 });
     }
 
-
     @Test
-    public void test3() {
-        this.contextRunner
-                .withPropertyValues("spring.application.name=grus-demo", "grus.db.read-write-separation=true")
+    public void testDbProperties() {
+        contextRunner
+                .withPropertyValues(TEST_APP_PAIRS, "grus.db.jdbcParams.useAffectedRows=true", "grus.db.dataSourceExtParams.minimumIdle=5")
                 .run(context -> {
                     Object masterDataSource = context.getBean("masterDataSource");
                     assertThat(masterDataSource).isInstanceOf(HikariDataSource.class);
 
-                    Object slaveDataSource = context.getBean("slaveDataSource");
-                    assertThat(slaveDataSource).isInstanceOf(HikariDataSource.class);
-
                     Map<String, HikariDataSource> beansOfType = context.getBeansOfType(HikariDataSource.class);
 
-                    assertThat(beansOfType.size()).isEqualTo(2);
+                    assertThat(beansOfType.size()).isEqualTo(1);
 
                     Object writeSqlSessionTemplate = context.getBean("writeSqlSessionTemplate");
                     assertThat(writeSqlSessionTemplate).isInstanceOf(SqlSessionTemplate.class);
                     Map<String, SqlSessionTemplate> beansOfType2 = context.getBeansOfType(SqlSessionTemplate.class);
 
-                    assertThat(beansOfType2.size()).isEqualTo(2);
+                    assertThat(beansOfType2.size()).isEqualTo(1);
+
+                    Object writeSqlSessionFactory = context.getBean("writeSqlSessionFactory");
+                    assertThat(writeSqlSessionFactory).isInstanceOf(SqlSessionFactory.class);
+                    Map<String, SqlSessionFactory> beansOfType3 = context.getBeansOfType(SqlSessionFactory.class);
+                    assertThat(beansOfType3.size()).isEqualTo(1);
 
                 });
     }
