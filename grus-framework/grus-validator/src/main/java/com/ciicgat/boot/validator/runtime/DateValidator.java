@@ -31,7 +31,7 @@ public class DateValidator extends Validator<Date> {
             return ValidateResult.SUCCESS;
         }
 
-        if (paramValue != null && paramValue instanceof String) {
+        if (paramValue instanceof String) {
 
             String value = (String) paramValue;
 
