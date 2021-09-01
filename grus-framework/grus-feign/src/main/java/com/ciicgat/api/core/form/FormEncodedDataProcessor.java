@@ -59,7 +59,7 @@ class FormEncodedDataProcessor implements FormDataProcessor {
         /**
          * 这边拼接原有的apiName等参数
          */
-        body.append("&");
+        body.append('&');
         byte[] bytes1 = com.ciicgat.sdk.lang.tool.Bytes.toBytes(body.toString());
 
 //        byte[] bytes3 = new byte[bytes1.length + bytes2.length];
