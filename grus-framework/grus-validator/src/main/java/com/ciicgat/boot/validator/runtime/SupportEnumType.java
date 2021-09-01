@@ -16,7 +16,7 @@ import java.util.Set;
  * Created by City Mo on 2017/12/11.
  */
 public class SupportEnumType {
-    public static final Logger LOGGER = LoggerFactory.getLogger(SupportEnumType.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SupportEnumType.class);
     static final Set<Class> set = new HashSet<>();
 
     static {

@@ -44,7 +44,7 @@ public class DecimalValidator extends Validator<Decimal> {
                         numLength = s.substring(0, lastIndexOfDot).length();
                     } else if (lastIndexOfE > 0) {
                         int leftLength = s.substring(0, lastIndexOfE).length();
-                        int rightValue = Integer.valueOf(s.substring(lastIndexOfE + 1));
+                        int rightValue = Integer.parseInt(s.substring(lastIndexOfE + 1));
                         numLength = (leftLength + rightValue) <= 1 ? 1 : (leftLength + rightValue);
                     }
                     if (decimal.numLength() > 0 && numLength > decimal.numLength()) {

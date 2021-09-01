@@ -13,7 +13,6 @@ import com.ciicgat.sdk.gconf.ConfigCollectionFactory;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
 import com.ciicgat.sdk.util.ComponentStatus;
 import com.ciicgat.sdk.util.http.CacheDnsResolver;
-import com.ciicgat.sdk.util.http.HttpClientSingleton;
 import com.ciicgat.sdk.util.http.SSL;
 import com.ciicgat.sdk.util.http.metrics.DelegateEventListener;
 import okhttp3.ConnectionPool;
@@ -38,7 +37,7 @@ import static com.ciicgat.api.core.contants.TimeOutConstants.DEFAULT_WRITE_TIMEO
  */
 class FeignHttpClient {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientSingleton.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FeignHttpClient.class);
 
     static final String CONNECT_TIMEOUT_TAG = "xxx-inner-tag-connect";
     static final String READ_TIMEOUT_TAG = "xxx-inner-tag-read";

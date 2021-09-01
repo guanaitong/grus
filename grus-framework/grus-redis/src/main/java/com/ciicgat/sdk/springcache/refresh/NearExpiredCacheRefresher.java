@@ -20,7 +20,7 @@ import java.util.concurrent.Executor;
  * @Date: 2021/4/13 15:28
  */
 public class NearExpiredCacheRefresher extends AbstractCacheRefresher {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FrequencyCacheRefresher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NearExpiredCacheRefresher.class);
     private final int preLoadSeconds;
 
 

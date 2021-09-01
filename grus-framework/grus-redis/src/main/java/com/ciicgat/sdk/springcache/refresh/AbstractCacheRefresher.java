@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * @Date: 2021/7/12 11:33
  */
 public abstract class AbstractCacheRefresher implements CacheRefresher {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FrequencyCacheRefresher.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCacheRefresher.class);
 
     private final Executor executor;
 

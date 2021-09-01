@@ -62,7 +62,7 @@ public class KubernetesClientUtils {
         final ClientBuilder builder = new ClientBuilder();
         final String host = System.getenv(ENV_SERVICE_HOST);
         final String port = System.getenv(ENV_SERVICE_PORT);
-        URI uri = new URI("https", null, host, Integer.valueOf(port), null, null, null);
+        URI uri = new URI("https", null, host, Integer.parseInt(port), null, null, null);
         builder.setBasePath(uri.toString());
         builder.setVerifyingSsl(false);
         builder.setAuthentication(new GconfAccessTokenAuthentication());

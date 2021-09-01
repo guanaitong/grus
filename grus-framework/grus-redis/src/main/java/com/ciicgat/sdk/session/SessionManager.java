@@ -141,7 +141,7 @@ public class SessionManager {
         }
         String value = Bytes.toString(v);
         try {
-            return System.currentTimeMillis() - Long.valueOf(value) < getSessionProp().getMaxSessionAliveTime();
+            return System.currentTimeMillis() - Long.parseLong(value) < getSessionProp().getMaxSessionAliveTime();
         } catch (NumberFormatException e) {
             LOGGER.error(value, e);
         }

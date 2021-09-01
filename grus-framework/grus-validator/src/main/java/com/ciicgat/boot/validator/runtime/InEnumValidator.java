@@ -22,8 +22,7 @@ import java.util.Set;
  */
 public class InEnumValidator extends Validator<InEnum> {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(InEnumValidator.class);
-    static Set<Class> set = new HashSet<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(InEnumValidator.class);
 
     @Override
     public ValidateResult validate(InEnum inEnum, String paramName, Object paramValue) {
