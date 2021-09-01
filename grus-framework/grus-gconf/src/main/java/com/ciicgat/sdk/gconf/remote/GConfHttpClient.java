@@ -132,28 +132,23 @@ public class GConfHttpClient {
             path = "/" + path;
         }
         String requestUri = baseUrl + path;
+        final HttpUrl.Builder httpUrlBuilder = HttpUrl.parse(requestUri).newBuilder();
+        params.forEach((key, value) -> {
+            if (key != null && value != null) {
+                httpUrlBuilder.addQueryParameter(key, value);
+            }
+        });
+        HttpUrl httpUrl = httpUrlBuilder.build();
         int count = 4;
         Exception exception = null;
         while (count-- > 0) {
-            try {
-                final HttpUrl.Builder httpUrlBuilder = HttpUrl.parse(requestUri).newBuilder();
-                params.forEach((key, value) -> {
-                    if (key != null && value != null) {
-                        httpUrlBuilder.addQueryParameter(key, value);
-                    }
-                });
-                final Request request = new Request.Builder().get().url(httpUrlBuilder.build()).build();
-                Call call = okHttpClient.newCall(request);
-                try (Response response = call.execute()) {
-                    if (response.isSuccessful()) {
-                        ResponseBody responseBody = response.body();
-                        return responseBody.string();
-                    } else {
-                        LOGGER.error("request {} ,response {} ,body {}", request.toString(), response.toString(), response.body() == null ? "" : response.body().string());
-                        return "";
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(request.toString(), e);
+            final Request request = new Request.Builder().get().url(httpUrl).build();
+            try (Response response = okHttpClient.newCall(request).execute()) {
+                if (response.isSuccessful()) {
+                    return response.body().string();
+                } else {
+                    LOGGER.error("request {} ,response {} ,body {}", request, response, response.body() == null ? "" : response.body().string());
+                    return "";
                 }
             } catch (Exception e) {
                 exception = e;
