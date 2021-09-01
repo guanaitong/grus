@@ -13,7 +13,7 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
-import java.util.Optional;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -33,7 +33,8 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
         this.prefix = redisCacheConfig.getPrefix().toUpperCase() + name.toUpperCase() + "_";
         this.redisKeyListener = redisCacheConfig.getRedisKeyListener();
         // 是否使用Gzip压缩
-        this.valueSerializer = Optional.ofNullable(config.getUseGzip()).orElse(redisCacheConfig.isUseGzip()) ? new GzipRedisSerializer(redisCacheConfig.getSerializer()) : redisCacheConfig.getSerializer();
+        boolean useGzip = Objects.isNull(config.getUseGzip()) ? redisCacheConfig.isUseGzip() : config.getUseGzip().booleanValue();
+        this.valueSerializer = useGzip ? new GzipRedisSerializer(redisCacheConfig.getSerializer()) : redisCacheConfig.getSerializer();
     }
 
     protected <T> T execute(Function<RedisConnection, T> callback) {
