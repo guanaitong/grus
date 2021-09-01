@@ -12,9 +12,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -30,13 +28,14 @@ public class ExcelResolver<T> {
         protected Converter converter;
 
         protected ExcelColumn excelColumn;
+
+        protected int column;
     }
 
     private final Class<T> clazz;
-    private final Map<Integer, CellResolver> cellResolverMap = new HashMap<>();
+    private final List<CellResolver> cellResolvers = new ArrayList<>();
 
     public ExcelResolver(Class<T> clazz) {
-
         this.clazz = clazz;
         Field[] fields = clazz.getDeclaredFields();
 
@@ -51,27 +50,25 @@ public class ExcelResolver<T> {
             cellResolver.field = field;
             cellResolver.converter = converter;
             cellResolver.excelColumn = excelColumn;
-
+            cellResolver.column = excelColumn.column();
             field.setAccessible(true);
-
-            cellResolverMap.put(excelColumn.column(), cellResolver);
+            cellResolvers.add(cellResolver);
         }
     }
 
     protected List<T> read(Sheet sheet) throws Exception {
-
         int rows = sheet.getPhysicalNumberOfRows();
-
         List<T> list = new ArrayList<>(rows);
         for (int i = 1; i < rows; i++) {
+            Row row = sheet.getRow(i);
             T readResult = clazz.getDeclaredConstructor().newInstance();
-            for (Map.Entry<Integer, CellResolver> entry : cellResolverMap.entrySet()) {
-                Row row = sheet.getRow(i);
-                Cell cell = row.getCell(entry.getKey());
-
-                Object val = Objects.isNull(cell) ? null : entry.getValue().converter.read(cell);
-                Field field = entry.getValue().field;
-                field.set(readResult, val);
+            for (CellResolver cellResolver : cellResolvers) {
+                Cell cell = row.getCell(cellResolver.column);
+                if (Objects.nonNull(cell)) {
+                    Object val = cellResolver.converter.read(cell);
+                    Field field = cellResolver.field;
+                    field.set(readResult, val);
+                }
             }
             list.add(readResult);
         }
@@ -80,14 +77,9 @@ public class ExcelResolver<T> {
 
     @SuppressWarnings("unchecked")
     protected void write(Sheet sheet, List<T> dataList) throws Exception {
-
         Row header = sheet.createRow(0);
-
-        for (Map.Entry<Integer, CellResolver> entry : cellResolverMap.entrySet()) {
-
-            CellResolver cellResolver = entry.getValue();
-
-            Cell cell = header.createCell(cellResolver.excelColumn.column());
+        for (CellResolver cellResolver : cellResolvers) {
+            Cell cell = header.createCell(cellResolver.column);
             cell.setCellType(CellType.STRING);
             cell.setCellValue(cellResolver.excelColumn.name());
         }
@@ -97,10 +89,8 @@ public class ExcelResolver<T> {
             Row row = sheet.createRow(i + 1);
             T data = dataList.get(i);
 
-            for (Map.Entry<Integer, CellResolver> entry : cellResolverMap.entrySet()) {
-
-                CellResolver cellResolver = entry.getValue();
-                Cell cell = row.createCell(cellResolver.excelColumn.column());
+            for (CellResolver cellResolver : cellResolvers) {
+                Cell cell = row.createCell(cellResolver.column);
 
                 cellResolver.converter.write(cell, cellResolver.field.get(data));
             }
