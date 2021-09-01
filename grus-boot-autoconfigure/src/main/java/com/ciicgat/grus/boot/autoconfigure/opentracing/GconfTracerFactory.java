@@ -58,7 +58,7 @@ public class GconfTracerFactory implements TracerFactory {
                 new Configuration
                         .SenderConfiguration()
                         .withAgentHost(host)
-                        .withAgentPort(Integer.parseInt(properties.getProperty("jaeger.agent.port", "6831")));
+                        .withAgentPort(Integer.valueOf(properties.getProperty("jaeger.agent.port", "6831")));
 
         Configuration.ReporterConfiguration reporterConfig =
                 new Configuration

@@ -118,7 +118,7 @@ class PropertiesValueWrapper extends ValueWrapper {
         } else if (Float.TYPE.equals(clazz) || Float.class.equals(clazz)) {
             return Float.valueOf(value);
         } else if (Boolean.TYPE.equals(clazz) || Boolean.class.equals(clazz)) {
-            return Boolean.parseBoolean(value);
+            return Boolean.valueOf(value);
         } else if (Date.class.equals(clazz)) {
             try {
                 return new Date(Long.parseLong(value));

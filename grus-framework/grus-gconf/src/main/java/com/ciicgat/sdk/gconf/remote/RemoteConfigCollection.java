@@ -13,6 +13,7 @@ import com.ciicgat.sdk.gconf.ConfigCollection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -43,39 +44,64 @@ class RemoteConfigCollection implements ConfigCollection {
 
     @Override
     public String getConfig(String key) {
-        return localCache.containsKey(key) ? localCache.get(key).getRaw() : null;
+        ValueReference valueReference = localCache.get(key);
+        if (Objects.nonNull(valueReference)) {
+            return valueReference.getRaw();
+        }
+        return null;
     }
 
     @Override
     public Properties getProperties(String key) {
-        return localCache.containsKey(key) ? localCache.get(key).asProperties() : null;
+        ValueReference valueReference = localCache.get(key);
+        if (Objects.nonNull(valueReference)) {
+            return valueReference.asProperties();
+        }
+        return null;
     }
 
     @Override
     public Map<String, Object> getJSONObject(String key) {
-        return localCache.containsKey(key) ? localCache.get(key).asJSONObject() : null;
+        ValueReference valueReference = localCache.get(key);
+        if (Objects.nonNull(valueReference)) {
+            return valueReference.asJSONObject();
+        }
+        return null;
     }
 
     @Override
     public <T> T getBean(final String key, Class<T> clazz) {
-        return localCache.containsKey(key) ? localCache.get(key).asBean(clazz) : null;
+        ValueReference valueReference = localCache.get(key);
+        if (Objects.nonNull(valueReference)) {
+            return valueReference.asBean(clazz);
+        }
+        return null;
     }
 
     @Override
     public <T> T getLatestBean(String key, Class<T> clazz) {
-        return localCache.containsKey(key) ? localCache.get(key).asLatestBean(clazz) : null;
+        ValueReference valueReference = localCache.get(key);
+        if (Objects.nonNull(valueReference)) {
+            return valueReference.asLatestBean(clazz);
+        }
+        return null;
     }
 
 
     @Override
     public <T> T getBean(String key, BeanLoader<T> beanLoader) {
-        return localCache.containsKey(key) ? localCache.get(key).asBean(beanLoader) : null;
+        ValueReference valueReference = localCache.get(key);
+        if (Objects.nonNull(valueReference)) {
+            return valueReference.asBean(beanLoader);
+        }
+        return null;
     }
 
     @Override
     public void addConfigChangeListener(String key, ConfigChangeListener configChangeListener) {
-        if (localCache.containsKey(key)) {
-            localCache.get(key).addConfigChangeListener(configChangeListener);
+        ValueReference valueReference = localCache.get(key);
+        if (Objects.nonNull(valueReference)) {
+            valueReference.addConfigChangeListener(configChangeListener);
         }
     }
 
