@@ -15,6 +15,7 @@ import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -49,7 +50,7 @@ public class ZKWorkIdHolder implements WorkIdHolder {
         try {
             String pathPrefix = ZKPaths.makePath(appName, ZKConstants.IDGEN_PATH);
             String node = curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT_SEQUENTIAL).
-                    forPath(pathPrefix + "/#", String.valueOf(System.currentTimeMillis()).getBytes());
+                    forPath(pathPrefix + "/#", String.valueOf(System.currentTimeMillis()).getBytes(StandardCharsets.UTF_8));
             String[] nodeKey = node.split("#");
             int workValue = Integer.parseInt(nodeKey[1]);
 
