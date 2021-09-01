@@ -26,8 +26,7 @@ public class JsonValidator extends Validator<Json> {
             return ValidateResult.SUCCESS;
         }
 
-        if (paramValue != null &&
-                (paramValue instanceof String && !"".equals(paramValue))) {
+        if (paramValue instanceof String && !"".equals(paramValue)) {
 
             try {
                 JsonNode jsonNode = JSON.parse((String) paramValue);
