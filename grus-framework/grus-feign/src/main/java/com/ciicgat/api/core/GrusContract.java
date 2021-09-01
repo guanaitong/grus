@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import static com.ciicgat.api.core.FeignHttpClient.CONNECT_TIMEOUT_TAG;
 import static com.ciicgat.api.core.FeignHttpClient.READ_TIMEOUT_TAG;
@@ -33,7 +34,8 @@ class GrusContract extends Contract.Default {
         if (annotationType == Headers.class) {
             String[] headersOnMethod = Headers.class.cast(methodAnnotation).value();
             Map<String, Collection<String>> headerCollectionMap = toMap(headersOnMethod);
-            if (headerCollectionMap.containsKey(HEADER_NAME)) {
+            Collection<String> stringCollection = headerCollectionMap.get(HEADER_NAME);
+            if (stringCollection != null) {
                 Map<String, Collection<String>> headers = data.template().headers();
                 Collection<String> collection = headers.get(HEADER_NAME);
                 if (collection != null && collection.size() > 1) {
@@ -41,7 +43,7 @@ class GrusContract extends Contract.Default {
                     data.template().headers(null); // to clear
                     Map<String, Collection<String>> newHeaders = new LinkedHashMap<>();
                     newHeaders.putAll(headers);
-                    newHeaders.put(HEADER_NAME, headerCollectionMap.get(HEADER_NAME));
+                    newHeaders.put(HEADER_NAME, stringCollection);
                     data.template().headers(newHeaders);
                 }
             }

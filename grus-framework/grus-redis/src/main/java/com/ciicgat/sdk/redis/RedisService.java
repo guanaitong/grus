@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -150,7 +151,7 @@ public class RedisService {
             Set<String> keysTmp = new HashSet<>(64);
             Cursor<byte[]> cursor = connection.scan(new ScanOptions.ScanOptionsBuilder().match(matchKey).count(1000).build());
             while (cursor.hasNext()) {
-                keysTmp.add(new String(cursor.next()));
+                keysTmp.add(new String(cursor.next(), StandardCharsets.UTF_8));
             }
 
             return keysTmp;

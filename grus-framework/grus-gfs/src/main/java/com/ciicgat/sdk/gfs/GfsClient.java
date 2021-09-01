@@ -413,7 +413,7 @@ public class GfsClient {
      */
     private String defaultOssFileKey(byte[] data, String originalFileName) {
 
-        StringBuffer gfsDefaultBuffer = new StringBuffer("grus-gfs");
+        StringBuilder gfsDefaultBuffer = new StringBuilder("grus-gfs");
         gfsDefaultBuffer.append('/').append(Systems.WORK_ENV);
         gfsDefaultBuffer.append('/').append(mergeAdBlock(Systems.APP_NAME));
         gfsDefaultBuffer.append('/').append("by-days"); // 默认存储逻辑为：按日期切分
@@ -444,7 +444,7 @@ public class GfsClient {
             return "";
         }
 
-        int lastDotIndex = originalFileName.lastIndexOf(".");
+        int lastDotIndex = originalFileName.lastIndexOf('.');
         if (lastDotIndex != -1) {
             return originalFileName.substring(lastDotIndex);
         } else {
