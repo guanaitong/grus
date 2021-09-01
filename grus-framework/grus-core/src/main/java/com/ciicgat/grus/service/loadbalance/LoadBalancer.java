@@ -8,9 +8,7 @@ package com.ciicgat.grus.service.loadbalance;
 import com.ciicgat.grus.service.discovery.ServiceInstance;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -24,6 +22,10 @@ public abstract class LoadBalancer {
 
     LoadBalancer(final String name) {
         this.name = name;
+    }
+
+    public final String getName() {
+        return name;
     }
 
     public ServiceInstance select(List<ServiceInstance> serviceInstanceList, Set<ServiceInstance> fails) {
@@ -61,20 +63,5 @@ public abstract class LoadBalancer {
                 '}';
     }
 
-    private static LoadBalancer defaultLoadBalancer = new RandomLoadBalancer();
-    private static Map<String, LoadBalancer> loadBalancerMap = new HashMap<>();
-
-    static {
-        put(defaultLoadBalancer);
-        put(new RandomLoadBalancer());
-    }
-
-    private static void put(LoadBalancer loadBalancer) {
-        loadBalancerMap.put(loadBalancer.name, loadBalancer);
-    }
-
-    public static LoadBalancer getLoadBalancer(String name) {
-        return loadBalancerMap.getOrDefault(name, defaultLoadBalancer);
-    }
 
 }

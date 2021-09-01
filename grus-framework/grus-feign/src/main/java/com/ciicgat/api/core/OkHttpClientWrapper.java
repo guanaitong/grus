@@ -11,6 +11,7 @@ import com.ciicgat.grus.service.GrusServiceHttpHeader;
 import com.ciicgat.grus.service.discovery.ServiceDiscoveryClient;
 import com.ciicgat.grus.service.discovery.ServiceInstance;
 import com.ciicgat.grus.service.loadbalance.LoadBalancer;
+import com.ciicgat.grus.service.loadbalance.LoadBalancers;
 import com.ciicgat.sdk.util.system.Systems;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import feign.Client;
@@ -191,7 +192,7 @@ public final class OkHttpClientWrapper implements Client {
             final KubernetesAppConfig appConfig = config.getAppConfig(serviceName);
             connectTimeoutMillis = config.getConnectTimeout();
             if (appConfig.isOn() && isNotPrepare) {
-                LoadBalancer loadBalancer = LoadBalancer.getLoadBalancer(appConfig.getScheduler());
+                LoadBalancer loadBalancer = LoadBalancers.getLoadBalancer(appConfig.getScheduler());
                 ServiceDiscoveryClient serviceDiscoveryClient = ServiceDiscoveryClientUtil.getServiceDiscoveryClient();
                 List<ServiceInstance> serviceInstances = serviceDiscoveryClient.getInstances(serviceName);
                 if (!serviceInstances.isEmpty()) {
