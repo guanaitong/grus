@@ -155,4 +155,8 @@ public class ExcelUtils {
         }
         return excelResolver;
     }
+
+    public static void removeCache(Class<?> clazz) {
+        EXCEL_RESOLVER_MAP.remove(clazz);
+    }
 }

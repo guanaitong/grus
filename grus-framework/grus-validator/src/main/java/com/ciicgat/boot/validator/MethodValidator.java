@@ -58,7 +58,7 @@ public class MethodValidator {
     }
 
     private void init() {
-        List<IndexObjectValidator> indexObjectValidatorList = new ArrayList<>();
+        List<IndexObjectValidator> indexObjectValidatorList = new ArrayList<>(length);
         for (int i = 0; i < length; i++) {
             Class<?> paramClass = paramTypes[i];
             String paramName = paramNames[i];

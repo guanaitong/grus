@@ -51,7 +51,7 @@ public class Consumer implements AutoCloseable {
      */
     private final int maxPollRecords;
 
-    protected List<InnerConsumer> consumers = new ArrayList<>();
+    private final List<InnerConsumer> consumers;
 
     private Executor taskExecutor = Runnable::run;
 
@@ -64,6 +64,7 @@ public class Consumer implements AutoCloseable {
         this.maxPollRecords = maxPollRecords;
         this.topics = topics;
         this.pullThreadNum = pullThreadNum;
+        this.consumers = new ArrayList<>(pullThreadNum);
 
         for (int i = 0; i < pullThreadNum; i++) {
             consumers.add(new InnerConsumer(i));
