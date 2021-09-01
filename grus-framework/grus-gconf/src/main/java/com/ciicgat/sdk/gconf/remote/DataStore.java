@@ -108,16 +108,16 @@ class DataStore implements Runnable {
             }
             try {
                 String configCollectionId = entry.getKey();
-                Map<String, ValueReference> data = entry.getValue();
-                Set<String> oldKeys = data.keySet();
+                Map<String, ValueReference> oldData = entry.getValue();
                 List<String> newKeys = gConfHttpClient.listConfigKeys(configCollectionId);
 
-                for (String key : oldKeys) {
-                    String oldRaw = data.get(key).getRaw();
+                for (Map.Entry<String, ValueReference> oldEntry : oldData.entrySet()) {
+                    String key = oldEntry.getKey();
+                    String oldRaw = oldEntry.getValue().getRaw();
                     if (newKeys.contains(key)) {
                         String newRaw = gConfHttpClient.getConfig(configCollectionId, key);
                         if (StringUtils.isNoneBlank(newRaw) && !Objects.equals(oldRaw, newRaw)) {
-                            data.get(key).setRaw(newRaw);
+                            oldEntry.getValue().setRaw(newRaw);
                             fireValueChanged(configCollectionId, key, oldRaw, newRaw);
                         }
                     } else {
@@ -126,10 +126,10 @@ class DataStore implements Runnable {
                     }
                 }
                 for (String key : newKeys) {
-                    if (!oldKeys.contains(key)) {
+                    if (!oldData.containsKey(key)) {
                         //新的有，但是老的没有，说明这条数据是新加的
                         String newRaw = gConfHttpClient.getConfig(configCollectionId, key);
-                        data.put(key, new ValueReference(key, newRaw));
+                        oldData.put(key, new ValueReference(key, newRaw));
                         fireValueChanged(configCollectionId, key, null, newRaw);
                     }
                 }

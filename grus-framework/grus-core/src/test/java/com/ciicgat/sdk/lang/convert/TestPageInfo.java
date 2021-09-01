@@ -18,8 +18,6 @@ public class TestPageInfo {
     @Test
     public void test() {
         PageInfo<String> pageInfo = new PageInfo<>(2, 25);
-        Object clone = pageInfo.clone();
-        Assert.assertEquals(pageInfo, clone);
         Assert.assertEquals(pageInfo.getStart(), 25);
         Assert.assertEquals(pageInfo.getEnd(), 50);
 
