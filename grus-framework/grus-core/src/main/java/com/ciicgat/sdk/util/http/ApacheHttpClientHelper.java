@@ -20,7 +20,6 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
@@ -212,11 +211,11 @@ public class ApacheHttpClientHelper {
      * @param httpUriRequest http请求结构体
      * @return
      */
-    public static String request(@Nonnull HttpUriRequest httpUriRequest) {
+    public static String request(HttpUriRequest httpUriRequest) {
         long start = System.currentTimeMillis();
         CloseableHttpClient closeableHttpClient = HttpClientSingleton.getApacheHttpClient();
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpUriRequest)) {
-            int statusCode = response.getStatusLine().getStatusCode();
+            int statusCode = response.getStatusLine().getStatusCode(); //NOSONAR
             HttpEntity entity = response.getEntity();
             String result = EntityUtils.toString(entity, StandardCharsets.UTF_8);
             if (statusCode >= 400) {
