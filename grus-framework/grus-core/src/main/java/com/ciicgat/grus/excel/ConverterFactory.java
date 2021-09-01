@@ -20,6 +20,7 @@ import com.ciicgat.grus.excel.converter.StringConverter;
 
 import java.lang.reflect.Constructor;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -32,15 +33,12 @@ import java.util.Map;
  * @Description:
  */
 public class ConverterFactory {
-    private final static Map<Class<?>, Class<? extends Converter<?>>> converterClassMap = new IdentityHashMap<>();
+    private final static Map<Class<?>, Class<? extends Converter<?>>> CONVERTER_CLASS_MAP;
 
 
     static {
+        Map<Class<?>, Class<? extends Converter<?>>> converterClassMap = new IdentityHashMap<>();
         //init load converters
-        initDefaultConverter();
-    }
-
-    private static void initDefaultConverter() {
         converterClassMap.put(int.class, IntegerConverter.class);
         converterClassMap.put(Integer.class, IntegerConverter.class);
 
@@ -68,10 +66,13 @@ public class ConverterFactory {
         converterClassMap.put(String.class, StringConverter.class);
         converterClassMap.put(BigDecimal.class, BigDecimalConverter.class);
         converterClassMap.put(Date.class, DateConverter.class);
+
+        CONVERTER_CLASS_MAP = Collections.unmodifiableMap(converterClassMap);
     }
 
-    public static Converter<?> getConverter(Class<?> fieldType, ExcelColumn excelColumn) {
-        Class<? extends Converter<?>> converterClass = converterClassMap.get(fieldType);
+
+    public static Converter<?> newConverter(Class<?> fieldType, ExcelColumn excelColumn) {
+        Class<? extends Converter<?>> converterClass = CONVERTER_CLASS_MAP.get(fieldType);
         if (converterClass == null) {
             return new DefaultFormatConverter();
         }

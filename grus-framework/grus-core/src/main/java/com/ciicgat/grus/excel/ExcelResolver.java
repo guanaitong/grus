@@ -45,7 +45,7 @@ public class ExcelResolver<T> {
             if (Objects.isNull(excelColumn)) {
                 continue;
             }
-            Converter<?> converter = ConverterFactory.getConverter(field.getType(), excelColumn);
+            Converter<?> converter = ConverterFactory.newConverter(field.getType(), excelColumn);
 
             CellResolver cellResolver = new CellResolver();
             cellResolver.field = field;
