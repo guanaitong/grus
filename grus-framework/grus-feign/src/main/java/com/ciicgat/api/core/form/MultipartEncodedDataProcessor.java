@@ -11,12 +11,12 @@ import feign.RequestTemplate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URLConnection;
+import java.nio.file.Files;
 import java.util.Map;
 
 import static feign.Util.UTF_8;
@@ -127,7 +127,7 @@ public class MultipartEncodedDataProcessor implements FormDataProcessor {
     protected void writeFile(OutputStream output, PrintWriter writer, String name, String contentType, File file) {
         writeFileMeta(writer, name, file.getName(), contentType);
 
-        try (InputStream input = new FileInputStream(file)) {
+        try (InputStream input = Files.newInputStream(file.toPath())) {
             byte[] buffer = new byte[1024];
             int length;
             while ((length = input.read(buffer)) > 0) {
