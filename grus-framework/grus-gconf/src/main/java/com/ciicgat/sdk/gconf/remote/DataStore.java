@@ -32,12 +32,11 @@ class DataStore implements Runnable {
     private ConcurrentMap<String, CopyOnWriteArrayList<ConfigChangeListener>> globalListeners = new ConcurrentHashMap<>();
 
 
-    private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(Threads.newDaemonThreadFactory("gconf-refresh", Thread.MIN_PRIORITY));
-
     private final GConfHttpClient gConfHttpClient;
 
     DataStore(GConfHttpClient gConfHttpClient) {
         this.gConfHttpClient = gConfHttpClient;
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(Threads.newDaemonThreadFactory("gconf-refresh", Thread.MIN_PRIORITY));
         scheduledExecutorService.scheduleAtFixedRate(this, 0, 10, TimeUnit.MILLISECONDS);
     }
 
