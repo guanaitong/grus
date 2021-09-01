@@ -179,8 +179,9 @@ public class GrusMybatisAutoConfiguration implements InitializingBean {
         if (StringUtils.hasLength(this.properties.getTypeHandlersPackage())) {
             factory.setTypeHandlersPackage(this.properties.getTypeHandlersPackage());
         }
-        if (!ObjectUtils.isEmpty(this.properties.resolveMapperLocations())) {
-            factory.setMapperLocations(this.properties.resolveMapperLocations());
+        Resource[] resources = this.properties.resolveMapperLocations();
+        if (!ObjectUtils.isEmpty(resources)) {
+            factory.setMapperLocations(resources);
         }
 
         return factory.getObject();
