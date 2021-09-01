@@ -37,8 +37,8 @@ public class DecimalValidator extends Validator<Decimal> {
             if (value != null) {
                 if (decimal.numLength() > 0) {
                     String s = paramValue.toString();
-                    int lastIndexOfDot = s.lastIndexOf(".");
-                    int lastIndexOfE = s.lastIndexOf("E");
+                    int lastIndexOfDot = s.lastIndexOf('.');
+                    int lastIndexOfE = s.lastIndexOf('E');
                     int numLength = s.length();
                     if (lastIndexOfDot > 0) {
                         numLength = s.substring(0, lastIndexOfDot).length();

@@ -54,7 +54,7 @@ public class InEnumValidator extends Validator<InEnum> {
             for (Object obj : clazz.getEnumConstants()) {
                 try {
                     Object value = method.invoke(obj);
-                    sb.append(value).append(",");
+                    sb.append(value).append(',');
                     if (!validate) {
                         boolean result = paramValue.equals(value);
                         if (result) {
@@ -69,7 +69,7 @@ public class InEnumValidator extends Validator<InEnum> {
         } else {
             Field[] fields = clazz.getFields();
             for (Field field : fields) {
-                sb.append(field.getName()).append(",");
+                sb.append(field.getName()).append(',');
                 if (field.getName().equals(paramValue)) {
                     validate = true;
                     break;

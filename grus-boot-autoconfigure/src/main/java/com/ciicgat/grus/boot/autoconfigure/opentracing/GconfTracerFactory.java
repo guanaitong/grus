@@ -64,7 +64,7 @@ public class GconfTracerFactory implements TracerFactory {
                 new Configuration
                         .ReporterConfiguration()
                         .withSender(senderConfiguration)
-                        .withLogSpans(false);
+                        .withLogSpans(Boolean.FALSE);
 
         Configuration.SamplerConfiguration samplerConfig = null;
         if (WorkRegion.getCurrentWorkRegion().isDevelop()) {

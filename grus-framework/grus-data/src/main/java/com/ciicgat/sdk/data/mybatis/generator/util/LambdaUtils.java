@@ -47,7 +47,7 @@ public class LambdaUtils {
         try {
             // 通过获取对象方法，判断是否存在该方法
             Method method = func.getClass().getDeclaredMethod("writeReplace");
-            method.setAccessible(Boolean.TRUE);
+            method.setAccessible(true);
             // 利用jdk的SerializedLambda 解析方法引用
             return (SerializedLambda) method.invoke(func);
         } catch (ReflectiveOperationException e) {

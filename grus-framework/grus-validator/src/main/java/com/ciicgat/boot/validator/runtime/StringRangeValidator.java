@@ -29,7 +29,7 @@ public class StringRangeValidator extends Validator<StringRange> {
                 if (value.equals(paramValue)) {
                     return ValidateResult.SUCCESS;
                 }
-                sb.append(value).append(",");
+                sb.append(value).append(',');
             }
             String msg = in.msg();
             String allowValue = sb.deleteCharAt(sb.length() - 1).toString();

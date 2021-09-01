@@ -62,7 +62,7 @@ public class SwaggerAutoConfiguration {
     @ConditionalOnMissingBean
     public UiConfiguration uiConfig() {
         return UiConfigurationBuilder.builder()
-                .showCommonExtensions(true)
+                .showCommonExtensions(Boolean.TRUE)
                 .build();
     }
 

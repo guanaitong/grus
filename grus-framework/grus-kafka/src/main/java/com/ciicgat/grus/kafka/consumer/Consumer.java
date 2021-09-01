@@ -120,7 +120,7 @@ public class Consumer implements AutoCloseable {
         // value.deserializer 消息体序列化方式
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         // enable.auto.commit 设置自动提交offset
-        properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+        properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE);
         // auto.offset.reset
         // earliest：当各分区下有已提交的offset时，从提交的offset开始消费；无提交的offset时，从头开始消费
         // latest：当各分区下有已提交的offset时，从提交的offset开始消费；无提交的offset时，消费新产生的该分区下的数据

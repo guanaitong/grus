@@ -39,7 +39,7 @@ public class LocalTracerFactory implements TracerFactory {
                 new Configuration
                         .ReporterConfiguration()
                         .withSender(senderConfiguration)
-                        .withLogSpans(false);
+                        .withLogSpans(Boolean.FALSE);
 
         Float parm = "unknown".equals(Systems.APP_NAME) ? 0f : 50f;
         //采样配置

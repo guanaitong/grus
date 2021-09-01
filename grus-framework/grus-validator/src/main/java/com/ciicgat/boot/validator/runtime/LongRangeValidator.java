@@ -29,7 +29,7 @@ public class LongRangeValidator extends Validator<LongRange> {
                 if (paramValue.equals(value)) {
                     return ValidateResult.SUCCESS;
                 }
-                sb.append(value).append(",");
+                sb.append(value).append(',');
             }
             String msg = in.msg();
             String allowedValue = sb.deleteCharAt(sb.length() - 1).toString();
