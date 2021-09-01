@@ -32,14 +32,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by August.Zhou on 2019-06-19 13:51.
  */
 public class GrusFilter implements Filter {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(GrusFilter.class);
-    
     private final AtomicInteger current = new AtomicInteger();
-
     private final RollingNumber rollingNumber = new RollingNumber();
-
-
     private ConfigCollection configCollection;
 
     public GrusFilter() {
