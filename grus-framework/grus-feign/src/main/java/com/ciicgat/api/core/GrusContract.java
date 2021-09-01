@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
 
 import static com.ciicgat.api.core.FeignHttpClient.CONNECT_TIMEOUT_TAG;
 import static com.ciicgat.api.core.FeignHttpClient.READ_TIMEOUT_TAG;

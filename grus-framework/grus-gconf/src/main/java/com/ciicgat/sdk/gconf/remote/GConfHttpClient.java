@@ -11,12 +11,10 @@ import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.util.http.HttpClientSingleton;
 import com.ciicgat.sdk.util.system.Systems;
 import com.fasterxml.jackson.core.type.TypeReference;
-import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
