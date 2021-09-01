@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.OptionalLong;
 import java.util.Set;
 import java.util.TreeSet;
@@ -83,8 +84,9 @@ public class JdkHttpClientWrapper implements Client {
             readTimeoutMillis = options.readTimeoutMillis();
         } else {
             Map<String, Collection<String>> headers = request.headers();
-            if (headers.containsKey(READ_TIMEOUT_TAG)) {
-                readTimeoutMillis = Integer.parseInt(headers.get(READ_TIMEOUT_TAG).stream().findAny().orElse("60000"));
+            Collection<String> stringCollection = headers.get(READ_TIMEOUT_TAG);
+            if (Objects.nonNull(stringCollection) && !stringCollection.isEmpty()) {
+                readTimeoutMillis = Integer.parseInt(stringCollection.stream().findAny().orElse("60000"));
             }
         }
 
