@@ -39,7 +39,7 @@ public class ElasticsearchAutoConfiguration {
             String[] s = node.split(":");
             httpHosts.add(new HttpHost(s[0], Integer.parseInt(s[1])));
         }
-        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(httpHosts.toArray(new HttpHost[0]))); //NOSONAR
+        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(httpHosts.toArray(new HttpHost[0])));
 
         int nodeSize = client.getLowLevelClient().getNodes().size();
         LOGGER.info("nodeSize {}", nodeSize);

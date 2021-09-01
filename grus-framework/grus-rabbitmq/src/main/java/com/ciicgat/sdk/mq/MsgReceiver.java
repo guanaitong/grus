@@ -58,7 +58,7 @@ public class MsgReceiver {
         this.exchangeName = Objects.requireNonNull(builder.exchangeName, "exchangeName为空");
         this.rqList = builder.rqList;
         this.prefetchCount = builder.prefetchCount;
-        this.parallelNum = Optional.ofNullable(builder.parallelNum).orElse(2);
+        this.parallelNum = builder.parallelNum;
         this.host = builder.host;
         this.connection = CacheConnectionFactory.getConnection(builder, true);
         queueDeclareAndBind();

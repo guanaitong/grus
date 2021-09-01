@@ -24,7 +24,7 @@ public abstract class AbstractBuilder<T, SELF extends AbstractBuilder> {
 
     private static final String DEFAULT_VHOST = "/";
 
-    private static final Integer DEFAULT_MQ_PORT = 5672;
+    private static final int DEFAULT_MQ_PORT = 5672;
 
     static {
         Properties properties = GlobalGconfConfig.getConfig().getProperties("rabbitmq.properties");
@@ -40,7 +40,7 @@ public abstract class AbstractBuilder<T, SELF extends AbstractBuilder> {
     /**
      * mq port
      */
-    Integer port = DEFAULT_MQ_PORT;
+    int port = DEFAULT_MQ_PORT;
 
     /**
      * user
@@ -63,7 +63,7 @@ public abstract class AbstractBuilder<T, SELF extends AbstractBuilder> {
     /**
      * 并发数，消费并发数或者发送并发数
      */
-    Integer parallelNum;
+    int parallelNum = 2;
 
     /**
      * @param exchangeName
@@ -81,7 +81,7 @@ public abstract class AbstractBuilder<T, SELF extends AbstractBuilder> {
     }
 
 
-    public SELF setPort(Integer port) {
+    public SELF setPort(int port) {
         this.port = port;
         return (SELF) this;
     }
@@ -103,7 +103,7 @@ public abstract class AbstractBuilder<T, SELF extends AbstractBuilder> {
         return (SELF) this;
     }
 
-    public SELF setParallelNum(Integer parallelNum) {
+    public SELF setParallelNum(int parallelNum) {
         this.parallelNum = parallelNum;
         return (SELF) this;
     }

@@ -360,7 +360,7 @@ public class GrusMvcContract extends Contract.BaseContract implements ResourceLo
 
     private Map<Class<? extends Annotation>, AnnotatedParameterProcessor> toAnnotatedArgumentProcessorMap(
             List<AnnotatedParameterProcessor> processors) {
-        Map<Class<? extends Annotation>, AnnotatedParameterProcessor> result = new HashMap<>();
+        Map<Class<? extends Annotation>, AnnotatedParameterProcessor> result = new HashMap<>(processors.size());
         for (AnnotatedParameterProcessor processor : processors) {
             result.put(processor.getAnnotationType(), processor);
         }

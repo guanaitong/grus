@@ -62,8 +62,7 @@ public class MsgDispatcher {
             channel.exchangeDeclare(exchangeName, exchangeType, true);
         }
 
-        int parallelNum = Optional.ofNullable(builder.parallelNum).orElse(16);
-        channelPool = new ChannelPool(connection, parallelNum, this.confirm);
+        channelPool = new ChannelPool(connection, builder.parallelNum, this.confirm);
 
         LOGGER.info("exchangeName {}", exchangeName);
 

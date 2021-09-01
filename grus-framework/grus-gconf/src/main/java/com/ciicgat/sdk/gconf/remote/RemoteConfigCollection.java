@@ -86,7 +86,7 @@ class RemoteConfigCollection implements ConfigCollection {
 
     @Override
     public Map<String, String> asMap() {
-        Map<String, String> res = new LinkedHashMap<>();
+        Map<String, String> res = new LinkedHashMap<>(localCache.size());
         for (Map.Entry<String, ValueReference> entry : localCache.entrySet()) {
             res.put(entry.getKey(), entry.getValue().getRaw());
         }

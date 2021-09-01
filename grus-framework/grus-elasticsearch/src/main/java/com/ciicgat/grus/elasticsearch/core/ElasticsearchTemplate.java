@@ -330,7 +330,7 @@ public class ElasticsearchTemplate<T extends IndexAble> {
     public Pagination<T> parseSearchResponse(SearchResponse searchResponse) {
         SearchHits searchHits = searchResponse.getHits();
         TotalHits totalHits = searchHits.getTotalHits();
-        List<T> resultList = new ArrayList<>();
+        List<T> resultList = new ArrayList<>(searchHits.getHits().length);
         for (SearchHit searchHit : searchHits.getHits()) {
             T object = entityMapper.mapToObject(searchHit.getSourceAsString(), clazz);
             object.setDocId(searchHit.getId());

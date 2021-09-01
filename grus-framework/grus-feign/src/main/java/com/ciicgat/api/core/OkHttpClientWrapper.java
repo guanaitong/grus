@@ -145,7 +145,7 @@ public final class OkHttpClientWrapper implements Client {
         return new feign.Response.Body() {
 
             @Override
-            public void close() throws IOException {
+            public void close() {
                 input.close();
             }
 
@@ -160,17 +160,17 @@ public final class OkHttpClientWrapper implements Client {
             }
 
             @Override
-            public InputStream asInputStream() throws IOException {
+            public InputStream asInputStream() {
                 return input.byteStream();
             }
 
             @Override
-            public Reader asReader() throws IOException {
+            public Reader asReader() {
                 return input.charStream();
             }
 
             @Override
-            public Reader asReader(Charset charset) throws IOException {
+            public Reader asReader(Charset charset) {
                 return asReader();
             }
         };

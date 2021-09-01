@@ -105,9 +105,9 @@ public class ReflectUtils {
         reflectEntity.setSimpleName(simpleName);
 
         // 读取字段
-        List<ReflectField> fields = new ArrayList<>();
-        reflectEntity.setFields(fields);
         List<Field> declaredFields = getDeclaredFields(clazz);
+        List<ReflectField> fields = new ArrayList<>(declaredFields.size());
+        reflectEntity.setFields(fields);
         for (Field declaredField : declaredFields) {
             String name = declaredField.getName();
             boolean primaryKey = false;
