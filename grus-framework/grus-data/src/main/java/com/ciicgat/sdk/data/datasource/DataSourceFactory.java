@@ -151,9 +151,10 @@ public class DataSourceFactory {
     }
 
     private static int getInt(Map<String, String> params, String key, int defaultValue) {
-        if (params.containsKey(key)) {
+        String s = params.get(key);
+        if (StringUtils.isNotEmpty(s)) {
             try {
-                return Integer.parseInt(params.get(key));
+                return Integer.parseInt(s);
             } catch (Exception e) {
                 LOGGER.warn("error", e);
                 return defaultValue;
@@ -163,9 +164,10 @@ public class DataSourceFactory {
     }
 
     private static long getLong(Map<String, String> params, String key, long defaultValue) {
-        if (params.containsKey(key)) {
+        String s = params.get(key);
+        if (StringUtils.isNotEmpty(s)) {
             try {
-                return Long.parseLong(params.get(key));
+                return Long.parseLong(s);
             } catch (Exception e) {
                 LOGGER.warn("error", e);
                 return defaultValue;

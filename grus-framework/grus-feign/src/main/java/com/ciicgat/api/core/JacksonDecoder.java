@@ -138,8 +138,9 @@ class JacksonDecoder implements Decoder {
     }
 
     private String getHeader(Map<String, Collection<String>> headers, String key) {
-        if (headers.containsKey(key) && !headers.get(key).isEmpty()) {
-            return headers.get(key).iterator().next();
+        Collection<String> values = headers.get(key);
+        if (values != null && !values.isEmpty()) {
+            return values.iterator().next();
         }
         return null;
     }
