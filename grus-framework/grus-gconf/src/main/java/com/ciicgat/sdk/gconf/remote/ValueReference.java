@@ -42,7 +42,7 @@ class ValueReference {
      * @param raw
      */
     public void setRaw(String raw) {
-        this.valueWrapper = ValueWrapper.of(this.key, raw);
+        this.valueWrapper = ValueWrappers.of(this.key, raw);
         if (proxyBean != null) {
             try {
                 //先生成一个全新的object
