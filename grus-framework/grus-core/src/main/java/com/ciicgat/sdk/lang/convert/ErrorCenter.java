@@ -27,6 +27,10 @@ public class ErrorCenter {
         ALL_ERROR_CODES.put(errorCode.getErrorCode(), errorCode);
     }
 
+    public static void remove(Integer code) {
+        ALL_ERROR_CODES.remove(code);
+    }
+
     @SuppressWarnings("unchecked")
     public static <T extends ErrorCode> T valueOf(Integer code) {
         T value = (T) ALL_ERROR_CODES.get(code);
@@ -40,6 +44,7 @@ public class ErrorCenter {
      * 此方法用于注册相关的errorcode到ErrorCenter里。
      * 这样子，返回的BusinessFeignException.getError就能返回正确的枚举对象，业务可以通过枚举==来判断。
      * 避免使用int值来判断。
+     *
      * @param classes
      */
     public static void initErrorCodeEnum(Class<? extends Enum>... classes) {
