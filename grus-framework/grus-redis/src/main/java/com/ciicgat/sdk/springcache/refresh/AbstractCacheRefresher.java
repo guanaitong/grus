@@ -45,9 +45,9 @@ public abstract class AbstractCacheRefresher implements CacheRefresher {
     void refresh(AbstractCache cache, String key, Callable<Object> valueLoader) {
         executor.execute(() -> {
             try {
-                LOGGER.info(String.format("start refresh,cache %s,key %s", cache.getName(), key));
+                LOGGER.info("start refresh,cache {},key {}", cache.getName(), key);
                 cache.put(key, valueLoader.call());
-                LOGGER.info(String.format("refresh success,cache %s,key %s", cache.getName(), key));
+                LOGGER.info("refresh success,cache {},key {}", cache.getName(), key);
             } catch (Exception e) {
                 LOGGER.warn(String.format("refresh failed,cache %s,key %s", cache.getName(), key), e);
             }

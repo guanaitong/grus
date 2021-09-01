@@ -215,17 +215,11 @@ public class ApacheHttpClientHelper {
         long start = System.currentTimeMillis();
         CloseableHttpClient closeableHttpClient = HttpClientSingleton.getApacheHttpClient();
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpUriRequest)) {
-
             int statusCode = response.getStatusLine().getStatusCode();
-
             HttpEntity entity = response.getEntity();
             String result = EntityUtils.toString(entity, StandardCharsets.UTF_8);
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("[{}]:-{}->{}", statusCode, httpUriRequest.getURI().toString(), result);
-            }
-
             if (statusCode >= 400) {
-                LOGGER.error(String.format("%s|[%s] -> %s", statusCode, httpUriRequest.getURI().toString(), result));
+                LOGGER.error("{}|[{}] -> {}", statusCode, httpUriRequest.getURI().toString(), result);
             }
             return result;
         } catch (Exception e) {
