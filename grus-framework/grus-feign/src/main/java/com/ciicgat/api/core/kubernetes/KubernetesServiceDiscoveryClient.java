@@ -163,21 +163,15 @@ public class KubernetesServiceDiscoveryClient implements ServiceDiscoveryClient 
         if (endpointPorts.size() == 1) {
             return endpointPorts.get(0).getPort();
         } else {
-            V1EndpointPort tcp80EndpointPort = null;
-            V1EndpointPort firstTcpEndpointPort = null;
             for (V1EndpointPort endpointPort : endpointPorts) {
                 if ("TCP".equals(endpointPort.getProtocol()) && Objects.equals(endpointPort.getPort(), 80)) {
-                    tcp80EndpointPort = endpointPort;
-                }
-                if ("TCP".equals(endpointPort.getProtocol()) && (firstTcpEndpointPort == null)) {
-                    firstTcpEndpointPort = endpointPort;
+                    return 80;
                 }
             }
-            if (tcp80EndpointPort != null) {
-                return 80;
-            }
-            if (firstTcpEndpointPort != null) {
-                return firstTcpEndpointPort.getPort();
+            for (V1EndpointPort endpointPort : endpointPorts) {
+                if ("TCP".equals(endpointPort.getProtocol())) {
+                    return endpointPort.getPort();
+                }
             }
             return 80;
         }
