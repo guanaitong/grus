@@ -50,12 +50,12 @@ public class SqlProvider implements ProviderMethodResolver {
     }
 
     public String update(ProviderContext providerContext, Map<String, Object> paramMap) {
-        SqlProviderSupport.checkEntity(paramMap);
+        SqlProviderSupport.checkEntityMap(paramMap);
         return SqlProviderSupport.getSqlScript("update", providerContext);
     }
 
     public String updateAll(ProviderContext providerContext, Map<String, Object> paramMap) {
-        SqlProviderSupport.checkEntity(paramMap);
+        SqlProviderSupport.checkEntityMap(paramMap);
         return SqlProviderSupport.getSqlScript("updateAll", providerContext);
     }
 

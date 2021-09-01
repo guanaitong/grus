@@ -54,26 +54,26 @@ public class SqlProviderSupport {
         });
     }
 
-    public static <T> Class<?> getEntityClassFromEntity(Map<String, Object> paramMap) {
-        T entity = (T) paramMap.get("entity");
+    public static Class<?> getEntityClassFromEntity(Map<String, Object> paramMap) {
+        Object entity = paramMap.get("entity");
         Assert.notNull(entity, "entity cant be null");
         return entity.getClass();
     }
 
-    public static <T> Class<?> getEntityClassFromProviderContext(ProviderContext providerContext) {
+    public static Class<?> getEntityClassFromProviderContext(ProviderContext providerContext) {
         return ReflectUtils.getClassGenericType(true, providerContext.getMapperType(), 0);
     }
 
-    public static <T> Class<?> getEntityClassFromMap(Map<String, Object> paramMap) {
+    public static Class<?> getEntityClassFromMap(Map<String, Object> paramMap) {
         Class<?> entityClass = (Class<?>) paramMap.get("entityClass");
         Assert.notNull(entityClass, "entityClass cant be null");
         return entityClass;
     }
 
-    public static <T> Class<?> getEntityClassFromList(Map<String, Object> paramMap) {
-        List<T> list = (List<T>) paramMap.get("list");
+    public static Class<?> getEntityClassFromList(Map<String, Object> paramMap) {
+        List list = (List) paramMap.get("list");
         Assert.isTrue(list.size() > 0, "list is empty");
-        T entity = list.get(0);
+        Object entity = list.get(0);
         Assert.notNull(entity, "entity in list cant be null");
         return entity.getClass();
     }
@@ -83,8 +83,8 @@ public class SqlProviderSupport {
      *
      * @param paramMap 参数map
      */
-    public static <T> void checkCondition(Map<String, Object> paramMap) {
-        ConditionExample<T> example = (ConditionExample<T>) paramMap.get("example");
+    public static void checkCondition(Map<String, Object> paramMap) {
+        ConditionExample example = (ConditionExample) paramMap.get("example");
         Assert.notNull(example, "example cant be null");
         Assert.isTrue(example.getOredCriteria().size() > 0, "Condition can't be empty");
     }
@@ -104,16 +104,16 @@ public class SqlProviderSupport {
      *
      * @param paramMap 参数map
      */
-    public static <T> void checkEntityList(Map<String, Object> paramMap) {
-        List<T> list = (List<T>) paramMap.get("list");
+    public static void checkEntityList(Map<String, Object> paramMap) {
+        List list = (List) paramMap.get("list");
         Assert.isTrue(Objects.nonNull(list) && list.size() > 0, "list can't be empty");
     }
 
-    public static <T> void checkEntity(Map<String, Object> paramMap) {
-        checkEntity((T) paramMap.get("entity"));
+    public static void checkEntityMap(Map<String, Object> paramMap) {
+        checkEntity(paramMap.get("entity"));
     }
 
-    public static <T> void checkEntity(T entity) {
+    public static void checkEntity(Object entity) {
         Assert.notNull(entity, "entity can't be empty");
     }
 
