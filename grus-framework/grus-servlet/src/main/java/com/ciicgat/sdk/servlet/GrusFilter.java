@@ -43,16 +43,10 @@ public class GrusFilter implements Filter {
 
     private final RollingNumber rollingNumber = new RollingNumber();
 
-    private final boolean logWebReq;
 
     private ConfigCollection configCollection;
 
     public GrusFilter() {
-        this(false);
-    }
-
-    public GrusFilter(boolean logWebReq) {
-        this.logWebReq = logWebReq;
         try {
             configCollection = RemoteConfigCollectionFactoryBuilder.getInstance().getConfigCollection();
         } catch (Exception e) {
