@@ -61,19 +61,6 @@ public class GfsClient {
     }
 
     /**
-     * 获取上传图片的授权签名地址
-     *
-     * @param data             图片文件名
-     * @param originalFileName 文件类型
-     * @return 上传图片URL
-     */
-    @Deprecated
-    private String getUploadUrl4Img(byte[] data, String originalFileName) {
-        return getUploadUrl4Img(defaultOssFileKey(data, originalFileName), null);
-    }
-
-
-    /**
      * 公开权限文件
      *
      * @param data             文件流
@@ -106,7 +93,6 @@ public class GfsClient {
      * @param originalFileName
      * @param ossFileKey
      * @param contentType
-     *
      * @return
      */
     public String uploadPublicFile(byte[] data,

@@ -87,7 +87,7 @@ abstract class ValueWrapper {
     }
 
     static void validate(Object v) {
-        if (v != null && v instanceof GConfBeanValidator) {
+        if (v instanceof GConfBeanValidator) {
             ((GConfBeanValidator) v).validate();
         }
     }
