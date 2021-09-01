@@ -42,7 +42,7 @@ public class GrusPageHelperAutoConfiguration {
         for (Map.Entry<String, Object> entry : map.entrySet()) {
             Object value = entry.getValue();
             if (Objects.nonNull(value) && !"".equals(value)) {
-                properties.setProperty(entry.getKey(), (String) value);
+                properties.setProperty(entry.getKey(), String.valueOf(value));
             }
         }
         interceptor.setProperties(properties);
