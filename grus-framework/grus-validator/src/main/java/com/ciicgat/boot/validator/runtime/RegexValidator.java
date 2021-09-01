@@ -29,13 +29,10 @@ public class RegexValidator extends Validator<Regex> {
         if (!regex.enable()) {
             return ValidateResult.SUCCESS;
         }
-
-        if (paramValue != null && paramValue instanceof String) {
-
+        if (paramValue instanceof String) {
             if ("".equals(paramValue) && regex.skipEmpty()) {
                 return ValidateResult.SUCCESS;
             }
-
             String reg = regex.value();
             if (reg.isBlank()) {
                 String msg = "参数验证不通过, " + paramName + "指定的正则表达式为空";

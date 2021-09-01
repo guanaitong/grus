@@ -22,8 +22,7 @@ public class StringRangeValidator extends Validator<StringRange> {
             return ValidateResult.SUCCESS;
         }
 
-        if (paramValue != null &&
-                (paramValue instanceof String && !"".equals(paramValue))) {
+        if (paramValue instanceof String && !"".equals(paramValue)) {
             StringBuilder sb = new StringBuilder();
             for (String value : in.value()) {
                 if (value.equals(paramValue)) {

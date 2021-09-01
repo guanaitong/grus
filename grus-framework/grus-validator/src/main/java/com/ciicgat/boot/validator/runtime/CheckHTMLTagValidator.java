@@ -26,7 +26,7 @@ public class CheckHTMLTagValidator extends Validator<CheckHTMLTag> {
             return ValidateResult.SUCCESS;
         }
 
-        if (paramValue != null && (paramValue.getClass() == String.class)) {
+        if (paramValue instanceof String) {
             String msg = checkHTMLTag.msg();
 
             if (msg.isBlank()) {
