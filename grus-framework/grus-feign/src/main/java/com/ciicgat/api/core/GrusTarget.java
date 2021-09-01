@@ -21,9 +21,7 @@ import org.slf4j.LoggerFactory;
 class GrusTarget<T> implements Target<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(GrusTarget.class);
     private final Class<T> type;
-    private final ServiceName serviceName;
     private final String name;
-    private final NamingService namingService;
     private final String url;
     private final boolean isK8sService;
 
@@ -31,8 +29,6 @@ class GrusTarget<T> implements Target<T> {
     GrusTarget(Class<T> serviceClazz, ServiceName serviceName, NamingService namingService) {
         this.type = serviceClazz;
         this.name = serviceName.value();
-        this.serviceName = serviceName;
-        this.namingService = namingService;
         this.url = buildTargetUrl(namingService.resolve(serviceName.value()), serviceName.urlPathPrefix());
         LOGGER.info("create service instance of {},  serviceName {}, baseUrl {}", serviceClazz, serviceName, url);
         isK8sService = K8sNamingService.isK8sService(name);

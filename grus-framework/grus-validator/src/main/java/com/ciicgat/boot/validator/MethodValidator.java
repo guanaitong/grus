@@ -49,7 +49,7 @@ public class MethodValidator {
             return ValidateResult.SUCCESS;
         }
         for (IndexObjectValidator indexObjectValidator : indexObjectValidators) {
-            ValidateResult validateResult = indexObjectValidator.objectValidator.validate(paramValues[indexObjectValidator.index]);
+            ValidateResult validateResult = indexObjectValidator.getObjectValidator().validate(paramValues[indexObjectValidator.getIndex()]);
             if (!validateResult.isValid()) {
                 return validateResult;
             }
@@ -73,16 +73,5 @@ public class MethodValidator {
         }
         indexObjectValidators = indexObjectValidatorList.toArray(new IndexObjectValidator[0]);
     }
-
-    static class IndexObjectValidator {
-        private final ObjectValidator objectValidator;
-        private final int index;
-
-        IndexObjectValidator(ObjectValidator objectValidator, int index) {
-            this.objectValidator = objectValidator;
-            this.index = index;
-        }
-    }
-
 
 }

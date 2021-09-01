@@ -18,7 +18,7 @@ public class EntityMapperTests {
 
     @Test
     public void test() {
-        DefaultEntityMapper entityMapper = new DefaultEntityMapper(Message.class);
+        DefaultEntityMapper entityMapper = new DefaultEntityMapper();
         Message message = new Message();
         message.setTimeCreated(new Date());
         message.setAppName("123");

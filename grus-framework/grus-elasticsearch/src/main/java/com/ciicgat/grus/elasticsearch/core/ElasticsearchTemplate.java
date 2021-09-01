@@ -64,7 +64,7 @@ public class ElasticsearchTemplate<T extends IndexAble> {
     private final RateLimiter saveRateLimiter = RateLimiter.create(20);
 
     public ElasticsearchTemplate(RestHighLevelClient restHighLevelClient, Class<T> clazz) {
-        this(restHighLevelClient, clazz, new DefaultEntityMapper<>(clazz));
+        this(restHighLevelClient, clazz, new DefaultEntityMapper<>());
     }
 
     public ElasticsearchTemplate(RestHighLevelClient restHighLevelClient, Class<T> clazz, EntityMapper<T> entityMapper) {

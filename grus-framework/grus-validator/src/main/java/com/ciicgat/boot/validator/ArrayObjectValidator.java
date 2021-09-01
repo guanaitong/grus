@@ -12,14 +12,12 @@ import java.lang.reflect.Array;
  */
 public class ArrayObjectValidator extends ObjectValidator {
 
-    private final Class<?> componentType;
 
     private ObjectValidator objectValidator;
 
     public ArrayObjectValidator(String name, Class<?> clazz) {
         super(name, clazz);
-        this.componentType = clazz.getComponentType();
-        objectValidator = NestedObjectValidator.build(name, this.componentType);
+        objectValidator = NestedObjectValidator.build(name, clazz.getComponentType());
     }
 
     @Override

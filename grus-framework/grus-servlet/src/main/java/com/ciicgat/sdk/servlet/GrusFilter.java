@@ -7,8 +7,6 @@ package com.ciicgat.sdk.servlet;
 
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.json.JSON;
-import com.ciicgat.grus.service.GrusFramework;
-import com.ciicgat.grus.service.GrusRuntimeConfig;
 import com.ciicgat.sdk.gconf.ConfigCollection;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
 import com.ciicgat.sdk.lang.convert.ErrorCode;
@@ -36,9 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GrusFilter implements Filter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrusFilter.class);
-
-    private GrusRuntimeConfig grusRuntimeConfig = GrusFramework.getGrusRuntimeManager().getGrusRuntimeConfig();
-
+    
     private final AtomicInteger current = new AtomicInteger();
 
     private final RollingNumber rollingNumber = new RollingNumber();

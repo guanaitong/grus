@@ -17,11 +17,10 @@ import java.io.IOException;
  */
 public class DefaultEntityMapper<T extends IndexAble> implements EntityMapper<T> {
 
-    private final Class<T> clazz;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
 
-    public DefaultEntityMapper(Class<T> clazz) {
+    public DefaultEntityMapper() {
         objectMapper.registerModule(new ElasticsearchModule());
 
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -29,7 +28,6 @@ public class DefaultEntityMapper<T extends IndexAble> implements EntityMapper<T>
         //属性为 空字符串 或者为 NULL 都不序列化
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 
-        this.clazz = clazz;
     }
 
 
