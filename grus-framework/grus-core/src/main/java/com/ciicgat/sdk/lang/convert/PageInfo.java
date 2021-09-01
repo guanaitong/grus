@@ -6,7 +6,6 @@
 package com.ciicgat.sdk.lang.convert;
 
 
-
 import com.ciicgat.grus.json.JSON;
 
 import java.io.Serializable;
@@ -19,7 +18,7 @@ import java.util.Objects;
  * <p>
  * Created by August.Zhou on 2018-10-22 14:02.
  */
-public class PageInfo<T> implements Serializable, Cloneable {
+public class PageInfo<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -115,18 +114,6 @@ public class PageInfo<T> implements Serializable, Cloneable {
 
     public void setTotal(int total) {
         this.total = total;
-    }
-
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Object clone() {
-        PageInfo pageInfo = new PageInfo(this.page, this.perPage);
-        pageInfo.setOrderBy(this.orderBy);
-        pageInfo.setOrder(this.order);
-        pageInfo.setTotal(this.total);
-        pageInfo.setList(this.list);
-        return pageInfo;
     }
 
     @Override
