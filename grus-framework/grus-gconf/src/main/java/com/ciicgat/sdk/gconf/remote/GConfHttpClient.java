@@ -137,10 +137,10 @@ public class GConfHttpClient {
             }
         });
         HttpUrl httpUrl = httpUrlBuilder.build();
+        final Request request = new Request.Builder().get().url(httpUrl).build();
         int count = 4;
         Exception exception = null;
         while (count-- > 0) {
-            final Request request = new Request.Builder().get().url(httpUrl).build();
             try (Response response = okHttpClient.newCall(request).execute()) {
                 if (response.isSuccessful()) {
                     return response.body().string();
