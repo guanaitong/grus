@@ -7,10 +7,6 @@ package com.ciicgat.grus.boot.autoconfigure.data;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.lang.reflect.Field;
-import java.util.Objects;
-import java.util.Properties;
-
 /**
  * 分页插件参数对象
  * https://github.com/pagehelper/Mybatis-PageHelper/blob/master/wikis/zh/HowToUse.md
@@ -87,22 +83,6 @@ public class PageHelperProperties {
      * 自动获取dialect
      */
     private String autoDialect;
-
-    public Properties toProperties() {
-        Properties properties = new Properties();
-        for (Field field : this.getClass().getDeclaredFields()) {
-            String fieldName = field.getName();
-            try {
-                field.setAccessible(true);
-                Object value = field.get(this);
-                if (Objects.nonNull(value) && !"".equals(value)) {
-                    properties.setProperty(fieldName, (String) value);
-                }
-            } catch (Exception e) {
-            }
-        }
-        return properties;
-    }
 
     public String getHelperDialect() {
         return helperDialect;

@@ -5,6 +5,7 @@
 
 package com.ciicgat.grus.boot.autoconfigure.data;
 
+import com.ciicgat.sdk.util.bean.BeanMapUtil;
 import com.github.pagehelper.PageInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -15,6 +16,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 
 /**
  * Mybatis分页插件PageHelper（https://github.com/pagehelper/Mybatis-PageHelper）
@@ -32,7 +37,15 @@ public class GrusPageHelperAutoConfiguration {
     @ConditionalOnMissingBean
     public PageInterceptor pageInterceptor(PageHelperProperties pageHelperProperties) {
         PageInterceptor interceptor = new PageInterceptor();
-        interceptor.setProperties(pageHelperProperties.toProperties());
+        Map<String, Object> map = BeanMapUtil.bean2Map(pageHelperProperties);
+        Properties properties = new Properties();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (Objects.nonNull(value) && !"".equals(value)) {
+                properties.setProperty(entry.getKey(), (String) value);
+            }
+        }
+        interceptor.setProperties(properties);
         return interceptor;
     }
 }
