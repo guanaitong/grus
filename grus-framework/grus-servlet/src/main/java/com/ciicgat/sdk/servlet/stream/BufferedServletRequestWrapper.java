@@ -47,7 +47,7 @@ public class BufferedServletRequestWrapper extends HttpServletRequestWrapper {
     /**
      * 内部InputStream类
      */
-    private class BufferedServletInputStream extends ServletInputStream {
+    private static class BufferedServletInputStream extends ServletInputStream {
         private ByteArrayInputStream inputStream;
 
         BufferedServletInputStream(byte[] buffer) {

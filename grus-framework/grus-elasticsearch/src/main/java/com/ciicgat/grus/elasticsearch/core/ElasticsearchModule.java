@@ -41,7 +41,7 @@ public class ElasticsearchModule extends SimpleModule {
         addDeserializer(Date.class, new DateDeserializer());
     }
 
-    private class ElasticsearchSerializerModifier extends BeanSerializerModifier {
+    static class ElasticsearchSerializerModifier extends BeanSerializerModifier {
         ElasticsearchSerializerModifier() {
         }
 
@@ -73,7 +73,7 @@ public class ElasticsearchModule extends SimpleModule {
     private static TimeZone timeZone = TimeZone.getTimeZone("GMT+8");
     private static Locale locale = Locale.forLanguageTag("zh");
 
-    class DateSerializer extends JsonSerializer<Date> {
+    static class DateSerializer extends JsonSerializer<Date> {
         @Override
         public void serialize(Date value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
             String format = DateFormatUtils.format(value, pattern, timeZone, locale);
@@ -81,7 +81,7 @@ public class ElasticsearchModule extends SimpleModule {
         }
     }
 
-    class DateDeserializer extends JsonDeserializer<Date> {
+    static class DateDeserializer extends JsonDeserializer<Date> {
         @Override
         public Date deserialize(JsonParser jp, DeserializationContext context) throws IOException {
             String value = jp.getValueAsString();

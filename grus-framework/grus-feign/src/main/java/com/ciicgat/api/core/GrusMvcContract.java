@@ -13,6 +13,7 @@ import com.ciicgat.api.core.processor.PathVariableParameterProcessor;
 import com.ciicgat.api.core.processor.RequestHeaderParameterProcessor;
 import com.ciicgat.api.core.processor.RequestParamParameterProcessor;
 import com.ciicgat.api.core.processor.RequestPartParameterProcessor;
+import com.google.common.collect.Maps;
 import feign.Contract;
 import feign.Feign;
 import feign.MethodMetadata;
@@ -360,7 +361,7 @@ public class GrusMvcContract extends Contract.BaseContract implements ResourceLo
 
     private Map<Class<? extends Annotation>, AnnotatedParameterProcessor> toAnnotatedArgumentProcessorMap(
             List<AnnotatedParameterProcessor> processors) {
-        Map<Class<? extends Annotation>, AnnotatedParameterProcessor> result = new HashMap<>(processors.size());
+        Map<Class<? extends Annotation>, AnnotatedParameterProcessor> result = Maps.newHashMapWithExpectedSize(processors.size());
         for (AnnotatedParameterProcessor processor : processors) {
             result.put(processor.getAnnotationType(), processor);
         }
