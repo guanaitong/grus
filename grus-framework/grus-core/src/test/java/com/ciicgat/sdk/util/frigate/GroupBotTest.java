@@ -5,7 +5,6 @@
 
 package com.ciicgat.sdk.util.frigate;
 
-import com.ciicgat.sdk.lang.tool.ReadResourceUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Test;
