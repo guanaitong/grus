@@ -9,7 +9,6 @@ package com.ciicgat.sdk.servlet.trace;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.service.GrusFramework;
-import com.ciicgat.grus.service.GrusRuntimeConfig;
 import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.GrusServiceHttpHeader;
 import com.ciicgat.grus.service.GrusServiceStatus;
@@ -47,7 +46,6 @@ public class TracingFilter implements Filter {
 
     private static final String SERVER_SPAN_CONTEXT = TracingFilter.class.getName() + ".activeSpanContext";
 
-    private GrusRuntimeConfig grusRuntimeConfig = GrusFramework.getGrusRuntimeManager().getGrusRuntimeConfig();
     private ServletFilterSpanDecorator spanDecorator = ServletFilterSpanDecorator.STANDARD_TAGS;
 
 
