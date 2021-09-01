@@ -60,7 +60,7 @@ public class InEnumValidator extends Validator<InEnum> {
                         }
                     }
                 } catch (Exception e) {
-                    throw new RuntimeException("枚举校验器执行失败");
+                    throw new RuntimeException("枚举校验器执行失败", e);
                 }
             }
         } else {
