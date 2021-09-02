@@ -7,7 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.data;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by August.Zhou on 2021/9/2 15:58.
