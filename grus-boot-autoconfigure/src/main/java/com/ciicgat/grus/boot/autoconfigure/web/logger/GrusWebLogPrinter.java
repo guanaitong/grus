@@ -38,7 +38,7 @@ import static org.springframework.core.annotation.AnnotatedElementUtils.findMerg
  */
 @Aspect
 public class GrusWebLogPrinter {
-    static Logger LOGGER = LoggerFactory.getLogger(GrusWebLogPrinter.class);
+    static Logger LOGGER = LoggerFactory.getLogger(GrusWebLogPrinter.class); //NOSONAR
 
     private static final List<Class<?>> EXCLUDE_PARAM_TYPES = Arrays.asList(ServletRequest.class, ServletResponse.class, MultipartFile.class);
 
