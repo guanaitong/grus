@@ -38,8 +38,7 @@ import static org.springframework.core.annotation.AnnotatedElementUtils.findMerg
  */
 @Aspect
 public class GrusWebLogPrinter {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GrusWebLogPrinter.class);
+    static Logger LOGGER = LoggerFactory.getLogger(GrusWebLogPrinter.class);
 
     private static final List<Class<?>> EXCLUDE_PARAM_TYPES = Arrays.asList(ServletRequest.class, ServletResponse.class, MultipartFile.class);
 
@@ -58,11 +57,14 @@ public class GrusWebLogPrinter {
         if ("isLive".equals(method.getName())) {
             return new MethodPrintConfig();
         }
+        var clazz = signature.getDeclaringType();
         ResponseBody responseBody = findMergedAnnotation(method, ResponseBody.class);
+        if (Objects.isNull(responseBody)) {
+            responseBody = findMergedAnnotation(clazz, ResponseBody.class);
+        }
         if (Objects.isNull(responseBody)) {
             return new MethodPrintConfig();
         }
-        var clazz = signature.getDeclaringType();
         LogExclude logExclude = method.getAnnotation(LogExclude.class);
         if (Objects.isNull(logExclude)) {
             logExclude = AnnotationUtils.getAnnotation(clazz, LogExclude.class);
@@ -80,10 +82,16 @@ public class GrusWebLogPrinter {
                 Parameter parameter = parameters[i];
                 LogExclude exclude = AnnotationUtils.getAnnotation(parameter, LogExclude.class);
                 if (Objects.isNull(exclude)) {
+                    boolean include = true;
                     for (Class<?> excludeParamType : EXCLUDE_PARAM_TYPES) {
                         if (excludeParamType.isAssignableFrom(parameter.getType())) {
-                            indexList.add(Integer.valueOf(i));
+                            include = false;
+                            break;
+
                         }
+                    }
+                    if (include) {
+                        indexList.add(Integer.valueOf(i));
                     }
                 }
             }
