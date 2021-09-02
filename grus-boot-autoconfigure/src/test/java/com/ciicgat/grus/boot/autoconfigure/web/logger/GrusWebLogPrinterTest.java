@@ -5,14 +5,14 @@
 
 package com.ciicgat.grus.boot.autoconfigure.web.logger;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 import org.springframework.aop.framework.AopProxy;
 import org.springframework.aop.framework.DefaultAopProxyFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+
 
 /**
  * Created by August.Zhou on 2021/9/2 13:12.
@@ -50,38 +50,39 @@ public class GrusWebLogPrinterTest {
         webLogController.isLive();
         webLogController.test("id", null, null);
         String msg = testLogger.getMsg();
-        assertEquals(msg, "WEB_REQ METHOD: WebLogController.test PARAM: [\"id\"]\n" +
+
+        Assert.assertEquals(msg, "WEB_REQ METHOD: WebLogController.test PARAM: [\"id\"]\n" +
                 "WEB_RSP METHOD: WebLogController.test RESULT: {\"code\":0,\"msg\":\"OK\",\"data\":\"I am OK ...\"}");
         webLogController.test1("id1", null);
         msg = testLogger.getMsg();
-        assertEquals(msg,"WEB_REQ METHOD: WebLogController.test1 PARAM: [\"id1\",null]\n" +
+        Assert.assertEquals(msg, "WEB_REQ METHOD: WebLogController.test1 PARAM: [\"id1\",null]\n" +
                 "WEB_RSP METHOD: WebLogController.test1 RESULT: {\"code\":0,\"msg\":\"OK\",\"data\":\"I am OK2 ...\"}");
         webLogController.test2("id1", "id2", "id3");
         msg = testLogger.getMsg();
-        assertEquals(msg,"WEB_REQ METHOD: WebLogController.test2 PARAM: [\"id1\",\"id3\"]\n" +
+        Assert.assertEquals(msg, "WEB_REQ METHOD: WebLogController.test2 PARAM: [\"id1\",\"id3\"]\n" +
                 "WEB_RSP METHOD: WebLogController.test2 RESULT: null");
         webLogController.test3("id3");
         msg = testLogger.getMsg();
-        assertEquals(msg,"WEB_REQ METHOD: WebLogController.test3 PARAM: [\"id3\"]\n" +
+        Assert.assertEquals(msg, "WEB_REQ METHOD: WebLogController.test3 PARAM: [\"id3\"]\n" +
                 "WEB_RSP METHOD: WebLogController.test3 RESULT: {\"code\":0,\"msg\":\"OK\",\"data\":\"I am OK3 ...\"}");
         webLogController.test4("id");
         msg = testLogger.getMsg();
-        assertEquals(msg,"");
+        Assert.assertEquals(msg, "");
         try {
             webLogController.test5("id");
-            fail();
+            Assert.fail();
         } catch (Exception e) {
             msg = testLogger.getMsg();
-            assertEquals(msg,"WEB_EX METHOD: WebLogController.test5 ERROR");
+            Assert.assertEquals(msg, "WEB_EX METHOD: WebLogController.test5 ERROR");
         }
 
 
         webLogController2.test("id");
         msg = testLogger.getMsg();
-        assertEquals(msg,"");
+        Assert.assertEquals(msg, "");
         webLogController3.test("id");
         msg = testLogger.getMsg();
-        assertEquals(msg,"");
+        Assert.assertEquals(msg, "");
     }
 
 }
