@@ -234,7 +234,6 @@
                         <environmentVariables>
                             <APP_NAME>grus-demo</APP_NAME>
                         </environmentVariables>
-                        <argLine>-Dspring.application.name=grus-demo</argLine>
                     </configuration>
                 </plugin>
                 <plugin>
