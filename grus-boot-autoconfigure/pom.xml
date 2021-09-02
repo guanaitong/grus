@@ -17,6 +17,7 @@
 
     <artifactId>grus-boot-autoconfigure</artifactId>
     <groupId>com.ciicgat.grus.boot</groupId>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
