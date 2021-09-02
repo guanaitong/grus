@@ -41,7 +41,7 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
 
     @Override
     public Object getNativeCache() {
-        return this;
+        return localCache;
     }
 
     @Override

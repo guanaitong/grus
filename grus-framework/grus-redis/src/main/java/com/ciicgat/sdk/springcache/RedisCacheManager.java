@@ -67,7 +67,7 @@ public class RedisCacheManager implements CacheManager {
             }
             names.add(name);
             CacheConfig cacheConfig = this.redisCacheConfig.getCacheConfig(name);
-            Cache wrapperCache = new TransactionAwareCacheDecorator(cacheConfig.newCache(name, this));
+            Cache wrapperCache = cacheConfig.newCache(name, this);
             redisCache = redisCacheMap.putIfAbsent(name, wrapperCache);
             if (null == redisCache) {
                 redisCache = wrapperCache;
@@ -137,8 +137,8 @@ public class RedisCacheManager implements CacheManager {
             try {
                 LocalCacheEvictMessage cacheEvictMessage = LocalCacheEvictMessage.fromBytes(message.getBody());
                 Cache cache = redisCacheMap.get(cacheEvictMessage.getName());
-                if (cache != null && cache.getNativeCache() != null && cache.getNativeCache() instanceof ILocalCache) {
-                    ((ILocalCache) cache.getNativeCache()).clearLocal(cacheEvictMessage.getKey());
+                if (cache instanceof ILocalCache) {
+                    ((ILocalCache) cache).clearLocal(cacheEvictMessage.getKey());
                 }
             } catch (Exception e) {
                 LOGGER.error("onMessage", e);

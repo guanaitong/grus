@@ -51,8 +51,8 @@ public class NearExpiredCacheRefresher extends AbstractCacheRefresher {
     @Override
     public void mayRefresh(AbstractCache cache, String key, Callable<Object> valueLoader) {
         try {
-            if (cache.getNativeCache() != null && cache.getNativeCache() instanceof IRedisCache) {
-                long ttl = ((IRedisCache) cache.getNativeCache()).ttl(key);
+            if (cache instanceof IRedisCache) {
+                long ttl = ((IRedisCache) cache).ttl(key);
                 if (ttl > 0 && ttl <= preLoadSeconds) {
                     refresh(cache, key, valueLoader);
                 }

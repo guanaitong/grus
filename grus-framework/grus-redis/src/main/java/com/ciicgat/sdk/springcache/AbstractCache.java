@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.concurrent.Callable;
 
@@ -49,6 +51,19 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
 
     @Override
     public final void put(Object key, Object value) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                @Override
+                public void afterCommit() {
+                    putIgnoreException(key, value);
+                }
+            });
+        } else {
+            putIgnoreException(key, value);
+        }
+    }
+
+    private void putIgnoreException(Object key, Object value) {
         try {
             put0(key, value);
         } catch (Exception e) {
@@ -60,6 +75,18 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
 
     @Override
     public final void evict(Object key) {
+        evictIgnoreException(key);
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                @Override
+                public void afterCommit() {
+                    evictIgnoreException(key);
+                }
+            });
+        }
+    }
+
+    private void evictIgnoreException(Object key) {
         try {
             evict0(key);
         } catch (Exception e) {

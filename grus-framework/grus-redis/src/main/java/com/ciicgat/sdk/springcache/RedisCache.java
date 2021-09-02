@@ -100,11 +100,6 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
 
 
     @Override
-    public ValueWrapper putIfAbsent(Object key, Object value) {
-        return null;
-    }
-
-    @Override
     protected void evict0(Object key) {
         byte[] redisKey = makeKey(key);
         execute(redisConnection -> redisConnection.del(redisKey));
