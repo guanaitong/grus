@@ -47,7 +47,6 @@ public class GrusFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        J2EEContainer.init(filterConfig.getServletContext());
     }
 
     @Override
