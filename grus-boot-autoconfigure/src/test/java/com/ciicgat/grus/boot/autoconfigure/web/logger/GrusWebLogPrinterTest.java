@@ -82,6 +82,9 @@ public class GrusWebLogPrinterTest {
         webLogController3.test("id");
         msg = testLogger.getMsg();
         Assert.assertEquals(msg, "");
+
+        msg = testLogger.getMsg();
+        Assert.assertEquals(msg, "");
     }
 
 }

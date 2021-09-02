@@ -45,11 +45,11 @@ public class GrusWebLogPrinter {
     private ConcurrentMap<Method, MethodPrintConfig> cache = new ConcurrentHashMap<>();
 
     private MethodPrintConfig getMethodPrintConfig(Signature signature, Method method) {
-        MethodPrintConfig MethodPrintConfig = cache.get(method);
-        if (MethodPrintConfig == null) {
+        MethodPrintConfig methodPrintConfig = cache.get(method);
+        if (methodPrintConfig == null) {
             return cache.computeIfAbsent(method, method1 -> getMethodPrintConfig0(signature, method1));
         } else {
-            return MethodPrintConfig;
+            return methodPrintConfig;
         }
     }
 
