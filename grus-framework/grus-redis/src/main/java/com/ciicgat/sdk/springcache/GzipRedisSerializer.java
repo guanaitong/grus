@@ -6,11 +6,11 @@
 package com.ciicgat.sdk.springcache;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.UnsynchronizedByteArrayInputStream;
+import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -34,7 +34,7 @@ public class GzipRedisSerializer implements RedisSerializer {
             return serialize;
         }
         try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            UnsynchronizedByteArrayOutputStream out = new UnsynchronizedByteArrayOutputStream();
             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(out);
             gzipOutputStream.write(serialize);
             gzipOutputStream.close();
@@ -50,9 +50,11 @@ public class GzipRedisSerializer implements RedisSerializer {
             return null;
         }
         try {
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+            UnsynchronizedByteArrayInputStream byteArrayInputStream = new UnsynchronizedByteArrayInputStream(bytes);
             GZIPInputStream inputStream = new GZIPInputStream(byteArrayInputStream);
             return redisSerializer.deserialize(IOUtils.toByteArray(inputStream));
+        } catch (SerializationException e) {
+            throw e;
         } catch (IOException e) {
             throw new SerializationException("gzip deserialize failed", e);
         }
