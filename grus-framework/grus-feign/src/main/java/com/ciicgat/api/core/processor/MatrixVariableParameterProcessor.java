@@ -60,7 +60,7 @@ public class MatrixVariableParameterProcessor implements AnnotatedParameterProce
 	}
 
 	private String expandMap(Object object) {
-		Map<String, Object> paramMap = (Map) object;
+		Map<String, Object> paramMap = (Map) object; //NOSONAR
 
 		return paramMap.keySet().stream()
 				.map(key -> ";" + key + "=" + paramMap.get(key).toString())

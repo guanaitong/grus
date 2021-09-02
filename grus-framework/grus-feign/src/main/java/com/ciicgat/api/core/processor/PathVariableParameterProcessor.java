@@ -6,12 +6,14 @@
 package com.ciicgat.api.core.processor;
 
 import feign.MethodMetadata;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import static feign.Util.checkState;
 import static feign.Util.emptyToNull;
@@ -53,11 +55,11 @@ public class PathVariableParameterProcessor implements AnnotatedParameterProcess
 
 	private <K, V> boolean searchMapValues(Map<K, Collection<V>> map, V search) {
 		Collection<Collection<V>> values = map.values();
-		if (values == null || values.isEmpty()) {
+		if (CollectionUtils.isEmpty(values)) {
 			return false;
 		}
 		for (Collection<V> entry : values) {
-			if (entry.contains(search)) {
+			if (Objects.nonNull(entry) && entry.contains(search)) {
 				return true;
 			}
 		}

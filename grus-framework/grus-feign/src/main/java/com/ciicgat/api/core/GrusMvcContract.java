@@ -477,8 +477,7 @@ public class GrusMvcContract extends Contract.BaseContract implements ResourceLo
         public Collection<String> setTemplateParameter(String name,
                                                        Collection<String> rest) {
 
-            Collection<String> params = ofNullable(rest).map(ArrayList::new)
-                    .orElse(new ArrayList<>());
+            Collection<String> params = ofNullable(rest).map(ArrayList::new).orElse(new ArrayList<>()); //NOSONAR
             params.add(String.format("{%s}", name));
             return params;
         }

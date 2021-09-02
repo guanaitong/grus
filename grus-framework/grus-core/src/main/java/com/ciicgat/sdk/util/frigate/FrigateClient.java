@@ -35,7 +35,7 @@ public abstract class FrigateClient {
      * 将消息发送对业务的影响，尽可能降低到最低
      */
     static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
-            new ArrayBlockingQueue<>(4096), Threads.newDaemonThreadFactory("frigate_notifier", Thread.NORM_PRIORITY), Threads.LOGGER_REJECTEDEXECUTIONHANDLER);
+            new ArrayBlockingQueue<>(4096), Threads.newDaemonThreadFactory("frigate_notifier", Thread.MIN_PRIORITY), Threads.LOGGER_REJECTEDEXECUTIONHANDLER);
 
     private final static OkHttpClient OK_HTTP_CLIENT;
 
