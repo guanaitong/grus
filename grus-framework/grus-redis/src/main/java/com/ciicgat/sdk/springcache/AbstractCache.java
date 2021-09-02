@@ -63,7 +63,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         try {
             evict0(key);
         } catch (Exception e) {
-            LOGGER.warn("save value failed,key=" + key, e);
+            LOGGER.warn("evict value failed,key=" + key, e);
         }
     }
 
