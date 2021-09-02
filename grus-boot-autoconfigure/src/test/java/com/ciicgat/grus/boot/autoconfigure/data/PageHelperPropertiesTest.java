@@ -31,5 +31,7 @@ class PageHelperPropertiesTest {
         pageHelperProperties.setReasonable(true);
         pageHelperProperties.setCloseConn(true);
         pageHelperProperties.setPageSizeZero(true);
+        pageHelperProperties.setRowBoundsWithCount(true);
+        pageHelperProperties.setDialect("mysql");
     }
 }
