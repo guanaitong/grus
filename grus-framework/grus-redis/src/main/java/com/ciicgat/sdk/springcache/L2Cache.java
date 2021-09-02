@@ -9,6 +9,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 
@@ -42,55 +43,48 @@ public class L2Cache extends RedisCache<CacheConfig.LocalRedis> implements ILoca
     }
 
     @Override
-    protected Object getValue(Object key) {
-        Object localValue = localCache.getIfPresent(key);
-        if (localValue == null) {
+    protected BytesValue getValue(Object key) {
+        Object value = localCache.getIfPresent(key);
+        if (value == null) {
             // 从redis中取
-            Object redisValue = super.getValue(key);
-            if (redisValue != null) {
-                saveLocalCache(key, redisValue);
-            }
-            return redisValue;
-        } else if (localValue == NULL) {
-            return localValue;
-        }
-        if (this.config.isSerialize()) {
-            byte[] bytesValue = (byte[]) localValue;
-            try {
-                return valueSerializer.deserialize(bytesValue);
-            } catch (Exception e) {
-                LOGGER.warn("deserialize error,name= " + name + ",key=" + key, e);
+            BytesValue redisBytesValue = super.getValue(key);
+            if (redisBytesValue == null) {
                 return null;
             }
+            localCache.put(key, this.config.isSerialize() ? redisBytesValue.getBytes() : redisBytesValue.getValue());
+            return redisBytesValue;
+        } else if (value == NULL) {
+            return NULL_BYTES_VALUE;
+        }
+        if (this.config.isSerialize()) {
+            byte[] bytesValue = (byte[]) value;
+            return new BytesValue(bytesValue, valueSerializer.deserialize(bytesValue));
         } else {
-            return localValue;
+            return new BytesValue(null, value);
         }
     }
 
-    private void saveLocalCache(Object key, Object value) {
-        if (value == null || value == NULL) {
+
+    @Override
+    protected void put0(Object key, Object value) {
+        if (Objects.isNull(value)) {
+            localCache.put(key, NULL);
+            saveRedisCache(key, NULL_BYTES_VALUE);
             return;
         }
         if (this.config.isSerialize()) {
-            try {
-                localCache.put(key, valueSerializer.serialize(value));
-            } catch (Exception e) {
-                LOGGER.warn("serialize error,name= " + name + ",key=" + key, e);
-            }
+            BytesValue bytesValue = new BytesValue(valueSerializer.serialize(value), value);
+            localCache.put(key, bytesValue.getBytes());
+            saveRedisCache(key, bytesValue);
         } else {
             localCache.put(key, value);
+            saveRedisCache(key, new BytesValue(valueSerializer.serialize(value), value));
         }
     }
 
     @Override
-    public void put(Object key, Object value) {
-        super.put(key, value);
-        saveLocalCache(key, value);
-    }
-
-    @Override
-    public void evict(Object key) {
-        super.evict(key);
+    public void evict0(Object key) {
+        super.evict0(key);
         localCache.invalidate(key);
         redisCacheManager.sendEvictMessage(key, this.name);
     }

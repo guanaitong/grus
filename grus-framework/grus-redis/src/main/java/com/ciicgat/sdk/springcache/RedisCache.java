@@ -53,31 +53,25 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
     }
 
     @Override
-    public ValueWrapper get(Object key) {
-        Object o = getValue(key);
-        if (o == AbstractCache.NULL) {
-            return new SimpleValueWrapper(null);
+    protected final ValueWrapper get0(Object key) {
+        BytesValue bytesValue = getValue(key);
+        if (Objects.isNull(bytesValue)) {
+            return null;
         }
-        return o == null ? null : new SimpleValueWrapper(o);
+        return new SimpleValueWrapper(bytesValue == AbstractCache.NULL_BYTES_VALUE ? null : bytesValue.getValue());
     }
 
 
-    protected Object getValue(Object key) {
-        Object o = null;
-        try {
-            byte[] redisKey = makeKey(key);
-            byte[] redisValue = execute(redisConnection -> redisConnection.get(redisKey));
-            if (redisValue == null) {
-                return null;
-            }
-            if (redisValue.length == 0) {
-                return AbstractCache.NULL;
-            }
-            o = valueSerializer.deserialize(redisValue);
-        } catch (Exception e) {
-            LOGGER.warn("redis error,name= " + name + ",key=" + key, e);
+    protected BytesValue getValue(Object key) {
+        byte[] redisKey = makeKey(key);
+        byte[] redisValue = execute(redisConnection -> redisConnection.get(redisKey));
+        if (redisValue == null) {
+            return null;
         }
-        return o;
+        if (redisValue.length == 0) {
+            return NULL_BYTES_VALUE;
+        }
+        return new BytesValue(redisValue, valueSerializer.deserialize(redisValue));
     }
 
     @Override
@@ -87,29 +81,21 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
     }
 
     @Override
-    public void put(final Object key, final Object value) {
-        try {
-            byte[] redisKey = makeKey(key);
-            byte[] redisValue;
-            if (value != null) {
-                redisValue = valueSerializer.serialize(value);
-            } else {
-                redisValue = Bytes.EMPTY_BYTE_ARRAY;
+    protected void put0(final Object key, final Object value) {
+        BytesValue bytesValue = value == null ? NULL_BYTES_VALUE : new BytesValue(valueSerializer.serialize(value), value);
+        saveRedisCache(key, bytesValue);
+    }
+
+    protected final void saveRedisCache(final Object key, final BytesValue bytesValue) {
+        byte[] redisKey = makeKey(key);
+        execute(redisConnection -> {
+            var redisValue = bytesValue.getBytes();
+            if (config.getExpireSeconds() == 0) {
+                return redisConnection.set(redisKey, redisValue);
             }
-            Boolean v = execute(redisConnection -> {
-                if (redisValue.length == 0) {
-                    return redisConnection.setEx(redisKey, 30, redisValue);
-                }
-                if (config.getExpireSeconds() == 0) {
-                    return redisConnection.set(redisKey, redisValue);
-                }
-                return redisConnection.setEx(redisKey, config.getExpireSeconds(), redisValue);
-            });
-            redisKeyListener.onPut(redisKey);
-            LOGGER.debug("保存缓存key：{} 的结果是：{}", this.prefix + key, v);
-        } catch (Exception e) {
-            LOGGER.warn("redis error,name= " + name + ",key=" + key, e);
-        }
+            return redisConnection.setEx(redisKey, config.getExpireSeconds(), redisValue);
+        });
+        redisKeyListener.onPut(redisKey);
     }
 
 
@@ -119,13 +105,9 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
     }
 
     @Override
-    public void evict(Object key) {
+    protected void evict0(Object key) {
         byte[] redisKey = makeKey(key);
-        try {
-            execute(redisConnection -> redisConnection.del(redisKey));
-        } catch (Exception e) {
-            LOGGER.warn("redis error,name= " + name + ",key=" + key, e);
-        }
+        execute(redisConnection -> redisConnection.del(redisKey));
         redisKeyListener.onDelete(redisKey);
     }
 

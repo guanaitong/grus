@@ -5,6 +5,9 @@
 
 package com.ciicgat.sdk.springcache;
 
+import com.ciicgat.sdk.lang.tool.Bytes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 
@@ -15,7 +18,9 @@ import java.util.concurrent.Callable;
  * @Date: 2021/4/15 9:46
  */
 public abstract class AbstractCache<C extends CacheConfig> implements Cache {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCache.class);
     protected static final Object NULL = new Object();
+    protected static final BytesValue NULL_BYTES_VALUE = new BytesValue(Bytes.EMPTY_BYTE_ARRAY, NULL);
     protected final String name;
     protected final RedisCacheManager redisCacheManager;
     protected final C config;
@@ -29,6 +34,40 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         this.cacheRefresher = this.redisCacheManager.getCacheRefresher();
         this.redisConnectionFactory = this.redisCacheManager.getRedisConnectionFactory();
     }
+
+    @Override
+    public final ValueWrapper get(Object key) {
+        try {
+            return get0(key);
+        } catch (Exception e) {
+            LOGGER.warn("get value failed,key=" + key, e);
+        }
+        return null;
+    }
+
+    protected abstract ValueWrapper get0(Object key);
+
+    @Override
+    public final void put(Object key, Object value) {
+        try {
+            put0(key, value);
+        } catch (Exception e) {
+            LOGGER.warn("save value failed,key=" + key, e);
+        }
+    }
+
+    protected abstract void put0(Object key, Object value);
+
+    @Override
+    public final void evict(Object key) {
+        try {
+            evict0(key);
+        } catch (Exception e) {
+            LOGGER.warn("save value failed,key=" + key, e);
+        }
+    }
+
+    protected abstract void evict0(Object key);
 
     @Override
     public final <T> T get(final Object key, final Class<T> type) {

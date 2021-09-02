@@ -45,56 +45,21 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
     }
 
     @Override
-    public ValueWrapper get(Object key) {
-        Object o = getValue(key);
-        if (o == NULL) {
-            return new SimpleValueWrapper(null);
-        }
-        return o == null ? null : new SimpleValueWrapper(o);
-    }
-
-    protected Object getValue(Object key) {
-        Object localValue = localCache.getIfPresent(key);
-        if (localValue == NULL) {
-            return localValue;
-        }
-
-        if (this.config.isSerialize()) {
-            byte[] bytesValue = (byte[]) localValue;
-            try {
-                return valueSerializer.deserialize(bytesValue);
-            } catch (Exception e) {
-                LOGGER.warn("deserialize error,name= " + name + ",key=" + key, e);
-                return null;
-            }
-        } else {
-            return localValue;
-        }
-    }
-
-    private void saveLocalCache(Object key, Object value) {
+    protected ValueWrapper get0(Object key) {
+        Object value = localCache.getIfPresent(key);
         if (value == null) {
-            localCache.put(key, NULL);
-            return;
+            return null;
         }
-        if (this.config.isSerialize()) {
-            try {
-                localCache.put(key, valueSerializer.serialize(value));
-            } catch (Exception e) {
-                LOGGER.warn("serialize error,name= " + name + ",key=" + key, e);
-            }
-        } else {
-            localCache.put(key, value);
-        }
+        return new SimpleValueWrapper(value == NULL ? null : this.config.isSerialize() ? valueSerializer.deserialize((byte[]) value) : value);
     }
 
     @Override
-    public void put(Object key, Object value) {
-        saveLocalCache(key, value);
+    protected void put0(Object key, Object value) {
+        localCache.put(key, value == null ? NULL : this.config.isSerialize() ? valueSerializer.serialize(value) : value);
     }
 
     @Override
-    public void evict(Object key) {
+    protected void evict0(Object key) {
         localCache.invalidate(key);
         redisCacheManager.sendEvictMessage(key, this.name);
     }
