@@ -49,6 +49,7 @@ class ValueWrappers {
             try (Reader reader = new StringReader(value)) {
                 p.load(reader);
             } catch (Exception e1) {
+                // NOSONAR
             }
             if (p.size() > 0) {
                 if (!key.endsWith(PropertiesUtils.SUFFIX)) {  //提醒下那些文件名命名不规范的用户
