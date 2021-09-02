@@ -72,7 +72,7 @@ class JacksonDecoder implements Decoder {
             return decodeFromResponse(response, type, reader);
         } catch (RuntimeJsonMappingException e) {
             if (e.getCause() instanceof IOException) {
-                throw (IOException) e.getCause();
+                throw (IOException) e.getCause(); //NOSONAR
             }
             throw e;
         }

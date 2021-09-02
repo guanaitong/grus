@@ -216,7 +216,7 @@ public class GfsClient {
         try {
             signedUrl = getUploadUrl4PrivateFile(tmpOssFileKey, true, contentType);
         } catch (OSSObjectExistsException e) {
-            throw new BusinessRuntimeException(-1, "上传文件请求签名失败（文件已存在）");
+            throw new BusinessRuntimeException(-1, "上传文件请求签名失败（文件已存在）"); //NOSONAR
         }
 
         ossPutObject(signedUrl, data, tmpOssFileKey, originalFileName, contentType, 0);

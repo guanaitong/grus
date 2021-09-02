@@ -53,7 +53,7 @@ public class PathVariableParameterProcessor implements AnnotatedParameterProcess
 
 	private <K, V> boolean searchMapValues(Map<K, Collection<V>> map, V search) {
 		Collection<Collection<V>> values = map.values();
-		if (values == null) {
+		if (values == null || values.isEmpty()) {
 			return false;
 		}
 		for (Collection<V> entry : values) {

@@ -112,7 +112,7 @@ public class SpringRedisConfCreator {
         List<RedisNode> nodes = new ArrayList<>();
         for (String node : nodesText.split(",")) {
             try {
-                String[] parts = org.springframework.util.StringUtils.split(node, ":");
+                String[] parts = node.split(":");
                 Assert.state(parts.length == 2, "Must be defined as 'host:port'");
                 nodes.add(new RedisNode(parts[0], Integer.parseInt(parts[1])));
             } catch (RuntimeException ex) {

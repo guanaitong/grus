@@ -17,6 +17,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ public class ElasticsearchAutoConfiguration {
         List<HttpHost> httpHosts = new ArrayList<>(elasticsearchProperties.getNodes().size());
         for (String node : elasticsearchProperties.getNodes()) {
             String[] s = node.split(":");
+            Assert.state(s.length == 2, "Must be defined as 'host:port'");
             httpHosts.add(new HttpHost(s[0], Integer.parseInt(s[1])));
         }
         RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(httpHosts.toArray(new HttpHost[0])));

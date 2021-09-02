@@ -58,7 +58,7 @@ public class MsgDispatcher {
         this.host = builder.host;
 
         try (Channel channel = connection.createChannel()) {
-            channel.exchangeDeclare(exchangeName, exchangeType, true);
+            channel.exchangeDeclare(exchangeName, exchangeType, true); //NOSONAR
         }
 
         channelPool = new ChannelPool(connection, builder.parallelNum, this.confirm);
