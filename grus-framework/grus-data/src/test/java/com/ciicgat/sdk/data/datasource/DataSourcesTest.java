@@ -6,7 +6,7 @@
 package com.ciicgat.sdk.data.datasource;
 
 import com.ciicgat.grus.json.JSON;
-import com.ciicgat.sdk.util.system.EnvPrepare;
+import com.ciicgat.sdk.util.system.EnvHook;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -53,7 +53,7 @@ public class DataSourcesTest {
 
     @Test
     public void testCreate() throws SQLException {
-        EnvPrepare.put("APP_NAME", "grus-demo");
+        EnvHook.setAppName("grus-demo");
 
         DataSource masterDataSource = DataSourceBuilder.newBuilder().setDbName("userdoor").newDataSource();
 

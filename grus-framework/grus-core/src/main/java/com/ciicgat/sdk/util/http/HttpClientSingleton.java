@@ -38,7 +38,6 @@ public class HttpClientSingleton {
     /**
      * 获取okHttpClient单例
      *
-     * @return
      */
     public static okhttp3.OkHttpClient getOkHttpClient() {
         return OkHttpClientSingletonHolder.OK_HTTP_CLIENT;

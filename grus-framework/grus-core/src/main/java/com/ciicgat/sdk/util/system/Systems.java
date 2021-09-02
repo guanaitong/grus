@@ -55,12 +55,12 @@ public class Systems {
             appInstanceKey = "APP_INSTANCE_NAME";
         }
 
-        APP_NAME = EnvPrepare.get("APP_NAME", () -> isEmpty(System.getenv("APP_NAME")) ? UNKNOWN : System.getenv("APP_NAME"));
+        APP_NAME = EnvHook.getAppName(() -> isEmpty(System.getenv("APP_NAME")) ? UNKNOWN : System.getenv("APP_NAME"));
 
-        APP_SECRET = EnvPrepare.get("APP_SECRET", () -> isEmpty(System.getenv("APP_SECRET")) ? UNKNOWN : System.getenv("APP_SECRET"));
+        APP_SECRET = isEmpty(System.getenv("APP_SECRET")) ? UNKNOWN : System.getenv("APP_SECRET");
 
 
-        APP_INSTANCE = EnvPrepare.get("APP_INSTANCE", () -> isEmpty(System.getenv(appInstanceKey)) ? UNKNOWN : System.getenv(appInstanceKey));
+        APP_INSTANCE = isEmpty(System.getenv(appInstanceKey)) ? UNKNOWN : System.getenv(appInstanceKey);
 
         String hostName;
 
@@ -71,13 +71,12 @@ public class Systems {
             LOGGER.warn("warn", e);
             hostName = System.getenv("HOSTNAME");
         }
-        final String hostNameCopy = hostName;
 
-        HOST_NAME = EnvPrepare.get("HOST_NAME", () -> hostNameCopy);
+        HOST_NAME = hostName;
 
-        HOST_IP = EnvPrepare.get("HOST_IP", () -> getIp());
+        HOST_IP = getIp();
 
-        CLIENT_ID = Systems.APP_INSTANCE + "-->" + Systems.HOST_IP + "-->" + UUID.randomUUID().toString();
+        CLIENT_ID = Systems.APP_INSTANCE + "-->" + Systems.HOST_IP + "-->" + UUID.randomUUID();
 
         LOGGER.info("appName {},appInstance {},hostName {},hostIp {},clientId {}", APP_NAME, APP_INSTANCE, HOST_NAME, HOST_IP, CLIENT_ID);
     }

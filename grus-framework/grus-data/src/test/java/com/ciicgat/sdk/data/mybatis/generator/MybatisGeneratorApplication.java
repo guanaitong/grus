@@ -7,7 +7,7 @@ package com.ciicgat.sdk.data.mybatis.generator;
 
 import com.ciicgat.sdk.data.datasource.DataSourceBuilder;
 import com.ciicgat.sdk.data.mybatis.SQLTelemetryInterceptor;
-import com.ciicgat.sdk.util.system.EnvPrepare;
+import com.ciicgat.sdk.util.system.EnvHook;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -28,7 +28,7 @@ import javax.sql.DataSource;
 public class MybatisGeneratorApplication {
 
     static {
-        EnvPrepare.put("APP_NAME", "grus-demo");
+        EnvHook.setAppName("grus-demo");
     }
 
     public static void main(String[] args) {

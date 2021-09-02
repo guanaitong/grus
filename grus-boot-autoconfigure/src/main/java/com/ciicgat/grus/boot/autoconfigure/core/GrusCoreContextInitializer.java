@@ -12,7 +12,7 @@ import com.ciicgat.grus.service.impl.StandardGrusRuntimeContext;
 import com.ciicgat.grus.service.impl.StandardGrusRuntimeManager;
 import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.util.frigate.FrigateNotifier;
-import com.ciicgat.sdk.util.system.EnvPrepare;
+import com.ciicgat.sdk.util.system.EnvHook;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContextInitializer;
@@ -54,7 +54,7 @@ public class GrusCoreContextInitializer implements ApplicationContextInitializer
         }
         String appNameFromEnv = System.getenv("APP_NAME");
         if (appNameFromEnv == null) {
-            EnvPrepare.put("APP_NAME", appName);
+            EnvHook.setAppName(appName);
         } else if (!appNameFromEnv.equals(appName)) { // 配置文件里的appName必须和环境变量里的一致
             throw new IllegalArgumentException("you should set spring.application.name as same as the env value of APP_NAME");
         }
