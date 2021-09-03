@@ -92,7 +92,12 @@ public class ExcelResolver<T> {
             for (CellResolver cellResolver : cellResolvers) {
                 Cell cell = row.createCell(cellResolver.column);
 
-                cellResolver.converter.write(cell, cellResolver.field.get(data));
+                Object value = cellResolver.field.get(data);
+                if (value == null) {
+                    cell.setCellType(CellType.BLANK);
+                } else {
+                    cellResolver.converter.write(cell, cellResolver.field.get(data));
+                }
             }
         }
     }

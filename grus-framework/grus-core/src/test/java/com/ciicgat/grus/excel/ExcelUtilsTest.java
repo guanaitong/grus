@@ -36,6 +36,8 @@ public class ExcelUtilsTest {
         private Boolean isParty;
         @ExcelColumn(name = "体重", column = 5)
         private BigDecimal weight;
+        @ExcelColumn(name = "空值", column = 6)
+        private Integer nothing;
 
         public int getAge() {
             return age;
@@ -83,6 +85,14 @@ public class ExcelUtilsTest {
 
         public void setWeight(BigDecimal weight) {
             this.weight = weight;
+        }
+
+        public Integer getNothing() {
+            return nothing;
+        }
+
+        public void setNothing(Integer nothing) {
+            this.nothing = nothing;
         }
 
         @Override
