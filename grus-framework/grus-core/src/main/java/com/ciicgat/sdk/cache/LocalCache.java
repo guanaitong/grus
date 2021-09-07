@@ -9,6 +9,7 @@ package com.ciicgat.sdk.cache;
 import com.ciicgat.sdk.lang.exception.CacheDataException;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,6 +27,7 @@ public class LocalCache {
     public LocalCache(int expiredSecond, long maximumSize) {
         this.localCache = Caffeine.newBuilder()
                 .expireAfterWrite(expiredSecond, TimeUnit.SECONDS)
+                .scheduler(Scheduler.systemScheduler())
                 .maximumSize(maximumSize)
                 .build();
     }

@@ -6,6 +6,7 @@
 package com.ciicgat.sdk.springcache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +32,7 @@ public class L2Cache extends RedisCache<CacheConfig.LocalRedis> implements ILoca
 
         if (localRedis.getLocalExpireSeconds() > 0) {
             caffeine.expireAfterWrite(localRedis.getLocalExpireSeconds(), TimeUnit.SECONDS);
+            caffeine.scheduler(Scheduler.systemScheduler());
         }
 
         this.localCache = caffeine.build();

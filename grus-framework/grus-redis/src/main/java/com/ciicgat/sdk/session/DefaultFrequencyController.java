@@ -7,6 +7,7 @@ package com.ciicgat.sdk.session;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,11 +24,13 @@ class DefaultFrequencyController implements FrequencyController {
 
     private LoadingCache<String, AtomicLong> oneHourLimit = Caffeine.newBuilder()
             .expireAfterWrite(1, TimeUnit.HOURS)
+            .scheduler(Scheduler.systemScheduler())
             .build(key -> new AtomicLong());
 
 
     private LoadingCache<String, AtomicLong> oneMinutesLimit = Caffeine.newBuilder()
             .expireAfterWrite(1, TimeUnit.MINUTES)
+            .scheduler(Scheduler.systemScheduler())
             .build(key -> new AtomicLong());
 
     private static boolean check(LoadingCache<String, AtomicLong> cache, String key, int maxCount) {

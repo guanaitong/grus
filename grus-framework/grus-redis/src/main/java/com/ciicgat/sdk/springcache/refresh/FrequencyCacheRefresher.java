@@ -8,6 +8,7 @@ package com.ciicgat.sdk.springcache.refresh;
 import com.ciicgat.sdk.lang.tool.Bytes;
 import com.ciicgat.sdk.springcache.AbstractCache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ public class FrequencyCacheRefresher extends AbstractCacheRefresher {
     private com.github.benmanes.caffeine.cache.Cache<String, Boolean> newLocalCache(int frequencySeconds) {
         return Caffeine.newBuilder()
                 .expireAfterWrite(Math.max(60, frequencySeconds / 2), TimeUnit.SECONDS)
+                .scheduler(Scheduler.systemScheduler())
                 .initialCapacity(1024)
                 .maximumSize(102400L)
                 .build();

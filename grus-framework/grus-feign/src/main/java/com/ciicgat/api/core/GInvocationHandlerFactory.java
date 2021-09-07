@@ -25,6 +25,7 @@ import com.ciicgat.sdk.util.frigate.NotifyChannel;
 import com.ciicgat.sdk.util.system.Systems;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Defaults;
 import feign.InvocationHandlerFactory;
@@ -275,6 +276,7 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 Cache<String, Object> newCache = Caffeine.newBuilder()
                         .expireAfterWrite(apiCache.expireSeconds(), TimeUnit.SECONDS)
                         .maximumSize(apiCache.maxCacheSize())
+                        .scheduler(Scheduler.systemScheduler())
                         .initialCapacity(16)
                         .build();
                 cache = cacheMap.putIfAbsent(method, newCache);

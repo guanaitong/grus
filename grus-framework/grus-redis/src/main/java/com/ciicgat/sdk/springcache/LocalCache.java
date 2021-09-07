@@ -6,6 +6,7 @@
 package com.ciicgat.sdk.springcache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.support.SimpleValueWrapper;
@@ -33,6 +34,7 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
                 .initialCapacity(local.getInitialCapacity());
         if (local.getExpireSeconds() > 0) {
             caffeine.expireAfterWrite(local.getExpireSeconds(), TimeUnit.SECONDS);
+            caffeine.scheduler(Scheduler.systemScheduler());
         }
         this.localCache = caffeine.build();
         this.redisCacheManager.initMessageListener();
