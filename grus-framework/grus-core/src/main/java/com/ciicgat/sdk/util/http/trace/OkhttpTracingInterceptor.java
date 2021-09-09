@@ -12,6 +12,7 @@ import com.ciicgat.sdk.trace.Spans;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.noop.NoopSpan;
+import io.opentracing.propagation.Format;
 import io.opentracing.tag.Tags;
 import io.opentracing.util.GlobalTracer;
 import okhttp3.Interceptor;
@@ -34,27 +35,32 @@ public class OkhttpTracingInterceptor implements Interceptor {
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        Request request = chain.request();
+
+        Request originalRequest = chain.request();
+        Request.Builder requestBuilder = originalRequest.newBuilder();
 
         Response response = null;
 
         Tracer tracer = GlobalTracer.get();
 
         Span rootSpan = Spans.getRootSpan();
-        final Span span = tracer.buildSpan(request.method())
+        final Span span = tracer.buildSpan(originalRequest.method())
                 .asChildOf(rootSpan == NoopSpan.INSTANCE ? null : rootSpan)
                 .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT)
                 .withTag(Tags.COMPONENT.getKey(), "okhttp")
                 .start();
         Spans.setSystemTags(span);
 
-        decorator.onRequest(request, span);
+        tracer.inject(span.context(), Format.Builtin.HTTP_HEADERS, new RequestBuilderInjectAdapter(requestBuilder));
+
+        Request newRequest = requestBuilder.build();
+        decorator.onRequest(originalRequest, span);
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Sending request {} on {} {}", request.url(), chain.connection(), request.headers());
+            LOGGER.debug("Sending request {} on {} {}", originalRequest.url(), chain.connection(), originalRequest.headers());
         }
         try {
-            response = chain.proceed(request);
+            response = chain.proceed(newRequest);
             decorator.onResponse(response, span);
         } catch (Throwable ex) {
             decorator.onError(ex, span);
@@ -62,7 +68,7 @@ public class OkhttpTracingInterceptor implements Interceptor {
         } finally {
             span.finish();
             long durationMilliSeconds = SpanUtil.getDurationMilliSeconds(span);
-            SlowLogger.logEvent(Module.HTTP_CLIENT, durationMilliSeconds, request.toString());
+            SlowLogger.logEvent(Module.HTTP_CLIENT, durationMilliSeconds, originalRequest.toString());
             if (LOGGER.isDebugEnabled()) {
                 if (response != null) {
                     LOGGER.debug("Received response for {} on {}", response.request().url(), response.headers());

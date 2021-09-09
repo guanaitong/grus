@@ -37,10 +37,11 @@ public class FeignTracingInterceptor implements Interceptor {
 
     @Override
     public Response intercept(Chain chain) throws IOException {
-        Request originalRequest = chain.request();
-        Request.Builder requestBuilder = chain.request().newBuilder();
 
-        Response response = null;
+        Request originalRequest = chain.request();
+        Request.Builder requestBuilder = originalRequest.newBuilder();
+
+        Response response;
 
         Tracer tracer = GlobalTracer.get();
 
@@ -55,7 +56,7 @@ public class FeignTracingInterceptor implements Interceptor {
         tracer.inject(span.context(), Format.Builtin.HTTP_HEADERS, new RequestBuilderInjectAdapter(requestBuilder));
 
         Request newRequest = requestBuilder.build();
-        decorator.onRequest(chain.request(), span);
+        decorator.onRequest(originalRequest, span);
 
         try {
             response = chain.proceed(newRequest);
