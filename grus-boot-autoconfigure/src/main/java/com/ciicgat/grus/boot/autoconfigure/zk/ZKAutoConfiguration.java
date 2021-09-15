@@ -38,12 +38,17 @@ import java.util.Objects;
 @AutoConfigureAfter({GconfAutoConfiguration.class})
 public class ZKAutoConfiguration {
 
+    @Bean(destroyMethod = "close")
+    @ConditionalOnMissingBean(name = "curatorFramework")
+    public CuratorFramework curatorFramework(ZKProperties zkProperties) {
+        Objects.requireNonNull(zkProperties.getServerLists());
+        return ZKUtils.init(zkProperties.getServerLists());
+    }
+
     @Bean
     @ConditionalOnMissingBean(name = "workIdHolder")
-    public WorkIdHolder workIdHolder(ZKProperties zkProperties) {
-        Objects.requireNonNull(zkProperties.getServerLists());
-
-        return new ZKWorkIdHolder(zkProperties.getServerLists(), Systems.APP_NAME);
+    public WorkIdHolder workIdHolder(CuratorFramework curatorFramework) {
+        return new ZKWorkIdHolder(curatorFramework, Systems.APP_NAME);
     }
 
     @Bean
@@ -52,18 +57,9 @@ public class ZKAutoConfiguration {
         return new SnowflakeIdGenerator(workIdHolder, idGenProperties.getDateFormat());
     }
 
-    @Bean(destroyMethod = "close")
-    @ConditionalOnMissingBean(name = "curatorFramework")
-    public CuratorFramework curatorFramework(ZKProperties zkProperties) {
-        Objects.requireNonNull(zkProperties.getServerLists());
-
-        return ZKUtils.init(zkProperties.getServerLists());
-    }
-
     @Bean
     @ConditionalOnMissingBean(name = "distLockFactory")
     public DistLockFactory distLockFactory(CuratorFramework curatorFramework) {
-
         return new ZKDistLockFactory(curatorFramework, Systems.APP_NAME);
     }
 

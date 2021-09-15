@@ -30,8 +30,12 @@ public class ZKWorkIdHolder implements WorkIdHolder {
 
     private long workValue;
 
-    public ZKWorkIdHolder(String connectString, String appName)  {
-        workValue = init(connectString, appName);
+    public ZKWorkIdHolder(String connectString, String appName) {
+        this(ZKUtils.init(connectString), appName);
+    }
+
+    public ZKWorkIdHolder(CuratorFramework curator, String appName) {
+        workValue = init(curator, appName);
     }
 
     @Override
@@ -39,25 +43,18 @@ public class ZKWorkIdHolder implements WorkIdHolder {
         return workValue;
     }
 
-    private long init(String connectString, String appName)  {
-        CuratorFramework curator = ZKUtils.init(connectString);
-
+    private long init(CuratorFramework curator, String appName) {
         try {
             String pathPrefix = ZKPaths.makePath(appName, ZKConstants.IDGEN_PATH);
             String node = curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT_SEQUENTIAL).
                     forPath(pathPrefix + "/#", String.valueOf(System.currentTimeMillis()).getBytes(StandardCharsets.UTF_8));
             String[] nodeKey = node.split("#");
             int workValue = Integer.parseInt(nodeKey[1]);
-
             deleteHisNode(curator, pathPrefix, workValue);
             return workValue;
         } catch (Exception e) {
             LOGGER.error("ZK_INIT ERROR", e);
             throw new ZKRuntimeException("序号生成器获取机器ID失败，程序终止启动", e);
-        } finally {
-            if (curator != null) {
-                curator.close();
-            }
         }
     }
 

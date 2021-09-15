@@ -6,8 +6,13 @@
 package com.ciicgat.grus.zk.idgen;
 
 import com.ciicgat.grus.zk.TestZkConfig;
+import com.ciicgat.grus.zk.ZKUtils;
+import org.apache.curator.framework.CuratorFramework;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @Auther: Jiaju Wei
@@ -17,15 +22,14 @@ import org.junit.Test;
 public class ZKWorkIdHolderTest {
     @Test
     public void testFetchId() throws Exception {
-        Long lastId = null;
-        for (int i = 0; i < 16; i++) {
-            ZKWorkIdHolder zkWorkIdHolder = new ZKWorkIdHolder(TestZkConfig.ZK, "payment");
-            long workId = zkWorkIdHolder.getId(16);
-
-            if (lastId != null && workId != 0) {
-                Assert.assertEquals(1, workId - lastId);
-            }
-            lastId = workId;
+        CuratorFramework curatorFramework = ZKUtils.init(TestZkConfig.ZK);
+        Set<Long> ids = new HashSet<>();
+        var n = 100;
+        for (int i = 0; i < n; i++) {
+            ZKWorkIdHolder zkWorkIdHolder = new ZKWorkIdHolder(curatorFramework, "payment");
+            long workId = zkWorkIdHolder.getId();
+            ids.add(workId);
         }
+        Assert.assertEquals(n, ids.size());
     }
 }
