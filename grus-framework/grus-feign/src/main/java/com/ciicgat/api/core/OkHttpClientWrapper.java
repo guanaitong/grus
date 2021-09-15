@@ -15,7 +15,13 @@ import com.ciicgat.grus.service.loadbalance.LoadBalancers;
 import com.ciicgat.sdk.util.system.Systems;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import feign.Client;
-import okhttp3.*;
+import okhttp3.Headers;
+import okhttp3.HttpUrl;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +31,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static com.ciicgat.api.core.FeignHttpClient.*;
+import static com.ciicgat.api.core.FeignHttpClient.CONNECT_TIMEOUT_TAG;
+import static com.ciicgat.api.core.FeignHttpClient.K8S_TARGET_TAG;
+import static com.ciicgat.api.core.FeignHttpClient.READ_TIMEOUT_TAG;
 
 /**
  * This performance directs Feign's http requests to
