@@ -33,11 +33,11 @@ public class SnowflakeIdGenerator implements IdGenerator {
     private final LoopAtomicLong loopAtomicId = new LoopAtomicLong(MAX_SEQUENCE);
 
     private DateTimeFormatter dateTimeFormatter;
-    private long workId;
+    private long loopWorkId;
 
     public SnowflakeIdGenerator(WorkIdHolder workIdHolder, String dateFormat) {
         this.dateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat);
-        workId = workIdHolder.getId(MAX_WORK_ID);
+        loopWorkId = workIdHolder.getId() % MAX_WORK_ID;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class SnowflakeIdGenerator implements IdGenerator {
         long sequence = loopAtomicNo.loopGet();
 
         // 机器码 10位 + 天秒数 17位 + 循环自增序列 17bit + 随机数 8bit = 52bit   16位整数
-        long id = (workId << (SECONDS_BITS + SEQUENCE_BITS + RANDOM_BITS))
+        long id = (loopWorkId << (SECONDS_BITS + SEQUENCE_BITS + RANDOM_BITS))
                 | (seconds << (SEQUENCE_BITS + RANDOM_BITS))
                 | (sequence << RANDOM_BITS)
                 | random;
@@ -70,7 +70,7 @@ public class SnowflakeIdGenerator implements IdGenerator {
         // 天数 20位 + 天秒数 17位 + 机器码 10位 + 循环自增序列 17bit = 64bit
         long id = (days << (SECONDS_BITS + WORK_ID_BITS + SEQUENCE_BITS))
                 | (seconds << (WORK_ID_BITS + SEQUENCE_BITS))
-                | (workId << SEQUENCE_BITS)
+                | (loopWorkId << SEQUENCE_BITS)
                 | sequence;
         return id;
     }

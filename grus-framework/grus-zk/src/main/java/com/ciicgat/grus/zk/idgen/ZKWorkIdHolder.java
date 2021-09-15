@@ -39,11 +39,6 @@ public class ZKWorkIdHolder implements WorkIdHolder {
         return workValue;
     }
 
-    @Override
-    public long getId(long maxId) {
-        return workValue % maxId;
-    }
-
     private long init(String connectString, String appName)  {
         CuratorFramework curator = ZKUtils.init(connectString);
 

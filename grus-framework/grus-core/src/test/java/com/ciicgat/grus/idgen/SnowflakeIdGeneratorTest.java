@@ -25,10 +25,6 @@ public class SnowflakeIdGeneratorTest {
             return new Random().nextInt(128);
         }
 
-        @Override
-        public long getId(long maxId) {
-            return new Random().nextInt(128);
-        }
     }
 
     @Test

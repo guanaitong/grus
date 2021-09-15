@@ -11,7 +11,9 @@ package com.ciicgat.grus.idgen;
  * @Description:
  */
 public interface WorkIdHolder {
+    /**
+     * get current instance Id,
+     * @return
+     */
     long getId();
-
-    long getId(long maxId);
 }
