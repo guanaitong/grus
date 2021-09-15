@@ -246,7 +246,8 @@ public final class OkHttpClientWrapper implements Client {
                     ioException = e;
                     if (config.couldRetry(e)) {
                         LOGGER.warn("retry");
-                        continue;
+                    } else {
+                        break;
                     }
                 }
             }
