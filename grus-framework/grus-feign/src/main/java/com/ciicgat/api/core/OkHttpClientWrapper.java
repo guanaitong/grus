@@ -182,7 +182,7 @@ public final class OkHttpClientWrapper implements Client {
             throws IOException {
         Map<String, Collection<String>> headers = input.headers();
         long connectTimeoutMillis = getValueFromHeader(headers, CONNECT_TIMEOUT_TAG, options.connectTimeoutMillis());
-        long readTimeoutMillis = getValueFromHeader(headers, READ_TIMEOUT_TAG, options.connectTimeoutMillis());
+        long readTimeoutMillis = getValueFromHeader(headers, READ_TIMEOUT_TAG, options.readTimeoutMillis());
         Collection<String> values = headers.get(K8S_TARGET_TAG);
         final KubernetesClientConfig config = KubernetesClientConfig.getConfig();
         boolean isK8sService = !CollectionUtils.isEmpty(values);
