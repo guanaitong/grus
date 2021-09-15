@@ -16,6 +16,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by August on 2021/9/15
@@ -43,10 +44,30 @@ public class TestRetry {
 
         Assert.assertEquals(2, i.intValue());
 
+        mockResponse = new MockResponse()
+                .addHeader("Content-Type", "application/json;charset=utf-8")
+                .setBody("2")
+                .setHeadersDelay(300, TimeUnit.MILLISECONDS)
+                .setBodyDelay(300, TimeUnit.MILLISECONDS)
+                .setResponseCode(400);
+        mockWebServer.enqueue(mockResponse);
+        try {
+            i = retryService.get();
+            System.out.println(i);
+            Assert.fail();
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof RetryableException);
+            final KubernetesClientConfig config = KubernetesClientConfig.getConfig();
+            Assert.assertFalse(config.couldRetry(e.getCause()));
+        }
+
+
         mockWebServer.close();
 
         try {
-            Integer j = retryService.get();
+            i = retryService.get();
+            System.out.println(i);
+            Assert.fail();
         } catch (Exception e) {
             Assert.assertTrue(e instanceof RetryableException);
             final KubernetesClientConfig config = KubernetesClientConfig.getConfig();

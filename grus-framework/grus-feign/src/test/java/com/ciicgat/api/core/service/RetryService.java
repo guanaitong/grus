@@ -5,6 +5,7 @@
 
 package com.ciicgat.api.core.service;
 
+import com.ciicgat.api.core.annotation.ApiTimeout;
 import com.ciicgat.api.core.annotation.ServiceName;
 import feign.Headers;
 import feign.RequestLine;
@@ -17,5 +18,6 @@ public interface RetryService {
 
     @Headers("Content-Type: application/x-www-form-urlencoded")
     @RequestLine("POST /get")
+    @ApiTimeout(readTimeoutMillis = 200)
     int get();
 }
