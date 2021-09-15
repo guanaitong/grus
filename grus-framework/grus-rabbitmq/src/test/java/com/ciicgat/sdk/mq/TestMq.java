@@ -5,7 +5,6 @@
 
 package com.ciicgat.sdk.mq;
 
-import com.ciicgat.sdk.lang.threads.Threads;
 import com.rabbitmq.client.BuiltinExchangeType;
 import org.junit.Assert;
 import org.junit.Test;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by August.Zhou on 2018-11-15 11:13.
@@ -31,9 +31,12 @@ public class TestMq {
         TestTracing.registerJaegerTracer();
         List<String> msgList = new ArrayList<>();
 
-        for (int i = 0; i < 100; i++) {
+        int num = 100;
+        for (int i = 0; i < num; i++) {
             msgList.add("测试消息:" + Math.random());
         }
+
+        AtomicInteger atomicInteger = new AtomicInteger(num * 2);
 
         MsgReceiver receiver = MsgReceiver
                 .newBuilder()
@@ -51,8 +54,10 @@ public class TestMq {
         receiver.register((r, msg) -> {
             if (forTestRoutingKeyA.equals(r)) {
                 aReceives.add(msg);
+                atomicInteger.decrementAndGet();
             } else if (forTestRoutingKeyB.equals(r)) {
                 bReceives.add(msg);
+                atomicInteger.decrementAndGet();
             }
             return true;
         });
@@ -71,7 +76,14 @@ public class TestMq {
             dispatcher.sendMsg(s, forTestRoutingKeyB);
         }
 
-        Threads.sleepSeconds(10);
+        long start = System.currentTimeMillis();
+
+        while (atomicInteger.get() > 0) {
+            if ((System.currentTimeMillis() - start) > 30 * 1000) {
+                Assert.fail("timeout");
+                return;
+            }
+        }
         compare(msgList, aReceives);
         compare(msgList, bReceives);
     }
