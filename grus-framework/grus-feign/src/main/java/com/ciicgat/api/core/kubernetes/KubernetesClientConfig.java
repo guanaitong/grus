@@ -52,7 +52,7 @@ public class KubernetesClientConfig implements GConfBeanValidator {
         return cache.getOrDefault(name, defaultConfig);
     }
 
-    public boolean couldRetry(Exception e) {
+    public boolean couldRetry(Throwable e) {
         for (RetryCondition retryCondition : retryConditions) {
             if (e.getClass().getName().equals(retryCondition.getClassName()) && e.getMessage().contains(retryCondition.getMessage())) {
                 return true;

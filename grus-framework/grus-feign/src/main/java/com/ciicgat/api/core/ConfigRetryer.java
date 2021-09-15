@@ -5,8 +5,11 @@
 
 package com.ciicgat.api.core;
 
+import com.ciicgat.api.core.kubernetes.KubernetesClientConfig;
 import feign.RetryableException;
 import feign.Retryer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -14,14 +17,18 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * @Author: August
  * @Date: 2021/7/8 15:32
  */
-public class RetryerConnectTimeout extends Retryer.Default {
-    public RetryerConnectTimeout() {
+public class ConfigRetryer extends Retryer.Default {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigRetryer.class);
+
+    public ConfigRetryer() {
         super(100, SECONDS.toMillis(1), 3);
     }
 
     @Override
     public void continueOrPropagate(RetryableException e) {
-        if (e.getCause() instanceof java.net.SocketTimeoutException && e.getCause().getMessage().contains("connect timed out")) {
+        final KubernetesClientConfig config = KubernetesClientConfig.getConfig();
+        if (config.couldRetry(e.getCause())) {
+            LOGGER.warn("retry");
             super.continueOrPropagate(e);
         } else {
             throw e;
@@ -30,6 +37,6 @@ public class RetryerConnectTimeout extends Retryer.Default {
 
     @Override
     public Retryer clone() {
-        return new RetryerConnectTimeout();
+        return new ConfigRetryer();
     }
 }

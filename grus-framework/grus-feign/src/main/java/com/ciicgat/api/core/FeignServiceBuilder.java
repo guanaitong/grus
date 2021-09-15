@@ -58,7 +58,7 @@ public class FeignServiceBuilder {
     private Class<?> serviceClazz;
     private Request.Options options;
 
-    private Retryer retryer = new RetryWith502.RetryerImpl();
+    private Retryer retryer;
 
     private boolean fromCache;
     private CacheOptions cacheOptions;
@@ -163,7 +163,7 @@ public class FeignServiceBuilder {
             options = new Request.Options(TimeOutConstants.DEFAULT_CONNECT_TIMEOUT_MILLIS, TimeOutConstants.DEFAULT_READ_TIMEOUT_MILLIS);
         }
         if (retryer == null) {
-            retryer = new RetryerConnectTimeout();
+            retryer = new ConfigRetryer();
         }
         ServiceName serviceName = getServiceName();
 

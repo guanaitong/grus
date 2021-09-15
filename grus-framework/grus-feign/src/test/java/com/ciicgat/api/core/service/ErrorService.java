@@ -43,8 +43,4 @@ public interface ErrorService {
     Optional<Integer> getOptionalWithIgnoreError();
 
 
-    //retry
-    @RequestLine("GET /getWith502Retry")
-    Integer getWith502Retry();
-
 }

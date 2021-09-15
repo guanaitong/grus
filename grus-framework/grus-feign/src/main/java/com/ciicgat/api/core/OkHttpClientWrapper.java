@@ -5,13 +5,8 @@
 
 package com.ciicgat.api.core;
 
-import com.ciicgat.api.core.kubernetes.KubernetesAppConfig;
 import com.ciicgat.api.core.kubernetes.KubernetesClientConfig;
 import com.ciicgat.grus.service.GrusServiceHttpHeader;
-import com.ciicgat.grus.service.discovery.ServiceDiscoveryClient;
-import com.ciicgat.grus.service.discovery.ServiceInstance;
-import com.ciicgat.grus.service.loadbalance.LoadBalancer;
-import com.ciicgat.grus.service.loadbalance.LoadBalancers;
 import com.ciicgat.sdk.util.system.Systems;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import feign.Client;
@@ -22,7 +17,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -32,10 +26,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.ciicgat.api.core.FeignHttpClient.CONNECT_TIMEOUT_TAG;
@@ -184,48 +175,11 @@ public final class OkHttpClientWrapper implements Client {
         long connectTimeoutMillis = getValueFromHeader(headers, CONNECT_TIMEOUT_TAG, options.connectTimeoutMillis());
         long readTimeoutMillis = getValueFromHeader(headers, READ_TIMEOUT_TAG, options.readTimeoutMillis());
         Collection<String> values = headers.get(K8S_TARGET_TAG);
-        final KubernetesClientConfig config = KubernetesClientConfig.getConfig();
         boolean isK8sService = !CollectionUtils.isEmpty(values);
-        int maxCount = config.getRetryCount();
         if (isK8sService) {
-            final String serviceName = values.stream().findAny().orElseThrow();
-            final KubernetesAppConfig appConfig = config.getAppConfig(serviceName);
-            connectTimeoutMillis = config.getConnectTimeout();
-            if (appConfig.isOn() && isNotPrepare) {
-                LoadBalancer loadBalancer = LoadBalancers.getLoadBalancer(appConfig.getScheduler());
-                ServiceDiscoveryClient serviceDiscoveryClient = ServiceDiscoveryClientUtil.getServiceDiscoveryClient();
-                List<ServiceInstance> serviceInstances = serviceDiscoveryClient.getInstances(serviceName);
-                if (!serviceInstances.isEmpty()) {
-                    okhttp3.OkHttpClient realClient = delegate.newBuilder()
-                            .connectTimeout(connectTimeoutMillis, TimeUnit.MILLISECONDS)
-                            .readTimeout(readTimeoutMillis, TimeUnit.MILLISECONDS)
-                            .followRedirects(options.isFollowRedirects())
-                            .build();
-                    Set<ServiceInstance> fails = new HashSet<>(2);
-                    while (maxCount-- > 0) {
-                        ServiceInstance serviceInstance = null;
-                        try {
-                            serviceInstance = loadBalancer.select(serviceInstances, fails);
-                            int port = appConfig.getPort() > 0 ? appConfig.getPort() : serviceInstance.getPort();
-                            String scheme = StringUtils.isEmpty(appConfig.getScheme()) ? "http" : appConfig.getScheme();
-                            String ip = serviceInstance.getIp();
-                            HttpUrl httpUrl = HttpUrl.get(input.url());
-                            HttpUrl targetUrl = httpUrl.newBuilder().scheme(scheme).host(ip).port(port).build();
-                            Request okHttpRequest = toOkHttpRequest(input, true, targetUrl);
-                            return execute0(input, realClient, okHttpRequest);
-                        } catch (IOException e) {
-                            LOGGER.error("client-side error", e);
-                            if (config.couldRetry(e)) {
-                                LOGGER.warn("retry");
-                                serviceInstances = serviceDiscoveryClient.getInstances(serviceName);
-                                fails.add(serviceInstance);
-                                continue;
-                            }
-                            LOGGER.warn("throw error");
-                            throw e;
-                        }
-                    }
-                }
+            long globalMaxConnectTimeout = KubernetesClientConfig.getConfig().getConnectTimeout();
+            if (connectTimeoutMillis > globalMaxConnectTimeout) {
+                connectTimeoutMillis = globalMaxConnectTimeout;
             }
         }
         // fall back to k8s clusterIp service
@@ -236,18 +190,6 @@ public final class OkHttpClientWrapper implements Client {
                 .followRedirects(options.isFollowRedirects())
                 .build();
         Request okHttpRequest = toOkHttpRequest(input, false, null);
-        while (maxCount-- > 0) {
-            try {
-                return execute0(input, realClient, okHttpRequest);
-            } catch (IOException e) {
-                LOGGER.error("server-side error", e);
-                if (config.couldRetry(e)) {
-                    LOGGER.warn("retry");
-                } else {
-                    throw e;
-                }
-            }
-        }
         return execute0(input, realClient, okHttpRequest);
     }
 

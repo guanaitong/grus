@@ -8,10 +8,7 @@ package com.ciicgat.api.core;
 import com.ciicgat.api.core.contants.HeaderConstants;
 import com.ciicgat.api.core.contants.VersionConstants;
 import com.ciicgat.api.core.service.ErrorService;
-import feign.Client;
 import feign.FeignException;
-import feign.Request;
-import feign.Response;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.commons.lang3.tuple.Pair;
@@ -19,12 +16,8 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Optional;
 
 /**
@@ -131,25 +124,5 @@ public class TestIgnoreError {
         Assert.assertTrue(!i.isPresent());
     }
 
-    @Test
-    public synchronized void testGetWith502Retry() throws IOException {
-
-        Client mockClient = Mockito.mock(Client.class);
-        ErrorService errorService = FeignServiceFactory.newInstance(ErrorService.class, mockClient);
-
-
-
-        Request request = Request.create(Request.HttpMethod.GET, "", Collections.emptyMap(), null, null);
-        Response mockResponse = Response.builder().request(request).body("{}", Charset.defaultCharset()).status(502).headers(new HashMap<>()).build();
-        Mockito.when(mockClient.execute(Mockito.any(), Mockito.any())).thenReturn(mockResponse);
-
-
-        try {
-            Integer i = errorService.getWith502Retry();
-        } catch (FeignException e) {
-            e.printStackTrace();
-        }
-        Mockito.verify(mockClient, Mockito.times(1)).execute(Mockito.any(), Mockito.any());
-    }
 
 }
