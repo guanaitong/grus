@@ -65,6 +65,7 @@ public class ZKWorkIdHolder implements WorkIdHolder {
                 String[] nodeKey = childPath.split("#");
                 int seq = Integer.parseInt(nodeKey[1]);
                 if ((current - seq) > HIS_NUM) {
+                    LOGGER.info("delete history node {}", childPath);
                     curator.delete().deletingChildrenIfNeeded().forPath(path + "/" + childPath);
                 }
             }
