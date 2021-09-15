@@ -5,7 +5,6 @@
 
 package com.ciicgat.grus.boot.autoconfigure.job;
 
-import com.ciicgat.sdk.lang.threads.Threads;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,11 +29,8 @@ public class JobAutoConfigurationTests {
 
 
     @Test
-    public void test() {
-        Threads.sleepSeconds(5);
-
+    public void test() throws InterruptedException {
         Assert.assertTrue(simpleJobTest.getValue() > 0);
         Assert.assertTrue(simpleJobTest2.getValue() > 0);
-
     }
 }

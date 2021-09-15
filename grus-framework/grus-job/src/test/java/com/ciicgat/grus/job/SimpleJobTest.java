@@ -5,7 +5,6 @@
 
 package com.ciicgat.grus.job;
 
-import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.util.system.Systems;
 import io.elasticjob.lite.api.ShardingContext;
 import io.elasticjob.lite.api.simple.SimpleJob;
@@ -24,6 +23,7 @@ import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -33,6 +33,7 @@ public class SimpleJobTest implements SimpleJob {
     private static Logger logger = LoggerFactory.getLogger(SimpleJobTest.class);
 
     private static AtomicInteger atomicInteger = new AtomicInteger();
+    private static CountDownLatch countDownLatch = new CountDownLatch(1);
 
     @BeforeClass
     public static void registerJaegerTracer() {
@@ -63,18 +64,20 @@ public class SimpleJobTest implements SimpleJob {
     @Override
     public void execute(ShardingContext shardingContext) {
         atomicInteger.incrementAndGet();
+        countDownLatch.countDown();
         System.out.println(1);
 
 
     }
 
-    public static int getValue() {
+    public static int getValue() throws InterruptedException {
+        countDownLatch.await();
         return atomicInteger.get();
     }
 
 
     @org.junit.Test
-    public void test() {
+    public void test() throws InterruptedException {
         logger.info("test");
         ZookeeperRegistryCenter zookeeperRegistryCenter = new ZookeeperRegistryCenter(new ZookeeperConfiguration("app-zk.servers.dev.ofc", "test2"));
         zookeeperRegistryCenter.init();
@@ -97,7 +100,6 @@ public class SimpleJobTest implements SimpleJob {
 
         springJobScheduler.init();
 
-        Threads.sleepSeconds(10);
 
         Assert.assertTrue(SimpleJobTest.getValue() > 0);
     }

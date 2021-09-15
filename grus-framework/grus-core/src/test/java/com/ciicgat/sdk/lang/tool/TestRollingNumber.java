@@ -5,12 +5,12 @@
 
 package com.ciicgat.sdk.lang.tool;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by August.Zhou on 2018/8/28 14:25.
@@ -41,6 +41,7 @@ public class TestRollingNumber {
         countDownLatch.await();
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
+        Assert.assertTrue(totalTime < 5);
         System.out.println("totalMilliseconds:  " + totalTime);
 
         for (int i = 0; i < 5000; i++) {
@@ -50,7 +51,7 @@ public class TestRollingNumber {
         long endTime1 = System.currentTimeMillis();
         long totalTime1 = endTime1 - endTime;
         System.out.println("totalMilliseconds:  " + totalTime1);
-        TimeUnit.SECONDS.sleep(20);
+        Assert.assertTrue(totalTime1 < 15);
 
     }
 }

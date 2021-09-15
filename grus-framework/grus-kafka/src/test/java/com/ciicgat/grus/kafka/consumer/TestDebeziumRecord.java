@@ -6,14 +6,13 @@
 package com.ciicgat.grus.kafka.consumer;
 
 import com.ciicgat.grus.json.JSON;
-import com.ciicgat.grus.kafka.consumer.debezium.DebeziumEventRecord;
 import com.ciicgat.grus.kafka.consumer.debezium.DebeziumMsgProcessor;
 import com.ciicgat.grus.kafka.consumer.debezium.meta.DebeziumRawRecord;
-import com.ciicgat.sdk.lang.threads.Threads;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -33,12 +32,14 @@ public class TestDebeziumRecord {
     public void testConsumer() throws Exception {
         Consumer consumer = Consumer.newBuilder().setPullThreadNum(2)
                 .setGroupId("test-consumer-group" + Math.random())
-                .setTopics(new String[] {"frigate.gatjob.JobLog"})
+                .setTopics(new String[]{"frigate.gatjob.JobLog"})
                 .build();
 
         AtomicInteger count = new AtomicInteger();
-        DebeziumMsgProcessor debeziumMsgProcessor = new DebeziumMsgProcessor((DebeziumEventRecord record) -> {
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        DebeziumMsgProcessor debeziumMsgProcessor = new DebeziumMsgProcessor(record -> {
             count.incrementAndGet();
+            countDownLatch.countDown();
             System.out.println(JSON.toJSONString(record));
         });
 
@@ -46,7 +47,7 @@ public class TestDebeziumRecord {
 
         consumer.start();
 
-        Threads.sleepSeconds(5);
+        countDownLatch.await();
         Assert.assertTrue(count.get() > 0);
         consumer.close();
     }

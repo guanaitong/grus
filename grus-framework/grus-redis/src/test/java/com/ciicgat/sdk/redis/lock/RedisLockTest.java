@@ -5,11 +5,11 @@
 
 package com.ciicgat.sdk.redis.lock;
 
-import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.LongAdder;
 
 /**
@@ -35,7 +35,7 @@ public class RedisLockTest {
     }
 
     @Test
-    public void test1() {
+    public void test1() throws InterruptedException {
 //        Pool<Jedis> pool = new JedisSentinelPool("mymaster", Set.of("192.168.223.190:26379"));
 
 //        Pool<Jedis> pool = new JedisPool(new JedisPoolConfig(), "redis.servers.dev.ofc", 6379,
@@ -47,7 +47,9 @@ public class RedisLockTest {
         LongAdder longAdder = new LongAdder();
         SessionIdGenerator sessionIdGenerator = new SessionIdGenerator();
         String key = sessionIdGenerator.generateSessionId();
-        for (int i = 0; i < 7; i++) {
+        int threadNum = 7;
+        CountDownLatch countDownLatch = new CountDownLatch(threadNum);
+        for (int i = 0; i < threadNum; i++) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -57,12 +59,13 @@ public class RedisLockTest {
                             longAdder.add(1);
                         }
                     }
+                    countDownLatch.countDown();
                 }
             }).start();
 
 
         }
-        Threads.sleepSeconds(5);
+        countDownLatch.await();
         Assert.assertTrue(1 == longAdder.longValue());
     }
 
