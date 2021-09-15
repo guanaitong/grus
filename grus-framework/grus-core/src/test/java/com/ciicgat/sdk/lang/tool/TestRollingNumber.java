@@ -41,7 +41,7 @@ public class TestRollingNumber {
         countDownLatch.await();
         long endTime = System.currentTimeMillis();
         long totalTime = endTime - startTime;
-        Assert.assertTrue(totalTime < 5);
+        Assert.assertTrue(totalTime < 100);
         System.out.println("totalMilliseconds:  " + totalTime);
 
         for (int i = 0; i < 5000; i++) {
@@ -51,7 +51,7 @@ public class TestRollingNumber {
         long endTime1 = System.currentTimeMillis();
         long totalTime1 = endTime1 - endTime;
         System.out.println("totalMilliseconds:  " + totalTime1);
-        Assert.assertTrue(totalTime1 < 15);
+        Assert.assertTrue(totalTime1 < 100);
 
     }
 }
