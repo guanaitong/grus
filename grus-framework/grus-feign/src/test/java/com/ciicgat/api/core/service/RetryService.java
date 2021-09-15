@@ -18,5 +18,4 @@ public interface RetryService {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     @RequestLine("POST /get")
     int get();
-    
 }

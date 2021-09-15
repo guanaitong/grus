@@ -32,8 +32,7 @@ public class TestRetry {
         retryService = pair.getLeft();
     }
 
-    //    @Test(expected = FeignException.class)
-    @Test()
+    @Test
     public synchronized void testRetry() throws IOException {
         MockResponse mockResponse = new MockResponse()
                 .addHeader("Content-Type", "application/json;charset=utf-8")
