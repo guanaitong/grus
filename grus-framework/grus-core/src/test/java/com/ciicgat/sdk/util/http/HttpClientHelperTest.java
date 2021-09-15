@@ -21,6 +21,7 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -66,7 +67,6 @@ public class HttpClientHelperTest extends TestCase {
 
     /**
      * 11.11.11.11 cannot ping
-     *
      */
     public void testOkHttpClientConnectTimeoutOfIpNotPingAble() {
 //        try {
@@ -154,7 +154,9 @@ public class HttpClientHelperTest extends TestCase {
         String url = "http://127.0.0.1:" + port;
         testSocketDisconnectAfterRequest(mockWebServer, url);
         testSocketTimeOut(mockWebServer, url);
-        CloseUtils.close(mockWebServer);
+        MockWebServer finalMockWebServer = mockWebServer;
+        CompletableFuture.runAsync(() -> CloseUtils.close(finalMockWebServer));
+//        CloseUtils.close(mockWebServer);
     }
 
     private void testSocketDisconnectAfterRequest(MockWebServer mockWebServer, String url) {

@@ -18,13 +18,13 @@ public class TestThreads {
     @Test
     public void testSleep() {
         long start = System.currentTimeMillis();
-        Threads.sleepSeconds(2);
+        Threads.sleepSeconds(1);
 
-        Assert.assertEquals(2, (System.currentTimeMillis() - start) / 1000);
+        Assert.assertEquals(1, (System.currentTimeMillis() - start) / 1000);
 
         long start2 = System.currentTimeMillis();
-        Threads.sleep(1548);
-        Assert.assertTrue(1548 - ((System.currentTimeMillis() - start2)) < 100);
+        Threads.sleep(348);
+        Assert.assertTrue(348 - ((System.currentTimeMillis() - start2)) < 100);
 
     }
 
