@@ -11,6 +11,8 @@ import com.ciicgat.sdk.util.frigate.FrigateNotifier;
 import com.ciicgat.sdk.util.frigate.NotifyChannel;
 import org.junit.Test;
 
+import java.util.Objects;
+
 /**
  * Created by Albert on 2018/10/29.
  */
@@ -68,7 +70,9 @@ public class FrigateNotifierTest {
         ConfigCollection config = GlobalGconfConfig.getConfig();
         FrigateClient.setSkip(false);
         FrigateNotifier.sendMessage(NotifyChannel.ALL, HUGE_CONTENT, new RuntimeException("都错了"), "HB533", "HB266");
-        Threads.sleepSeconds(3);
+        if (Objects.isNull(System.getenv("CI"))) {
+            Threads.sleepSeconds(3);
+        }
     }
 
 }

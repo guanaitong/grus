@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Created by Albert on 2019-05-08.
@@ -26,11 +27,12 @@ public class GroupBotTest {
     @After
     public void tearDown() throws Exception {
         try {
-            Thread.sleep(1000);
+            if (Objects.isNull(System.getenv("CI"))) {
+                Thread.sleep(1000);
+            }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-
     }
 
     @Test
