@@ -6,6 +6,7 @@
 package com.ciicgat.sdk.springcache;
 
 import com.ciicgat.sdk.lang.tool.Bytes;
+import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
 import com.ciicgat.sdk.redis.config.RedisSetting;
 import com.ciicgat.sdk.redis.config.SpringRedisConfCreator;
 import com.ciicgat.sdk.util.system.Systems;
@@ -37,6 +38,7 @@ public class RedisCacheManager implements CacheManager {
     private volatile LocalCacheEvictMessageListener localCacheEvictMessageListener;
     private byte[] channel = null;
     private final CacheRefresher cacheRefresher;
+    private final String id;
 
     public RedisCacheManager(RedisCacheConfig redisCacheConfig) {
         this.redisCacheConfig = Objects.requireNonNull(redisCacheConfig);
@@ -51,6 +53,7 @@ public class RedisCacheManager implements CacheManager {
         Objects.requireNonNull(redisCacheConfig);
         this.cacheRefresher = redisCacheConfig.getCacheRefresher();
         this.redisConnectionFactory = SpringRedisConfCreator.newRedisConnectionFactory(redisSetting, true);
+        this.id = new SessionIdGenerator().generateSessionId(8);
     }
 
 
@@ -79,7 +82,7 @@ public class RedisCacheManager implements CacheManager {
 
     void sendEvictMessage(Object key, String name) {
         try (RedisConnection connection = redisConnectionFactory.getConnection()) {
-            connection.publish(getChannel(), new LocalCacheEvictMessage(key, name, Systems.HOST_IP).toBytes());
+            connection.publish(getChannel(), new LocalCacheEvictMessage(key, name, id).toBytes());
         } catch (Exception e) {
             LOGGER.error("sendEvictMessage,key:" + key + ",name:" + name, e);
         }
@@ -137,7 +140,7 @@ public class RedisCacheManager implements CacheManager {
             try {
                 LocalCacheEvictMessage cacheEvictMessage = LocalCacheEvictMessage.fromBytes(message.getBody());
                 Cache cache = redisCacheMap.get(cacheEvictMessage.getName());
-                if ((cache instanceof ILocalCache) && !Objects.equals(Systems.HOST_IP, cacheEvictMessage.getIp())) {
+                if ((cache instanceof ILocalCache) && !Objects.equals(id, cacheEvictMessage.getId())) {
                     ((ILocalCache) cache).clearLocal(cacheEvictMessage.getKey());
                 }
             } catch (Exception e) {

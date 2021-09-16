@@ -15,23 +15,24 @@ import com.ciicgat.sdk.lang.tool.Bytes;
 public class LocalCacheEvictMessage {
     private Object key;
     private String name;
-    private String ip;
+    private String id;
 
     public LocalCacheEvictMessage() {
     }
 
-    public LocalCacheEvictMessage(Object key, String name, String ip) {
+    public LocalCacheEvictMessage(Object key, String name, String id) {
         this.key = key;
         this.name = name;
-        this.ip = ip;
+        this.id = id;
     }
 
-    public String getIp() {
-        return ip;
+    public String getId() {
+        return id;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    public LocalCacheEvictMessage setId(String id) {
+        this.id = id;
+        return this;
     }
 
     public byte[] toBytes() {
