@@ -11,7 +11,6 @@ import com.ciicgat.sdk.lang.threads.Threads;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -232,7 +231,6 @@ public class SpringCacheTests {
         Assert.assertTrue(fifth.startsWith("5"));
     }
 
-    @Ignore
     @Test
     public void test_autoRefresh() {
         String uid = UUID.randomUUID().toString();
@@ -240,18 +238,24 @@ public class SpringCacheTests {
         // 第一次访问，走目标方法，Miss cache
         String first = cacheService.getUseFrequencyAsyncCacheRefresher(uid, 1);
 
-        Threads.sleepSeconds(60);
-        // 第二次访问，from local cache
+//        Threads.sleepSeconds(10);
+        // 第二次访问，from local cache,trigger async refresh,but ignored refresh
         String second = cacheService.getUseFrequencyAsyncCacheRefresher(uid, 2);
-        Assert.assertSame(first, second);
+        Assert.assertEquals(first, second);
         Assert.assertTrue(second.startsWith("1"));
 
-        // 模拟等待异步刷新完成
-        Threads.sleepSeconds(1);
-        // 第三次访问，from refreshed local cache
+        // wait frequency interval time
+        Threads.sleepSeconds(3);
+        // 第三次访问，from refreshed local cache,but trigger async refresh
         String third = cacheService.getUseFrequencyAsyncCacheRefresher(uid, 3);
-        Assert.assertNotSame(first, third);
-        Assert.assertTrue(third.startsWith("2"));
+        Assert.assertEquals(second, third);
+        Assert.assertTrue(third.startsWith("1"));
+
+        // get new value of previous refresh
+        String four = cacheService.getUseFrequencyAsyncCacheRefresher(uid, 4);
+//        Assert.assertEquals(four, third);
+        Assert.assertTrue(four.startsWith("3"));
+
 
         // cacheKey test
         String firstUseCacheKey = cacheService.getUseCacheKey(() -> "customCacheKey", uid, 1);

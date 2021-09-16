@@ -50,7 +50,7 @@ public class FrequencyCacheRefresher extends AbstractCacheRefresher {
 
     private com.github.benmanes.caffeine.cache.Cache<String, Boolean> newLocalCache(int frequencySeconds) {
         return Caffeine.newBuilder()
-                .expireAfterWrite(Math.max(60, frequencySeconds / 2), TimeUnit.SECONDS)
+                .expireAfterWrite(frequencySeconds, TimeUnit.SECONDS)
                 .scheduler(Scheduler.systemScheduler())
                 .initialCapacity(1024)
                 .maximumSize(102400L)
