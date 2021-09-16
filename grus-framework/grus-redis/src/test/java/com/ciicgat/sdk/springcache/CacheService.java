@@ -21,7 +21,7 @@ public class CacheService {
     @Resource
     private Cache frequencyAsyncCache;
     @Resource
-    private Cache nearExpiredAsyncCache;
+    private Cache randomAsyncCache;
 
     @Cacheable(cacheManager = "cacheManager2", value = "caffeineRedisCache", key = "#uid")
     public String get(String uid, int num) {
@@ -88,8 +88,8 @@ public class CacheService {
         return frequencyAsyncCache.get(uid, () -> num + "_" + uid);
     }
 
-    public String getUseNearExpiredAsyncCacheRefresher(String uid, int num) {
-        return nearExpiredAsyncCache.get(uid, () -> num + "_" + uid);
+    public String getRandomCacheRefresher(String uid, int num) {
+        return randomAsyncCache.get(uid, () -> num + "_" + uid);
     }
 
     public String getUseCacheKey(CacheKey cacheKey, String uid,  int num) {

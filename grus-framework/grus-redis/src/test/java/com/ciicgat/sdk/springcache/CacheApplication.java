@@ -10,7 +10,7 @@ import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
 import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.redis.config.RedisSetting;
 import com.ciicgat.sdk.springcache.refresh.FrequencyCacheRefresher;
-import com.ciicgat.sdk.springcache.refresh.NearExpiredCacheRefresher;
+import com.ciicgat.sdk.springcache.refresh.RandomCacheRefresher;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -120,20 +120,7 @@ public class CacheApplication {
         redisCacheConfig.setPrefix("GRUS_DEMO_3_");
         redisCacheConfig.setSerializer(RedisSerializer.java());
         redisCacheConfig.setUseGzip(true);
-        redisCacheConfig.setCacheConfigFunc(name -> {
-            switch (name) {
-                case "useRedisCache":
-                    return CacheConfig.redis().setExpireSeconds(600);
-                case "useLocalCacheSerialize":
-                    return CacheConfig.localRedis().setExpireSeconds(600).setLocalExpireSeconds(120).setSerialize(true);
-                case "useLocalCache":
-                    return CacheConfig.local().setExpireSeconds(60);
-                case "useLocalCacheNoExpire":
-                    return CacheConfig.local().setExpireSeconds(0);
-            }
-
-            return CacheConfig.localRedis().setSerialize(false);
-        });
+        redisCacheConfig.setCacheConfigFunc(name -> CacheConfig.localRedis().setSerialize(false));
         redisCacheConfig.setCacheRefresher(new FrequencyCacheRefresher(Runnable::run, 3));
         return new RedisCacheManager(redisCacheConfig);
     }
@@ -152,12 +139,12 @@ public class CacheApplication {
         redisCacheConfig.setSerializer(RedisSerializer.java());
         redisCacheConfig.setUseGzip(true);
         redisCacheConfig.setCacheConfigFunc(name -> CacheConfig.redis());
-        redisCacheConfig.setCacheRefresher(new NearExpiredCacheRefresher(EXECUTOR_SERVICE, 3600));
+        redisCacheConfig.setCacheRefresher(new RandomCacheRefresher(Runnable::run, 0.3));
         return new RedisCacheManager(redisCacheConfig);
     }
 
-    @Bean(name = "nearExpiredAsyncCache")
-    public Cache nearExpiredAsyncCache(@Qualifier("cacheManager4") CacheManager cacheManager) {
-        return cacheManager.getCache("nearExpiredAsyncCache");
+    @Bean(name = "randomAsyncCache")
+    public Cache randomAsyncCache(@Qualifier("cacheManager4") CacheManager cacheManager) {
+        return cacheManager.getCache("randomAsyncCache");
     }
 }

@@ -232,7 +232,18 @@ public class SpringCacheTests {
     }
 
     @Test
-    public void test_autoRefresh() {
+    public void test_cache_key() {
+        String uid2 = UUID.randomUUID().toString();
+        String uid = UUID.randomUUID().toString();
+        // cacheKey test
+        String firstUseCacheKey = cacheService.getUseCacheKey(() -> uid2, uid, 1);
+        String secondUseCacheKey = frequencyAsyncCache.get(uid2, () -> "customCacheKey");
+        Assert.assertSame(firstUseCacheKey, secondUseCacheKey);
+        Assert.assertTrue(secondUseCacheKey.startsWith("1"));
+    }
+
+    @Test
+    public void test_frequency_refresh() {
         String uid = UUID.randomUUID().toString();
         // default, use l2cache
         // 第一次访问，走目标方法，Miss cache
@@ -255,30 +266,22 @@ public class SpringCacheTests {
         String four = cacheService.getUseFrequencyAsyncCacheRefresher(uid, 4);
 //        Assert.assertEquals(four, third);
         Assert.assertTrue(four.startsWith("3"));
+    }
 
-        String uid2 = UUID.randomUUID().toString();
-        // cacheKey test
-        String firstUseCacheKey = cacheService.getUseCacheKey(() -> uid2, uid, 1);
-        String secondUseCacheKey = frequencyAsyncCache.get(uid2, () -> "customCacheKey");
-        Assert.assertSame(firstUseCacheKey, secondUseCacheKey);
-        Assert.assertTrue(secondUseCacheKey.startsWith("1"));
 
-        // use redis cache
-        // 第一次访问，走目标方法。Miss cache
-        String firstFromUseRedisCache = cacheService.getUseNearExpiredAsyncCacheRefresher(uid, 1);
+    @Test
+    public void test_random_refresh() {
+        String uid = UUID.randomUUID().toString();
+        // default, use l2cache
+        // 第一次访问，走目标方法，Miss cache
+        String first = cacheService.getRandomCacheRefresher(uid, 1);
 
-        // 第二次访问，from redis cache
-        String secondFromUseRedisCache = cacheService.getUseNearExpiredAsyncCacheRefresher(uid, 2);
-        Assert.assertNotSame(firstFromUseRedisCache, secondFromUseRedisCache);
-        Assert.assertEquals(firstFromUseRedisCache, secondFromUseRedisCache);
-        Assert.assertTrue(secondFromUseRedisCache.startsWith("1"));
-
-        // 模拟等待异步刷新完成
-        Threads.sleepSeconds(1);
-
-        // 第三次访问，from refreshed redis cache
-        String thirdFromUseRedisCache = cacheService.getUseNearExpiredAsyncCacheRefresher(uid, 3);
-        Assert.assertNotEquals(firstFromUseRedisCache, thirdFromUseRedisCache);
-        Assert.assertTrue(thirdFromUseRedisCache.startsWith("2"));
+        for (int i = 2; i < 39; i++) {
+            cacheService.getRandomCacheRefresher(uid, i);
+        }
+        // get new value of previous refresh
+        String four = cacheService.getRandomCacheRefresher(uid, 4);
+//        Assert.assertEquals(four, third);
+        Assert.assertTrue(four.startsWith("3"));
     }
 }
