@@ -120,7 +120,20 @@ public class CacheApplication {
         redisCacheConfig.setPrefix("GRUS_DEMO_3_");
         redisCacheConfig.setSerializer(RedisSerializer.java());
         redisCacheConfig.setUseGzip(true);
-        redisCacheConfig.setCacheConfigFunc(name -> CacheConfig.localRedis().setSerialize(false));
+        redisCacheConfig.setCacheConfigFunc(name -> {
+            switch (name) {
+                case "useRedisCache":
+                    return CacheConfig.redis().setExpireSeconds(600);
+                case "useLocalCacheSerialize":
+                    return CacheConfig.localRedis().setExpireSeconds(600).setLocalExpireSeconds(120).setSerialize(true);
+                case "useLocalCache":
+                    return CacheConfig.local().setExpireSeconds(60);
+                case "useLocalCacheNoExpire":
+                    return CacheConfig.local().setExpireSeconds(0);
+            }
+
+            return CacheConfig.localRedis().setSerialize(false);
+        });
         redisCacheConfig.setCacheRefresher(new FrequencyCacheRefresher(Runnable::run, 3));
         return new RedisCacheManager(redisCacheConfig);
     }

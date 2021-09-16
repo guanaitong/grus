@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.SerializationException;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -73,6 +74,38 @@ public class RedisSerializerTests {
         }
     }
 
+    public static class User2 {
+        private String name;
+        private Date date;
+
+        public User2(String name, Date date) {
+            this.name = name;
+            this.date = date;
+        }
+
+        public User2() {
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public User2 setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Date getDate() {
+            return date;
+        }
+
+        public User2 setDate(Date date) {
+            this.date = date;
+            return this;
+        }
+    }
+
+
     @Test
     public void test() {
         User user = new User(1, "aa", new Date());
@@ -93,6 +126,19 @@ public class RedisSerializerTests {
             }
             Assert.assertEquals(user, redisSerializer.deserialize(bytes));
         }
+    }
+
+    @Test(expected = SerializationException.class)
+    public void testWithException() {
+        User2 user = new User2("aaa", new Date());
+        GzipRedisSerializer redisSerializer = new GzipRedisSerializer(RedisSerializer.java());
+        redisSerializer.serialize(user);
+    }
+
+    @Test(expected = SerializationException.class)
+    public void testWithException2() {
+        GzipRedisSerializer redisSerializer = new GzipRedisSerializer(RedisSerializer.java());
+        redisSerializer.deserialize(new byte[]{1, 2});
     }
 
 }
