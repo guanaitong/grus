@@ -43,7 +43,7 @@ public abstract class AbstractCacheRefresher implements CacheRefresher {
         this.executor = Objects.requireNonNull(executor);
     }
 
-    void compareThenRefresh(AbstractCache cache, String key, Cache.ValueWrapper oldValueWrapper, Callable<Object> valueLoader) {
+    public void compareThenRefresh(AbstractCache cache, String key, Cache.ValueWrapper oldValueWrapper, Callable<Object> valueLoader) {
         executor.execute(() -> {
             try {
                 LOGGER.info("start refresh,cache {},key {}", cache.getName(), key);
