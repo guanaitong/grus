@@ -25,7 +25,6 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -133,14 +132,9 @@ public class CacheApplication {
                     return CacheConfig.local().setExpireSeconds(0);
             }
 
-            return CacheConfig.localRedis();
+            return CacheConfig.localRedis().setSerialize(false);
         });
-        redisCacheConfig.setCacheRefresher(new FrequencyCacheRefresher(new Executor() {
-            @Override
-            public void execute(Runnable command) {
-                command.run();
-            }
-        }, 3));
+        redisCacheConfig.setCacheRefresher(new FrequencyCacheRefresher(Runnable::run, 3));
         return new RedisCacheManager(redisCacheConfig);
     }
 

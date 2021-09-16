@@ -256,10 +256,10 @@ public class SpringCacheTests {
 //        Assert.assertEquals(four, third);
         Assert.assertTrue(four.startsWith("3"));
 
-
+        String uid2 = UUID.randomUUID().toString();
         // cacheKey test
-        String firstUseCacheKey = cacheService.getUseCacheKey(() -> "customCacheKey", uid, 1);
-        String secondUseCacheKey = frequencyAsyncCache.get("customCacheKey", () -> "customCacheKey");
+        String firstUseCacheKey = cacheService.getUseCacheKey(() -> uid2, uid, 1);
+        String secondUseCacheKey = frequencyAsyncCache.get(uid2, () -> "customCacheKey");
         Assert.assertSame(firstUseCacheKey, secondUseCacheKey);
         Assert.assertTrue(secondUseCacheKey.startsWith("1"));
 
