@@ -5,6 +5,8 @@
 
 package com.ciicgat.sdk.springcache;
 
+import org.springframework.cache.Cache;
+
 import java.util.concurrent.Callable;
 
 /**
@@ -15,8 +17,7 @@ public interface CacheRefresher {
 
     CacheRefresher NOOP = new CacheRefresher() {
         @Override
-        public void mayRefresh(AbstractCache cache, String key, Callable<Object> valueLoader) {
-
+        public void mayRefresh(AbstractCache cache, String key, Cache.ValueWrapper oldValueWrapper, Callable<Object> valueLoader) {
         }
 
         @Override
@@ -32,7 +33,7 @@ public interface CacheRefresher {
      * @param key
      * @param valueLoader 注意：该闭包不能是被代理的方法
      */
-    void mayRefresh(AbstractCache cache, String key, Callable<Object> valueLoader);
+    void mayRefresh(AbstractCache cache, String key, Cache.ValueWrapper oldValueWrapper, Callable<Object> valueLoader);
 
     /**
      * 在缓存未命中，初始化缓存后，记录下这次事件。

@@ -9,6 +9,7 @@ import com.ciicgat.sdk.springcache.AbstractCache;
 import com.ciicgat.sdk.springcache.IRedisCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.Cache;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
@@ -49,12 +50,12 @@ public class NearExpiredCacheRefresher extends AbstractCacheRefresher {
      * @param valueLoader
      */
     @Override
-    public void mayRefresh(AbstractCache cache, String key, Callable<Object> valueLoader) {
+    public void mayRefresh(AbstractCache cache, String key, Cache.ValueWrapper oldValueWrapper, Callable<Object> valueLoader) {
         try {
             if (cache instanceof IRedisCache) {
                 long ttl = ((IRedisCache) cache).ttl(key);
                 if (ttl > 0 && ttl <= preLoadSeconds) {
-                    refresh(cache, key, valueLoader);
+                    compareThenRefresh(cache, key, oldValueWrapper, valueLoader);
                 }
             }
         } catch (Exception e) {

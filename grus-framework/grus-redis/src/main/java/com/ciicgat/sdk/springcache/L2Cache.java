@@ -36,7 +36,7 @@ public class L2Cache extends RedisCache<CacheConfig.LocalRedis> implements ILoca
         }
 
         this.localCache = caffeine.build();
-        this.redisCacheManager.initMessageListener();
+        redisCacheManager.initMessageListener();
     }
 
     @Override
@@ -85,17 +85,23 @@ public class L2Cache extends RedisCache<CacheConfig.LocalRedis> implements ILoca
     }
 
     @Override
+    public void putNewValue(Object key, Object value) {
+        putIgnoreException(key, value);
+        sendEvictMessage(key);
+    }
+
+    @Override
     public void evict0(Object key) {
         super.evict0(key);
         localCache.invalidate(key);
-        redisCacheManager.sendEvictMessage(key, this.name);
+        sendEvictMessage(key);
     }
 
 
     @Override
     public void clear() {
         localCache.invalidateAll();
-        redisCacheManager.sendEvictMessage(null, this.name);
+        sendEvictMessage(null);
     }
 
     @Override

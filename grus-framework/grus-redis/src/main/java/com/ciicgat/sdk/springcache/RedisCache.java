@@ -9,38 +9,27 @@ import com.ciicgat.sdk.lang.tool.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.support.SimpleValueWrapper;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * Created by August.Zhou on 2017/9/5 15:46.
  */
 public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> implements IRedisCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisCache.class);
-    protected final RedisConnectionFactory redisConnectionFactory;
     protected final String prefix;
     private final RedisKeyListener redisKeyListener;
     protected final RedisSerializer<Object> valueSerializer;
 
     public RedisCache(String name, RedisCacheManager redisCacheManager, R config) {
         super(name, redisCacheManager, config);
-        this.redisConnectionFactory = redisCacheManager.getRedisConnectionFactory();
         final RedisCacheConfig redisCacheConfig = redisCacheManager.getRedisCacheConfig();
         this.prefix = redisCacheConfig.getPrefix().toUpperCase() + name.toUpperCase() + "_";
         this.redisKeyListener = redisCacheConfig.getRedisKeyListener();
         // 是否使用Gzip压缩
         boolean useGzip = Objects.isNull(config.getUseGzip()) ? redisCacheConfig.isUseGzip() : config.getUseGzip().booleanValue();
         this.valueSerializer = useGzip ? new GzipRedisSerializer(redisCacheConfig.getSerializer()) : redisCacheConfig.getSerializer();
-    }
-
-    protected <T> T execute(Function<RedisConnection, T> callback) {
-        try (RedisConnection connection = redisConnectionFactory.getConnection()) {
-            return callback.apply(connection);
-        }
     }
 
     @Override
@@ -59,6 +48,11 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
             return null;
         }
         return new SimpleValueWrapper(bytesValue == AbstractCache.NULL_BYTES_VALUE ? null : bytesValue.getValue());
+    }
+
+    @Override
+    public void putNewValue(Object key, Object value) {
+        putIgnoreException(key, value);
     }
 
 

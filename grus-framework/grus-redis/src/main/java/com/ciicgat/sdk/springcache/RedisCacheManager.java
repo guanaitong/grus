@@ -79,7 +79,7 @@ public class RedisCacheManager implements CacheManager {
 
     void sendEvictMessage(Object key, String name) {
         try (RedisConnection connection = redisConnectionFactory.getConnection()) {
-            connection.publish(getChannel(), new LocalCacheEvictMessage(key, name).toBytes());
+            connection.publish(getChannel(), new LocalCacheEvictMessage(key, name, Systems.HOST_IP).toBytes());
         } catch (Exception e) {
             LOGGER.error("sendEvictMessage,key:" + key + ",name:" + name, e);
         }
@@ -137,7 +137,7 @@ public class RedisCacheManager implements CacheManager {
             try {
                 LocalCacheEvictMessage cacheEvictMessage = LocalCacheEvictMessage.fromBytes(message.getBody());
                 Cache cache = redisCacheMap.get(cacheEvictMessage.getName());
-                if (cache instanceof ILocalCache) {
+                if ((cache instanceof ILocalCache) && !Objects.equals(Systems.HOST_IP, cacheEvictMessage.getIp())) {
                     ((ILocalCache) cache).clearLocal(cacheEvictMessage.getKey());
                 }
             } catch (Exception e) {

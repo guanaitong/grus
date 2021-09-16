@@ -9,11 +9,13 @@ import com.ciicgat.sdk.lang.tool.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 
 /**
  * @Author: August
@@ -24,10 +26,10 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
     protected static final Object NULL = new Object();
     protected static final BytesValue NULL_BYTES_VALUE = new BytesValue(Bytes.EMPTY_BYTE_ARRAY, NULL);
     protected final String name;
-    protected final RedisCacheManager redisCacheManager;
+    private final RedisCacheManager redisCacheManager;
     protected final C config;
-    protected final CacheRefresher cacheRefresher;
-    protected final RedisConnectionFactory redisConnectionFactory;
+    private final CacheRefresher cacheRefresher;
+    private final RedisConnectionFactory redisConnectionFactory;
 
     public AbstractCache(String name, RedisCacheManager redisCacheManager, C config) {
         this.name = name;
@@ -36,6 +38,18 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         this.cacheRefresher = this.redisCacheManager.getCacheRefresher();
         this.redisConnectionFactory = this.redisCacheManager.getRedisConnectionFactory();
     }
+
+
+    protected final <T> T execute(Function<RedisConnection, T> callback) {
+        try (RedisConnection connection = redisConnectionFactory.getConnection()) {
+            return callback.apply(connection);
+        }
+    }
+
+    protected final void sendEvictMessage(Object key) {
+        redisCacheManager.sendEvictMessage(key, name);
+    }
+
 
     @Override
     public final ValueWrapper get(Object key) {
@@ -63,7 +77,9 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         }
     }
 
-    private void putIgnoreException(Object key, Object value) {
+    public abstract void putNewValue(Object key, Object value);
+
+    protected void putIgnoreException(Object key, Object value) {
         try {
             put0(key, value);
         } catch (Exception e) {
@@ -133,7 +149,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
             this.cacheRefresher.recordCacheInit(this, actualKey);
             return (T) o;
         } else {
-            this.cacheRefresher.mayRefresh(this, actualKey, (Callable<Object>) valueLoader);
+            this.cacheRefresher.mayRefresh(this, actualKey, valueWrapper, (Callable<Object>) valueLoader);
             return (T) valueWrapper.get();
         }
     }

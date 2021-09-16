@@ -12,6 +12,7 @@ import com.github.benmanes.caffeine.cache.Scheduler;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.Cache;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.types.Expiration;
@@ -65,7 +66,7 @@ public class FrequencyCacheRefresher extends AbstractCacheRefresher {
      * @param valueLoader
      */
     @Override
-    public void mayRefresh(AbstractCache cache, String key, Callable<Object> valueLoader) {
+    public void mayRefresh(AbstractCache cache, String key, Cache.ValueWrapper oldValueWrapper, Callable<Object> valueLoader) {
         final String cacheKey = makeGlobalCacheKey(cache, key);
         // 1、先过本地缓存、再通过redis，两层频率限制。
         // 2、本地缓存可以降低redis的访问量
@@ -75,7 +76,7 @@ public class FrequencyCacheRefresher extends AbstractCacheRefresher {
             try (RedisConnection connection = cache.getRedisConnectionFactory().getConnection()) {
                 Boolean set = connection.set(Bytes.toBytes(cacheKey), ArrayUtils.EMPTY_BYTE_ARRAY, expiration, RedisStringCommands.SetOption.ifAbsent());
                 if (set != null && set.booleanValue()) {
-                    refresh(cache, key, valueLoader);
+                    compareThenRefresh(cache, key, oldValueWrapper, valueLoader);
                 }
             } catch (Exception e) {  //如果刷新失败，那么就错过这次机会了。下个循环开始
                 LOGGER.error(cacheKey, e);

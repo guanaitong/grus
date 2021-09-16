@@ -37,7 +37,7 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
             caffeine.scheduler(Scheduler.systemScheduler());
         }
         this.localCache = caffeine.build();
-        this.redisCacheManager.initMessageListener();
+        redisCacheManager.initMessageListener();
     }
 
 
@@ -56,6 +56,12 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
     }
 
     @Override
+    public void putNewValue(Object key, Object value) {
+        putIgnoreException(key, value);
+        sendEvictMessage(key);
+    }
+
+    @Override
     protected void put0(Object key, Object value) {
         localCache.put(key, value == null ? NULL : this.config.isSerialize() ? valueSerializer.serialize(value) : value);
     }
@@ -63,14 +69,14 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
     @Override
     protected void evict0(Object key) {
         localCache.invalidate(key);
-        redisCacheManager.sendEvictMessage(key, this.name);
+        sendEvictMessage(key);
     }
 
 
     @Override
     public void clear() {
         localCache.invalidateAll();
-        redisCacheManager.sendEvictMessage(null, this.name);
+        sendEvictMessage(null);
     }
 
     /**

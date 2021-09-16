@@ -6,6 +6,7 @@
 package com.ciicgat.sdk.springcache.refresh;
 
 import com.ciicgat.sdk.springcache.AbstractCache;
+import org.springframework.cache.Cache;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
@@ -29,9 +30,9 @@ public class RandomCacheRefresher extends AbstractCacheRefresher {
     }
 
     @Override
-    public void mayRefresh(AbstractCache cache, String key, Callable<Object> valueLoader) {
+    public void mayRefresh(AbstractCache cache, String key, Cache.ValueWrapper oldValueWrapper, Callable<Object> valueLoader) {
         if (ThreadLocalRandom.current().nextDouble(1) <= sample) {
-            refresh(cache, key, valueLoader);
+            compareThenRefresh(cache, key, oldValueWrapper, valueLoader);
         }
     }
 

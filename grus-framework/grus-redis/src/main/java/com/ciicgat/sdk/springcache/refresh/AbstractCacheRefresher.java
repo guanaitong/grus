@@ -11,6 +11,7 @@ import com.ciicgat.sdk.springcache.CacheRefresher;
 import com.ciicgat.sdk.trace.TraceThreadPoolExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.Cache;
 
 import java.util.Objects;
 import java.util.concurrent.Callable;
@@ -32,9 +33,9 @@ public abstract class AbstractCacheRefresher implements CacheRefresher {
                 4,
                 0,
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(128),
+                new LinkedBlockingQueue<>(512),
                 Threads.newDaemonThreadFactory("cacheRefresher", Thread.MIN_PRIORITY),
-                Threads.LOGGER_REJECTEDEXECUTIONHANDLER
+                (r, executor) -> LOGGER.error("rejected,queue size {},task count {},active count {}", executor.getQueue().size(), executor.getTaskCount(), executor.getActiveCount())
         ));
     }
 
@@ -42,11 +43,17 @@ public abstract class AbstractCacheRefresher implements CacheRefresher {
         this.executor = Objects.requireNonNull(executor);
     }
 
-    void refresh(AbstractCache cache, String key, Callable<Object> valueLoader) {
+    void compareThenRefresh(AbstractCache cache, String key, Cache.ValueWrapper oldValueWrapper, Callable<Object> valueLoader) {
         executor.execute(() -> {
             try {
                 LOGGER.info("start refresh,cache {},key {}", cache.getName(), key);
-                cache.put(key, valueLoader.call());
+                Object newValue = valueLoader.call();
+                Object oldValue = oldValueWrapper.get();
+                if (Objects.equals(newValue, oldValue)) {
+                    LOGGER.info("no changed,cache {},key {}", cache.getName(), key);
+                    return;
+                }
+                cache.putNewValue(key, newValue);
                 LOGGER.info("refresh success,cache {},key {}", cache.getName(), key);
             } catch (Exception e) {
                 LOGGER.warn(String.format("refresh failed,cache %s,key %s", cache.getName(), key), e);
