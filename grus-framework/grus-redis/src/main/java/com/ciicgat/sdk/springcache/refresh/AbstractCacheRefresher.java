@@ -9,6 +9,7 @@ import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.springcache.AbstractCache;
 import com.ciicgat.sdk.springcache.CacheRefresher;
 import com.ciicgat.sdk.trace.TraceThreadPoolExecutor;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
@@ -49,7 +50,7 @@ public abstract class AbstractCacheRefresher implements CacheRefresher {
                 LOGGER.info("start refresh,cache {},key {}", cache.getName(), key);
                 Object newValue = valueLoader.call();
                 Object oldValue = oldValueWrapper.get();
-                if (Objects.equals(newValue, oldValue)) {
+                if (EqualsBuilder.reflectionEquals(newValue, oldValue)) {
                     LOGGER.info("no changed,cache {},key {}", cache.getName(), key);
                     return;
                 }
