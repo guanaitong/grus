@@ -48,6 +48,11 @@
             <email>jiaju.wei@guanaitong.com</email>
             <organization>www.guanaitong.com</organization>
         </developer>
+        <developer>
+            <name>Clive.Yuan</name>
+            <email>jian.yuan@guanaitong.com</email>
+            <organization>www.guanaitong.com</organization>
+        </developer>
     </developers>
     <licenses>
         <license>

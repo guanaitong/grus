@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE code-generator PUBLIC "-//guanaitong.com//DTD CodeGenerator 1.0//EN"
+        "https://e.guanaitong.com/manual/code-generator.dtd">
+<!--<!DOCTYPE code-generator SYSTEM "dtd/code-generator.dtd">-->
+
+<code-generator>
+
+    <!--基础配置-->
+    <baseConfig>
+        <property name="enableSwagger">false</property>
+        <property name="enableValidation">false</property>
+        <property name="disableUpdatingMapperXml">true</property>
+        <property name="enableMapperAnnotation">true</property>
+    </baseConfig>
+
+    <!--数据库连接-->
+    <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
+                    host="mdb.servers.dev.ofc"
+                    database="grus_demo"
+                    username="amy"
+                    password="1qazxsw@"/>
+
+    <!-- 生成实体文件 -->
+    <javaModelGenerator targetPackage="com.ciicgat.grusgenerator.test.cg.generated.entity"
+                        codePath="src/test/java"/>
+
+    <!-- 生成Mapper的映射XML文件 -->
+    <sqlMapGenerator targetPackage="generated/mapper"
+                     codePath="src/test/resources"/>
+
+    <!-- 生成Mapper的类文件 -->
+    <javaClientGenerator targetPackage="com.ciicgat.grusgenerator.test.cg.generated.mapper"
+                         codePath="src/test/java"/>
+
+    <!-- 生成Service文件 -->
+    <serviceGenerator targetPackage="com.ciicgat.grusgenerator.test.cg.generated.service"
+                      codePath="src/test/java"/>
+
+    <!-- 生成Controller文件 -->
+    <controllerGenerator targetPackage="com.ciicgat.grusgenerator.test.cg.generated.controller"
+                         codePath="src/test/java"/>
+
+    <!-- 生成DTO文件 -->
+    <dtoGenerator targetPackage="com.ciicgat.grusgenerator.test.cg.generated.dto"
+                        codePath="src/test/java" suffix="VO"/>
+
+    <!--需要生成的表-->
+    <!--tables ignoreColumns:忽略的字段, createTimeColumn:创建时间字段(默认为timeCreated), updateTimeColumn:创建时间字段(默认为timeModified)-->
+    <tables entityObjectSuffix="DO">
+        <!--table tableName: 表名, entityObjectName:实体对象名(默认为表名去下划线大写驼峰),ignoreColumns:忽略的字段-->
+        <table tableName="Test" ignoreColumns="double"/>
+        <table tableName="t_Test" entityObjectName="Test2"/>
+        <table tableName="Person"/>
+    </tables>
+
+</code-generator>
+

@@ -32,6 +32,7 @@
         <module>grus-elasticsearch</module>
         <module>grus-zk</module>
         <module>grus-kafka</module>
+        <module>grus-generator</module>
     </modules>
 
 </project>

@@ -83,7 +83,11 @@
                 <groupId>com.ciicgat.grus</groupId>
                 <version>${revision}</version>
             </dependency>
-
+            <dependency>
+                <artifactId>grus-generator</artifactId>
+                <groupId>com.ciicgat.grus</groupId>
+                <version>${revision}</version>
+            </dependency>
             <dependency>
                 <groupId>com.ciicgat.grus.boot</groupId>
                 <artifactId>grus-boot-autoconfigure</artifactId>

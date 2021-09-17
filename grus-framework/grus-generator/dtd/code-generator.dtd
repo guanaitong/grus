@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+        <!ELEMENT code-generator (baseConfig | jdbcConnection| javaModelGenerator | sqlMapGenerator | javaClientGenerator | serviceGenerator | controllerGenerator| dtoGenerator | tables)+>
+
+
+        <!ELEMENT baseConfig (#PCDATA | property)*>
+        <!ELEMENT property (#PCDATA)>
+        <!ATTLIST property
+                name CDATA #REQUIRED>
+
+        <!ELEMENT jdbcConnection (#PCDATA)>
+        <!ATTLIST jdbcConnection
+                driverClass CDATA #REQUIRED
+                host CDATA #REQUIRED
+                database CDATA #REQUIRED
+                username CDATA #REQUIRED
+                password CDATA #REQUIRED
+                tinyInt1isBit CDATA #IMPLIED
+                >
+
+        <!ELEMENT javaModelGenerator (#PCDATA)>
+        <!ATTLIST javaModelGenerator
+                targetPackage CDATA #REQUIRED
+                codePath CDATA #REQUIRED
+                disabled CDATA #IMPLIED
+                templatePath CDATA #IMPLIED
+                >
+
+        <!ELEMENT sqlMapGenerator (#PCDATA)>
+        <!ATTLIST sqlMapGenerator
+                targetPackage CDATA #REQUIRED
+                codePath CDATA #REQUIRED
+                disabled CDATA #IMPLIED
+                templatePath CDATA #IMPLIED
+                suffix CDATA #IMPLIED
+                >
+
+        <!ELEMENT javaClientGenerator (#PCDATA)>
+        <!ATTLIST javaClientGenerator
+                targetPackage CDATA #REQUIRED
+                codePath CDATA #REQUIRED
+                disabled CDATA #IMPLIED
+                templatePath CDATA #IMPLIED
+                suffix CDATA #IMPLIED
+                >
+
+        <!ELEMENT serviceGenerator (#PCDATA)>
+        <!ATTLIST serviceGenerator
+                targetPackage CDATA #REQUIRED
+                codePath CDATA #REQUIRED
+                disabled CDATA #IMPLIED
+                templatePath CDATA #IMPLIED
+                suffix CDATA #IMPLIED
+                >
+
+        <!ELEMENT controllerGenerator (#PCDATA)>
+        <!ATTLIST controllerGenerator
+                targetPackage CDATA #REQUIRED
+                codePath CDATA #REQUIRED
+                disabled CDATA #IMPLIED
+                templatePath CDATA #IMPLIED
+                suffix CDATA #IMPLIED
+                >
+
+        <!ELEMENT dtoGenerator (#PCDATA)>
+        <!ATTLIST dtoGenerator
+                targetPackage CDATA #REQUIRED
+                codePath CDATA #REQUIRED
+                disabled CDATA #IMPLIED
+                templatePath CDATA #IMPLIED
+                suffix CDATA #IMPLIED
+                >
+
+        <!ELEMENT tables (table)*>
+        <!ATTLIST tables
+                all CDATA #IMPLIED
+                ignoreColumns CDATA #IMPLIED
+                createTimeColumn CDATA #IMPLIED
+                updateTimeColumn CDATA #IMPLIED
+                entityObjectSuffix CDATA #IMPLIED
+                >
+
+        <!ELEMENT table (#PCDATA)>
+        <!ATTLIST table
+                tableName CDATA #REQUIRED
+                ignoreColumns CDATA #IMPLIED
+                entityObjectName CDATA #IMPLIED
+                >
