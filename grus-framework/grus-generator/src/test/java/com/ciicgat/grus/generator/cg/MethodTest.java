@@ -5,7 +5,6 @@
 
 package com.ciicgat.grus.generator.cg;
 
-import com.ciicgat.grus.generator.cg.core.GeneratorChain;
 import com.ciicgat.grus.generator.cg.util.GeneratorUtils;
 import org.junit.Assert;
 import org.junit.Test;
