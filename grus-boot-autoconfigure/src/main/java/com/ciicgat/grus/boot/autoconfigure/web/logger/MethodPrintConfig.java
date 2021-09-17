@@ -19,7 +19,7 @@ class MethodPrintConfig {
     }
 
     MethodPrintConfig(int[] requestLogParameterIndex, boolean logReq, boolean logResp) {
-        this.log = logReq || logReq;
+        this.log = logReq || logResp;
         this.requestLogParameterIndex = requestLogParameterIndex;
         this.logReq = logReq;
         this.logResp = logResp;
