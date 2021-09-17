@@ -45,7 +45,7 @@ public class ${entity.fileName} {
 [#if baseConfig.enableSwagger]
     @ApiOperation("保存")
 [/#if]
-    public ApiResponse save([#if baseConfig.enableValidation]@Validated[/#if] ${entity.upperCamelName}${dtoSuffix} request) {
+    public ApiResponse save([#if baseConfig.enableValidation]@Validated [/#if]${entity.upperCamelName}${dtoSuffix} request) {
         ${entity.entityName} entity = BeanCopyUtil.copy(request, ${entity.entityName}.class);
         ${entity.lowerCamelName}${serviceSuffix}.save(entity);
         return ApiResponse.success(entity.getId());

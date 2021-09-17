@@ -5,9 +5,9 @@
 
 package com.ciicgat.grus.generator.cg.generated.service.impl;
 
+import com.ciicgat.sdk.data.mybatis.generator.template.BaseServiceImpl;
 import com.ciicgat.grus.generator.cg.generated.entity.PersonDO;
 import com.ciicgat.grus.generator.cg.generated.service.PersonService;
-import com.ciicgat.sdk.data.mybatis.generator.template.BaseServiceImpl;
 import org.springframework.stereotype.Service;
 
 /**

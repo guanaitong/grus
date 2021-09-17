@@ -41,31 +41,31 @@ public class Test2DO implements Serializable {
     /**
      * 创建时间
      */
-    @TableField("created_at")
+    @TableField(value = "created_at")
     private Date createdAt;
 
     /**
      * 更新时间
      */
-    @TableField("updated_at")
+    @TableField(value = "updated_at")
     private Date updatedAt;
 
     /**
      * 管理员ID
      */
-    @TableField("admin_id")
+    @TableField(value = "admin_id")
     private Long adminId;
 
     /**
      * 用户ID
      */
-    @TableField("user_id")
+    @TableField(value = "user_id")
     private Long userId;
 
     /**
      * 邀请配置
      */
-    @TableField("invitation_config")
+    @TableField(value = "invitation_config")
     private String invitationConfig;
 
     /**

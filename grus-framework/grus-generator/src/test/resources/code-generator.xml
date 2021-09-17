@@ -21,7 +21,7 @@
                     password="1qazxsw@"/>
 
     <!-- 生成实体文件 -->
-    <javaModelGenerator targetPackage="com.ciicgat.grusgenerator.test.cg.generated.entity"
+    <javaModelGenerator targetPackage="com.ciicgat.grus.generator.cg.generated.entity"
                         codePath="src/test/java"/>
 
     <!-- 生成Mapper的映射XML文件 -->
@@ -29,19 +29,19 @@
                      codePath="src/test/resources"/>
 
     <!-- 生成Mapper的类文件 -->
-    <javaClientGenerator targetPackage="com.ciicgat.grusgenerator.test.cg.generated.mapper"
+    <javaClientGenerator targetPackage="com.ciicgat.grus.generator.cg.generated.mapper"
                          codePath="src/test/java"/>
 
     <!-- 生成Service文件 -->
-    <serviceGenerator targetPackage="com.ciicgat.grusgenerator.test.cg.generated.service"
+    <serviceGenerator targetPackage="com.ciicgat.grus.generator.cg.generated.service"
                       codePath="src/test/java"/>
 
     <!-- 生成Controller文件 -->
-    <controllerGenerator targetPackage="com.ciicgat.grusgenerator.test.cg.generated.controller"
+    <controllerGenerator targetPackage="com.ciicgat.grus.generator.cg.generated.controller"
                          codePath="src/test/java"/>
 
     <!-- 生成DTO文件 -->
-    <dtoGenerator targetPackage="com.ciicgat.grusgenerator.test.cg.generated.dto"
+    <dtoGenerator targetPackage="com.ciicgat.grus.generator.cg.generated.dto"
                         codePath="src/test/java" suffix="VO"/>
 
     <!--需要生成的表-->

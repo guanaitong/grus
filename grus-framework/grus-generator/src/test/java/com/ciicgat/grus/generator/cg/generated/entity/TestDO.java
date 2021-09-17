@@ -57,13 +57,13 @@ public class TestDO implements Serializable {
     /**
      * medium_int
      */
-    @TableField("medium_int")
+    @TableField(value = "medium_int")
     private Integer mediumInt;
 
     /**
      * float
      */
-    @TableField("float")
+    @TableField(value = "float")
     private Float float$;
 
     /**
@@ -74,31 +74,31 @@ public class TestDO implements Serializable {
     /**
      * DATE
      */
-    @TableField("DATE")
+    @TableField(value = "DATE")
     private Date date;
 
     /**
      * DATETIME
      */
-    @TableField("DATETIME")
+    @TableField(value = "DATETIME")
     private Date datetime;
 
     /**
      * TIMESTAMP
      */
-    @TableField("TIMESTAMP")
+    @TableField(value = "TIMESTAMP")
     private Date timestamp;
 
     /**
      * TIME
      */
-    @TableField("TIME")
+    @TableField(value = "TIME")
     private Date time;
 
     /**
      * YEAR
      */
-    @TableField("YEAR")
+    @TableField(value = "YEAR")
     private Date year;
 
     /**
@@ -109,19 +109,19 @@ public class TestDO implements Serializable {
     /**
      * TEXT
      */
-    @TableField("TEXT")
+    @TableField(value = "TEXT")
     private String text;
 
     /**
      * LONGTEXT
      */
-    @TableField("LONGTEXT")
+    @TableField(value = "LONGTEXT")
     private String longtext;
 
     /**
      * enum
      */
-    @TableField("enum")
+    @TableField(value = "enum")
     private String enum$;
 
     /**
@@ -132,7 +132,7 @@ public class TestDO implements Serializable {
     /**
      * public
      */
-    @TableField("public")
+    @TableField(value = "public")
     private Integer public$;
 
     /**

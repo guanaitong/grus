@@ -5,8 +5,8 @@
 
 package com.ciicgat.grus.generator.cg.generated.service;
 
-import com.ciicgat.grus.generator.cg.generated.entity.TestDO;
 import com.ciicgat.sdk.data.mybatis.generator.template.BaseService;
+import com.ciicgat.grus.generator.cg.generated.entity.TestDO;
 
 /**
  * 测试 服务接口

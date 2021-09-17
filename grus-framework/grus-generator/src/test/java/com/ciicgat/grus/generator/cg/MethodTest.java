@@ -22,12 +22,6 @@ public class MethodTest {
     }
 
     @Test
-    public void test2() {
-        GeneratorChain generatorChain = new GeneratorChain();
-        generatorChain.generate(null, generatorChain);
-    }
-
-    @Test
     public void getLowerCamelName() {
         String str = "user -> user\n" +
                 "User -> user\n" +
