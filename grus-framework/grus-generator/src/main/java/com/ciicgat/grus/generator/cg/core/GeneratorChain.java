@@ -137,7 +137,7 @@ public class GeneratorChain implements Generator {
         String targetPackage = generatorConfig.getTargetPackage();
         String projectPath = System.getProperty("user.dir");
         String codePath = generatorConfig.getCodePath();
-        String packagePath = targetPackage.replace(".", "/");
+        String packagePath = targetPackage.replace('.', '/');
         return String.format("%s/%s/%s", projectPath, codePath, packagePath);
     }
 

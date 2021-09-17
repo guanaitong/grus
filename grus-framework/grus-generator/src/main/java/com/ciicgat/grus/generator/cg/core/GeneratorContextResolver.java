@@ -117,7 +117,7 @@ public class GeneratorContextResolver {
                 .findAny().ifPresent(idColumn -> {
                     fields.removeIf(x -> Objects.equals(GeneratorConst.PRIMARY_KEY_COL, x.getColumnName()));
                     Field idField = this.convertColumnInfo2Field(idColumn);
-                    idField.setNullable(true);
+                    idField.setNullable(Boolean.TRUE);
                     idField.setComment("ID 主键");
                     idField.setMarkColumnName(false);
                     idField.setPrimaryKey(true);
@@ -149,7 +149,7 @@ public class GeneratorContextResolver {
     }
 
     private boolean hasBigDecimalField(List<Field> fields) {
-        return fields.stream().anyMatch(x -> JdbcType.DECIMAL.equals(x.getJdbcType()));
+        return fields.stream().anyMatch(x -> JdbcType.DECIMAL == x.getJdbcType());
     }
 
     private CodeGeneratorXmlConfig parseXmlConfig(String configFilePath) {
@@ -317,7 +317,7 @@ public class GeneratorContextResolver {
         field.setUpperCamelName(StringUtils.capitalize(lowerCamelName));
         field.setColumnName(primaryKeyColumn);
         field.setLength(20);
-        field.setNullable(true);
+        field.setNullable(Boolean.TRUE);
         field.setComment("ID 主键");
         field.setMarkColumnName(false);
         field.setPrimaryKey(true);
@@ -335,7 +335,7 @@ public class GeneratorContextResolver {
         field.setUpperCamelName(StringUtils.capitalize(lowerCamelName));
         field.setColumnName(column);
         field.setLength(19);
-        field.setNullable(true);
+        field.setNullable(Boolean.TRUE);
         field.setComment(comment);
         field.setMarkColumnName(!Objects.equals(field.getLowerCamelName(), field.getColumnName()));
         field.setSwaggerHidden(true);

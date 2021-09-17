@@ -53,7 +53,7 @@ public class MysqlTableIntrospect implements TableIntrospect {
 
             // introspect column info
             try (ResultSet columnRs = metaData.getColumns(connection.getCatalog(), null, tableName, null)) {
-                while (columnRs.next()) {
+                while (columnRs != null && columnRs.next()) {
                     String columnName = columnRs.getString("COLUMN_NAME");
                     String typeName = columnRs.getString("TYPE_NAME");
                     int columnSize = columnRs.getInt("COLUMN_SIZE");
@@ -71,7 +71,7 @@ public class MysqlTableIntrospect implements TableIntrospect {
             return tableInfo;
         } catch (SQLException e) {
             LOGGER.error("introspect", e);
-            throw new RuntimeException("Fail to introspect table: " + tableName);
+            throw new RuntimeException("Fail to introspect table: " + tableName, e);
         }
     }
 

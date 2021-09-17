@@ -36,7 +36,11 @@ public class ${entity.entityName} implements Serializable {
      * ${field.comment}
      */
     [#if field.markColumnName || field.ignoreSaving]
+        [#if field.markColumnName && !field.ignoreSaving]
+    @TableField("${field.columnName}")
+        [#else]
     @TableField([#if field.markColumnName]value = "${field.columnName}"[/#if][#if field.markColumnName && field.ignoreSaving], [/#if][#if field.ignoreSaving]ignoreSaving = true[/#if])
+        [/#if]
     [/#if]
     [#if field.primaryKey]
     @TableId

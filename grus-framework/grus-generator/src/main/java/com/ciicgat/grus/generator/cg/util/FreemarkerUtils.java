@@ -44,7 +44,7 @@ public class FreemarkerUtils {
             return strWriter.toString();
         } catch (Exception e) {
             LOGGER.error("parseTemplate Exc", e);
-            throw new IllegalArgumentException("freemarker 模板解析失败");
+            throw new IllegalArgumentException("freemarker 模板解析失败", e);
         }
     }
 
