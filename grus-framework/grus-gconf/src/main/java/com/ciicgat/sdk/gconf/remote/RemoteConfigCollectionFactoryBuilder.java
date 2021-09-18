@@ -6,7 +6,7 @@
 package com.ciicgat.sdk.gconf.remote;
 
 import com.ciicgat.sdk.gconf.ConfigCollectionFactory;
-import com.ciicgat.sdk.gconf.GconfDomain;
+import com.ciicgat.sdk.gconf.GconfConfig;
 import com.ciicgat.sdk.gconf.noop.NoopConfigCollectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +33,11 @@ public class RemoteConfigCollectionFactoryBuilder {
         static {
             ConfigCollectionFactory configCollectionFactory = null;
             try {
-                InetAddress[] inetAddresses = InetAddress.getAllByName(GconfDomain.DOMAIN);
-                configCollectionFactory = new RemoteConfigCollectionFactory(GconfDomain.DOMAIN);
-                LOGGER.info("use remote, domain {} ,target {}", GconfDomain.DOMAIN, Arrays.asList(inetAddresses));
+                InetAddress[] inetAddresses = InetAddress.getAllByName(GconfConfig.DOMAIN);
+                configCollectionFactory = new RemoteConfigCollectionFactory(GconfConfig.DOMAIN);
+                LOGGER.info("use remote, domain {} ,target {}", GconfConfig.DOMAIN, Arrays.asList(inetAddresses));
             } catch (Throwable e) {
-                LOGGER.warn("use noop,cannot resolve gconf domain " + GconfDomain.DOMAIN, e);
+                LOGGER.warn("use noop,cannot resolve gconf domain " + GconfConfig.DOMAIN, e);
                 configCollectionFactory = new NoopConfigCollectionFactory();
             }
 

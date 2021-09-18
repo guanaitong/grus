@@ -5,7 +5,6 @@
 
 package com.ciicgat.sdk.gconf.remote;
 
-import com.ciicgat.grus.json.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +29,8 @@ class ValueWrappers {
      */
     static ValueWrapper of(String key, String value) {
         try {
-            JSON.parse(value);
-            LinkedHashMap<String, Object> p = JSON.parse(value, new TypeReference<>() {
+            InnerJson.parse(value);
+            LinkedHashMap<String, Object> p = InnerJson.parse(value, new TypeReference<>() {
             });
             if (!key.endsWith(".json")) {  //提醒下那些文件名命名不规范的用户
                 LOGGER.warn("you file is json format,but name is" + key, "please change it with .json suffix");

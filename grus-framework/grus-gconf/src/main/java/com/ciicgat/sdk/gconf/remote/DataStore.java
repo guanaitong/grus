@@ -6,8 +6,6 @@
 package com.ciicgat.sdk.gconf.remote;
 
 import com.ciicgat.sdk.gconf.ConfigChangeListener;
-import com.ciicgat.sdk.lang.threads.Threads;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +34,11 @@ class DataStore implements Runnable {
 
     DataStore(GConfHttpClient gConfHttpClient) {
         this.gConfHttpClient = gConfHttpClient;
-        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(Threads.newDaemonThreadFactory("gconf-refresh", Thread.MIN_PRIORITY));
+        ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(r -> {
+            Thread thread = new Thread(r, "gconf-refresher");
+            thread.setDaemon(true);
+            return thread;
+        });
         scheduledExecutorService.scheduleAtFixedRate(this, 0, 10, TimeUnit.MILLISECONDS);
     }
 
@@ -94,7 +96,10 @@ class DataStore implements Runnable {
             refresh(needUpdateConfigApps);
         } catch (Throwable e) {
             LOGGER.error("unexpect error", e);
-            Threads.sleepSeconds(60);
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException ex) {
+            }
         }
 
     }
@@ -114,7 +119,7 @@ class DataStore implements Runnable {
                     String oldRaw = oldEntry.getValue().getRaw();
                     if (newKeys.contains(key)) {
                         String newRaw = gConfHttpClient.getConfig(configCollectionId, key);
-                        if (StringUtils.isNoneBlank(newRaw) && !Objects.equals(oldRaw, newRaw)) {
+                        if (Objects.nonNull(newRaw) && !newRaw.isBlank() && !Objects.equals(oldRaw, newRaw)) {
                             oldEntry.getValue().setRaw(newRaw);
                             fireValueChanged(configCollectionId, key, oldRaw, newRaw);
                         }

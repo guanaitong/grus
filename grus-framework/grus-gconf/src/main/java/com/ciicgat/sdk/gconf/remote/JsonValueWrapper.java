@@ -5,8 +5,6 @@
 
 package com.ciicgat.sdk.gconf.remote;
 
-import com.ciicgat.grus.json.JSON;
-
 import java.util.Map;
 
 /**
@@ -32,7 +30,7 @@ class JsonValueWrapper extends ValueWrapper {
     @Override
     public Object asBean(Class<?> clazz) {
         if (asBeanCache == null) {
-            Object v = JSON.parse(value, clazz);
+            Object v = InnerJson.parse(value, clazz);
             validate(v);
             this.asBeanCache = v;
         }

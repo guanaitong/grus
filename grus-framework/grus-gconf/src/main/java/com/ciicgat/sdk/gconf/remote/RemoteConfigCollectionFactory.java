@@ -9,7 +9,7 @@ package com.ciicgat.sdk.gconf.remote;
 import com.ciicgat.sdk.gconf.ConfigApp;
 import com.ciicgat.sdk.gconf.ConfigCollection;
 import com.ciicgat.sdk.gconf.ConfigCollectionFactory;
-import com.ciicgat.sdk.util.system.Systems;
+import com.ciicgat.sdk.gconf.GconfConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,15 +29,13 @@ class RemoteConfigCollectionFactory implements ConfigCollectionFactory {
     private final GConfHttpClient gConfHttpClient;
 
     private final DataStore dataStore;
+    private final GconfConfig gconfConfig;
 
 
-    RemoteConfigCollectionFactory(GConfHttpClient gConfHttpClient) {
-        this.gConfHttpClient = gConfHttpClient;
+    RemoteConfigCollectionFactory(GconfConfig gconfConfig) {
+        this.gconfConfig = gconfConfig;
+        this.gConfHttpClient = new GConfHttpClient(gconfConfig);
         this.dataStore = new DataStore(gConfHttpClient);
-    }
-
-    RemoteConfigCollectionFactory(String domain) {
-        this(new GConfHttpClient(domain));
     }
 
     @Override
@@ -67,10 +65,10 @@ class RemoteConfigCollectionFactory implements ConfigCollectionFactory {
 
     @Override
     public ConfigCollection getConfigCollection() {
-        if (Objects.equals(Systems.APP_NAME, Systems.UNKNOWN)) {
-            throw new RuntimeException("请设置APP_NAME环境变量");
+        if (Objects.isNull(gconfConfig.getAppName())) {
+            return getConfigCollection(System.getenv("WORK_ENV"));
         }
-        return getConfigCollection(Systems.APP_NAME);
+        return getConfigCollection(gconfConfig.getAppName());
     }
 
 }

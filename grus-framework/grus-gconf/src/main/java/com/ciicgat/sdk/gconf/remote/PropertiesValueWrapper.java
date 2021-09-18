@@ -6,13 +6,13 @@
 package com.ciicgat.sdk.gconf.remote;
 
 import com.ciicgat.sdk.gconf.annotation.BeanFieldKey;
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 import java.util.Properties;
@@ -124,9 +124,13 @@ class PropertiesValueWrapper extends ValueWrapper {
                 return new Date(Long.parseLong(value));
             } catch (NumberFormatException e) {
                 try {
-                    return DateUtils.parseDate(value, new String[]{"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd"});
+                    return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(value);
                 } catch (ParseException parseException) {
-                    LOGGER.warn("parse date failed,value: " + value, parseException);
+                    try {
+                        return new SimpleDateFormat("yyyy-MM-dd").parse(value);
+                    } catch (ParseException parseException1) {
+                        LOGGER.warn("parse date failed,value: " + value, parseException1);
+                    }
                 }
             }
         }
