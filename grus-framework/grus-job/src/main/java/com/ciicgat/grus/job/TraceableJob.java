@@ -19,7 +19,7 @@ public class TraceableJob implements SimpleJob {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TraceableJob.class);
 
-    private SimpleJob simpleJob;
+    private final SimpleJob simpleJob;
 
     public TraceableJob(SimpleJob simpleJob) {
         this.simpleJob = simpleJob;

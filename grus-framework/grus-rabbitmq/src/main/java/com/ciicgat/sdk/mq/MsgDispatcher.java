@@ -6,6 +6,9 @@
 package com.ciicgat.sdk.mq;
 
 import com.ciicgat.grus.core.Module;
+import com.ciicgat.sdk.mq.trace.ProducerSpanDecorator;
+import com.ciicgat.sdk.mq.trace.TracingUtils;
+import com.ciicgat.sdk.trace.Spans;
 import com.ciicgat.sdk.util.ComponentStatus;
 import com.ciicgat.sdk.util.frigate.FrigateNotifier;
 import com.ciicgat.sdk.util.frigate.NotifyChannel;
@@ -14,6 +17,11 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.MessageProperties;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
+import io.opentracing.noop.NoopSpan;
+import io.opentracing.tag.Tags;
+import io.opentracing.util.GlobalTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,15 +102,26 @@ public class MsgDispatcher {
         if (BuiltinExchangeType.FANOUT == exchangeType) {
             routingKey = "";
         }
-
+        Tracer tracer = GlobalTracer.get();
+        ProducerSpanDecorator producerSpanDecorator = ProducerSpanDecorator.STANDARD_TAGS;
+        Span rootSpan = Spans.getRootSpan();
+        final Span span = tracer.buildSpan("sendMsg")
+                .asChildOf(rootSpan == NoopSpan.INSTANCE ? null : rootSpan)
+                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_PRODUCER)
+                .start();
+        Tags.DB_INSTANCE.set(span, this.host);
+        producerSpanDecorator.onRequest(span);
         Channel channel = null;
         try {
             channel = channelPool.borrowObject();
-            channel.basicPublish(exchangeName, routingKey, false, properties, msg.getBytes(StandardCharsets.UTF_8));
+            AMQP.BasicProperties traceProperties = TracingUtils.inject(properties, span, tracer);
+            channel.basicPublish(exchangeName, routingKey, false, traceProperties, msg.getBytes(StandardCharsets.UTF_8));
             if (this.confirm) {
                 channel.waitForConfirmsOrDie();
             }
+            producerSpanDecorator.onResponse(span);
         } catch (Throwable e) {
+            producerSpanDecorator.onError(e, span);
             FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT_AND_EMAIL, Module.RABBITMQ, "rabbitmq error", e);
             throw new IOException(e);
         } finally {
@@ -110,6 +129,7 @@ public class MsgDispatcher {
                 if (null != channel) {
                     channelPool.returnObject(channel);
                 }
+                span.finish();
             } catch (Exception e) {
                 // ignored
             }
@@ -184,9 +204,6 @@ public class MsgDispatcher {
          */
         @Override
         public MsgDispatcher build() throws Exception {
-            if (ComponentStatus.isTraceEnable()) {
-                return new TracingMsgDispatcher(this);
-            }
             return new MsgDispatcher(this);
         }
     }

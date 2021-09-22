@@ -38,11 +38,7 @@ public class RedisPoolBuilder implements RedisConstants {
     }
 
     public RedisExecutor newRedisExecutor() {
-        JedisPoolAbstract jedisPoolAbstract = newPool();
-        if (ComponentStatus.isTraceEnable()) {
-            return new TracingRedisExecutorImpl(this.setting, jedisPoolAbstract);
-        }
-        return new RedisExecutorImpl(this.setting, jedisPoolAbstract);
+        return new RedisExecutorImpl(this.setting, newPool());
     }
 
     public JedisPoolAbstract newPool() {

@@ -5,7 +5,6 @@
 
 package com.ciicgat.sdk.util.http;
 
-import com.ciicgat.sdk.util.ComponentStatus;
 import com.ciicgat.sdk.util.http.metrics.DelegateEventListener;
 import com.ciicgat.sdk.util.http.trace.OkhttpTracingInterceptor;
 import okhttp3.ConnectionPool;
@@ -37,7 +36,6 @@ public class HttpClientSingleton {
 
     /**
      * 获取okHttpClient单例
-     *
      */
     public static okhttp3.OkHttpClient getOkHttpClient() {
         return OkHttpClientSingletonHolder.OK_HTTP_CLIENT;
@@ -78,9 +76,7 @@ public class HttpClientSingleton {
                     .sslSocketFactory(SSL.sslSocketFactory, SSL.x509TrustManager)
                     .hostnameVerifier(SSL.hostnameVerifier);
 
-            if (ComponentStatus.isTraceEnable()) {
-                clientBuilder.addInterceptor(new OkhttpTracingInterceptor());
-            }
+            clientBuilder.addInterceptor(new OkhttpTracingInterceptor());
             OK_HTTP_CLIENT = clientBuilder.build();
         }
     }

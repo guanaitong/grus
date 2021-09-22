@@ -7,7 +7,6 @@ package com.ciicgat.sdk.mq;
 
 import com.ciicgat.sdk.lang.threads.ShutdownHook;
 import com.ciicgat.sdk.lang.tool.CloseUtils;
-import com.ciicgat.sdk.util.ComponentStatus;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -109,14 +108,12 @@ public class MsgReceiver {
             channelList.add(channel);
         }
 
-        boolean isTracing = ComponentStatus.isTraceEnable();
 
         AtomicBoolean isRunning = new AtomicBoolean(true);
 
         for (Channel channel : channelList) {
             for (RQ rq : rqList) {
-                channel.basicConsume(rq.queueName, false,
-                        isTracing ? new GrusTracingConsumer(channel, msgProcessor, host, isRunning) : new GrusDefaultConsumer(channel, msgProcessor, isRunning));
+                channel.basicConsume(rq.queueName, false, new GrusDefaultConsumer(channel, host, msgProcessor, isRunning));
             }
         }
         ShutdownHook.addShutdownHook(() -> {

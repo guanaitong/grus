@@ -6,12 +6,21 @@
 package com.ciicgat.sdk.mq;
 
 import com.ciicgat.grus.core.Module;
+import com.ciicgat.sdk.mq.trace.ConsumerSpanDecorator;
+import com.ciicgat.sdk.mq.trace.MapHeadersAdapter;
+import com.ciicgat.sdk.trace.Spans;
 import com.ciicgat.sdk.util.frigate.FrigateNotifier;
 import com.ciicgat.sdk.util.frigate.NotifyChannel;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
+import io.opentracing.Span;
+import io.opentracing.SpanContext;
+import io.opentracing.Tracer;
+import io.opentracing.propagation.Format;
+import io.opentracing.tag.Tags;
+import io.opentracing.util.GlobalTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +38,12 @@ public class GrusDefaultConsumer extends DefaultConsumer {
 
     private MsgProcessor msgProcessor;
     private final AtomicBoolean isRunning;
+    private ConsumerSpanDecorator consumerSpanDecorator = ConsumerSpanDecorator.STANDARD_TAGS;
+    private final String host;
 
-    GrusDefaultConsumer(Channel channel, MsgProcessor msgProcessor, AtomicBoolean isRunning) {
+    GrusDefaultConsumer(Channel channel, String host, MsgProcessor msgProcessor, AtomicBoolean isRunning) {
         super(channel);
+        this.host = host;
         this.msgProcessor = msgProcessor;
         this.isRunning = Objects.requireNonNull(isRunning);
     }
@@ -57,6 +69,20 @@ public class GrusDefaultConsumer extends DefaultConsumer {
             return;
         }
 
+        Tracer tracer = GlobalTracer.get();
+        SpanContext spanContext = null;
+        if (properties.getHeaders() != null) {
+            spanContext = tracer.extract(Format.Builtin.TEXT_MAP, new MapHeadersAdapter(properties.getHeaders()));
+        }
+        final Span span = tracer.buildSpan("handleMsg")
+                .asChildOf(spanContext)
+                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CONSUMER)
+                .start();
+        Spans.setRootSpan(span);
+
+        Tags.DB_INSTANCE.set(span, this.host);
+
+        consumerSpanDecorator.onRequest(span);
         try {
             boolean b = msgProcessor.apply(envelope.getRoutingKey(), text);
             if (b) {
@@ -68,10 +94,15 @@ public class GrusDefaultConsumer extends DefaultConsumer {
                 FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT_AND_EMAIL, Module.RABBITMQ, msg, null);
                 LOGGER.warn(msg);
             }
+            consumerSpanDecorator.onResponse(span);
         } catch (Exception e) {
+            consumerSpanDecorator.onError(e, span);
             FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT_AND_EMAIL, Module.RABBITMQ, "rabbitmq error", e);
             LOGGER.error("msg:" + text, e);
             throw e;
+        } finally {
+            span.finish();
+            Spans.remove();
         }
     }
 }

@@ -7,7 +7,6 @@ package com.ciicgat.grus.boot.autoconfigure.job;
 
 import com.ciicgat.grus.job.TraceableJob;
 import com.ciicgat.sdk.lang.threads.Threads;
-import com.ciicgat.sdk.util.ComponentStatus;
 import com.google.common.base.Optional;
 import io.elasticjob.lite.api.simple.SimpleJob;
 import io.elasticjob.lite.config.JobCoreConfiguration;
@@ -74,10 +73,8 @@ public class JobBeanProcessor implements BeanPostProcessor, BeanFactoryAware {
                 .build();
 
         LOGGER.info("start init job {}", jobName);
-        if (ComponentStatus.isTraceEnable()) {
-            simpleJob = new TraceableJob(simpleJob);
-        }
-        SpringJobScheduler springJobScheduler = new SpringJobScheduler(simpleJob, zookeeperRegistryCenter, liteJobConfiguration);
+        TraceableJob traceableJob = new TraceableJob(simpleJob);
+        SpringJobScheduler springJobScheduler = new SpringJobScheduler(traceableJob, zookeeperRegistryCenter, liteJobConfiguration);
         try {
             springJobScheduler.init();
         } catch (JobConfigurationException e) {

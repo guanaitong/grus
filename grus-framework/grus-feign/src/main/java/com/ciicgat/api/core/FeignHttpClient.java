@@ -11,7 +11,6 @@ import com.ciicgat.grus.language.LanguageConstant;
 import com.ciicgat.sdk.gconf.ConfigCollection;
 import com.ciicgat.sdk.gconf.ConfigCollectionFactory;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
-import com.ciicgat.sdk.util.ComponentStatus;
 import com.ciicgat.sdk.util.http.CacheDnsResolver;
 import com.ciicgat.sdk.util.http.SSL;
 import com.ciicgat.sdk.util.http.metrics.DelegateEventListener;
@@ -71,9 +70,7 @@ class FeignHttpClient {
                 .writeTimeout(DEFAULT_WRITE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
                 .sslSocketFactory(SSL.sslSocketFactory, SSL.x509TrustManager)
                 .hostnameVerifier(SSL.hostnameVerifier);
-        if (ComponentStatus.isTraceEnable()) {
-            clientBuilder.addInterceptor(new FeignTracingInterceptor());
-        }
+        clientBuilder.addInterceptor(new FeignTracingInterceptor());
         try {
             ConfigCollectionFactory configCollectionFactory = RemoteConfigCollectionFactoryBuilder.getInstance();
             ConfigCollection configCollection = configCollectionFactory.getConfigCollection();
