@@ -5,7 +5,9 @@
 
 package com.ciicgat.grus.boot.autoconfigure.swagger;
 
+import com.ciicgat.grus.boot.autoconfigure.condition.ConditionalOnWorkEnv;
 import com.ciicgat.sdk.util.system.Systems;
+import com.ciicgat.sdk.util.system.WorkEnv;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -41,6 +43,7 @@ import springfox.documentation.swagger.web.UiConfigurationBuilder;
 @ConditionalOnClass(Docket.class)
 @ConditionalOnProperty(prefix = "grus.swagger", value = "enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+@ConditionalOnWorkEnv({WorkEnv.DEVELOP, WorkEnv.TEST})
 @AutoConfigureBefore(OpenApiAutoConfiguration.class)
 public class SwaggerAutoConfiguration {
 

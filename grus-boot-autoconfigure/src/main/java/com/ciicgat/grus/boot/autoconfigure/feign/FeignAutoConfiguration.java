@@ -6,9 +6,8 @@
 package com.ciicgat.grus.boot.autoconfigure.feign;
 
 import com.ciicgat.api.core.FeignServiceBuilder;
-import com.ciicgat.grus.service.naming.NamingService;
 import com.ciicgat.grus.gconf.GconfEndPointNamingService;
-import com.ciicgat.sdk.util.ComponentStatus;
+import com.ciicgat.grus.service.naming.NamingService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -26,9 +25,7 @@ public class FeignAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public NamingService namingService() {
-        if (ComponentStatus.isGconfEnable()) {
-            NamingService.DEFAULT.add(2, new GconfEndPointNamingService());
-        }
+        NamingService.DEFAULT.add(2, new GconfEndPointNamingService());
         return NamingService.DEFAULT;
     }
 

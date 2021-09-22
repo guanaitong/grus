@@ -63,11 +63,6 @@ public class GconfContextInitializer implements ApplicationContextInitializer<Co
             }
         }
 
-
-        if (!ComponentStatus.isGconfEnable()) {
-            return;
-        }
-
         applicationContext.getBeanFactory().addBeanPostProcessor(new GconfBeanProcessor());
 
 
