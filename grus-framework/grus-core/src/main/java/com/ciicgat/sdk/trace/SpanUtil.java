@@ -16,7 +16,7 @@ public class SpanUtil {
     protected static final String USER_ID = "userid";
 
     public static long getDurationMilliSeconds(Span span) {
-        if (span instanceof NoopSpan) {
+        if (isNoop(span)) {
             return 0;
         }
 
