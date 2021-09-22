@@ -22,10 +22,6 @@
             <artifactId>grus-boot-starter-server-minor</artifactId>
             <groupId>com.ciicgat.grus.boot</groupId>
         </dependency>
-        <dependency>
-            <artifactId>grus-boot-starter-gconf</artifactId>
-            <groupId>com.ciicgat.grus.boot</groupId>
-        </dependency>
     </dependencies>
 
 </project>
