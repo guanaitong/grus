@@ -181,7 +181,7 @@ public class FeignServiceBuilder {
 
         Object serviceInstance = Feign.builder()
                 .logger(new Slf4jLogger())
-                .contract(getContract())
+                .contract(GrusFeignContractUtil.getFeignContract(serviceClazz))
                 .options(options)
                 .logLevel(feign.Logger.Level.NONE)
                 .requestInterceptors(requestInterceptors)
@@ -197,12 +197,6 @@ public class FeignServiceBuilder {
         return (T) serviceInstance;
     }
 
-    private Contract getContract() {
-        if (!ComponentStatus.isSpringMvcEnable()) {
-            return new GrusContract();
-        }
-        return GrusFeignContractUtil.getFeignContract(serviceClazz);
-    }
 
 
     /**

@@ -5,7 +5,7 @@
 
 package com.ciicgat.api.core;
 
-import com.ciicgat.sdk.util.ComponentStatus;
+import com.ciicgat.sdk.lang.tool.ClassUtils;
 import feign.Contract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,16 +21,17 @@ import java.lang.reflect.Method;
 public class GrusFeignContractUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GrusFeignContractUtil.class);
+    private static final boolean SPRING_MVC_PRESENT = ClassUtils.isPresent("org.springframework.web.bind.annotation.RequestMapping");
 
 
     static {
-        if (!ComponentStatus.isSpringMvcEnable()) {
+        if (!SPRING_MVC_PRESENT) {
             LOGGER.warn("not in spring-web, use default GrusContract. if you want to use feign extension, please import spring-web");
         }
     }
 
     public static Contract getFeignContract(Class<?> serviceClazz) {
-        if (!ComponentStatus.isSpringMvcEnable()) {
+        if (!SPRING_MVC_PRESENT) {
             return new GrusContract();
         }
 

@@ -22,20 +22,13 @@ public class ComponentStatus {
                     && ClassUtils.isPresent("com.ciicgat.sdk.trace.Spans");
 
 
-    private static final boolean SPRING_MVC_PRESENT = ClassUtils.isPresent("org.springframework.web.bind.annotation.RequestMapping");
 
     static {
         LOGGER.info("trace status {}", TRACE_CLASS_PRESENT);
-        LOGGER.info("spring mvc status={}", SPRING_MVC_PRESENT);
     }
 
     public static boolean isTraceEnable() {
         return TRACE_CLASS_PRESENT;
-    }
-
-
-    public static boolean isSpringMvcEnable() {
-        return SPRING_MVC_PRESENT;
     }
 
 }
