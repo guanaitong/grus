@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.gconf.security;
+package com.ciicgat.grus.gconf;
 
 import org.junit.Assert;
 import org.junit.Test;

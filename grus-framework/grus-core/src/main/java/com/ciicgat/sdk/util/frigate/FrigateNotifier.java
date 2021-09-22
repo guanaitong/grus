@@ -22,7 +22,7 @@ import static com.ciicgat.sdk.util.frigate.FrigateClient.send;
  * <p>
  * Created by Albert on 2018/10/29.
  */
-public abstract class FrigateNotifier {
+public abstract class FrigateNotifier implements FrigateMessageConstants {
 
     private FrigateNotifier() {
 
@@ -38,7 +38,7 @@ public abstract class FrigateNotifier {
      */
     public static void sendMessage(NotifyChannel channel, String content, Throwable throwable, String... empNos) {
         FrigateMessage frigateMessage = buildMsg(channel, content, throwable);
-        send(LocalFrigateMessageConstants.DEFAULT.getByQiWeiXinUrl(), Map.of("receiveWeChatIds", String.join(",", empNos)), frigateMessage);
+        send(QIYE_WECHAT_PATH, Map.of("receiveWeChatIds", String.join(",", empNos)), frigateMessage);
     }
 
 
@@ -55,7 +55,7 @@ public abstract class FrigateNotifier {
             return;
         }
         FrigateMessage frigateMessage = buildMsg(channel, content, throwable);
-        send(LocalFrigateMessageConstants.DEFAULT.getByGroupUrl(), Map.of("receiveGroups", String.valueOf(groupId)), frigateMessage);
+        send(GROUP_PATH, Map.of("receiveGroups", String.valueOf(groupId)), frigateMessage);
     }
 
 
@@ -91,7 +91,7 @@ public abstract class FrigateNotifier {
             return;
         }
         FrigateMessage frigateMessage = buildMsg(channel, content, throwable);
-        send(LocalFrigateMessageConstants.DEFAULT.getByAppNameUrl(), Map.of("receiveAppNames", Systems.APP_NAME), frigateMessage);
+        send(APP_NAME_PATH, Map.of("receiveAppNames", Systems.APP_NAME), frigateMessage);
     }
 
     /**
@@ -108,7 +108,7 @@ public abstract class FrigateNotifier {
         }
         FrigateMessage frigateMessage = buildMsg(channel, content, throwable);
         frigateMessage.setModule(module.getName());
-        send(LocalFrigateMessageConstants.DEFAULT.getByAppNameUrl(), Map.of("receiveAppNames", Systems.APP_NAME), frigateMessage);
+        send(APP_NAME_PATH, Map.of("receiveAppNames", Systems.APP_NAME), frigateMessage);
     }
 
     /**

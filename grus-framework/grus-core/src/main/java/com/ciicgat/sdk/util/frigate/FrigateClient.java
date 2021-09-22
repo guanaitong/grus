@@ -5,6 +5,7 @@
 
 package com.ciicgat.sdk.util.frigate;
 
+import com.ciicgat.grus.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.util.http.HttpClientSingleton;
 import okhttp3.Call;
@@ -61,12 +62,13 @@ public abstract class FrigateClient {
     /**
      * Frigate 对外消息接口。
      *
-     * @param url
+     * @param path
      * @param params
      */
-    static void send(String url, Map<String, String> params, FrigateMessage frigateMessage) {
+    static void send(String path, Map<String, String> params, FrigateMessage frigateMessage) {
         if (skip) return;
-
+        String baseUrl = GlobalGconfConfig.getConfig().getProperties("frigate.properties").getProperty("frigate.message.base.url");
+        String url = baseUrl = path;
         try {
             //同样的消息限制频率每2分钟发送一次
             EXECUTOR_SERVICE.execute(() -> executeRequest(url, params, frigateMessage));

@@ -20,7 +20,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>grus-boot-starter</module>
-        <module>grus-boot-starter-gconf</module>
         <module>grus-boot-starter-opentracing</module>
         <module>grus-boot-starter-fegin</module>
         <module>grus-boot-starter-gfs</module>

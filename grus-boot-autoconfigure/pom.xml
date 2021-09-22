@@ -37,11 +37,6 @@
             <groupId>com.ciicgat.grus</groupId>
         </dependency>
         <dependency>
-            <artifactId>grus-gconf</artifactId>
-            <groupId>com.ciicgat.grus</groupId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <artifactId>grus-gfs</artifactId>
             <groupId>com.ciicgat.grus</groupId>
             <optional>true</optional>

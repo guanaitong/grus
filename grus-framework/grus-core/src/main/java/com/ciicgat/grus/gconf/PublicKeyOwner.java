@@ -3,9 +3,8 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.gconf.security;
+package com.ciicgat.grus.gconf;
 
-import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.lang.digest.RSACrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

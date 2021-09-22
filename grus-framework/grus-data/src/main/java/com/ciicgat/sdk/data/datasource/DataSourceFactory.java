@@ -9,7 +9,7 @@ import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.data.connection.JdbcUrlBuilder;
 import com.ciicgat.sdk.gconf.ConfigCollection;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
-import com.ciicgat.sdk.gconf.security.PublicKeyOwner;
+import com.ciicgat.grus.gconf.PublicKeyOwner;
 import com.ciicgat.sdk.util.system.Systems;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import com.zaxxer.hikari.HikariConfig;

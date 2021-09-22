@@ -27,11 +27,6 @@
             <artifactId>jedis</artifactId>
         </dependency>
         <dependency>
-            <artifactId>grus-gconf</artifactId>
-            <groupId>com.ciicgat.grus</groupId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <scope>provided</scope>

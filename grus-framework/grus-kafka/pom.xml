@@ -22,11 +22,6 @@
             <groupId>com.ciicgat.grus</groupId>
         </dependency>
         <dependency>
-            <artifactId>grus-gconf</artifactId>
-            <groupId>com.ciicgat.grus</groupId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
             <version>${kafka-clients.version}</version>

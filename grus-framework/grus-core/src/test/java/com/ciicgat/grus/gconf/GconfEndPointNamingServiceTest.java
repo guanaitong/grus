@@ -3,10 +3,9 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.gconf;
+package com.ciicgat.grus.gconf;
 
 import com.ciicgat.grus.service.naming.NamingService;
-import com.ciicgat.sdk.gconf.support.GconfEndPointNamingService;
 import org.junit.Assert;
 import org.junit.Test;
 

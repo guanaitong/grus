@@ -5,7 +5,7 @@
 
 package com.ciicgat.grus.boot.autoconfigure.opentracing;
 
-import com.ciicgat.sdk.gconf.GlobalGconfConfig;
+import com.ciicgat.grus.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.lang.tool.PropertiesUtils;
 import com.ciicgat.sdk.util.system.Systems;
 import com.ciicgat.sdk.util.system.WorkRegion;

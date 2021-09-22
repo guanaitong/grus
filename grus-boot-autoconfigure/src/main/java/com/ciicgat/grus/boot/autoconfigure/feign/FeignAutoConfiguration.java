@@ -7,7 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.feign;
 
 import com.ciicgat.api.core.FeignServiceBuilder;
 import com.ciicgat.grus.service.naming.NamingService;
-import com.ciicgat.sdk.gconf.support.GconfEndPointNamingService;
+import com.ciicgat.grus.gconf.GconfEndPointNamingService;
 import com.ciicgat.sdk.util.ComponentStatus;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

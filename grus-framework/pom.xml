@@ -20,7 +20,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>grus-core</module>
-        <module>grus-gconf</module>
         <module>grus-gfs</module>
         <module>grus-redis</module>
         <module>grus-rabbitmq</module>

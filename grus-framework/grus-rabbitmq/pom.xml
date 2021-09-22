@@ -23,11 +23,6 @@
             <groupId>com.ciicgat.grus</groupId>
         </dependency>
         <dependency>
-            <artifactId>grus-gconf</artifactId>
-            <groupId>com.ciicgat.grus</groupId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
         </dependency>

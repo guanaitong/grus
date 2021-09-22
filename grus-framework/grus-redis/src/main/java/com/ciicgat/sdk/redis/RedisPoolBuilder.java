@@ -6,7 +6,7 @@
 package com.ciicgat.sdk.redis;
 
 import com.ciicgat.grus.core.Module;
-import com.ciicgat.sdk.gconf.security.PublicKeyOwner;
+import com.ciicgat.grus.gconf.PublicKeyOwner;
 import com.ciicgat.sdk.redis.config.RedisSetting;
 import com.ciicgat.sdk.util.ComponentStatus;
 import com.ciicgat.sdk.util.frigate.FrigateNotifier;

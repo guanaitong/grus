@@ -5,7 +5,7 @@
 
 package com.ciicgat.grus.kafka.consumer;
 
-import com.ciicgat.sdk.gconf.GlobalGconfConfig;
+import com.ciicgat.grus.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.lang.tool.CloseUtils;
 import com.ciicgat.sdk.util.system.Systems;

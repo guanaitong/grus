@@ -24,11 +24,6 @@
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <artifactId>grus-gconf</artifactId>
-                <groupId>com.ciicgat.grus</groupId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
                 <artifactId>grus-gfs</artifactId>
                 <groupId>com.ciicgat.grus</groupId>
                 <version>${revision}</version>

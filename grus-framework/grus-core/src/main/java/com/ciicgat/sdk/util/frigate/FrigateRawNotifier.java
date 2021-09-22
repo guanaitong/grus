@@ -15,7 +15,7 @@ import static com.ciicgat.sdk.util.frigate.FrigateClient.send;
 /**
  * Created by August.Zhou on 2019-09-18 17:07.
  */
-public abstract class FrigateRawNotifier {
+public abstract class FrigateRawNotifier implements FrigateMessageConstants {
 
     /**
      * 发送信息给项目组ID，可同时把一条消息发送给该组下的所有成员，可指定渠道。
@@ -24,7 +24,7 @@ public abstract class FrigateRawNotifier {
      * @param frigateMessage 消息体
      */
     public static void sendMsgByGroups(List<Integer> receiveGroups, FrigateMessage frigateMessage) {
-        send(LocalFrigateMessageConstants.DEFAULT.getByGroupUrl(), Map.of("receiveGroups", StringUtils.join(receiveGroups, ",")), frigateMessage);
+        send(GROUP_PATH, Map.of("receiveGroups", StringUtils.join(receiveGroups, ",")), frigateMessage);
     }
 
     /**
@@ -34,7 +34,7 @@ public abstract class FrigateRawNotifier {
      * @param frigateMessage 消息体
      */
     public static void sendMsgByWeChatIds(List<String> empNos, FrigateMessage frigateMessage) {
-        send(LocalFrigateMessageConstants.DEFAULT.getByQiWeiXinUrl(), Map.of("receiveWeChatIds", StringUtils.join(empNos, ",")), frigateMessage);
+        send(QIYE_WECHAT_PATH, Map.of("receiveWeChatIds", StringUtils.join(empNos, ",")), frigateMessage);
     }
 
     /**
@@ -44,6 +44,6 @@ public abstract class FrigateRawNotifier {
      * @param frigateMessage  消息体
      */
     public static void sendMsgByAppNames(List<String> receiveAppNames, FrigateMessage frigateMessage) {
-        send(LocalFrigateMessageConstants.DEFAULT.getByAppNameUrl(), Map.of("receiveAppNames", StringUtils.join(receiveAppNames, ",")), frigateMessage);
+        send(APP_NAME_PATH, Map.of("receiveAppNames", StringUtils.join(receiveAppNames, ",")), frigateMessage);
     }
 }

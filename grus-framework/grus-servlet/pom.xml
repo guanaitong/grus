@@ -22,12 +22,6 @@
             <artifactId>grus-core</artifactId>
             <groupId>com.ciicgat.grus</groupId>
         </dependency>
-
-        <dependency>
-            <artifactId>grus-gconf</artifactId>
-            <groupId>com.ciicgat.grus</groupId>
-        </dependency>
-
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
