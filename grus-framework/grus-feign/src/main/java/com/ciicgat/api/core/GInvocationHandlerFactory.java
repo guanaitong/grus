@@ -146,6 +146,9 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
             } else if ("toString".equals(method.getName())) {
                 return toString();
             }
+            if (method.isDefault()) {
+                return dispatch.get(method).invoke(args);
+            }
 
             LogExclude logExclude = method.getAnnotation(LogExclude.class);
             if (logReq && LogUtil.checkPrintReq(logExclude)) {
