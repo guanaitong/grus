@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.servlet.trace;
+package com.ciicgat.sdk.servlet;
 
 /**
  * @Author: Jiaju.Wei

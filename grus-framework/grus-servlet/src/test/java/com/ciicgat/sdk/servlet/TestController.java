@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.servlet.trace;
+package com.ciicgat.sdk.servlet;
 
 import com.ciicgat.sdk.lang.convert.ApiResponse;
 import com.ciicgat.sdk.trace.Spans;

@@ -27,8 +27,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by August.Zhou on 2019-04-08 13:45.
  */
-public class SimpleJobTest implements SimpleJob {
-    private static Logger logger = LoggerFactory.getLogger(SimpleJobTest.class);
+public class TraceableJobTest implements SimpleJob {
+    private static Logger logger = LoggerFactory.getLogger(TraceableJobTest.class);
 
     private static AtomicInteger atomicInteger = new AtomicInteger();
     private static CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -80,7 +80,7 @@ public class SimpleJobTest implements SimpleJob {
         ZookeeperRegistryCenter zookeeperRegistryCenter = new ZookeeperRegistryCenter(new ZookeeperConfiguration("app-zk.servers.dev.ofc", "test2"));
         zookeeperRegistryCenter.init();
 
-        SimpleJobTest simpleJob = new SimpleJobTest();
+        TraceableJobTest simpleJob = new TraceableJobTest();
 
         String jobName = "testxxx";
         JobConfiguration jobCoreConfiguration = JobConfiguration
@@ -109,6 +109,6 @@ public class SimpleJobTest implements SimpleJob {
 //        springJobScheduler.init();
 
 
-        Assert.assertTrue(SimpleJobTest.getValue() > 0);
+        Assert.assertTrue(TraceableJobTest.getValue() > 0);
     }
 }

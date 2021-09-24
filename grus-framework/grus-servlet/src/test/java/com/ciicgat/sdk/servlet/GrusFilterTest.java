@@ -3,10 +3,9 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.servlet.trace;
+package com.ciicgat.sdk.servlet;
 
 import com.ciicgat.grus.json.JSON;
-import com.ciicgat.sdk.servlet.GrusFilter;
 import com.ciicgat.sdk.util.system.Systems;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.jaegertracing.Configuration;
@@ -29,9 +28,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
- * Created by August.Zhou on 2019-03-25 15:15.
+ * Created by August.Zhou on 2021/9/24 16:48.
  */
-public class TracingFilterTest {
+public class GrusFilterTest {
     private MockMvc mockMvc;
 
     @BeforeClass
