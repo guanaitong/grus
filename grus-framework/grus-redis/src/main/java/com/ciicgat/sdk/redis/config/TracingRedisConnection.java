@@ -5,9 +5,18 @@
 
 package com.ciicgat.sdk.redis.config;
 
-import com.ciicgat.grus.metrics.Event;
-import com.ciicgat.grus.metrics.ModuleEventType;
-import com.ciicgat.sdk.lang.tool.CloseUtils;
+import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.performance.SlowLogger;
+import com.ciicgat.sdk.redis.RedisSpanDecorator;
+import com.ciicgat.sdk.trace.SpanUtil;
+import com.ciicgat.sdk.trace.Spans;
+import com.ciicgat.sdk.util.frigate.FrigateNotifier;
+import com.ciicgat.sdk.util.frigate.NotifyChannel;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
+import io.opentracing.noop.NoopSpan;
+import io.opentracing.tag.Tags;
+import io.opentracing.util.GlobalTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -33,6 +42,7 @@ import org.springframework.data.redis.core.types.Expiration;
 import java.util.List;
 import java.util.function.Supplier;
 
+
 /**
  * @author Stanley Shen stanley.shen@guanaitong.com
  * @version 2020-07-31 10:05
@@ -46,6 +56,8 @@ class TracingRedisConnection extends AbstractRedisConnection {
     private final RedisSetting redisSetting;
     private final String instance;
 
+    private final RedisSpanDecorator redisSpanDecorator = RedisSpanDecorator.STANDARD_TAGS;
+
     TracingRedisConnection(RedisConnection redisConnection, RedisSetting redisSetting) {
         this.redisConnection = redisConnection;
         this.redisSetting = redisSetting;
@@ -53,20 +65,32 @@ class TracingRedisConnection extends AbstractRedisConnection {
     }
 
     private <T> T trace(String commandName, Supplier<T> callback) {
-        String[] tags = new String[]{"db.instance", instance, "command", commandName};
-        Event event = ModuleEventType.REDIS_REQUEST.newEvent(commandName, tags, "lettuce redis slow");
-
+        Span rootSpan = Spans.getRootSpan();
+        Tracer tracer = GlobalTracer.get();
+        final Span span = tracer.buildSpan("executeRedisCMD")
+                .asChildOf(rootSpan == NoopSpan.INSTANCE ? null : rootSpan)
+                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT)
+                .withTag("command", commandName == null ? "unknown" : commandName)
+                .start();
+        Tags.DB_INSTANCE.set(span, instance);
+        Tags.DB_TYPE.set(span, "redis");
+        redisSpanDecorator.onRequest(span);
         try {
             T result = callback.get();
+            redisSpanDecorator.onResponse(span);
             return result;
         } catch (Throwable e) {
+            FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, Module.REDIS, "redis error:" + redisSetting.toString(), e);
+            redisSpanDecorator.onError(e, span);
             LOGGER.error("redis error:" + redisSetting.toString(), e);
-            event.error("redis error:" + redisSetting, e);
             throw e;
         } finally {
-            CloseUtils.close(event);
+            span.finish();
+            long duration = SpanUtil.getDurationMilliSeconds(span);
+            SlowLogger.logEvent(Module.REDIS, duration, "lettuce redis slow");
         }
     }
+
 
     @Override
     public RedisGeoCommands geoCommands() {

@@ -5,14 +5,24 @@
 
 package com.ciicgat.sdk.redis;
 
-import com.ciicgat.grus.metrics.Event;
-import com.ciicgat.grus.metrics.ModuleEventType;
+import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.sdk.lang.tool.CloseUtils;
 import com.ciicgat.sdk.redis.config.RedisSetting;
+import com.ciicgat.sdk.trace.SpanUtil;
+import com.ciicgat.sdk.trace.Spans;
+import com.ciicgat.sdk.util.frigate.FrigateNotifier;
+import com.ciicgat.sdk.util.frigate.NotifyChannel;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
+import io.opentracing.noop.NoopSpan;
+import io.opentracing.tag.Tags;
+import io.opentracing.util.GlobalTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPoolAbstract;
+
 
 /**
  * Created by August.Zhou on 2019-04-25 17:43.
@@ -21,6 +31,7 @@ class RedisExecutorImpl implements RedisExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisExecutorImpl.class);
     private final RedisSetting redisSetting;
     private final JedisPoolAbstract pool;
+    private RedisSpanDecorator redisSpanDecorator = RedisSpanDecorator.STANDARD_TAGS;
 
     private final String instance;
 
@@ -32,20 +43,33 @@ class RedisExecutorImpl implements RedisExecutor {
 
     @Override
     public final <T> T execute(RedisAction<T> redisAction) {
-        String[] tags = new String[]{"db.instance", instance, "command", "execute"};
-        Event event = ModuleEventType.REDIS_REQUEST.newEvent("execute", tags, redisAction.toString());
+        Span rootSpan = Spans.getRootSpan();
+        Tracer tracer = GlobalTracer.get();
+        final Span span = tracer.buildSpan("executeRedisCMD")
+                .asChildOf(rootSpan == NoopSpan.INSTANCE ? null : rootSpan)
+                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT)
+                .start();
+
+        Tags.DB_INSTANCE.set(span, instance);
+        Tags.DB_TYPE.set(span, "redis");
+        redisSpanDecorator.onRequest(span);
 
         Jedis jedis = pool.getResource();
         try {
             T result = redisAction.apply(jedis);
+            redisSpanDecorator.onResponse(span);
             return result;
         } catch (Throwable e) {
+            FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, Module.REDIS, "redis error:" + redisSetting.toString(), e);
+            redisSpanDecorator.onError(e, span);
             LOGGER.error("redis error:" + redisSetting.toString(), e);
-            event.error("redis error:" + redisSetting, e);
             throw e;
         } finally {
             CloseUtils.close(jedis);
-            CloseUtils.close(event);
+            span.finish();
+
+            long duration = SpanUtil.getDurationMilliSeconds(span);
+            SlowLogger.logEvent(Module.REDIS, duration, redisAction.toString());
         }
     }
 

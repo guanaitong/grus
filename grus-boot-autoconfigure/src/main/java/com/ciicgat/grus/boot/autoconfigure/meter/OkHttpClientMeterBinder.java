@@ -17,14 +17,14 @@ public class OkHttpClientMeterBinder implements MeterBinder {
     @Override
     public void bindTo(MeterRegistry registry) {
         OkHttpMetricsEventListener okHttpMetricsEventListenerForCore = OkHttpMetricsEventListener
-                .builder(registry, "okhttp-core")
+                .builder(registry, "grus.http")
                 .uriMapper(request -> request.url().encodedPath())
                 .build();
         DelegateEventListener.getForCoreInstance().setEventListener(okHttpMetricsEventListenerForCore);
 
 
         OkHttpMetricsEventListener okHttpMetricsEventListenerForFeign = OkHttpMetricsEventListener
-                .builder(registry, "okhttp-feign")
+                .builder(registry, "grus.feign")
                 .uriMapper(request -> request.url().encodedPath())
                 .build();
         DelegateEventListener.getForFeignInstance().setEventListener(okHttpMetricsEventListenerForFeign);

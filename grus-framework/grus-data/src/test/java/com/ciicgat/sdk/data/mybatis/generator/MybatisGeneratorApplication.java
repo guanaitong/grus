@@ -6,7 +6,7 @@
 package com.ciicgat.sdk.data.mybatis.generator;
 
 import com.ciicgat.sdk.data.datasource.DataSourceBuilder;
-import com.ciicgat.sdk.data.mybatis.SQLTelemetryInterceptor;
+import com.ciicgat.sdk.data.mybatis.SQLTracingInterceptor;
 import com.ciicgat.sdk.util.system.EnvHook;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -47,7 +47,7 @@ public class MybatisGeneratorApplication {
         SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
         factoryBean.setDataSource(dataSource);
         // 加入SQL 语句执行拦截器
-        factoryBean.setPlugins(new Interceptor[] {new SQLTelemetryInterceptor()});
+        factoryBean.setPlugins(new Interceptor[]{new SQLTracingInterceptor()});
         return factoryBean.getObject();
     }
 }

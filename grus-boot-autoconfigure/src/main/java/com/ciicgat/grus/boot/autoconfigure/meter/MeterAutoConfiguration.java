@@ -26,16 +26,7 @@ public class MeterAutoConfiguration {
     MeterRegistryCustomizer<MeterRegistry> meterRegistryCustomizer(@Value("${spring.application.name}") String appName) {
         return registry -> registry.config().commonTags("application", appName);
     }
-
-    @Bean
-    TelemetryMeterBinder telemetryMeterBinder() {
-        return new TelemetryMeterBinder();
-    }
-
-//    @Bean
-//    public OkHttpClientMeterBinder okHttpClientMeterBinder() {
-//        return new OkHttpClientMeterBinder();
-//    }
+    
 
     @Bean
     @ConditionalOnClass({ConnectionFactory.class, DelegateMetricsCollector.class})

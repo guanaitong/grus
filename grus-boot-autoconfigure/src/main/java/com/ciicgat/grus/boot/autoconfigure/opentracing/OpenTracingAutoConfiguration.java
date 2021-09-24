@@ -7,7 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.opentracing;
 
 import com.ciicgat.grus.boot.autoconfigure.condition.ConditionalOnServerEnv;
 import com.ciicgat.sdk.data.mybatis.SQLLineInterceptor;
-import com.ciicgat.sdk.data.mybatis.SQLTelemetryInterceptor;
+import com.ciicgat.sdk.data.mybatis.SQLTracingInterceptor;
 import com.ciicgat.sdk.servlet.trace.TracingFilter;
 import io.jaegertracing.internal.JaegerTracer;
 import io.opentracing.Tracer;
@@ -65,15 +65,15 @@ public class OpenTracingAutoConfiguration {
     }
 
 
-    @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class, SQLLineInterceptor.class, SQLTelemetryInterceptor.class})
+    @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class, SQLLineInterceptor.class, SQLTracingInterceptor.class})
     @Configuration(proxyBeanMethods = false)
     public static class SQLTracingInterceptorConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
         @Order
-        public SQLTelemetryInterceptor sqlTracingInterceptor() {
-            return new SQLTelemetryInterceptor();
+        public SQLTracingInterceptor sqlTracingInterceptor() {
+            return new SQLTracingInterceptor();
         }
     }
 
