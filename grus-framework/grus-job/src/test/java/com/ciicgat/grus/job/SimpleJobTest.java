@@ -6,18 +6,16 @@
 package com.ciicgat.grus.job;
 
 import com.ciicgat.sdk.util.system.Systems;
-import io.elasticjob.lite.api.ShardingContext;
-import io.elasticjob.lite.api.simple.SimpleJob;
-import io.elasticjob.lite.config.JobCoreConfiguration;
-import io.elasticjob.lite.config.LiteJobConfiguration;
-import io.elasticjob.lite.config.simple.SimpleJobConfiguration;
-import io.elasticjob.lite.reg.zookeeper.ZookeeperConfiguration;
-import io.elasticjob.lite.reg.zookeeper.ZookeeperRegistryCenter;
-import io.elasticjob.lite.spring.api.SpringJobScheduler;
 import io.jaegertracing.Configuration;
 import io.jaegertracing.internal.JaegerTracer;
 import io.jaegertracing.internal.samplers.RateLimitingSampler;
 import io.opentracing.util.GlobalTracer;
+import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
+import org.apache.shardingsphere.elasticjob.api.ShardingContext;
+import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
+import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration;
+import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter;
+import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.slf4j.Logger;
@@ -84,21 +82,31 @@ public class SimpleJobTest implements SimpleJob {
 
         SimpleJobTest simpleJob = new SimpleJobTest();
 
-        JobCoreConfiguration jobCoreConfiguration = JobCoreConfiguration
-                .newBuilder("name", "* * * ? * *", 1)
+        String jobName = "testxxx";
+        JobConfiguration jobCoreConfiguration = JobConfiguration
+                .newBuilder(jobName, 1)
+                .cron("* * * ? * *")
+                .overwrite(true)
                 .shardingItemParameters("").build();
 
-        LiteJobConfiguration liteJobConfiguration = LiteJobConfiguration
-                .newBuilder(new SimpleJobConfiguration(jobCoreConfiguration, simpleJob.getClass().getCanonicalName()))
-                .overwrite(true)
-                .build();
+//        LiteJobConfiguration liteJobConfiguration = LiteJobConfiguration
+//                .newBuilder(new SimpleJobConfiguration(jobCoreConfiguration, simpleJob.getClass().getCanonicalName()))
+//                .overwrite(true)
+//                .build();
+//        new JobConfigurationAPIImpl(zookeeperRegistryCenter).removeJobConfiguration(jobName);
+        ScheduleJobBootstrap scheduleJobBootstrap = new ScheduleJobBootstrap(zookeeperRegistryCenter, simpleJob, jobCoreConfiguration);
+        scheduleJobBootstrap.schedule();
 
-        TraceableJob traceableJob = new TraceableJob(simpleJob);
+//        new JobConfigurationAPIImpl(zookeeperRegistryCenter).removeJobConfiguration(jobName);
+        ScheduleJobBootstrap scheduleJobBootstrap1 = new ScheduleJobBootstrap(zookeeperRegistryCenter, new TraceableJob(simpleJob), jobCoreConfiguration);
+        scheduleJobBootstrap1.schedule();
 
-        SpringJobScheduler springJobScheduler = new SpringJobScheduler(traceableJob, zookeeperRegistryCenter, liteJobConfiguration);
+
+
+//        SpringJobScheduler springJobScheduler = new SpringJobScheduler(traceableJob, zookeeperRegistryCenter, liteJobConfiguration);
 //        JobScheduler springJobScheduler = new JobScheduler(zookeeperRegistryCenter,liteJobConfiguration ,new ElasticJobListener[0]);
 
-        springJobScheduler.init();
+//        springJobScheduler.init();
 
 
         Assert.assertTrue(SimpleJobTest.getValue() > 0);

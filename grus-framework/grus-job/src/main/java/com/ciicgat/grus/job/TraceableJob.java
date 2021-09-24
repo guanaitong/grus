@@ -6,14 +6,16 @@
 package com.ciicgat.grus.job;
 
 import com.ciicgat.sdk.trace.Spans;
-import io.elasticjob.lite.api.ShardingContext;
-import io.elasticjob.lite.api.simple.SimpleJob;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.tag.Tags;
 import io.opentracing.util.GlobalTracer;
+import org.apache.shardingsphere.elasticjob.api.ShardingContext;
+import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 public class TraceableJob implements SimpleJob {
 
@@ -22,7 +24,7 @@ public class TraceableJob implements SimpleJob {
     private final SimpleJob simpleJob;
 
     public TraceableJob(SimpleJob simpleJob) {
-        this.simpleJob = simpleJob;
+        this.simpleJob = Objects.requireNonNull(simpleJob);
     }
 
     @Override

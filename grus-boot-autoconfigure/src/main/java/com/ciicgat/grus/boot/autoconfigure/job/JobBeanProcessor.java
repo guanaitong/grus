@@ -7,16 +7,12 @@ package com.ciicgat.grus.boot.autoconfigure.job;
 
 import com.ciicgat.grus.job.TraceableJob;
 import com.ciicgat.sdk.lang.threads.Threads;
-import com.google.common.base.Optional;
-import io.elasticjob.lite.api.simple.SimpleJob;
-import io.elasticjob.lite.config.JobCoreConfiguration;
-import io.elasticjob.lite.config.LiteJobConfiguration;
-import io.elasticjob.lite.config.simple.SimpleJobConfiguration;
-import io.elasticjob.lite.exception.JobConfigurationException;
-import io.elasticjob.lite.lifecycle.internal.operate.JobOperateAPIImpl;
-import io.elasticjob.lite.lifecycle.internal.settings.JobSettingsAPIImpl;
-import io.elasticjob.lite.reg.zookeeper.ZookeeperRegistryCenter;
-import io.elasticjob.lite.spring.api.SpringJobScheduler;
+import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
+import org.apache.shardingsphere.elasticjob.infra.exception.JobConfigurationException;
+import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.settings.JobConfigurationAPIImpl;
+import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter;
+import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -56,45 +52,41 @@ public class JobBeanProcessor implements BeanPostProcessor, BeanFactoryAware {
         Objects.requireNonNull(jobBeanAnnotation.jobName());
         Objects.requireNonNull(jobBeanAnnotation.cron());
         if (!(bean instanceof SimpleJob)) {
-            throw new RuntimeException("bean class " + bean.getClass().getName() + " should implements io.elasticjob.lite.api.simple.SimpleJob");
+            throw new RuntimeException("bean class " + bean.getClass().getName() + " should implements org.apache.shardingsphere.elasticjob.simple.job.SimpleJob");
         }
 
         String jobName = jobBeanAnnotation.jobName();
         SimpleJob simpleJob = (SimpleJob) bean;
 
-        JobCoreConfiguration jobCoreConfiguration = JobCoreConfiguration
-                .newBuilder(jobName, jobBeanAnnotation.cron(), jobBeanAnnotation.shardingTotalCount())
+        JobConfiguration jobCoreConfiguration = JobConfiguration
+                .newBuilder(jobName, jobBeanAnnotation.shardingTotalCount())
+                .cron(jobBeanAnnotation.cron())
+                .overwrite(true)
                 .description(jobBeanAnnotation.description())
                 .shardingItemParameters(jobBeanAnnotation.shardingItemParameters()).build();
-
-        LiteJobConfiguration liteJobConfiguration = LiteJobConfiguration
-                .newBuilder(new SimpleJobConfiguration(jobCoreConfiguration, bean.getClass().getCanonicalName()))
-                .overwrite(true)
-                .build();
-
         LOGGER.info("start init job {}", jobName);
         TraceableJob traceableJob = new TraceableJob(simpleJob);
-        SpringJobScheduler springJobScheduler = new SpringJobScheduler(traceableJob, zookeeperRegistryCenter, liteJobConfiguration);
+        ScheduleJobBootstrap scheduleJobBootstrap = null;
         try {
-            springJobScheduler.init();
+            scheduleJobBootstrap = new ScheduleJobBootstrap(zookeeperRegistryCenter, traceableJob, jobCoreConfiguration);
+            scheduleJobBootstrap.schedule();
         } catch (JobConfigurationException e) {
             if (e.getMessage().contains("Job conflict with register center")) {
                 LOGGER.warn(e.getMessage());
                 LOGGER.warn("job {} exist and conflict,remove it", jobName);
-
-                new JobOperateAPIImpl(zookeeperRegistryCenter).remove(Optional.of(jobName), Optional.absent());
-                new JobSettingsAPIImpl(zookeeperRegistryCenter).removeJobSettings(jobName);
+                new JobConfigurationAPIImpl(zookeeperRegistryCenter).removeJobConfiguration(jobName);
                 LOGGER.warn("job {} removed", jobName);
                 //这边固定sleep 3秒，等待zk客户端缓存失效
                 Threads.sleepSeconds(3);
                 //re init
-                springJobScheduler.init();
+                scheduleJobBootstrap = new ScheduleJobBootstrap(zookeeperRegistryCenter, traceableJob, jobCoreConfiguration);
+                scheduleJobBootstrap.schedule();
             } else {
                 throw e;
             }
         }
         LOGGER.info("end init job {}", jobName);
-        configurableBeanFactory.registerSingleton(JOBSCHEDULER_BEAN_NAME_PREFIX + jobBeanAnnotation.jobName(), springJobScheduler);
+        configurableBeanFactory.registerSingleton(JOBSCHEDULER_BEAN_NAME_PREFIX + jobBeanAnnotation.jobName(), scheduleJobBootstrap);
         return bean;
     }
 

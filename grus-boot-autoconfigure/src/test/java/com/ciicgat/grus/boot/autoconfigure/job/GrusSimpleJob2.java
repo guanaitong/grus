@@ -5,8 +5,8 @@
 
 package com.ciicgat.grus.boot.autoconfigure.job;
 
-import io.elasticjob.lite.api.ShardingContext;
-import io.elasticjob.lite.api.simple.SimpleJob;
+import org.apache.shardingsphere.elasticjob.api.ShardingContext;
+import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -10,10 +10,9 @@ import com.ciicgat.grus.boot.autoconfigure.gconf.GconfAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.zk.ZKProperties;
 import com.ciicgat.grus.job.TraceableJob;
 import com.ciicgat.sdk.util.system.WorkEnv;
-import io.elasticjob.lite.api.JobScheduler;
-import io.elasticjob.lite.reg.zookeeper.ZookeeperConfiguration;
-import io.elasticjob.lite.reg.zookeeper.ZookeeperRegistryCenter;
-import io.elasticjob.lite.spring.api.SpringJobScheduler;
+import org.apache.shardingsphere.elasticjob.lite.internal.schedule.JobScheduler;
+import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration;
+import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -31,7 +30,7 @@ import java.util.Objects;
  */
 @EnableConfigurationProperties({JobProperties.class, ZKProperties.class})
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnClass({TraceableJob.class, JobScheduler.class, SpringJobScheduler.class})
+@ConditionalOnClass({TraceableJob.class, JobScheduler.class})
 @ConditionalOnProperty(prefix = "grus.job", value = "enabled", havingValue = "true", matchIfMissing = true)
 @AutoConfigureAfter({GconfAutoConfiguration.class})
 @ConditionalOnWorkEnv({WorkEnv.DEVELOP, WorkEnv.TEST, WorkEnv.PRODUCT})

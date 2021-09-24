@@ -23,20 +23,14 @@
         </dependency>
 
         <!-- elasticjob管理配置 -->
-
         <dependency>
-            <groupId>io.elasticjob</groupId>
-            <artifactId>elastic-job-lite-spring</artifactId>
+            <groupId>org.apache.shardingsphere.elasticjob</groupId>
+            <artifactId>elasticjob-lite-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.elasticjob</groupId>
-            <artifactId>elastic-job-lite-core</artifactId>
+            <groupId>org.apache.shardingsphere.elasticjob</groupId>
+            <artifactId>elasticjob-lite-lifecycle</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.elasticjob</groupId>
-            <artifactId>elastic-job-lite-lifecycle</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>

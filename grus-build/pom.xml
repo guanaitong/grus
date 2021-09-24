@@ -325,18 +325,13 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>io.elasticjob</groupId>
-                <artifactId>elastic-job-lite-core</artifactId>
+                <groupId>org.apache.shardingsphere.elasticjob</groupId>
+                <artifactId>elasticjob-lite-core</artifactId>
                 <version>${elastic-job.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.elasticjob</groupId>
-                <artifactId>elastic-job-lite-spring</artifactId>
-                <version>${elastic-job.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.elasticjob</groupId>
-                <artifactId>elastic-job-lite-lifecycle</artifactId>
+                <groupId>org.apache.shardingsphere.elasticjob</groupId>
+                <artifactId>elasticjob-lite-lifecycle</artifactId>
                 <version>${elastic-job.version}</version>
             </dependency>
 
