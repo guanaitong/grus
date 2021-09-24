@@ -9,7 +9,6 @@ import com.ciicgat.grus.core.Module;
 import com.ciicgat.sdk.mq.trace.ProducerSpanDecorator;
 import com.ciicgat.sdk.mq.trace.TracingUtils;
 import com.ciicgat.sdk.trace.Spans;
-import com.ciicgat.sdk.util.ComponentStatus;
 import com.ciicgat.sdk.util.frigate.FrigateNotifier;
 import com.ciicgat.sdk.util.frigate.NotifyChannel;
 import com.rabbitmq.client.AMQP;

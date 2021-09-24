@@ -26,7 +26,11 @@ public class MeterAutoConfiguration {
     MeterRegistryCustomizer<MeterRegistry> meterRegistryCustomizer(@Value("${spring.application.name}") String appName) {
         return registry -> registry.config().commonTags("application", appName);
     }
-    
+
+    @Bean
+    GrusCacheMeterBinderProvider grusCacheMeterBinderProvider() {
+        return new GrusCacheMeterBinderProvider();
+    }
 
     @Bean
     @ConditionalOnClass({ConnectionFactory.class, DelegateMetricsCollector.class})

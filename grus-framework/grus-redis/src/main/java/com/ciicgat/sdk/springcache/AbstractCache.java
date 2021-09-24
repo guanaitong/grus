@@ -6,6 +6,8 @@
 package com.ciicgat.sdk.springcache;
 
 import com.ciicgat.sdk.lang.tool.Bytes;
+import com.github.benmanes.caffeine.cache.stats.CacheStats;
+import com.github.benmanes.caffeine.cache.stats.ConcurrentStatsCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
@@ -30,6 +32,8 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
     protected final C config;
     private final CacheRefresher cacheRefresher;
     private final RedisConnectionFactory redisConnectionFactory;
+    // use caffeine stats counter
+    private final ConcurrentStatsCounter statsCounter = new ConcurrentStatsCounter();
 
     public AbstractCache(String name, RedisCacheManager redisCacheManager, C config) {
         this.name = name;
@@ -39,6 +43,9 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         this.redisConnectionFactory = this.redisCacheManager.getRedisConnectionFactory();
     }
 
+    public final CacheStats stats() {
+        return statsCounter.snapshot();
+    }
 
     protected final <T> T execute(Function<RedisConnection, T> callback) {
         try (RedisConnection connection = redisConnectionFactory.getConnection()) {
@@ -53,9 +60,18 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
 
     @Override
     public final ValueWrapper get(Object key) {
+        long start = System.nanoTime();
         try {
-            return get0(key);
+            ValueWrapper valueWrapper = get0(key);
+            statsCounter.recordLoadSuccess(System.nanoTime() - start);
+            if (valueWrapper == null) {
+                statsCounter.recordMisses(1);
+            } else {
+                statsCounter.recordHits(1);
+            }
+            return valueWrapper;
         } catch (Exception e) {
+            statsCounter.recordLoadFailure(System.nanoTime() - start);
             LOGGER.warn("get value failed,key=" + key, e);
         }
         return null;
@@ -104,6 +120,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
 
     private void evictIgnoreException(Object key) {
         try {
+            statsCounter.recordEviction();
             evict0(key);
         } catch (Exception e) {
             LOGGER.warn("evict value failed,key=" + key, e);

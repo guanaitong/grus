@@ -41,7 +41,7 @@ public class L2Cache extends RedisCache<CacheConfig.LocalRedis> implements ILoca
 
     @Override
     public Object getNativeCache() {
-        return this;
+        return localCache;
     }
 
     @Override
