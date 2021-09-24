@@ -8,7 +8,6 @@ package com.ciicgat.grus.boot.autoconfigure.opentracing;
 import com.ciicgat.grus.boot.autoconfigure.condition.ConditionalOnServerEnv;
 import com.ciicgat.sdk.data.mybatis.SQLLineInterceptor;
 import com.ciicgat.sdk.data.mybatis.SQLTracingInterceptor;
-import com.ciicgat.sdk.servlet.trace.TracingFilter;
 import io.jaegertracing.internal.JaegerTracer;
 import io.opentracing.Tracer;
 import io.opentracing.contrib.tracerresolver.TracerFactory;
@@ -20,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -46,22 +44,6 @@ public class OpenTracingAutoConfiguration {
     public Tracer tracer(TracerFactory tracerFactory) {
         GlobalTracer.registerIfAbsent(tracerFactory::getTracer);
         return GlobalTracer.get();
-    }
-
-    @Bean
-    public TracingFilter tracingFilter() {
-        return new TracingFilter();
-    }
-
-
-    @Bean
-    public FilterRegistrationBean tracingFilterRegistrationBean(TracingFilter tracingFilter) {
-        FilterRegistrationBean<TracingFilter> registration = new FilterRegistrationBean<>();
-        registration.setFilter(tracingFilter);
-        registration.addUrlPatterns("/*");
-        registration.setName("tracingFilter");
-        registration.setOrder(1);
-        return registration;
     }
 
 

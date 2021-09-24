@@ -6,6 +6,7 @@
 package com.ciicgat.sdk.servlet.trace;
 
 import com.ciicgat.grus.json.JSON;
+import com.ciicgat.sdk.servlet.GrusFilter;
 import com.ciicgat.sdk.util.system.Systems;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.jaegertracing.Configuration;
@@ -64,7 +65,7 @@ public class TracingFilterTest {
         MockitoAnnotations.initMocks(this);
 
 
-        this.mockMvc = MockMvcBuilders.standaloneSetup(new TestController()).addFilters(new TracingFilter()).build();
+        this.mockMvc = MockMvcBuilders.standaloneSetup(new TestController()).addFilters(new GrusFilter()).build();
     }
 
     @Test
