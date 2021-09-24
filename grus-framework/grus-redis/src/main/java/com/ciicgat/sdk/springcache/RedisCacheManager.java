@@ -10,6 +10,9 @@ import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
 import com.ciicgat.sdk.redis.config.RedisSetting;
 import com.ciicgat.sdk.redis.config.SpringRedisConfCreator;
 import com.ciicgat.sdk.util.system.Systems;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.binder.MeterBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
@@ -29,16 +32,17 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by August.Zhou on 2017/9/5 15:45.
  */
-public class RedisCacheManager implements CacheManager {
+public class RedisCacheManager implements CacheManager, MeterBinder {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisCacheManager.class);
     private final RedisCacheConfig redisCacheConfig;
     private Set<String> names = new HashSet<>();
-    private ConcurrentHashMap<String, Cache> redisCacheMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, AbstractCache> redisCacheMap = new ConcurrentHashMap<>();
     private final RedisConnectionFactory redisConnectionFactory;
     private volatile LocalCacheEvictMessageListener localCacheEvictMessageListener;
     private byte[] channel = null;
     private final CacheRefresher cacheRefresher;
     private final String id;
+    private MeterRegistry meterRegistry;
 
     public RedisCacheManager(RedisCacheConfig redisCacheConfig) {
         this.redisCacheConfig = Objects.requireNonNull(redisCacheConfig);
@@ -59,7 +63,7 @@ public class RedisCacheManager implements CacheManager {
 
     @Override
     public Cache getCache(String name) {
-        Cache redisCache = redisCacheMap.get(name);
+        AbstractCache redisCache = redisCacheMap.get(name);
         if (null != redisCache) {
             return redisCache;
         }
@@ -68,14 +72,16 @@ public class RedisCacheManager implements CacheManager {
             if (null != redisCache) {
                 return redisCache;
             }
-            names.add(name);
-            CacheConfig cacheConfig = this.redisCacheConfig.getCacheConfig(name);
-            Cache wrapperCache = cacheConfig.newCache(name, this);
-            redisCache = redisCacheMap.putIfAbsent(name, wrapperCache);
-            if (null == redisCache) {
-                redisCache = wrapperCache;
-            }
-            return redisCache;
+            return redisCacheMap.computeIfAbsent(name, cacheName -> {
+                names.add(cacheName);
+                CacheConfig cacheConfig = redisCacheConfig.getCacheConfig(cacheName);
+                AbstractCache newCache = cacheConfig.newCache(cacheName, RedisCacheManager.this);
+                if (meterRegistry != null) {
+                    Tags tags = Tags.of("name", cacheName);
+                    new GrusCacheMeterBinder(newCache, cacheName, tags).bindTo(meterRegistry);
+                }
+                return newCache;
+            });
         }
     }
 
@@ -128,6 +134,11 @@ public class RedisCacheManager implements CacheManager {
 
     public final RedisConnectionFactory getRedisConnectionFactory() {
         return redisConnectionFactory;
+    }
+
+    @Override
+    public void bindTo(MeterRegistry registry) {
+        this.meterRegistry = registry;
     }
 
     public class LocalCacheEvictMessageListener implements MessageListener {

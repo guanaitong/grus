@@ -34,7 +34,7 @@ public class GrusRedisSpringCacheAutoConfiguration {
 
     @Bean(name = {"cacheManager", "redisCacheManager"})
     @ConditionalOnMissingBean
-    public CacheManager cacheManager(RedisCacheConfig redisCacheConfig) {
+    public RedisCacheManager cacheManager(RedisCacheConfig redisCacheConfig) {
         return new RedisCacheManager(redisCacheConfig);
     }
 

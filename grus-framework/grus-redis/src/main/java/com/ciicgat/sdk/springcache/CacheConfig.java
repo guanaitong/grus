@@ -5,8 +5,6 @@
 
 package com.ciicgat.sdk.springcache;
 
-import org.springframework.cache.Cache;
-
 /**
  * Cache 配置参数
  *
@@ -31,7 +29,7 @@ public abstract class CacheConfig {
         return new LocalRedis();
     }
 
-    public abstract Cache newCache(String name, RedisCacheManager redisCacheManager);
+    public abstract AbstractCache newCache(String name, RedisCacheManager redisCacheManager);
 
     /**
      * Local specific cache properties.
@@ -98,7 +96,7 @@ public abstract class CacheConfig {
         }
 
         @Override
-        public Cache newCache(String name, RedisCacheManager redisCacheManager) {
+        public AbstractCache newCache(String name, RedisCacheManager redisCacheManager) {
             return new LocalCache(name, redisCacheManager, this);
         }
     }
@@ -141,7 +139,7 @@ public abstract class CacheConfig {
         }
 
         @Override
-        public Cache newCache(String name, RedisCacheManager redisCacheManager) {
+        public AbstractCache newCache(String name, RedisCacheManager redisCacheManager) {
             return new RedisCache(name, redisCacheManager, this);
         }
     }
@@ -212,7 +210,7 @@ public abstract class CacheConfig {
         }
 
         @Override
-        public Cache newCache(String name, RedisCacheManager redisCacheManager) {
+        public AbstractCache newCache(String name, RedisCacheManager redisCacheManager) {
             return new L2Cache(name, redisCacheManager, this);
         }
     }

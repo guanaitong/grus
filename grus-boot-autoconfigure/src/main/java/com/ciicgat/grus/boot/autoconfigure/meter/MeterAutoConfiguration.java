@@ -28,11 +28,6 @@ public class MeterAutoConfiguration {
     }
 
     @Bean
-    GrusCacheMeterBinderProvider grusCacheMeterBinderProvider() {
-        return new GrusCacheMeterBinderProvider();
-    }
-
-    @Bean
     @ConditionalOnClass({ConnectionFactory.class, DelegateMetricsCollector.class})
     public GrusRabbitMeterBinder grusRabbitMetrics() {
         return new GrusRabbitMeterBinder();
