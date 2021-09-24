@@ -44,7 +44,7 @@ public class OpenTracingAutoConfiguration {
 
     @Bean
     public Tracer tracer(TracerFactory tracerFactory) {
-        GlobalTracer.registerIfAbsent(() -> tracerFactory.getTracer());
+        GlobalTracer.registerIfAbsent(tracerFactory::getTracer);
         return GlobalTracer.get();
     }
 
