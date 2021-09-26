@@ -38,6 +38,7 @@
         <module>grus-boot-starter-velocity</module>
         <module>grus-boot-starter-zk</module>
         <module>grus-boot-starter-pagehelper</module>
+        <module>grus-boot-starter-sentinel</module>
     </modules>
 
 
