@@ -13,6 +13,7 @@ import io.opentracing.util.GlobalTracer;
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
+import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.settings.JobConfigurationAPIImpl;
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration;
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter;
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
@@ -93,11 +94,12 @@ public class TraceableJobTest implements SimpleJob {
 //                .newBuilder(new SimpleJobConfiguration(jobCoreConfiguration, simpleJob.getClass().getCanonicalName()))
 //                .overwrite(true)
 //                .build();
-//        new JobConfigurationAPIImpl(zookeeperRegistryCenter).removeJobConfiguration(jobName);
+        new JobConfigurationAPIImpl(zookeeperRegistryCenter).removeJobConfiguration(jobName);
         ScheduleJobBootstrap scheduleJobBootstrap = new ScheduleJobBootstrap(zookeeperRegistryCenter, simpleJob, jobCoreConfiguration);
         scheduleJobBootstrap.schedule();
 
-//        new JobConfigurationAPIImpl(zookeeperRegistryCenter).removeJobConfiguration(jobName);
+
+        new JobConfigurationAPIImpl(zookeeperRegistryCenter).removeJobConfiguration(jobName);
         ScheduleJobBootstrap scheduleJobBootstrap1 = new ScheduleJobBootstrap(zookeeperRegistryCenter, new TraceableJob(simpleJob), jobCoreConfiguration);
         scheduleJobBootstrap1.schedule();
 
