@@ -53,6 +53,10 @@
             <artifactId>grus-boot-starter-opentracing</artifactId>
             <groupId>com.ciicgat.grus.boot</groupId>
         </dependency>
+        <dependency>
+            <artifactId>grus-boot-starter-sentinel</artifactId>
+            <groupId>com.ciicgat.grus.boot</groupId>
+        </dependency>
     </dependencies>
 
 </project>
