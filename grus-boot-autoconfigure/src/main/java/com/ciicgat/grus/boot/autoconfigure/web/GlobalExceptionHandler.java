@@ -6,13 +6,11 @@
 package com.ciicgat.grus.boot.autoconfigure.web;
 
 import com.ciicgat.api.core.BusinessFeignException;
-import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
 import com.ciicgat.sdk.lang.convert.ErrorCode;
 import com.ciicgat.sdk.lang.convert.StandardErrorCode;
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
-import com.ciicgat.sdk.util.frigate.FrigateNotifier;
-import com.ciicgat.sdk.util.frigate.NotifyChannel;
 import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -204,7 +202,7 @@ public class GlobalExceptionHandler {
         requestInfo.append("，params=>");
         request.getParameterMap().forEach((key, value) -> requestInfo.append(key).append(':').append(Arrays.toString(value)));
         String msg = "发生异常，请求信息为：" + requestInfo;
-        FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, Module.SERVLET, msg, throwable);
+        Alert.send(msg, throwable);
         LOGGER.error(msg, throwable);
         String errorMsg = "系统异常";
         if (throwable instanceof SQLException) {

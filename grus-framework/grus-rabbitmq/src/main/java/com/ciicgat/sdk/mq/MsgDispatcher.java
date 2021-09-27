@@ -5,12 +5,10 @@
 
 package com.ciicgat.sdk.mq;
 
-import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.sdk.mq.trace.ProducerSpanDecorator;
 import com.ciicgat.sdk.mq.trace.TracingUtils;
 import com.ciicgat.sdk.trace.Spans;
-import com.ciicgat.sdk.util.frigate.FrigateNotifier;
-import com.ciicgat.sdk.util.frigate.NotifyChannel;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
@@ -121,7 +119,7 @@ public class MsgDispatcher {
             producerSpanDecorator.onResponse(span);
         } catch (Throwable e) {
             producerSpanDecorator.onError(e, span);
-            FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT_AND_EMAIL, Module.RABBITMQ, "rabbitmq error", e);
+            Alert.send("send msg error,msg:" + msg, e);
             throw new IOException(e);
         } finally {
             try {

@@ -5,24 +5,17 @@
 
 package com.ciicgat.sdk.servlet;
 
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
-import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.GrusServiceHttpHeader;
 import com.ciicgat.grus.service.GrusServiceStatus;
-import com.ciicgat.sdk.gconf.ConfigCollection;
-import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
-import com.ciicgat.sdk.lang.convert.ErrorCode;
-import com.ciicgat.sdk.lang.tool.RollingNumber;
-import com.ciicgat.sdk.servlet.fallback.FallbackHelper;
 import com.ciicgat.sdk.servlet.trace.HttpServletRequestExtractAdapter;
 import com.ciicgat.sdk.servlet.trace.ServletFilterSpanDecorator;
 import com.ciicgat.sdk.trace.SpanUtil;
 import com.ciicgat.sdk.trace.Spans;
-import com.ciicgat.sdk.util.frigate.FrigateNotifier;
-import com.ciicgat.sdk.util.frigate.NotifyChannel;
 import io.opentracing.Scope;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
@@ -53,17 +46,10 @@ public class GrusFilter implements Filter {
     private static final Logger LOGGER = LoggerFactory.getLogger(GrusFilter.class);
     private static final String SERVER_SPAN_CONTEXT = GrusFilter.class.getName() + ".activeSpanContext";
     private final AtomicInteger current = new AtomicInteger();
-    private final RollingNumber rollingNumber = new RollingNumber();
-    private ConfigCollection configCollection;
 
     private ServletFilterSpanDecorator spanDecorator = ServletFilterSpanDecorator.STANDARD_TAGS;
 
     public GrusFilter() {
-        try {
-            configCollection = RemoteConfigCollectionFactoryBuilder.getInstance().getConfigCollection();
-        } catch (Exception e) {
-            configCollection = null;
-        }
     }
 
     @Override
@@ -76,41 +62,27 @@ public class GrusFilter implements Filter {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
-
         //这边过滤掉forward和避免上游重复配置了Filter
         if (servletRequest.getAttribute(SERVER_SPAN_CONTEXT) != null) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
-
-        int con = current.incrementAndGet(); //并发数
-        int qps = rollingNumber.record(); //qps
-        if (con > 128) {
-            String logMsg = "服务并发有点高,并发数:" + con + ",qps:" + qps;
-            LOGGER.warn(logMsg);
-            FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, Module.SERVLET, logMsg, null);
-            FrigateNotifier.sendMessageByAppName(logMsg);
-        } else if (con > 64 && con > 4 * qps) {
-            String logMsg = "服务性能有问题,并发数远远超过qps,并发数:" + con + ",qps:" + qps;
-            LOGGER.warn(logMsg);
-            FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, Module.SERVLET, logMsg, null);
-        }
-
         // 服务端降级
         final HttpServletRequest request = (HttpServletRequest) servletRequest;
         final HttpServletResponse response = (HttpServletResponse) servletResponse;
-        if (FallbackHelper.isUriNeedFallback(request.getRequestURI(), configCollection)) {
-            response.setContentType("application/json; charset=utf-8");
-            response.getWriter().append(JSON.toJSONString(ErrorCode.REQUEST_BLOCK));
-            return;
-        }
         String uri = request.getRequestURI();
-
         //是否满足排除条件
-        if (UriUtils.isExclude(uri)) {
+        if (isExclude(uri)) {
             filterChain.doFilter(request, response);
             return;
         }
+        int con = current.incrementAndGet(); //并发数
+        if (con > 64) {
+            String logMsg = "服务并发有点高,并发数:" + con;
+            LOGGER.warn(logMsg);
+            Alert.send(logMsg);
+        }
+
 
         GrusServiceStatus grusServiceStatus = null;
         String reqAppName = request.getHeader(GrusServiceHttpHeader.REQ_APP_NAME);
@@ -167,5 +139,14 @@ public class GrusFilter implements Filter {
             Spans.remove();
             current.decrementAndGet();
         }
+    }
+
+    private static boolean isExclude(String uri) {
+        return uri.contains("isLive")
+                || uri.endsWith(".css")
+                || uri.endsWith(".js")
+                || uri.endsWith(".ico")
+                || uri.endsWith(".png")
+                || uri.endsWith(".jpg");
     }
 }

@@ -12,7 +12,7 @@ import com.ciicgat.sdk.util.system.Systems;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.ciicgat.sdk.util.frigate.FrigateClient.send;
+import static com.ciicgat.sdk.util.frigate.MsgClient.send;
 
 /**
  * Frigate 通知器

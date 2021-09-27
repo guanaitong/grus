@@ -5,16 +5,10 @@
 
 package com.ciicgat.grus.performance;
 
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
-import com.ciicgat.sdk.util.frigate.FrigateMessage;
-import com.ciicgat.sdk.util.frigate.FrigateRawNotifier;
-import com.ciicgat.sdk.util.frigate.NotifyChannel;
-import com.ciicgat.sdk.util.system.Systems;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Created by August.Zhou on 2019-06-26 11:19.
@@ -60,13 +54,7 @@ public class SlowLogger {
             if (sendSlowLog) {
                 boolean alertLevel = level.biggerThan(module.getAlertLevel());
                 if (alertLevel && isHttpThread()) {
-                    FrigateMessage frigateMessage = FrigateMessage.newInstance();
-                    frigateMessage.setChannel(NotifyChannel.QY_WE_CHAT.code());
-                    frigateMessage.setContent(msg);
-                    frigateMessage.setModule(module.getName());
-                    frigateMessage.setTitle(module.getName() + " slow");
-                    frigateMessage.setTags(Map.of("duration", String.valueOf(duration), "level", level.name()));
-                    FrigateRawNotifier.sendMsgByAppNames(List.of(Systems.APP_NAME), frigateMessage);
+                    Alert.send(msg);
                 }
             }
         } else if (LOGGER.isDebugEnabled()) {

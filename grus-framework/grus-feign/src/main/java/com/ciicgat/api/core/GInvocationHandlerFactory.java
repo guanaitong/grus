@@ -9,6 +9,7 @@ import com.ciicgat.api.core.annotation.ApiCache;
 import com.ciicgat.api.core.annotation.IgnoreError;
 import com.ciicgat.api.core.interceptor.FallbackInterceptor;
 import com.ciicgat.api.core.interceptor.GHandlerInterceptor;
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.logger.LogExclude;
@@ -18,11 +19,6 @@ import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeConfig;
 import com.ciicgat.grus.service.GrusService;
 import com.ciicgat.grus.service.GrusServiceStatus;
-import com.ciicgat.sdk.util.StackUtil;
-import com.ciicgat.sdk.util.frigate.FrigateMessage;
-import com.ciicgat.sdk.util.frigate.FrigateRawNotifier;
-import com.ciicgat.sdk.util.frigate.NotifyChannel;
-import com.ciicgat.sdk.util.system.Systems;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Scheduler;
@@ -37,7 +33,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -188,13 +183,7 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
             } catch (Throwable throwable) {
                 if (!Objects.equals(throwable.getClass(), BusinessFeignException.class)) {
                     grusServiceStatus.incrementFailed();
-                    FrigateMessage frigateMessage = FrigateMessage.newInstance();
-                    frigateMessage.setChannel(NotifyChannel.QY_WE_CHAT.code());
-                    frigateMessage.setContent("Feign调用异常,type:" + target.type() + ",method:" + method.getName());
-                    frigateMessage.setModule(Module.FEIGN.getName());
-                    frigateMessage.setStack(StackUtil.getStack(throwable));
-                    //发送给当前应用开发者和服务提供方
-                    FrigateRawNotifier.sendMsgByAppNames(List.of(serviceName, Systems.APP_NAME), frigateMessage);
+                    Alert.send("Feign调用异常,type:" + target.type() + ",method:" + method.getName(), throwable);
                 }
                 if (isIgnoreError(method)) {
                     LOGGER.warn("Exception has been ignored", throwable);

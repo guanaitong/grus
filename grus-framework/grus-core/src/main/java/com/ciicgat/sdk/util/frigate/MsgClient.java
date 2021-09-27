@@ -6,9 +6,10 @@
 package com.ciicgat.sdk.util.frigate;
 
 import com.ciicgat.grus.gconf.GlobalGconfConfig;
+import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.util.http.HttpClientSingleton;
-import okhttp3.Call;
+import com.ciicgat.sdk.util.system.WorkRegion;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -28,9 +29,8 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by Albert on 2018/10/29.
  */
-public abstract class FrigateClient {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FrigateClient.class);
-
+abstract class MsgClient {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MsgClient.class);
     /**
      * 单线程，中等优先级，队列最大500个(超过任务丢弃)
      * 将消息发送对业务的影响，尽可能降低到最低
@@ -38,7 +38,7 @@ public abstract class FrigateClient {
     static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
             new ArrayBlockingQueue<>(4096), Threads.newDaemonThreadFactory("frigate_notifier", Thread.MIN_PRIORITY), Threads.LOGGER_REJECTEDEXECUTIONHANDLER);
 
-    private final static OkHttpClient OK_HTTP_CLIENT;
+    final static OkHttpClient OK_HTTP_CLIENT;
 
     static {
         OkHttpClient.Builder builder = HttpClientSingleton.getOkHttpClient().newBuilder().readTimeout(2, TimeUnit.SECONDS);
@@ -47,16 +47,16 @@ public abstract class FrigateClient {
     }
 
     /**
-     * DEV 环境消息不发送
+     * DEV/TEST 环境消息不发送
      */
-    private static boolean skip = null == System.getenv("WORK_ENV") || "dev".equals(System.getenv("WORK_ENV"));
+    private static boolean skip = WorkRegion.getCurrentWorkRegion().isDevelopOrTest();
 
 
-    private FrigateClient() {
+    private MsgClient() {
     }
 
     public static void setSkip(boolean skip) {
-        FrigateClient.skip = skip;
+        MsgClient.skip = skip;
     }
 
     /**
@@ -68,18 +68,7 @@ public abstract class FrigateClient {
     static void send(String path, Map<String, String> params, FrigateMessage frigateMessage) {
         if (skip) return;
         String baseUrl = GlobalGconfConfig.getConfig().getProperties("frigate.properties").getProperty("frigate.message.base.url");
-        String url = baseUrl = path;
-        try {
-            //同样的消息限制频率每2分钟发送一次
-            EXECUTOR_SERVICE.execute(() -> executeRequest(url, params, frigateMessage));
-        } catch (Exception e) {
-            LOGGER.error("发送消息到Frigate异常", e);
-        }
-
-    }
-
-
-    private static void executeRequest(String url, Map<String, String> params, FrigateMessage frigateMessage) {
+        String url = baseUrl + path;
         HttpUrl httpUrl = HttpUrl.parse(url);
         final HttpUrl.Builder httpUrlBuilder = httpUrl.newBuilder();
         params.forEach((key, value) -> {
@@ -87,15 +76,30 @@ public abstract class FrigateClient {
                 httpUrlBuilder.addQueryParameter(key, value);
             }
         });
-        RequestBody requestBody = RequestBody.create(com.ciicgat.sdk.util.http.HttpClientHelper.APPLICATION_JSON, frigateMessage.toString());
-        Request request = new Request.Builder().post(requestBody).url(httpUrlBuilder.build()).build();
-        Call call = OK_HTTP_CLIENT.newCall(request);
-        try (Response response = call.execute()) {
-            if (!response.isSuccessful()) {
-                LOGGER.error("request {} ,response {} ,body {}", request.toString(), response.toString(), response.body() == null ? "" : response.body().string());
-            }
+        executeRequest(httpUrlBuilder.toString(), frigateMessage);
+    }
+
+    static void sendGroupBotMsg(String groupBotKey, Object body) {
+        if (skip) return;
+        executeRequest(String.format("https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=%s", groupBotKey), body);
+    }
+
+
+    private static void executeRequest(String url, Object jsonBody) {
+        try {
+            EXECUTOR_SERVICE.execute(() -> {
+                RequestBody requestBody = RequestBody.create(com.ciicgat.sdk.util.http.HttpClientHelper.APPLICATION_JSON, JSON.toJSONString(jsonBody));
+                Request request = new Request.Builder().post(requestBody).url(url).build();
+                try (Response response = OK_HTTP_CLIENT.newCall(request).execute()) {
+                    if (!response.isSuccessful()) {
+                        LOGGER.error("request {} ,response {} ,body {}", request, response, response.body() == null ? "" : response.body().string());
+                    }
+                } catch (Exception e) {
+                    LOGGER.error("send frigate msg error", e);
+                }
+            });
         } catch (Exception e) {
-            LOGGER.error("send frigate msg error", e);
+            LOGGER.error("发送消息异常", e);
         }
     }
 

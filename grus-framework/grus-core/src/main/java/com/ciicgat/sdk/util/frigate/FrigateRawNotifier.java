@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 import java.util.Map;
 
-import static com.ciicgat.sdk.util.frigate.FrigateClient.send;
+import static com.ciicgat.sdk.util.frigate.MsgClient.send;
 
 /**
  * Created by August.Zhou on 2019-09-18 17:07.

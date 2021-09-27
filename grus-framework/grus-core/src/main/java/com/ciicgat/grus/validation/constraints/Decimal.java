@@ -6,8 +6,8 @@
 package com.ciicgat.grus.validation.constraints;
 
 
-
 import com.ciicgat.grus.validation.validators.DecimalValidator;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.Documented;

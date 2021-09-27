@@ -5,14 +5,13 @@
 
 package com.ciicgat.sdk.redis;
 
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.sdk.lang.tool.CloseUtils;
 import com.ciicgat.sdk.redis.config.RedisSetting;
 import com.ciicgat.sdk.trace.SpanUtil;
 import com.ciicgat.sdk.trace.Spans;
-import com.ciicgat.sdk.util.frigate.FrigateNotifier;
-import com.ciicgat.sdk.util.frigate.NotifyChannel;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.noop.NoopSpan;
@@ -31,7 +30,7 @@ class RedisExecutorImpl implements RedisExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisExecutorImpl.class);
     private final RedisSetting redisSetting;
     private final JedisPoolAbstract pool;
-    private RedisSpanDecorator redisSpanDecorator = RedisSpanDecorator.STANDARD_TAGS;
+    private final RedisSpanDecorator redisSpanDecorator = RedisSpanDecorator.STANDARD_TAGS;
 
     private final String instance;
 
@@ -60,9 +59,9 @@ class RedisExecutorImpl implements RedisExecutor {
             redisSpanDecorator.onResponse(span);
             return result;
         } catch (Throwable e) {
-            FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, Module.REDIS, "redis error:" + redisSetting.toString(), e);
+            Alert.send("redis error:" + redisSetting.toString(), e);
             redisSpanDecorator.onError(e, span);
-            LOGGER.error("redis error:" + redisSetting.toString(), e);
+            LOGGER.error("redis error:" + redisSetting, e);
             throw e;
         } finally {
             CloseUtils.close(jedis);

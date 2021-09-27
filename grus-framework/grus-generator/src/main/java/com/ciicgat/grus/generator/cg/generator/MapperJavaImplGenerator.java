@@ -5,9 +5,9 @@
 
 package com.ciicgat.grus.generator.cg.generator;
 
-import com.ciicgat.grus.generator.cg.core.Generator;
 import com.ciicgat.grus.generator.cg.core.CodeGeneratorXmlConfig;
 import com.ciicgat.grus.generator.cg.core.GenerateParam;
+import com.ciicgat.grus.generator.cg.core.Generator;
 import com.ciicgat.grus.generator.cg.core.GeneratorChain;
 import com.ciicgat.grus.generator.cg.core.GeneratorConst;
 import com.ciicgat.grus.generator.cg.core.GeneratorContext;

@@ -5,9 +5,7 @@
 
 package com.ciicgat.sdk.redis.config;
 
-import com.ciicgat.grus.core.Module;
-import com.ciicgat.sdk.util.frigate.FrigateNotifier;
-import com.ciicgat.sdk.util.frigate.NotifyChannel;
+import com.ciicgat.grus.alert.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConfiguration;
@@ -47,8 +45,8 @@ class LettuceConnectionFactoryWrapper extends LettuceConnectionFactory {
         try (RedisConnection connection = this.getConnection()) {
             connection.ping();
         } catch (Throwable e) {
-            String msg = "GAT Redis connect error, please check redis-config.json in gconf";
-            FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, Module.REDIS, msg, e);
+            String msg = "redis connect error, please check redis-config.json in gconf";
+            Alert.send(msg, e);
             LOGGER.error(msg, e);
             throw e;
         }

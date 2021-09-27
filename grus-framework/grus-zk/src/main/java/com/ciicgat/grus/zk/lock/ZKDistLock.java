@@ -5,10 +5,9 @@
 
 package com.ciicgat.grus.zk.lock;
 
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.lock.DistLock;
 import com.ciicgat.sdk.lang.exception.ZKRuntimeException;
-import com.ciicgat.sdk.util.frigate.FrigateNotifier;
-import com.ciicgat.sdk.util.frigate.NotifyChannel;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.slf4j.Logger;
@@ -42,7 +41,7 @@ class ZKDistLock implements DistLock {
             mutex.acquire();
         } catch (Exception e) {
             LOGGER.error("ZK_LOCK_ERR", e);
-            FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, "ZK锁连接异常", e);
+            Alert.send("ZK锁连接异常", e);
             throw new ZKRuntimeException(e);
         }
     }
@@ -53,7 +52,7 @@ class ZKDistLock implements DistLock {
             return mutex.acquire(time, unit);
         } catch (Exception e) {
             LOGGER.error("ZK_LOCK_ERR", e);
-            FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, "ZK锁连接异常", e);
+            Alert.send("ZK锁连接异常", e);
             throw new ZKRuntimeException(e);
         }
     }

@@ -6,6 +6,7 @@
 package com.ciicgat.sdk.util.frigate;
 
 import org.junit.After;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.Objects;
@@ -74,8 +75,11 @@ public class FrigateNotifierTest {
 
     @Test
     public void sendMessage() throws Exception {
-        FrigateClient.setSkip(false);
         FrigateNotifier.sendMessage(NotifyChannel.ALL, HUGE_CONTENT, new RuntimeException("都错了"), "HB533", "HB266");
     }
 
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        MsgClient.setSkip(false);
+    }
 }

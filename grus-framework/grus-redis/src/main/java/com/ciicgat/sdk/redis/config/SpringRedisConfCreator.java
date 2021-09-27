@@ -5,8 +5,8 @@
 
 package com.ciicgat.sdk.redis.config;
 
-import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
 import com.ciicgat.grus.gconf.PublicKeyOwner;
+import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import io.lettuce.core.TimeoutOptions;

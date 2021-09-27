@@ -9,7 +9,10 @@ import com.ciicgat.sdk.trace.SpanUtil;
 import com.ciicgat.sdk.trace.Spans;
 import com.ciicgat.sdk.util.system.Systems;
 import io.opentracing.Span;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -195,5 +198,21 @@ public class FrigateMessage {
     @Override
     public String toString() {
         return com.ciicgat.grus.json.JSON.toJSONString(this);
+    }
+
+    private List<FormatUtil.Element> toElements() {
+        List<FormatUtil.Element> elements = new ArrayList<>();
+        elements.add(new FormatUtil.Element("APP", this.getAppInstance()));
+        elements.add(new FormatUtil.Element("ENV", this.getWorkEnv()));
+        elements.add(new FormatUtil.Element("HOST", this.getHostIp()));
+        elements.add(new FormatUtil.Element("TRACE", this.getTraceId()));
+        elements.add(new FormatUtil.Element("TIME", DateFormatUtils.format(this.getTime(), "yyyy-MM-dd HH:mm:ss")));
+        elements.add(new FormatUtil.Element("CONTENT", this.getContent(), true, false));
+        elements.add(new FormatUtil.Element("STACK", this.getStack(), true, false));
+        return elements;
+    }
+
+    public String toFormatText() {
+        return FormatUtil.formatText(toElements());
     }
 }

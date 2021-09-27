@@ -7,10 +7,10 @@ package com.ciicgat.api.core.service;
 
 import com.ciicgat.api.core.annotation.ServiceName;
 import com.ciicgat.api.core.model.BodyBean;
-import com.ciicgat.api.core.model.TestBean;
 import com.ciicgat.api.core.model.DateBean;
 import com.ciicgat.api.core.model.MvcDateBeanRequest;
 import com.ciicgat.api.core.model.MvcDateBeanResponse;
+import com.ciicgat.api.core.model.TestBean;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

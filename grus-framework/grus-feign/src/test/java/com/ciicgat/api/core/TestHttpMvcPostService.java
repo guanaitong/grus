@@ -7,11 +7,11 @@ package com.ciicgat.api.core;
 
 import com.ciicgat.api.core.contants.HeaderConstants;
 import com.ciicgat.api.core.contants.VersionConstants;
+import com.ciicgat.api.core.model.BodyBean;
 import com.ciicgat.api.core.model.DateBean;
-import com.ciicgat.api.core.model.TestBean;
 import com.ciicgat.api.core.model.MvcDateBeanRequest;
 import com.ciicgat.api.core.model.MvcDateBeanResponse;
-import com.ciicgat.api.core.model.BodyBean;
+import com.ciicgat.api.core.model.TestBean;
 import com.ciicgat.api.core.service.HttpMvcPostService;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.lang.constant.GatDateFormat;

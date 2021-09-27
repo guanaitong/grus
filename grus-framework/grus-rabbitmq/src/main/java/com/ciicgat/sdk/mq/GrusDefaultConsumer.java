@@ -5,12 +5,10 @@
 
 package com.ciicgat.sdk.mq;
 
-import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.sdk.mq.trace.ConsumerSpanDecorator;
 import com.ciicgat.sdk.mq.trace.MapHeadersAdapter;
 import com.ciicgat.sdk.trace.Spans;
-import com.ciicgat.sdk.util.frigate.FrigateNotifier;
-import com.ciicgat.sdk.util.frigate.NotifyChannel;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
@@ -91,14 +89,14 @@ public class GrusDefaultConsumer extends DefaultConsumer {
                 // 消息处理失败，重新入队
                 getChannel().basicReject(envelope.getDeliveryTag(), true);
                 String msg = msgProcessor.getClass().getName() + "处理失败(将重新入队)[需开发紧急处理]:" + text;
-                FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT_AND_EMAIL, Module.RABBITMQ, msg, null);
+                Alert.send(msg);
                 LOGGER.warn(msg);
             }
             consumerSpanDecorator.onResponse(span);
         } catch (Exception e) {
             consumerSpanDecorator.onError(e, span);
-            FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT_AND_EMAIL, Module.RABBITMQ, "rabbitmq error", e);
-            LOGGER.error("msg:" + text, e);
+            Alert.send("handle msg error,msg:" + text, e);
+            LOGGER.error("handle msg error,msg:" + text, e);
             throw e;
         } finally {
             span.finish();

@@ -5,12 +5,10 @@
 
 package com.ciicgat.sdk.servlet.trace;
 
-import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.sdk.trace.SpanDecorator;
 import com.ciicgat.sdk.trace.SpanUtil;
 import com.ciicgat.sdk.trace.Spans;
-import com.ciicgat.sdk.util.frigate.FrigateNotifier;
-import com.ciicgat.sdk.util.frigate.NotifyChannel;
 import com.ciicgat.sdk.util.system.Systems;
 import io.opentracing.Span;
 import io.opentracing.tag.Tags;
@@ -72,7 +70,7 @@ public interface ServletFilterSpanDecorator extends SpanDecorator {
             Tags.HTTP_STATUS.set(span, httpServletResponse.getStatus());
             Tags.ERROR.set(span, httpServletResponse.getStatus() >= 400);
             if (httpServletResponse.getStatus() >= 500) {
-                FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, Module.SERVLET, String.format("server error，statusCode:%d,requestURI:%s", httpServletResponse.getStatus(), httpServletRequest.getRequestURI()), null);
+                Alert.send(String.format("server error，statusCode:%d,requestURI:%s", httpServletResponse.getStatus(), httpServletRequest.getRequestURI()));
             }
         }
 
@@ -83,7 +81,7 @@ public interface ServletFilterSpanDecorator extends SpanDecorator {
             Tags.ERROR.set(span, Boolean.TRUE);
             span.log(logsForException(exception));
             if (httpServletResponse.getStatus() >= 500) {
-                FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, Module.SERVLET, String.format("server error，statusCode:%d,requestURI:%s", httpServletResponse.getStatus(), httpServletRequest.getRequestURI()), null);
+                Alert.send(String.format("server error，statusCode:%d,requestURI:%s", httpServletResponse.getStatus(), httpServletRequest.getRequestURI()));
             }
         }
 

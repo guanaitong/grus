@@ -5,11 +5,9 @@
 
 package com.ciicgat.sdk.redis;
 
-import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.gconf.PublicKeyOwner;
 import com.ciicgat.sdk.redis.config.RedisSetting;
-import com.ciicgat.sdk.util.frigate.FrigateNotifier;
-import com.ciicgat.sdk.util.frigate.NotifyChannel;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +73,7 @@ public class RedisPoolBuilder implements RedisConstants {
                 } catch (RuntimeException e) {
                     //默认情况的错误是不输出redis配置信息的，这里重载一下
                     LOGGER.error(setting.toString(), e);
-                    FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, Module.REDIS, "redis pool error:" + setting.toString(), e);
+                    Alert.send("redis pool error:" + setting, e);
                     throw e;
                 }
             }
@@ -104,7 +102,7 @@ public class RedisPoolBuilder implements RedisConstants {
                 } catch (RuntimeException e) {
                     //默认情况的错误是不输出redis配置信息的，这里重载一下
                     LOGGER.error(setting.toString(), e);
-                    FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, Module.REDIS, "redis pool error:" + setting.toString(), e);
+                    Alert.send("redis pool error:" + setting, e);
                     throw e;
                 }
             }

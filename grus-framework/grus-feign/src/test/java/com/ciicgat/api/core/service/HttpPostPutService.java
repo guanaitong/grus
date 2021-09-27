@@ -7,9 +7,9 @@ package com.ciicgat.api.core.service;
 
 import com.ciicgat.api.core.annotation.ServiceName;
 import com.ciicgat.api.core.model.BodyBean;
+import com.ciicgat.api.core.model.BodyBean2;
 import com.ciicgat.api.core.model.DateBean;
 import com.ciicgat.api.core.model.TestBean;
-import com.ciicgat.api.core.model.BodyBean2;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;

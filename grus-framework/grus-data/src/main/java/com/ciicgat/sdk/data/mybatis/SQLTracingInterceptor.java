@@ -5,12 +5,11 @@
 
 package com.ciicgat.sdk.data.mybatis;
 
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.sdk.trace.SpanUtil;
 import com.ciicgat.sdk.trace.Spans;
-import com.ciicgat.sdk.util.frigate.FrigateNotifier;
-import com.ciicgat.sdk.util.frigate.NotifyChannel;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.noop.NoopSpan;
@@ -69,7 +68,7 @@ public class SQLTracingInterceptor implements Interceptor {
             if (result instanceof List && ((List) result).size() > 10000) {
                 String msg = String.format("too large query result size:[%d] ,sql is %s", ((List) result).size(), sql);
                 LOGGER.warn(msg);
-                FrigateNotifier.sendMessageByAppName(NotifyChannel.QY_WE_CHAT, Module.DB, msg, null);
+                Alert.send(msg);
             }
             return result;
         } catch (Throwable throwable) {

@@ -7,6 +7,7 @@ package com.ciicgat.sdk.util.frigate;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -24,6 +25,11 @@ public class GroupBotTest {
      */
     private static final String GROUP_BOT_KEY = "ceed6aa3-ca81-4e9e-9638-9bc23e115a16";
 
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        MsgClient.setSkip(false);
+    }
+
     @After
     public void tearDown() throws Exception {
         try {
@@ -37,7 +43,7 @@ public class GroupBotTest {
 
     @Test
     public void sendMarkdownMsg() {
-        StringBuffer markdown = new StringBuffer();
+        StringBuilder markdown = new StringBuilder();
         markdown.append("# Grus 构建知会").append("\n");
         markdown.append(">").append("警告:").append("<font color=\"warning\">这是警告（黄色）</font>").append("\n");
         markdown.append(">").append("提示:").append("<font color=\"info\">这是提示（绿色）</font>").append("\n");

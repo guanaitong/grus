@@ -5,6 +5,7 @@
 
 package com.ciicgat.sdk.data.datasource;
 
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.sdk.util.frigate.FrigateNotifier;
 import com.ciicgat.sdk.util.frigate.NotifyChannel;
@@ -39,7 +40,8 @@ public class GrusHikariDataSource extends HikariDataSource {
         } catch (SQLTransientConnectionException e) {
             if (e.getMessage().contains("Connection is not available")) {
                 LOGGER.error("严重警报：应用无法获取新数据库连接", e);
-                FrigateNotifier.sendMessageByAppName(NotifyChannel.ALL, Module.DB, "严重警报：应用无法获取新数据库连接", e);
+                Alert.send("严重警报：应用无法获取新数据库连接", e);
+                FrigateNotifier.sendMessageByAppName(NotifyChannel.SMS, Module.DB, "严重警报：应用无法获取新数据库连接", e);
             }
             throw e;
         } catch (SQLException e) {
@@ -54,7 +56,8 @@ public class GrusHikariDataSource extends HikariDataSource {
         } catch (SQLTransientConnectionException e) {
             if (e.getMessage().contains("Connection is not available")) {
                 LOGGER.error("严重警报：应用无法获取新数据库连接", e);
-                FrigateNotifier.sendMessageByAppName(NotifyChannel.ALL, Module.DB, "严重警报：应用无法获取新数据库连接", null);
+                Alert.send("严重警报：应用无法获取新数据库连接", e);
+                FrigateNotifier.sendMessageByAppName(NotifyChannel.SMS, Module.DB, "严重警报：应用无法获取新数据库连接", null);
             }
             throw e;
         } catch (SQLException e) {

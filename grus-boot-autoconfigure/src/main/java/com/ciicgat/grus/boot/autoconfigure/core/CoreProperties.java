@@ -6,15 +6,24 @@
 package com.ciicgat.grus.boot.autoconfigure.core;
 
 import com.ciicgat.grus.performance.SlowLogger;
+import com.ciicgat.sdk.util.frigate.GroupBot;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 /**
  * Created by August.Zhou on 2019-07-05 10:16.
  */
 @ConfigurationProperties(prefix = "grus.core")
 public class CoreProperties {
+
+    /**
+     * work_wechat group bot key
+     */
+    @NotNull
+    private String groupBotKey;
 
     /**
      * true时，会打印慢日志
@@ -36,6 +45,17 @@ public class CoreProperties {
         if (!sendSlowLog) {
             SlowLogger.closeSendSlowLog();
         }
+        if (Objects.nonNull(groupBotKey)) {
+            GroupBot.GLOBAL_GROUP_KEY = groupBotKey;
+        }
+    }
+
+    public String getGroupBotKey() {
+        return groupBotKey;
+    }
+
+    public void setGroupBotKey(String groupBotKey) {
+        this.groupBotKey = groupBotKey;
     }
 
     public boolean isPrintSlowLog() {

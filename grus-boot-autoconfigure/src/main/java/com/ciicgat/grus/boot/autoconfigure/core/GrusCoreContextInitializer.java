@@ -5,6 +5,7 @@
 
 package com.ciicgat.grus.boot.autoconfigure.core;
 
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.boot.autoconfigure.constants.GrusConstants;
 import com.ciicgat.grus.gconf.GlobalGconfConfig;
 import com.ciicgat.grus.service.GrusFramework;
@@ -12,7 +13,6 @@ import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.impl.StandardGrusRuntimeContext;
 import com.ciicgat.grus.service.impl.StandardGrusRuntimeManager;
 import com.ciicgat.sdk.gconf.GconfConfig;
-import com.ciicgat.sdk.util.frigate.FrigateNotifier;
 import com.ciicgat.sdk.util.system.EnvHook;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -73,7 +73,7 @@ public class GrusCoreContextInitializer implements ApplicationContextInitializer
 
         initGlobalGconfConfig(appName);
         if (!WorkRegion.getCurrentWorkRegion().isDevelopOrTest()) {
-            FrigateNotifier.sendMessageByAppName(String.format("应用（%s）正在发布", appName));
+            Alert.send(String.format("应用（%s）正在发布", appName));
         }
     }
 
