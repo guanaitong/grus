@@ -19,16 +19,16 @@ class FormatUtil {
             if (StringUtils.isBlank(element.getKey()) || StringUtils.isBlank(element.getValue())) {
                 continue;
             }
-            stringBuilder.append(element.getKey()).append(":");
+            stringBuilder.append(element.getKey()).append(':');
             if (element.isWrap()) {
-                stringBuilder.append("[").append(element.getValue()).append("]");
+                stringBuilder.append('[').append(element.getValue()).append(']');
             } else {
                 stringBuilder.append(element.getValue());
             }
             if (element.isLineEnd()) {
-                stringBuilder.append("\n");
+                stringBuilder.append('\n');
             } else {
-                stringBuilder.append("_");
+                stringBuilder.append('_');
             }
         }
         stringBuilder.deleteCharAt(stringBuilder.length() - 1);
