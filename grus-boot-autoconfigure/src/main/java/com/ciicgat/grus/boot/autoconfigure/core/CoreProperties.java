@@ -20,7 +20,7 @@ import java.util.Objects;
 public class CoreProperties {
 
     /**
-     * work_wechat group bot key
+     * work_wechat group bot key,since version 2021.1.10+,we use work_wechat group bot to send system msg
      */
     @NotNull
     private String groupBotKey;
