@@ -54,6 +54,10 @@
                     <groupId>com.alibaba.csp</groupId>
                     <artifactId>sentinel-cluster-client-default</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.alibaba.cloud</groupId>
+                    <artifactId>spring-cloud-circuitbreaker-sentinel</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
