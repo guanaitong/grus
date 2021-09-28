@@ -40,7 +40,8 @@ export JAVA_OPTS="${JAVA_OPTS} \
   -Xlog:gc*:file=logs/gc.log:time,tags:filecount=10,filesize=10240000"
 
 java_params="--server.port=80 \
-      --server.tomcat.max-threads=200 \
+      --server.tomcat.threads.max=200 \
+      --server.tomcat.threads.min-spare=5 \
       --server.tomcat.basedir=. \
       --server.tomcat.accesslog.directory=logs \
       --server.tomcat.accesslog.enabled=true \
@@ -49,17 +50,15 @@ java_params="--server.port=80 \
       --server.tomcat.accesslog.suffix=.log \
       --server.tomcat.accesslog.rotate=true \
       --server.tomcat.accesslog.rename-on-rotate=true \
-      --server.tomcat.min-spare-threads=5 \
-      --server.tomcat.uri-encoding=UTF-8 \
+      --server.tomcat.uri-encoding=utf-8 \
       --spring.boot.admin.client.url=http://spring-boot-admin-server/ \
       --spring.boot.admin.client.instance.prefer-ip=true \
       --management.server.port=8181 \
       --management.endpoints.web.exposure.include=* \
       --spring.cloud.sentinel.transport.dashboard=sentinel-dashboard \
-      --spring.http.encoding.charset=UTF-8 \
-      --spring.http.encoding.enabled=true \
+      --server.servlet.encoding.charset=utf-8 \
+      --server.servlet.encoding.enabled=true \
       --logging.file.name=logs/application.log \
-      --logging.file.max-history=7 \
       --logging.file.max-size=2048MB"
 
 printf "env[${env}],app[${origin_file}] starting...\n"
