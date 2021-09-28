@@ -5,7 +5,7 @@
 
 package com.ciicgat.sdk.mq;
 
-import com.ciicgat.grus.gconf.GlobalGconfConfig;
+import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.util.system.WorkRegion;
 
 import java.util.Properties;

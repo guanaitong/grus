@@ -7,7 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.core;
 
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.boot.autoconfigure.constants.GrusConstants;
-import com.ciicgat.grus.gconf.GlobalGconfConfig;
+import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.impl.StandardGrusRuntimeContext;

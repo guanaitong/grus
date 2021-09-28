@@ -6,7 +6,7 @@
 package com.ciicgat.sdk.session;
 
 
-import com.ciicgat.grus.gconf.GlobalGconfConfig;
+import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.lang.tool.Bytes;
 import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
 import com.ciicgat.sdk.lang.url.UrlCoder;

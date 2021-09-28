@@ -5,7 +5,7 @@
 
 package com.ciicgat.sdk.util.frigate;
 
-import com.ciicgat.grus.gconf.GlobalGconfConfig;
+import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.util.http.HttpClientSingleton;

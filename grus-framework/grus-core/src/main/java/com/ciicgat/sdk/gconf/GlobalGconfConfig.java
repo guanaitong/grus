@@ -3,9 +3,8 @@
  * All rights reserved.
  */
 
-package com.ciicgat.grus.gconf;
+package com.ciicgat.sdk.gconf;
 
-import com.ciicgat.sdk.gconf.ConfigCollection;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
 
 /**

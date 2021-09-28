@@ -6,7 +6,7 @@
 package com.ciicgat.sdk.redis;
 
 import com.ciicgat.grus.alert.Alert;
-import com.ciicgat.grus.gconf.PublicKeyOwner;
+import com.ciicgat.sdk.gconf.PublicKeyOwner;
 import com.ciicgat.sdk.redis.config.RedisSetting;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

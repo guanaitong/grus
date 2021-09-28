@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.grus.gconf;
+package com.ciicgat.sdk.gconf;
 
 import com.ciicgat.grus.service.naming.NamingService;
 

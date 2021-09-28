@@ -5,7 +5,7 @@
 
 package com.ciicgat.api.core.kubernetes;
 
-import com.ciicgat.grus.gconf.GlobalGconfConfig;
+import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.gconf.GConfBeanValidator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
