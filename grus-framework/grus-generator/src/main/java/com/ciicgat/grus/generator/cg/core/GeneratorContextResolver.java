@@ -58,11 +58,11 @@ public class GeneratorContextResolver {
      */
     public GeneratorContext resolve(String configFilePath) {
         LOGGER.info("GeneratorContextResolver resolving START, configFilePath={}", configFilePath);
-        CodeGeneratorXmlConfig xmlConfig = this.parseXmlConfig(configFilePath);
-        List<Entity> entityList = this.parseEntityList(xmlConfig);
+        CodeGeneratorXmlConfig codeGeneratorXmlConfig = this.parseXmlConfig(configFilePath);
+        List<Entity> entityList = this.parseEntityList(codeGeneratorXmlConfig);
         GeneratorContext generatorContext = new GeneratorContext();
         generatorContext.setEntityList(entityList);
-        generatorContext.setXmlConfig(xmlConfig);
+        generatorContext.setXmlConfig(codeGeneratorXmlConfig);
         this.closeTableIntrospect();
         LOGGER.info("GeneratorContextResolver resolving END, entityList.size={}", entityList.size());
         return generatorContext;
@@ -168,6 +168,7 @@ public class GeneratorContextResolver {
             }
             Assert.notNull(xmlInputStream, "code generator config file is not exist: " + configFilePath);
             SAXReader reader = new SAXReader();
+            reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
             reader.setValidation(true);
             Document document = reader.read(xmlInputStream);
             Element rootElement = document.getRootElement();
@@ -228,6 +229,7 @@ public class GeneratorContextResolver {
                     case "enableMapperAnnotation":
                         baseConfig.setEnableMapperAnnotation("true".equalsIgnoreCase(property.getStringValue()));
                         break;
+                    default:
                 }
             }
         }

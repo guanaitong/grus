@@ -13,6 +13,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
@@ -38,6 +39,8 @@ public class SqlUtils {
     private static final Map<String, String> SQL_SEGMENT = new ConcurrentHashMap<>();
     private static final String INJECTION_REGEX = "[A-Za-z0-9\\_\\-\\+\\.]+";
 
+    private SqlUtils() {
+    }
 
     /**
      * 检查字段名是否合法
@@ -69,7 +72,9 @@ public class SqlUtils {
     private static Map<String, String> doResolveSqlSegment() {
         Map<String, String> map = new HashMap<>();
         try {
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance(); //NOSONAR
+            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+            builderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            builderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
             InputStream inputStream = SqlUtils.class.getResourceAsStream(SQL_SEGMENT_PATH);
             Document document = builder.parse(inputStream);
