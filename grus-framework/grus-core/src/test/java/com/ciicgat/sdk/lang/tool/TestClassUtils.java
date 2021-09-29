@@ -23,13 +23,13 @@ public class TestClassUtils {
     @Test
     public void test() {
         List<Class<?>> classes = ClassUtils.getClasses("com.ciicgat.sdk.lang.constant");
-        Assert.assertNotNull(classes.contains(GatBoolean.class));
+        Assert.assertTrue(classes.contains(GatBoolean.class));
     }
 
     @Test
     public void test1() {
         List<Class> classes = ClassUtils.getAllClassByInterface(ErrorCode.class);
-        Assert.assertNotNull(classes.contains(BaseErrorCode.class));
-        Assert.assertNotNull(classes.contains(StandardErrorCode.class));
+        Assert.assertTrue(classes.contains(BaseErrorCode.class));
+        Assert.assertTrue(classes.contains(StandardErrorCode.class));
     }
 }

@@ -140,9 +140,9 @@ public class JacksonTest {
 
         //2节点存在，但是值为null，对应jsonnode类型为NullNode，它不是null
         Assert.assertNotNull(jsonNode.get("2"));
-        Assert.assertNotNull(jsonNode.get("2").isNull());
-        Assert.assertTrue(jsonNode.get("2") == NullNode.getInstance());
-        Assert.assertEquals(jsonNode.get("2").asText(), "null");
+        Assert.assertTrue(jsonNode.get("2").isNull());
+        Assert.assertSame(jsonNode.get("2"), NullNode.getInstance());
+        Assert.assertEquals("null", jsonNode.get("2").asText());
 
         //不存在的3节点为null
         Assert.assertNull(jsonNode.get("3"));
