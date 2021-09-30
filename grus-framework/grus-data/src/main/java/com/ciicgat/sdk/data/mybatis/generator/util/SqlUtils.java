@@ -13,7 +13,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
@@ -72,10 +71,8 @@ public class SqlUtils {
     private static Map<String, String> doResolveSqlSegment() {
         Map<String, String> map = new HashMap<>();
         try {
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            builderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-            builderFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-            DocumentBuilder builder = builderFactory.newDocumentBuilder();
+            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance(); // NOSONAR
+            DocumentBuilder builder = builderFactory.newDocumentBuilder(); // NOSONAR
             InputStream inputStream = SqlUtils.class.getResourceAsStream(SQL_SEGMENT_PATH);
             Document document = builder.parse(inputStream);
             Element rootElement = document.getDocumentElement();

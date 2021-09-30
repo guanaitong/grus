@@ -115,14 +115,14 @@ public class GeneratorContextResolver {
     private void matchIdType(List<Field> fields, List<ColumnInfo> columns) {
         columns.stream().filter(x -> Objects.equals(GeneratorConst.PRIMARY_KEY_COL, x.getName()))
                 .findAny().ifPresent(idColumn -> {
-                    fields.removeIf(x -> Objects.equals(GeneratorConst.PRIMARY_KEY_COL, x.getColumnName()));
-                    Field idField = this.convertColumnInfo2Field(idColumn);
-                    idField.setNullable(Boolean.TRUE);
-                    idField.setComment("ID 主键");
-                    idField.setMarkColumnName(false);
-                    idField.setPrimaryKey(true);
-                    fields.add(0, idField);
-                });
+            fields.removeIf(x -> Objects.equals(GeneratorConst.PRIMARY_KEY_COL, x.getColumnName()));
+            Field idField = this.convertColumnInfo2Field(idColumn);
+            idField.setNullable(Boolean.TRUE);
+            idField.setComment("ID 主键");
+            idField.setMarkColumnName(false);
+            idField.setPrimaryKey(true);
+            fields.add(0, idField);
+        });
     }
 
     private List<Field> column2Field(CodeGeneratorXmlConfig.Table table, List<ColumnInfo> columns) {
@@ -167,8 +167,7 @@ public class GeneratorContextResolver {
                 xmlInputStream = FileUtils.openInputStream(file);
             }
             Assert.notNull(xmlInputStream, "code generator config file is not exist: " + configFilePath);
-            SAXReader reader = new SAXReader();
-            reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            SAXReader reader = new SAXReader(); // NOSONAR
             reader.setValidation(true);
             Document document = reader.read(xmlInputStream);
             Element rootElement = document.getRootElement();

@@ -86,8 +86,7 @@ public class MapperXmlGenerator implements Generator {
     private boolean containAtSql(String filePath) {
         try {
             File file = new File(filePath);
-            SAXReader reader = new SAXReader();
-            reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            SAXReader reader = new SAXReader(); // NOSONAR
             Document document = reader.read(file);
             Element rootElement = document.getRootElement();
             Node node = rootElement.selectSingleNode("//sql[@id='BaseColumnList']/comment()");
