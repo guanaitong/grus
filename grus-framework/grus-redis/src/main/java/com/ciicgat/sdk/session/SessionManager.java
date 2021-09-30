@@ -32,6 +32,11 @@ import java.util.function.Function;
  * Created by August.Zhou on 2017/3/29 11:02.
  */
 public class SessionManager {
+
+    private SessionManager() {
+        //hide construct
+    }
+
     @VisibleForTesting
     static final String SESSION_ID_COOKIE_NAME = "GSESSIONID";
     private static final Logger LOGGER = LoggerFactory.getLogger(SessionManager.class);
@@ -39,7 +44,7 @@ public class SessionManager {
     private static final SessionIdGenerator SESSIONIDGENERATOR = new SessionIdGenerator();
 
 
-    private volatile static RedisConnectionFactory redisConnectionFactory;
+    private static volatile RedisConnectionFactory redisConnectionFactory;
     private static boolean secure = WorkRegion.getCurrentWorkRegion().isProduct();
     private static FrequencyController frequencyController = new DefaultFrequencyController();
 
@@ -70,6 +75,9 @@ public class SessionManager {
      */
     public static HttpSession getCurrentSession() {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes == null) {
+            throw new IllegalStateException("无法从RequestContextHolder中获取requestAttributes，系统异常");
+        }
         return getCurrentSession(requestAttributes.getRequest(), requestAttributes.getResponse());
     }
 

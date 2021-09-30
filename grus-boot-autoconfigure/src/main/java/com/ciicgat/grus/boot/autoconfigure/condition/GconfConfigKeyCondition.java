@@ -25,8 +25,10 @@ public class GconfConfigKeyCondition extends SpringBootCondition {
 
     @Override
     public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        MultiValueMap<String, Object> annotationAttributes = metadata.getAllAnnotationAttributes(
-                ConditionalOnGconfConfigKey.class.getName());
+        MultiValueMap<String, Object> annotationAttributes = metadata.getAllAnnotationAttributes(ConditionalOnGconfConfigKey.class.getName());
+        if (annotationAttributes == null || annotationAttributes.isEmpty()) {
+            return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnGconfConfigKey.class).notAvailable("项目未使用@ConditionalOnGconfConfigKey"));
+        }
         List<Object> value = annotationAttributes.get("value");
         String key = (String) value.get(0);
         // 这边Systems.AppName可能未加载，所以优先从context env里取

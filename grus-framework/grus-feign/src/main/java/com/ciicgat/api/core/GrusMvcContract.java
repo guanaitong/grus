@@ -231,6 +231,9 @@ public class GrusMvcContract extends Contract.BaseContract implements ResourceLo
         }
 
         RequestMapping methodMapping = findMergedAnnotation(method, RequestMapping.class);
+        if (methodMapping == null) {
+            throw new IllegalStateException("methodMapping must exist, but found null");
+        }
         // HTTP Method
         RequestMethod[] methods = methodMapping.method();
         if (methods.length == 0) {

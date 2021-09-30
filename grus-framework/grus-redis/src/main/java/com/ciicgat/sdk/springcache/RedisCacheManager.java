@@ -116,8 +116,9 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
         if (localCacheEvictMessageListener == null) {
             synchronized (this) {
                 if (localCacheEvictMessageListener == null) {
-                    this.localCacheEvictMessageListener = new LocalCacheEvictMessageListener();
-                    redisConnectionFactory.getConnection().subscribe(this.localCacheEvictMessageListener, getChannel());
+                    LocalCacheEvictMessageListener tempListener = new LocalCacheEvictMessageListener();
+                    redisConnectionFactory.getConnection().subscribe(tempListener, getChannel());
+                    this.localCacheEvictMessageListener = tempListener;
                 }
             }
         }
@@ -144,6 +145,7 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
     public class LocalCacheEvictMessageListener implements MessageListener {
 
         public LocalCacheEvictMessageListener() {
+            //nothing
         }
 
         @Override

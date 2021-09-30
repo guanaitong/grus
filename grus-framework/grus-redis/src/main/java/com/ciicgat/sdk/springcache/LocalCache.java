@@ -63,7 +63,11 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
 
     @Override
     protected void put0(Object key, Object value) {
-        localCache.put(key, value == null ? NULL : this.config.isSerialize() ? valueSerializer.serialize(value) : value);
+        Object putValue = value == null ? NULL : this.config.isSerialize() ? valueSerializer.serialize(value) : value;
+        if (putValue == null) {
+            throw new IllegalArgumentException("不支持将一个非null对象序列化成null对象后放入缓存中");
+        }
+        localCache.put(key, putValue);
     }
 
     @Override

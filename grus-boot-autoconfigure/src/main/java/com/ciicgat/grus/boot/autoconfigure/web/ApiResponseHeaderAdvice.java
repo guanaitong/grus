@@ -41,8 +41,12 @@ public class ApiResponseHeaderAdvice implements ResponseBodyAdvice<Object> {
             ResponseEntity responseEntity = (ResponseEntity) body;
             if (responseEntity.getBody() instanceof ApiResponse) {
                 ApiResponse apiResponse = (ApiResponse) responseEntity.getBody();
-                attachHeader(response, apiResponse.getCode(), apiResponse.getMsg(), VersionConstants.V1);
-                return body;
+                if (apiResponse != null) {
+                    attachHeader(response, apiResponse.getCode(), apiResponse.getMsg(), VersionConstants.V1);
+                    return body;
+                } else {
+                    throw new IllegalStateException("返回ApiResponse时，不允许返回null");
+                }
             }
         }
 

@@ -28,8 +28,10 @@ public class WorkEnvCondition extends SpringBootCondition {
         }
 
         WorkEnv currentWorkEnv = WorkRegion.getCurrentWorkRegion().getWorkEnv();
-        MultiValueMap<String, Object> annotationAttributes = metadata.getAllAnnotationAttributes(
-                ConditionalOnWorkEnv.class.getName());
+        MultiValueMap<String, Object> annotationAttributes = metadata.getAllAnnotationAttributes(ConditionalOnWorkEnv.class.getName());
+        if (annotationAttributes == null || annotationAttributes.isEmpty()) {
+            return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnWorkEnv.class).notAvailable("项目未使用@ConditionalOnWorkEnv"));
+        }
         List<Object> value = annotationAttributes.get("value");
         WorkEnv[] workEnvs = (WorkEnv[]) value.get(0);
         for (WorkEnv workEnv : workEnvs) {
