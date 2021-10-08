@@ -79,7 +79,6 @@ public class JobBeanProcessor implements BeanPostProcessor, BeanFactoryAware {
                 //这边固定sleep 3秒，等待zk客户端缓存失效
                 Threads.sleepSeconds(3);
                 //re init
-                scheduleJobBootstrap = new ScheduleJobBootstrap(zookeeperRegistryCenter, traceableJob, jobCoreConfiguration);
                 scheduleJobBootstrap.schedule();
             } else {
                 throw e;
