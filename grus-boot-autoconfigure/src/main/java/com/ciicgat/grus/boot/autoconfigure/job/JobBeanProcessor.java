@@ -56,7 +56,7 @@ public class JobBeanProcessor implements BeanPostProcessor, BeanFactoryAware {
         }
 
         String jobName = jobBeanAnnotation.jobName();
-        SimpleJob simpleJob = (SimpleJob) bean;
+        TraceableJob traceableJob = new TraceableJob((SimpleJob) bean);
 
         JobConfiguration jobCoreConfiguration = JobConfiguration
                 .newBuilder(jobName, jobBeanAnnotation.shardingTotalCount())
@@ -65,11 +65,8 @@ public class JobBeanProcessor implements BeanPostProcessor, BeanFactoryAware {
                 .description(jobBeanAnnotation.description())
                 .shardingItemParameters(jobBeanAnnotation.shardingItemParameters()).build();
         LOGGER.info("start init job {}", jobName);
-        TraceableJob traceableJob = new TraceableJob(simpleJob);
-        ScheduleJobBootstrap scheduleJobBootstrap = null;
         try {
-            scheduleJobBootstrap = new ScheduleJobBootstrap(zookeeperRegistryCenter, traceableJob, jobCoreConfiguration);
-            scheduleJobBootstrap.schedule();
+            initAndStartJob(jobName, traceableJob, jobCoreConfiguration);
         } catch (JobConfigurationException e) {
             if (e.getMessage().contains("Job conflict with register center")) {
                 LOGGER.warn(e.getMessage());
@@ -79,14 +76,19 @@ public class JobBeanProcessor implements BeanPostProcessor, BeanFactoryAware {
                 //这边固定sleep 3秒，等待zk客户端缓存失效
                 Threads.sleepSeconds(3);
                 //re init
-                scheduleJobBootstrap.schedule();
+                initAndStartJob(jobName, traceableJob, jobCoreConfiguration);
             } else {
                 throw e;
             }
         }
         LOGGER.info("end init job {}", jobName);
-        configurableBeanFactory.registerSingleton(JOBSCHEDULER_BEAN_NAME_PREFIX + jobBeanAnnotation.jobName(), scheduleJobBootstrap);
         return bean;
+    }
+
+    private void initAndStartJob(String jobName, TraceableJob traceableJob, JobConfiguration jobCoreConfiguration) {
+        ScheduleJobBootstrap scheduleJobBootstrap = new ScheduleJobBootstrap(zookeeperRegistryCenter, traceableJob, jobCoreConfiguration);
+        scheduleJobBootstrap.schedule();
+        configurableBeanFactory.registerSingleton(JOBSCHEDULER_BEAN_NAME_PREFIX + jobName, scheduleJobBootstrap);
     }
 
     @Override
