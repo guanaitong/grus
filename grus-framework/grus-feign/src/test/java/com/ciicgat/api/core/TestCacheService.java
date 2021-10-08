@@ -41,7 +41,7 @@ public class TestCacheService {
     public void init() throws IOException {
         mockClient = Mockito.mock(Client.class);
 
-        Request request = Request.create(Request.HttpMethod.GET, "", Collections.emptyMap(), null, null);
+        Request request = Request.create(Request.HttpMethod.GET, "", Collections.emptyMap(), (byte[]) null, null);
         Map<String, Collection<String>> headers = new HashMap<>();
         headers.put(HeaderConstants.ERROR_CODE_HEADER, Collections.singletonList("0"));
         headers.put(HeaderConstants.ERROR_MSG_HEADER, Collections.singletonList(""));

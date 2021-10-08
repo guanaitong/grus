@@ -26,31 +26,31 @@ import static com.ciicgat.api.core.FeignHttpClient.READ_TIMEOUT_TAG;
 class GrusContract extends Contract.Default {
     private static final String HEADER_NAME = "Content-Type";
 
-    @Override
-    protected void processAnnotationOnMethod(MethodMetadata data, Annotation methodAnnotation, Method method) {
-        super.processAnnotationOnMethod(data, methodAnnotation, method);
-        Class<? extends Annotation> annotationType = methodAnnotation.annotationType();
-        if (annotationType == Headers.class) {
-            String[] headersOnMethod = Headers.class.cast(methodAnnotation).value();
-            Map<String, Collection<String>> headerCollectionMap = toMap(headersOnMethod);
-            Collection<String> stringCollection = headerCollectionMap.get(HEADER_NAME);
-            if (stringCollection != null) {
-                Map<String, Collection<String>> headers = data.template().headers();
-                Collection<String> collection = headers.get(HEADER_NAME);
-                if (collection != null && collection.size() > 1) {
-                    //有多个Content-Type时，以最后一个为基准
-                    data.template().headers(null); // to clear
-                    Map<String, Collection<String>> newHeaders = new LinkedHashMap<>();
-                    newHeaders.putAll(headers);
-                    newHeaders.put(HEADER_NAME, stringCollection);
-                    data.template().headers(newHeaders);
-                }
-            }
-
-        }
-
-
-    }
+//    @Override
+//    protected void processAnnotationOnMethod(MethodMetadata data, Annotation methodAnnotation, Method method) {
+//        super.processAnnotationOnMethod(data, methodAnnotation, method);
+//        Class<? extends Annotation> annotationType = methodAnnotation.annotationType();
+//        if (annotationType == Headers.class) {
+//            String[] headersOnMethod = Headers.class.cast(methodAnnotation).value();
+//            Map<String, Collection<String>> headerCollectionMap = toMap(headersOnMethod);
+//            Collection<String> stringCollection = headerCollectionMap.get(HEADER_NAME);
+//            if (stringCollection != null) {
+//                Map<String, Collection<String>> headers = data.template().headers();
+//                Collection<String> collection = headers.get(HEADER_NAME);
+//                if (collection != null && collection.size() > 1) {
+//                    //有多个Content-Type时，以最后一个为基准
+//                    data.template().headers(null); // to clear
+//                    Map<String, Collection<String>> newHeaders = new LinkedHashMap<>();
+//                    newHeaders.putAll(headers);
+//                    newHeaders.put(HEADER_NAME, stringCollection);
+//                    data.template().headers(newHeaders);
+//                }
+//            }
+//
+//        }
+//
+//
+//    }
 
     private static Map<String, Collection<String>> toMap(String[] input) {
         Map<String, Collection<String>> result =

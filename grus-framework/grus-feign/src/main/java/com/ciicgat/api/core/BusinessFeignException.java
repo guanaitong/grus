@@ -27,7 +27,7 @@ public class BusinessFeignException extends FeignException implements ErrorCode 
 
 
     public BusinessFeignException(int status, int errorCode, String errorMsg) {
-        super(status, "", new byte[0]);
+        super(status, "");
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
     }

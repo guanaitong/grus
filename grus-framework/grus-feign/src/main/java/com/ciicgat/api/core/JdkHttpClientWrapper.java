@@ -98,10 +98,10 @@ public class JdkHttpClientWrapper implements Client {
         }
 
         final HttpRequest.BodyPublisher body;
-        if (request.requestBody().asBytes() == null) {
+        if (request.body() == null) {
             body = HttpRequest.BodyPublishers.noBody();
         } else {
-            body = HttpRequest.BodyPublishers.ofByteArray(request.requestBody().asBytes());
+            body = HttpRequest.BodyPublishers.ofByteArray(request.body());
         }
 
         final HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()

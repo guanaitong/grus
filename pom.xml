@@ -90,7 +90,7 @@
         <pagehelper.version>5.1.10</pagehelper.version>
         <jmh.version>1.21</jmh.version>
         <guava.version>29.0-jre</guava.version>
-        <feign.version>10.2.0</feign.version>
+        <feign.version>11.6</feign.version>
         <okhttp.version>3.14.9</okhttp.version>
         <opentracing.version>0.33.0</opentracing.version>
         <jaeger.version>1.0.0</jaeger.version>

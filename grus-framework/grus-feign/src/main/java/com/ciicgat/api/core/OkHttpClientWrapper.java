@@ -87,8 +87,7 @@ public final class OkHttpClientWrapper implements Client {
         if (!hasAcceptHeader) {
             requestBuilder.addHeader("Accept", "*/*");
         }
-
-        byte[] inputBody = input.requestBody().asBytes();
+        byte[] inputBody = input.body();
         boolean isMethodWithBody = feign.Request.HttpMethod.POST == input.httpMethod() || feign.Request.HttpMethod.PUT == input.httpMethod();
         if (isMethodWithBody) {
             requestBuilder.removeHeader("Content-Type");
