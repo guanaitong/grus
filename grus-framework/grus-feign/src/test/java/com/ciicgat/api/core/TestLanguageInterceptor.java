@@ -72,7 +72,7 @@ public class TestLanguageInterceptor {
         }
 
         // path encode的时候，
-        Assert.assertEquals("/get/" + UrlCoder.encode("我的xx") + "@", recordedRequest.getPath());
+        Assert.assertEquals("/get/" + UrlCoder.encode("我的xx@"), recordedRequest.getPath());
         Assert.assertEquals("POST", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
         Assert.assertEquals("", bodyString);

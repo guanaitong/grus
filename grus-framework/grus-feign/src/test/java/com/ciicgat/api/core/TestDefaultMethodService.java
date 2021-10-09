@@ -66,7 +66,7 @@ public class TestDefaultMethodService {
         }
 
         //path encode的时候，
-        Assert.assertEquals("/get/" + UrlCoder.encode("我的xx") + "@" + "?count=456", recordedRequest.getPath());
+        Assert.assertEquals("/get/" + UrlCoder.encode("我的xx@") + "?count=456", recordedRequest.getPath());
         Assert.assertEquals("GET", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
         Assert.assertEquals("", bodyString);

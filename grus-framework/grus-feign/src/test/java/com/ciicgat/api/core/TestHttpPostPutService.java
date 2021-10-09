@@ -98,7 +98,7 @@ public class TestHttpPostPutService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/postWithUrlParams?text=" + UrlCoder.encode("我的xx") + "@", recordedRequest.getPath());
+        Assert.assertEquals("/postWithUrlParams?text=" + UrlCoder.encode("我的xx@"), recordedRequest.getPath());
         Assert.assertEquals("POST", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
         Assert.assertEquals("integer=" + 456, bodyString);

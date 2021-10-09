@@ -70,7 +70,7 @@ public class TestHttpGetDeleteService {
         }
 
         //path encode的时候，
-        Assert.assertEquals("/get/" + UrlCoder.encode("我的xx") + "@" + "?count=456", recordedRequest.getPath());
+        Assert.assertEquals("/get/" + UrlCoder.encode("我的xx@") + "?count=456", recordedRequest.getPath());
         Assert.assertEquals("GET", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
         Assert.assertEquals("", bodyString);
@@ -103,7 +103,7 @@ public class TestHttpGetDeleteService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/delete/" + UrlCoder.encode("我的xx") + "@" + "?count=456", recordedRequest.getPath());
+        Assert.assertEquals("/delete/" + UrlCoder.encode("我的xx@") + "?count=456", recordedRequest.getPath());
         Assert.assertEquals("DELETE", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
         Assert.assertEquals("", bodyString);
