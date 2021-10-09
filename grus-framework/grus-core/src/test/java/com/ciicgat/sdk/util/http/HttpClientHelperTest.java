@@ -187,10 +187,9 @@ public class HttpClientHelperTest extends TestCase {
             HttpClientHelper.get(url, null, null, new HttpTimeout().readTimeout(Duration.ofSeconds(1)));
         } catch (RuntimeException e) {
             assertTrue(e.getCause() instanceof SocketTimeoutException);
-            assertTrue(e.getCause().getMessage().equals("timeout"));
+            assertTrue(e.getCause().getMessage().equals("timeout") || e.getCause().getMessage().equals("Read timed out"));
             return;
         }
         fail();
-
     }
 }
