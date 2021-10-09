@@ -83,7 +83,7 @@ public class TraceableJobTest implements SimpleJob {
 
         TraceableJobTest simpleJob = new TraceableJobTest();
 
-        String jobName = "testxxx";
+        String jobName = "testxxx-17";
         JobConfiguration jobCoreConfiguration = JobConfiguration
                 .newBuilder(jobName, 1)
                 .cron("* * * ? * *")
