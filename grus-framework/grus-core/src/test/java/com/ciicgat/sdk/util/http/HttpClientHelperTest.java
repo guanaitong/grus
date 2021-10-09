@@ -156,7 +156,6 @@ public class HttpClientHelperTest extends TestCase {
         testSocketTimeOut(mockWebServer, url);
         MockWebServer finalMockWebServer = mockWebServer;
         CompletableFuture.runAsync(() -> CloseUtils.close(finalMockWebServer));
-//        CloseUtils.close(mockWebServer);
     }
 
     private void testSocketDisconnectAfterRequest(MockWebServer mockWebServer, String url) {
