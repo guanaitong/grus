@@ -98,7 +98,7 @@ public class TestHeaderService {
     }
 
     @Test(expected = BusinessFeignException.class)
-    public synchronized void testResponseHeader() {
+    public synchronized void testResponseHeader() throws InterruptedException {
         TestBean bean1 = new TestBean("jasdlfj", 91823);
         MockResponse mockResponse = new MockResponse()
                 .addHeader("Content-Type", "application/json;charset=utf-8")
@@ -109,7 +109,12 @@ public class TestHeaderService {
                 .setBody(JSON.toJSONString(bean1));
         mockWebServer.enqueue(mockResponse);
 
-        testService.get("我的xx@");
+        try {
+            testService.get("我的xx@");
+        } catch (RuntimeException ex) {
+            mockWebServer.takeRequest();
+            throw ex;
+        }
     }
 
 }
