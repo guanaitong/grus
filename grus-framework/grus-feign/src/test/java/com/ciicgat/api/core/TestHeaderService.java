@@ -42,7 +42,6 @@ public class TestHeaderService {
         mockWebServer.shutdown();
     }
 
-
     @Test
     public synchronized void testGet() {
         TestBean bean1 = new TestBean("jasdlfj", 91823);
@@ -68,6 +67,32 @@ public class TestHeaderService {
         //path encode的时候，
         Assert.assertEquals("/get/" + UrlCoder.encode("我的xx@"), recordedRequest.getPath());
         Assert.assertEquals("POST", recordedRequest.getMethod());
+        Assert.assertEquals("application/json", recordedRequest.getHeader("Content-Type"));
+        String bodyString = recordedRequest.getBody().readUtf8();
+        Assert.assertEquals("", bodyString);
+    }
+
+    @Test
+    public synchronized void testHeader() throws InterruptedException {
+        TestBean bean1 = new TestBean("jasdlfj", 91823);
+        MockResponse mockResponse = new MockResponse()
+                .addHeader("Content-Type", "application/json;charset=utf-8")
+                .setResponseCode(200)
+                .setHeader(HeaderConstants.ERROR_CODE_HEADER, 0)
+                .setHeader(HeaderConstants.ERROR_MSG_HEADER, "")
+                .setHeader(HeaderConstants.API_VERSION_HEADER, VersionConstants.V2)
+                .setBody(JSON.toJSONString(bean1));
+        mockWebServer.enqueue(mockResponse);
+
+        TestBean bean = testService.getDefault("我的xx@");
+        Assert.assertEquals(bean1, bean);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+
+        // path encode的时候，
+        Assert.assertEquals("/get/default/" + UrlCoder.encode("我的xx@"), recordedRequest.getPath());
+        Assert.assertEquals("POST", recordedRequest.getMethod());
+        Assert.assertEquals("application/x-www-form-urlencoded", recordedRequest.getHeader("Content-Type"));
         String bodyString = recordedRequest.getBody().readUtf8();
         Assert.assertEquals("", bodyString);
     }
@@ -86,6 +111,5 @@ public class TestHeaderService {
 
         testService.get("我的xx@");
     }
-
 
 }

@@ -15,13 +15,11 @@ import feign.RequestLine;
 @ServiceName("get-delete")
 public interface HeaderService {
 
-
-//    @Headers({"Content-Type: application/json"})
-//    @RequestLine("POST /get/{serverId}")
-//    TestBean get(@Param("serverId") String serverId, @Param("count") int count);
-
-
     @Headers({"Content-Type: application/json"})
     @RequestLine("POST /get/{serverId}")
     TestBean get(@Param("serverId") String serverId);
+
+    @RequestLine("POST /get/default/{serverId}")
+    TestBean getDefault(@Param("serverId") String serverId);
+
 }
