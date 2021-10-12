@@ -15,24 +15,28 @@
 #  paths:
 #    - .m2/repository/
 #    - target/
+stages:
+  - testOnJava11
+  - testOnJava17
+  - deploy
 
-build:
-  stage: build
-  test:java11:
-    image: maven:3.8.3-eclipse-temurin-11
-    script:
-      - mvn package sonar:sonar
-  test:java17:
-    image: maven:3.8.3-eclipse-temurin-17
-    script:
-      - mvn package sonar:sonar
+test:java11:
+  image: maven:3.8.3-eclipse-temurin-11
+  stage: testOnJava11
   script:
-    - sh generate_parent_pom.sh
-
+    - mvn package sonar:sonar
+test:java17:
+  image: maven:3.8.3-eclipse-temurin-17
+  stage: testOnJava17
+  script:
+    - mvn package sonar:sonar
 
 deploy:
+  image: maven:3.8.3-eclipse-temurin-11
   stage: deploy
   script:
+    - mvn deploy -Dmaven.test.skip=true
+    - sh generate_parent_pom.sh
     - mvn -f tmp/.flattened-pom.xml -Dmaven.test.skip=true deploy
   only:
     - master
