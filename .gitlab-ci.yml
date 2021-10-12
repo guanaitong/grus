@@ -26,6 +26,7 @@ test:java11:
   variables:
     TZ: "Asia/Shanghai"
   script:
+    - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
     - mvn package sonar:sonar
 test:java17:
   image: maven:3.8.3-eclipse-temurin-17
@@ -33,6 +34,7 @@ test:java17:
   variables:
     TZ: "Asia/Shanghai"
   script:
+    - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
     - mvn package sonar:sonar
 
 deploy:
