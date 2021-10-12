@@ -1,20 +1,3 @@
-#test:java11:
-#  image: maven:3.8.3-eclipse-temurin-11
-#  script:
-#    - mvn package sonar:sonar
-#test:java17:
-#  image: maven:3.8.3-eclipse-temurin-17
-#  script:
-#    - mvn package sonar:sonar
-
-#variables:
-#  MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
-#  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-
-#cache:
-#  paths:
-#    - .m2/repository/
-#    - target/
 variables:
   TZ: "Asia/Shanghai"
   MAVEN_CLI_OPTS: " --batch-mode"
