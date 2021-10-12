@@ -23,17 +23,23 @@ stages:
 test:java11:
   image: maven:3.8.3-eclipse-temurin-11
   stage: testOnJava11
+  variables:
+    TZ: "Asia/Shanghai"
   script:
     - mvn package sonar:sonar
 test:java17:
   image: maven:3.8.3-eclipse-temurin-17
   stage: testOnJava17
+  variables:
+    TZ: "Asia/Shanghai"
   script:
     - mvn package sonar:sonar
 
 deploy:
   image: maven:3.8.3-eclipse-temurin-11
   stage: deploy
+  variables:
+    TZ: "Asia/Shanghai"
   script:
     - mvn deploy -Dmaven.test.skip=true
     - sh generate_parent_pom.sh
