@@ -23,18 +23,17 @@ stages:
   - testOnJava11
   - testOnJava17
   - deploy
-
+before_script:
+  - keytool -keystore -cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
 test:java11:
   image: maven:3.8.3-eclipse-temurin-11
   stage: testOnJava11
   script:
-    - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
     - mvn package sonar:sonar
 test:java17:
   image: maven:3.8.3-eclipse-temurin-17
   stage: testOnJava17
   script:
-    - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
     - mvn package sonar:sonar
 
 deploy:
