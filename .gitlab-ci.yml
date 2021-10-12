@@ -45,3 +45,4 @@ deploy:
     - mvn -f tmp/.flattened-pom.xml -Dmaven.test.skip=true deploy
   only:
     - master
+    - 2021.1.x
