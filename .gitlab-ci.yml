@@ -15,6 +15,10 @@
 #  paths:
 #    - .m2/repository/
 #    - target/
+variables:
+  TZ: "Asia/Shanghai"
+
+
 stages:
   - testOnJava11
   - testOnJava17
@@ -23,16 +27,12 @@ stages:
 test:java11:
   image: maven:3.8.3-eclipse-temurin-11
   stage: testOnJava11
-  variables:
-    TZ: "Asia/Shanghai"
   script:
     - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
     - mvn package sonar:sonar
 test:java17:
   image: maven:3.8.3-eclipse-temurin-17
   stage: testOnJava17
-  variables:
-    TZ: "Asia/Shanghai"
   script:
     - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
     - mvn package sonar:sonar
@@ -40,8 +40,6 @@ test:java17:
 deploy:
   image: maven:3.8.3-eclipse-temurin-11
   stage: deploy
-  variables:
-    TZ: "Asia/Shanghai"
   script:
     - mvn deploy -Dmaven.test.skip=true
     - sh generate_parent_pom.sh
