@@ -44,6 +44,7 @@ public class ReflectUtils {
     private static final Map<String, ReflectEntity> REFLECT_ENTITY_CACHE = new ConcurrentHashMap<>();
     private static final String GET_METHOD_PREFIX = "get";
     private static final String PRIMARY_KEY_NAME = "id";
+    private static final String JAVA_OBJECT = "java.lang.Object";
 
     public static Class<?> getSuperClassGenericType(final Class<?> clazz, final int index) {
         return getClassGenericType(false, clazz, index);
@@ -103,9 +104,9 @@ public class ReflectUtils {
         reflectEntity.setSimpleName(simpleName);
 
         // 读取字段
-        List<Field> declaredFields = getDeclaredFields(clazz);
-        List<ReflectField> fields = new ArrayList<>(declaredFields.size());
+        List<ReflectField> fields = new ArrayList<>();
         reflectEntity.setFields(fields);
+        List<Field> declaredFields = getAllDeclaredFields(clazz);
         for (Field declaredField : declaredFields) {
             String name = declaredField.getName();
             boolean primaryKey = false;
@@ -156,24 +157,34 @@ public class ReflectUtils {
      * @param <T>    实体对象类
      * @return
      */
-    public static <T> Map<String, String> resolveEntityFieldAndValue(T entity) {
-        Map<String, String> fieldValueMap = new HashMap<>();
+    public static <T> Map<String, Object> resolveEntityFieldAndValue(T entity) {
+        Map<String, Object> fieldValueMap = new HashMap<>();
         Class<?> entityClass = entity.getClass();
-        List<Field> declaredFields = getDeclaredFields(entityClass);
+        List<Field> declaredFields = getAllDeclaredFields(entityClass);
         List<String> fieldNames = declaredFields.stream()
                 .map(Field::getName)
                 .collect(Collectors.toList());
+        Map<String, Field> fieldMap = declaredFields.stream().collect(Collectors.toMap(Field::getName, Function.identity()));
 
-        Method[] declaredMethods = entityClass.getDeclaredMethods();
-        Map<String, Method> getMethodMap = Arrays.stream(declaredMethods).filter(x -> x.getName().startsWith(GET_METHOD_PREFIX))
+        List<Method> declaredMethods = getAllMethods(entityClass);
+        Map<String, Method> getMethodMap = declaredMethods.stream().filter(x -> x.getName().startsWith(GET_METHOD_PREFIX))
                 .collect(Collectors.toMap(Method::getName, Function.identity()));
 
         fieldNames.forEach(fieldName -> {
+            String columnName = fieldName;
+            Field field = fieldMap.get(fieldName);
+            TableField tableField = field.getAnnotation(TableField.class);
+            if (Objects.nonNull(tableField) && StringUtils.isNotBlank(tableField.value())) {
+                columnName = tableField.value();
+            }
             String methodName = GET_METHOD_PREFIX.concat(SqlUtils.firstToUpperCase(fieldName));
             Method method = getMethodMap.get(methodName);
+            if (Objects.isNull(method)) {
+                return;
+            }
             Object value = methodInvoke(method, entity);
             if (Objects.nonNull(value)) {
-                fieldValueMap.put(fieldName, value.toString());
+                fieldValueMap.put(columnName, value);
             }
         });
         return fieldValueMap;
@@ -190,25 +201,85 @@ public class ReflectUtils {
     }
 
     public static Method getMethod(Class<?> entityClass, String fieldName) {
-        try {
-            return entityClass.getDeclaredMethod(GET_METHOD_PREFIX.concat(SqlUtils.firstToUpperCase(fieldName)));
-        } catch (NoSuchMethodException e) {
-            LOGGER.error("getMethod error", e);
-            throw new RuntimeException(e);
+        Method method = getMethodRecursion(entityClass, fieldName);
+        if (Objects.isNull(method)) {
+            String methodName = GET_METHOD_PREFIX.concat(SqlUtils.firstToUpperCase(fieldName));
+            throw new RuntimeException(String.format("NoSuchMethodException: %s.%s()", entityClass, methodName));
         }
+        return method;
     }
 
     /**
-     * 获取所有声明字段,且非static修饰
+     * 递归获取对象get方法
+     *
+     * @param entityClass 对象类
+     * @param fieldName   字段名
+     * @return
+     */
+    private static Method getMethodRecursion(Class<?> entityClass, String fieldName) {
+        String methodName = GET_METHOD_PREFIX.concat(SqlUtils.firstToUpperCase(fieldName));
+        if (JAVA_OBJECT.equalsIgnoreCase(entityClass.getName())) {
+            return null;
+        }
+        return Arrays.stream(entityClass.getDeclaredMethods())
+                .filter(x -> Objects.equals(x.getName(), methodName))
+                .findFirst()
+                .orElseGet(() -> getMethodRecursion(entityClass.getSuperclass(), fieldName));
+    }
+
+    public static List<Method> getAllMethods(Class<?> entityClass) {
+        List<Method> list = new ArrayList<>();
+        getMethodsRecursion(entityClass, list);
+        return list;
+    }
+
+    public static void getMethodsRecursion(Class<?> entityClass, List<Method> list) {
+        if (JAVA_OBJECT.equalsIgnoreCase(entityClass.getName())) {
+            return;
+        }
+        list.addAll(Arrays.stream(entityClass.getDeclaredMethods()).collect(Collectors.toList()));
+        getMethodsRecursion(entityClass.getSuperclass(), list);
+    }
+
+    /**
+     * 获取当前类声明字段,且非static修饰
      *
      * @param clazz 类对象
      * @return
      */
-    private static List<Field> getDeclaredFields(Class<?> clazz) {
+    public static List<Field> getDeclaredFields(Class<?> clazz) {
         Field[] declaredFields = clazz.getDeclaredFields();
-        return List.of(declaredFields).stream().filter(x -> !Modifier.isStatic(x.getModifiers()))
+        return Arrays.stream(declaredFields).filter(x -> !Modifier.isStatic(x.getModifiers()))
                 .collect(Collectors.toList());
+    }
 
+    /**
+     * 获取所有声明字段,且非static修饰 (包括父类)
+     *
+     * @param clazz 类对象
+     * @return
+     */
+    public static List<Field> getAllDeclaredFields(Class<?> clazz) {
+        List<Field> list = new ArrayList<>();
+        getFieldsRecursion(clazz, list);
+        return list;
+    }
+
+    /**
+     * 递归获取对象字段
+     *
+     * @param entityClass 对象类
+     * @param fields      字段列表
+     * @return
+     */
+    private static void getFieldsRecursion(Class<?> entityClass, List<Field> fields) {
+        if (JAVA_OBJECT.equalsIgnoreCase(entityClass.getName())) {
+            return;
+        }
+        Field[] declaredFields = entityClass.getDeclaredFields();
+        fields.addAll(Arrays.stream(declaredFields).filter(x -> !Modifier.isStatic(x.getModifiers()))
+                .collect(Collectors.toList()));
+        getFieldsRecursion(entityClass.getSuperclass(), fields);
     }
 
 }

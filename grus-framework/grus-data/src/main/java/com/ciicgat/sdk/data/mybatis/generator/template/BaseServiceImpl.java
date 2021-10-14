@@ -157,7 +157,7 @@ public class BaseServiceImpl<T> implements BaseService<T> {
     private Example<T> convertQueryToExample(Query<T> query) {
         T entity = query.getEntity();
         if (Objects.nonNull(entity)) {
-            Map<String, String> fieldAndValue = ReflectUtils.resolveEntityFieldAndValue(entity);
+            Map<String, Object> fieldAndValue = ReflectUtils.resolveEntityFieldAndValue(entity);
             GeneratedCriteria criteria = query.getExistCriteria();
             if (criteria instanceof LambdaCriteria) {
                 LambdaCriteria lambdaCriteria = (LambdaCriteria) criteria;
