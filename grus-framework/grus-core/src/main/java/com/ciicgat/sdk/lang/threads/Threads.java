@@ -8,17 +8,20 @@ package com.ciicgat.sdk.lang.threads;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 /**
  * Created by August.Zhou on 2016/6/20 16:56.
  */
 public class Threads {
     private static final Logger LOGGER = LoggerFactory.getLogger(Threads.class);
-    private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger();
+    private static final ConcurrentMap<String,AtomicInteger> THREAD_NUM_MAP = new ConcurrentHashMap<>();
     public static final Thread.UncaughtExceptionHandler LOGGER_UNCAUGHTEXCEPTIONHANDLER = (t, e) -> LOGGER.error(t.getName(), e);
     public static final RejectedExecutionHandler LOGGER_REJECTEDEXECUTIONHANDLER =
             (r, executor) -> LOGGER.error("rejected,queue size {},task count {},active count {}", executor.getQueue().size(), executor.getTaskCount(), executor.getActiveCount());
@@ -74,7 +77,8 @@ public class Threads {
     }
 
     public static Thread newThread(Runnable runnable, String name, int priority, boolean daemon) {
-        Thread thread = new Thread(runnable, name + "_" + ATOMIC_INTEGER.getAndIncrement());
+        AtomicInteger atomicInteger = THREAD_NUM_MAP.computeIfAbsent(name, s -> new AtomicInteger());
+        Thread thread = new Thread(runnable, name + "_" + atomicInteger.getAndIncrement());
         thread.setPriority(priority);
         thread.setDaemon(daemon);
         thread.setUncaughtExceptionHandler(LOGGER_UNCAUGHTEXCEPTIONHANDLER);
@@ -91,6 +95,10 @@ public class Threads {
         try {
             TimeUnit.MILLISECONDS.sleep(milliseconds);
         } catch (InterruptedException e) { //NOSONAR
+            // DONOT CALL Thread.currentThread().interrupt()
+            // 调用interrupt中断线程某些时候非本意，线程不会真正中断，比如http线程是不会中断的。但是其中断状态变为true。
+            // 此时，就会影响某些api（如redis lettuce），因为它们检测了线程是否中断。
+            // 此时，灾难发生了，而且不会恢复。因为无法将http线程的状态重置为正常了。
             LOGGER.error("unexpected", e);
         }
     }
@@ -99,6 +107,7 @@ public class Threads {
         try {
             TimeUnit.SECONDS.sleep(seconds);
         } catch (InterruptedException e) { //NOSONAR
+            // DONOT CALL Thread.currentThread().interrupt()
             LOGGER.error("unexpected", e);
         }
     }

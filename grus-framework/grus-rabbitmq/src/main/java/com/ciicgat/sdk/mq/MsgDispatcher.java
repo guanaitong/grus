@@ -120,7 +120,6 @@ public class MsgDispatcher {
         } catch (Throwable e) {
             producerSpanDecorator.onError(e, span);
             Alert.send("send msg error,msg:" + msg, e);
-            Thread.currentThread().interrupt();
             throw new IOException(e);
         } finally {
             try {

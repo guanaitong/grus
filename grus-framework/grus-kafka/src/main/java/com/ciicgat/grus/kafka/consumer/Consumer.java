@@ -169,8 +169,6 @@ public class Consumer implements AutoCloseable {
                 } catch (Exception ex) {
                     LOGGER.error("consumer records error.", ex);
                     Threads.sleep(200);
-                    // Restore interrupted state...
-                    Thread.currentThread().interrupt();
                 }
             }
         }
