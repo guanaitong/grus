@@ -20,7 +20,7 @@ public class LambdaCriteria<T> extends GeneratedCriteria<T, SFunction<T, ?>, Lam
         return LambdaUtils.getFieldName(column);
     }
 
-    public LambdaCriteria eq(String column, String val) {
+    public LambdaCriteria eq(String column, Object val) {
         this.addCriterion(this.contactCondition(column, SqlKeyword.EQ), val, column);
         return this;
     }
