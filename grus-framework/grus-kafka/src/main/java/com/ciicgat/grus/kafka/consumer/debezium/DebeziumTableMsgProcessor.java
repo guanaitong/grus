@@ -11,5 +11,9 @@ package com.ciicgat.grus.kafka.consumer.debezium;
  */
 public interface DebeziumTableMsgProcessor {
 
+    /**
+     * 用户需要自己处理异常
+     * @param record
+     */
     void handle(DebeziumEventRecord record);
 }

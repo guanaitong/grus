@@ -23,8 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.ciicgat.sdk.lang.threads.Threads.LOGGER_UNCAUGHTEXCEPTIONHANDLER;
@@ -53,8 +51,6 @@ public class Consumer implements AutoCloseable {
 
     private final List<InnerConsumer> consumers;
 
-    private Executor taskExecutor = Runnable::run;
-
     private final AtomicBoolean isRunning = new AtomicBoolean();
     private KafkaMsgProcessor kafkaMsgProcessor;
     private final int pullThreadNum;
@@ -75,9 +71,6 @@ public class Consumer implements AutoCloseable {
         return new KafkaConsumerBuilder();
     }
 
-    public void setTaskExecutor(Executor taskExecutor) {
-        this.taskExecutor = taskExecutor;
-    }
 
     public void setKafkaMsgProcessor(KafkaMsgProcessor kafkaMsgProcessor) {
         this.kafkaMsgProcessor = Objects.requireNonNull(kafkaMsgProcessor);
@@ -151,19 +144,9 @@ public class Consumer implements AutoCloseable {
                 try {
                     ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(3_000));
                     if (!records.isEmpty()) {
-                        final CountDownLatch countDownLatch = new CountDownLatch(records.count());
                         for (ConsumerRecord<String, String> record : records) {
-                            taskExecutor.execute(() -> {
-                                try {
-                                    kafkaMsgProcessor.handle(record);
-                                } catch (Exception ex) {
-                                    LOGGER.error("current record:{}", record);
-                                    LOGGER.error("kafkaMsgProcessor handle error.", ex);
-                                }
-                                countDownLatch.countDown();
-                            });
+                            kafkaMsgProcessor.handle(record);
                         }
-                        countDownLatch.await();
                         kafkaConsumer.commitSync();
                     }
                 } catch (Exception ex) {

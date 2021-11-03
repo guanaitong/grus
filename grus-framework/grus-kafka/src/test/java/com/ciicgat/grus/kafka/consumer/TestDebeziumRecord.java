@@ -9,7 +9,6 @@ import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.kafka.consumer.debezium.DebeziumMsgProcessor;
 import com.ciicgat.grus.kafka.consumer.debezium.meta.DebeziumRawRecord;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
@@ -28,11 +27,10 @@ public class TestDebeziumRecord {
     }
 
     @Test
-    @Ignore
     public void testConsumer() throws Exception {
         Consumer consumer = Consumer.newBuilder().setPullThreadNum(2)
                 .setGroupId("test-consumer-group" + Math.random())
-                .setTopics(new String[]{"frigate.gatjob.JobLog"})
+                .setTopics(new String[]{"devapp57.jifenpay.Trade"})
                 .build();
 
         AtomicInteger count = new AtomicInteger();
@@ -40,7 +38,6 @@ public class TestDebeziumRecord {
         DebeziumMsgProcessor debeziumMsgProcessor = new DebeziumMsgProcessor(record -> {
             count.incrementAndGet();
             countDownLatch.countDown();
-            System.out.println(JSON.toJSONString(record));
         });
 
         consumer.setKafkaMsgProcessor(debeziumMsgProcessor);
