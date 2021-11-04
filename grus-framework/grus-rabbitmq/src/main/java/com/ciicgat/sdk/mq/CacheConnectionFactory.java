@@ -62,8 +62,8 @@ public class CacheConnectionFactory {
 
         //这边只是new了，只要不调用execute(Runnable command)方法就不会创建新线程池
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
-                32,
-                32,
+                4,
+                4,
                 0,
                 TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(),
