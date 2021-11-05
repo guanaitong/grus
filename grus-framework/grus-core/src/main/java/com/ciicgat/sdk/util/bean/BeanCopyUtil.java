@@ -6,8 +6,6 @@
 package com.ciicgat.sdk.util.bean;
 
 import com.ciicgat.sdk.lang.convert.Pagination;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
@@ -20,9 +18,6 @@ import java.util.List;
  * @Description: bean拷贝工具
  */
 public class BeanCopyUtil {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BeanCopyUtil.class);
-
 
     public static <T> T copy(Object src, Class<T> dstClass) {
         if (src == null) {

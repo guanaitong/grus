@@ -6,8 +6,6 @@
 package com.ciicgat.sdk.util.bean;
 
 import com.google.common.collect.Maps;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.FatalBeanException;
 
@@ -24,8 +22,6 @@ import java.util.Objects;
  * @Description:
  */
 public class BeanMapUtil {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(BeanMapUtil.class);
 
     public static Map<String, Object> bean2Map(Object bean) {
         if (bean == null) {
