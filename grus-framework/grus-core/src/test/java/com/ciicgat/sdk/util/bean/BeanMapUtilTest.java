@@ -98,6 +98,8 @@ public class BeanMapUtilTest {
         Assert.assertEquals("111", beanMap.get("app"));
         Assert.assertEquals(4, beanMap.get("num"));
         Assert.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), beanMap.get("date"));
+
+        System.out.println("finished");
     }
 
     @Test
@@ -112,5 +114,6 @@ public class BeanMapUtilTest {
         Assert.assertEquals("111", bean.getApp());
         Assert.assertEquals(Integer.valueOf(4), bean.getNum());
         Assert.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), bean.getDate());
+        System.out.println("finished");
     }
 }

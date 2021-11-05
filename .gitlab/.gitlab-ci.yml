@@ -23,7 +23,6 @@ buildOnJava17:
     - mvn -v
     - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
     - mvn $MAVEN_CLI_OPTS package sonar:sonar -Djava.version=17
-#      -Dsonar.java.source=17
 
 deploy:
   image: maven:3.8.3-eclipse-temurin-11
