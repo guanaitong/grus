@@ -21,9 +21,13 @@ import java.util.Map;
 public class BeanMapUtilTest {
 
     public static class Bean {
+        private static String ss;
         private String app;
         private Integer num;
         private Date date;
+        private boolean isOk;
+        private boolean autoRuntimeDialect;
+        private String privateField;
 
         public String getApp() {
             return app;
@@ -48,6 +52,38 @@ public class BeanMapUtilTest {
         public void setDate(Date date) {
             this.date = date;
         }
+
+        public boolean isOk() {
+            return isOk;
+        }
+
+        public void setOk(boolean ok) {
+            isOk = ok;
+        }
+
+        public boolean isAutoRuntimeDialect() {
+            return autoRuntimeDialect;
+        }
+
+        public void setAutoRuntimeDialect(boolean autoRuntimeDialect) {
+            this.autoRuntimeDialect = autoRuntimeDialect;
+        }
+
+        private String getPrivateField() {
+            return privateField;
+        }
+
+        public void setPrivateField(String privateField) {
+            this.privateField = privateField;
+        }
+
+        public static String getSs() {
+            return ss;
+        }
+
+        public static void setSs(String ss) {
+            Bean.ss = ss;
+        }
     }
 
     @Test
@@ -58,7 +94,7 @@ public class BeanMapUtilTest {
         bean.setDate(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"));
 
         Map<String, Object> beanMap = BeanMapUtil.bean2Map(bean);
-
+        Assert.assertTrue(beanMap.size() == 5);
         Assert.assertEquals("111", beanMap.get("app"));
         Assert.assertEquals(4, beanMap.get("num"));
         Assert.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), beanMap.get("date"));

@@ -55,7 +55,7 @@ public class SSL {
                     }
                     try {
                         X509Certificate x509Certificate = chain[0];
-                        String name = x509Certificate.getSubjectDN().getName().toLowerCase();
+                        String name = x509Certificate.getSubjectX500Principal().getName().toLowerCase();
                         //信任关爱通的证书
                         if (name.contains("guanaitong") || name.contains("ciicgat") || name.contains("4008885818")) {
                             return;

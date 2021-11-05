@@ -5,12 +5,18 @@
 
 package com.ciicgat.sdk.util.bean;
 
+import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cglib.beans.BeanMap;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.FatalBeanException;
 
-import java.util.HashMap;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @Auther: Jiaju Wei
@@ -21,31 +27,71 @@ public class BeanMapUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BeanMapUtil.class);
 
-    @SuppressWarnings("uncheck")
     public static Map<String, Object> bean2Map(Object bean) {
         if (bean == null) {
             return null;
         }
-        Map<String, Object> map = new HashMap<>();
-
-        BeanMap beanMap = BeanMap.create(bean);
-        map.putAll(beanMap);
-
+        PropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(bean.getClass());
+        if (propertyDescriptors == null || propertyDescriptors.length == 0) {
+            return Collections.emptyMap();
+        }
+        Map<String, Object> map = Maps.newHashMapWithExpectedSize(propertyDescriptors.length);
+        for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
+            String name = propertyDescriptor.getName();
+            if ("class".equals(name)) {
+                continue;
+            }
+            Method readMethod = propertyDescriptor.getReadMethod();
+            if (readMethod != null) {
+                if (!Modifier.isPublic(readMethod.getDeclaringClass().getModifiers())) {
+                    readMethod.setAccessible(true);
+                }
+                try {
+                    Object value = readMethod.invoke(bean);
+                    if (Objects.nonNull(value)) {
+                        map.put(name, value);
+                    }
+                } catch (Throwable ex) {
+                    throw new FatalBeanException(
+                            "Could not copy property '" + name + "' from source to target", ex);
+                }
+            }
+        }
         return map;
     }
 
     public static <T> T map2Bean(Map<String, Object> map, Class<T> beanClass) {
-        T bean;
-        try {
-            bean = beanClass.getDeclaredConstructor().newInstance();
-            BeanMap beanMap = BeanMap.create(bean);
-            beanMap.putAll(map);
-        } catch (Exception e) {
-            LOGGER.error("BeanMapUtil cglib copy error", e);
-            throw new RuntimeException(e);
+        T bean = BeanUtils.instantiateClass(beanClass);
+        if (map.size() == 0) {
+            return bean;
         }
+        PropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(beanClass);
+        if (propertyDescriptors == null || propertyDescriptors.length == 0) {
+            return bean;
+        }
+        for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
+            String name = propertyDescriptor.getName();
+            if ("class".equals(name)) {
+                continue;
+            }
+            Method writeMethod = propertyDescriptor.getWriteMethod();
+            if (writeMethod != null) {
+                try {
+                    Object value = map.get(name);
+                    if (Objects.nonNull(value)) {
+                        if (!Modifier.isPublic(writeMethod.getDeclaringClass().getModifiers())) {
+                            writeMethod.setAccessible(true);
+                        }
+                        writeMethod.invoke(bean, value);
+                    }
+                } catch (Throwable ex) {
+                    throw new FatalBeanException(
+                            "Could not copy property '" + name + "' from source to target", ex);
+                }
+            }
+        }
+
         return bean;
     }
-
 
 }

@@ -8,12 +8,11 @@ package com.ciicgat.sdk.util.bean;
 import com.ciicgat.sdk.lang.convert.Pagination;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cglib.beans.BeanCopier;
+import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Auther: Jiaju Wei
@@ -24,22 +23,14 @@ public class BeanCopyUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BeanCopyUtil.class);
 
-    private static ConcurrentHashMap<String, BeanCopier> BEAN_COPIER_CACHE = new ConcurrentHashMap<>();
 
     public static <T> T copy(Object src, Class<T> dstClass) {
         if (src == null) {
             return null;
         }
 
-        BeanCopier beanCopier = getCopier(src.getClass(), dstClass);
-        T dst;
-        try {
-            dst = dstClass.getDeclaredConstructor().newInstance();
-            beanCopier.copy(src, dst, null);
-        } catch (Exception e) {
-            LOGGER.error("BeanCopyUtil cglib copy error", e);
-            throw new RuntimeException(e);
-        }
+        T dst = BeanUtils.instantiateClass(dstClass);
+        BeanUtils.copyProperties(src, dst);
         return dst;
     }
 
@@ -47,7 +38,6 @@ public class BeanCopyUtil {
     public static <T, R> R copy(T src, Class<R> dstClass, BeanExtraConverter<T, R> converter) {
         R dst = copy(src, dstClass);
         converter.afterProcess(src, dst);
-
         return dst;
     }
 
@@ -75,20 +65,6 @@ public class BeanCopyUtil {
         return dst;
     }
 
-    private static BeanCopier getCopier(Class srcClass, Class dstClass) {
-        String key = srcClass.getName() + dstClass.getName();
-        BeanCopier beanCopier = BEAN_COPIER_CACHE.get(key);
-        if (null == beanCopier) {
-            BeanCopier newBeanCopier = BeanCopier.create(srcClass, dstClass, false);
-            beanCopier = BEAN_COPIER_CACHE.putIfAbsent(key, newBeanCopier);
-            // 线程安全，保证取到的是一个copier
-            if (beanCopier == null) {
-                beanCopier = newBeanCopier;
-            }
-        }
-
-        return beanCopier;
-    }
 
     @SuppressWarnings("unchecked")
     private static <T, R> List<R> doCopyList(List<T> srcList, Class<R> dstClass, BeanExtraConverter<T, R> converter) {
@@ -98,21 +74,14 @@ public class BeanCopyUtil {
         if (srcList.isEmpty()) {
             return Collections.EMPTY_LIST;
         }
-        BeanCopier beanCopier = getCopier(srcList.get(0).getClass(), dstClass);
-
         List<R> dstList = new ArrayList<>();
-        try {
-            for (T src : srcList) {
-                R dst = dstClass.getDeclaredConstructor().newInstance();
-                beanCopier.copy(src, dst, null);
-                if (converter != null) {
-                    converter.afterProcess(src, dst);
-                }
-                dstList.add(dst);
+        for (T src : srcList) {
+            R dst = BeanUtils.instantiateClass(dstClass);
+            BeanUtils.copyProperties(src, dst);
+            if (converter != null) {
+                converter.afterProcess(src, dst);
             }
-        } catch (Exception e) {
-            LOGGER.error("BeanCopyUtil cglib copy error", e);
-            throw new RuntimeException(e);
+            dstList.add(dst);
         }
         return dstList;
     }
