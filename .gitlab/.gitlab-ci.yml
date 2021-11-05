@@ -4,8 +4,8 @@ variables:
 
 
 stages:
-  - buildOnJava11
   - buildOnJava17
+  - buildOnJava11
   - deploy
 
 buildOnJava11:
