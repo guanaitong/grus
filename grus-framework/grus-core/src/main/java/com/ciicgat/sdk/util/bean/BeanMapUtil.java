@@ -8,11 +8,13 @@ package com.ciicgat.sdk.util.bean;
 import com.google.common.collect.Maps;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.FatalBeanException;
+import org.springframework.cglib.beans.BeanMap;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -23,7 +25,19 @@ import java.util.Objects;
  */
 public class BeanMapUtil {
 
+    @SuppressWarnings("uncheck")
     public static Map<String, Object> bean2Map(Object bean) {
+        if (bean == null) {
+            return null;
+        }
+        Map<String, Object> map = new HashMap<>();
+
+        BeanMap beanMap = BeanMap.create(bean);
+        map.putAll(beanMap);
+
+        return map;
+    }
+    public static Map<String, Object> bean2Map1(Object bean) {
         if (bean == null) {
             return null;
         }
