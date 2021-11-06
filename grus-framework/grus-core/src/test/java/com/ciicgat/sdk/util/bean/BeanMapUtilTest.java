@@ -9,6 +9,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -87,14 +88,14 @@ public class BeanMapUtilTest {
     }
 
     @Test
-    public void testBean2Map() throws Exception {
+    public void testBean2Map() throws ParseException {
         Bean bean = new Bean();
         bean.setApp("111");
         bean.setNum(4);
         bean.setDate(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"));
 
         Map<String, Object> beanMap = BeanMapUtil.bean2Map(bean);
-        Assert.assertTrue(beanMap.size() == 5);
+        Assert.assertEquals(beanMap.size(), 5);
         Assert.assertEquals("111", beanMap.get("app"));
         Assert.assertEquals(4, beanMap.get("num"));
         Assert.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), beanMap.get("date"));
