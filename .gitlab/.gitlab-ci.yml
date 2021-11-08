@@ -1,6 +1,6 @@
 variables:
   TZ: "Asia/Shanghai"
-  MAVEN_CLI_OPTS: " --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+  MAVEN_CLI_OPTS: " --batch-mode -Dorg.slf4j.simpleLogger.defaultLogLevel=warn"
 
 
 stages:
