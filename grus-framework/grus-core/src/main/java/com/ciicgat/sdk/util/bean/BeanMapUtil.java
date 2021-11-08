@@ -26,7 +26,7 @@ import java.util.Objects;
 public class BeanMapUtil {
 
     @SuppressWarnings("uncheck")
-    public static Map<String, Object> bean2Map(Object bean) {
+    public static Map<String, Object> oldBean2Map(Object bean) {
         if (bean == null) {
             return null;
         }
@@ -37,7 +37,7 @@ public class BeanMapUtil {
 
         return map;
     }
-    public static Map<String, Object> bean2Map1(Object bean) {
+    public static Map<String, Object> bean2Map(Object bean) {
         if (bean == null) {
             return null;
         }
