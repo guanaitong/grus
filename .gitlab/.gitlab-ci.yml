@@ -13,7 +13,7 @@ buildOnJava17:
   stage: buildOnJava17
   script:
     - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
-    - mvn $MAVEN_CLI_OPTS test -Djava.version=17
+    - mvn $MAVEN_CLI_OPTS test -Djava.version=17 -Djacoco.skip=true
 
 buildOnJava11:
   image: maven:3.8.3-eclipse-temurin-11
@@ -21,7 +21,7 @@ buildOnJava11:
   script:
     - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
     - mvn $MAVEN_CLI_OPTS test
-    - mvn $MAVEN_CLI_OPTS verify sonar:sonar -Djacoco.skip=false -Dsonar.projectKey=grus-2 -Dsonar.projectName=grus-2
+    - mvn $MAVEN_CLI_OPTS verify sonar:sonar -Dsonar.projectKey=grus-2 -Dsonar.projectName=grus-2
 
 
 
