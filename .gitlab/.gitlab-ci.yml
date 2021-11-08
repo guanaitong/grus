@@ -8,20 +8,22 @@ stages:
   - buildOnJava11
   - deploy
 
-buildOnJava11:
-  image: maven:3.8.3-eclipse-temurin-11
-  stage: buildOnJava11
-  script:
-    - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
-    - mvn $MAVEN_CLI_OPTS test
-    - mvn $MAVEN_CLI_OPTS verify sonar:sonar -Djacoco.skip=false
-
 buildOnJava17:
   image: maven:3.8.3-eclipse-temurin-17
   stage: buildOnJava17
   script:
     - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
     - mvn $MAVEN_CLI_OPTS test -Djava.version=17
+
+buildOnJava11:
+  image: maven:3.8.3-eclipse-temurin-11
+  stage: buildOnJava11
+  script:
+    - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
+    - mvn $MAVEN_CLI_OPTS test
+    - mvn $MAVEN_CLI_OPTS verify sonar:sonar -Djacoco.skip=false -Dsonar.projectKey=grus-2 -Dsonar.projectName=grus-2
+
+
 
 deploy:
   image: maven:3.8.3-eclipse-temurin-11
