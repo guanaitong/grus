@@ -21,9 +21,9 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -39,14 +39,14 @@ public class TestHttpPostPutService {
     private static MockWebServer mockWebServer;
     private static HttpPostPutService testService;
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         Pair<HttpPostPutService, MockWebServer> pair = TestUtil.newInstance("post-put", HttpPostPutService.class);
         mockWebServer = pair.getRight();
         testService = pair.getLeft();
     }
 
-    @AfterClass
+    @AfterAll
     public static void stop() throws IOException {
         mockWebServer.shutdown();
     }

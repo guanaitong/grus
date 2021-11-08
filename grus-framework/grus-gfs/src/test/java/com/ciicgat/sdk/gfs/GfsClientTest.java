@@ -8,7 +8,6 @@ package com.ciicgat.sdk.gfs;
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -34,8 +33,7 @@ public class GfsClientTest {
     private File imgFile;
     private File audioFile;
 
-    @BeforeAll
-    public void setUp() {
+    public GfsClientTest() {
 
         {
             imgFile = new File(getClass().getClassLoader().getResource("ciicgat-signature.png").getFile());

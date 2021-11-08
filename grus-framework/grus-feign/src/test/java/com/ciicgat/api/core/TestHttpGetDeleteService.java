@@ -13,14 +13,13 @@ import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
 import com.ciicgat.sdk.lang.convert.Pagination;
 import com.ciicgat.sdk.lang.url.UrlCoder;
-import feign.FeignException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -35,14 +34,14 @@ public class TestHttpGetDeleteService {
     private static MockWebServer mockWebServer;
     private static HttpGetDeleteService testService;
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         Pair<HttpGetDeleteService, MockWebServer> pair = TestUtil.newInstance("get-delete", HttpGetDeleteService.class);
         mockWebServer = pair.getRight();
         testService = pair.getLeft();
     }
 
-    @AfterClass
+    @AfterAll
     public static void stop() throws IOException {
         mockWebServer.shutdown();
     }

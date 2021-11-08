@@ -15,9 +15,9 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -30,14 +30,14 @@ public class TestHeaderService {
     private static MockWebServer mockWebServer;
     private static HeaderService testService;
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         Pair<HeaderService, MockWebServer> pair = TestUtil.newInstance("get-delete", HeaderService.class);
         mockWebServer = pair.getRight();
         testService = pair.getLeft();
     }
 
-    @AfterClass
+    @AfterAll
     public static void stop() throws IOException {
         mockWebServer.shutdown();
     }

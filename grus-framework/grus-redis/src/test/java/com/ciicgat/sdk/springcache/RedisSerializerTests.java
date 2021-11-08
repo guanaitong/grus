@@ -138,7 +138,7 @@ public class RedisSerializerTests {
     @Test
     public void testWithException2() {
         GzipRedisSerializer redisSerializer = new GzipRedisSerializer(RedisSerializer.java());
-        Assertions.assertThrows(SerializationException.class, () ->redisSerializer.deserialize(new byte[]{1, 2}));
+        Assertions.assertThrows(SerializationException.class, () -> redisSerializer.deserialize(new byte[]{1, 2}));
     }
 
 }

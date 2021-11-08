@@ -12,9 +12,9 @@ import com.ciicgat.api.core.service.CacheService;
 import feign.Client;
 import feign.Request;
 import feign.Response;
-import org.junit.After;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -37,8 +37,8 @@ public class TestCacheService {
     private static Client mockClient1;
 
 
-    @Before
-    public void init() throws IOException {
+    @BeforeAll
+    public static void init() throws IOException {
         mockClient = Mockito.mock(Client.class);
 
         Request request = Request.create(Request.HttpMethod.GET, "", Collections.emptyMap(), (byte[]) null, null);
@@ -58,11 +58,10 @@ public class TestCacheService {
 
     }
 
-    @After
-    public void clear() {
+    @AfterAll
+    public static void clear() {
         Mockito.reset(mockClient);
         Mockito.reset(mockClient1);
-
         FeignServiceFactory.removeCache(CacheService.class);
     }
 

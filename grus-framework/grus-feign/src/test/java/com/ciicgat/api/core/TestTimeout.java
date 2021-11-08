@@ -13,9 +13,9 @@ import feign.Request;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class TestTimeout {
     private static MockWebServer mockWebServer1;
     private static TimeoutService testService1;
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         Pair<TimeoutService, MockWebServer> pair = TestUtil.newInstance("timeout", TimeoutService.class);
         mockWebServer = pair.getRight();
@@ -45,7 +45,7 @@ public class TestTimeout {
         testService1 = pair1.getLeft();
     }
 
-    @AfterClass
+    @AfterAll
     public static void stop() throws IOException {
         mockWebServer.shutdown();
         mockWebServer1.shutdown();

@@ -12,9 +12,9 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -29,14 +29,14 @@ public class TestQueryMap {
     private static MockWebServer mockWebServer;
     private static QueryMapService queryMapService;
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         Pair<QueryMapService, MockWebServer> pair = TestUtil.newInstance("querymap", QueryMapService.class);
         mockWebServer = pair.getRight();
         queryMapService = pair.getLeft();
     }
 
-    @AfterClass
+    @AfterAll
     public static void stop() throws IOException {
         mockWebServer.shutdown();
     }

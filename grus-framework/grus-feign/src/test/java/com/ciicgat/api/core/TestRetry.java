@@ -12,7 +12,7 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class TestRetry {
 
     private static RetryService retryService;
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         Pair<RetryService, MockWebServer> pair = TestUtil.newInstance("retry", RetryService.class);
         mockWebServer = pair.getRight();

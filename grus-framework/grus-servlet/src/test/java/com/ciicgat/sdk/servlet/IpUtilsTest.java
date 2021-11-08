@@ -28,23 +28,23 @@ public class IpUtilsTest {
 
         when(httpServletRequest.getHeader("X-Forwarded-For")).thenReturn("1.1.1.2,1.1.1.3");
         requestIp = IpUtils.getRequestIp(httpServletRequest);
-        Assertions.assertEquals("1.1.1.2",requestIp);
+        Assertions.assertEquals("1.1.1.2", requestIp);
 
         when(httpServletRequest.getHeader("X-Forwarded-For")).thenReturn(null);
         when(httpServletRequest.getHeader("X-Real-IP")).thenReturn("1.1.1.4");
         requestIp = IpUtils.getRequestIp(httpServletRequest);
-        Assertions.assertEquals("1.1.1.4",requestIp);
+        Assertions.assertEquals("1.1.1.4", requestIp);
 
         when(httpServletRequest.getHeader("X-Forwarded-For")).thenReturn(null);
         when(httpServletRequest.getHeader("X-Real-IP")).thenReturn(null);
         when(httpServletRequest.getRemoteAddr()).thenReturn("remote");
         requestIp = IpUtils.getRequestIp(httpServletRequest);
-        Assertions.assertEquals("remote",requestIp);
+        Assertions.assertEquals("remote", requestIp);
 
         when(httpServletRequest.getHeader("X-Forwarded-For")).thenReturn("unKnown");
         when(httpServletRequest.getHeader("X-Real-IP")).thenReturn("unKnown");
         when(httpServletRequest.getRemoteAddr()).thenReturn("remote");
         requestIp = IpUtils.getRequestIp(httpServletRequest);
-        Assertions.assertEquals("remote",requestIp);
+        Assertions.assertEquals("remote", requestIp);
     }
 }

@@ -14,9 +14,9 @@ import com.ciicgat.sdk.lang.convert.ApiResponse;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -30,14 +30,14 @@ public class TestOptionalService {
     private static MockWebServer mockWebServer;
     private static OptionalService optionalService;
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         Pair<OptionalService, MockWebServer> pair = TestUtil.newInstance("optional", OptionalService.class);
         mockWebServer = pair.getRight();
         optionalService = pair.getLeft();
     }
 
-    @AfterClass
+    @AfterAll
     public static void stop() throws IOException {
         mockWebServer.shutdown();
     }
