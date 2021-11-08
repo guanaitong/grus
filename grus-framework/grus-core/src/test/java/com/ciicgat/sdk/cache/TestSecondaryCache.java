@@ -79,7 +79,7 @@ public class TestSecondaryCache {
     }
 
     @Test
-    public void testGet_miss_Cache_withException(){
+    public void testGet_miss_Cache_withException() {
         final Person person = new Person();
         person.setId(1);
         person.setMemberId(3);
