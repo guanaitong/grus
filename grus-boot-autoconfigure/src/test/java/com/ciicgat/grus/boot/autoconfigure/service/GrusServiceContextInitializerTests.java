@@ -9,7 +9,7 @@ import com.ciicgat.grus.boot.autoconfigure.core.GrusCoreContextInitializer;
 import com.ciicgat.grus.service.GrusRuntimeContext;
 import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.sdk.util.system.Systems;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;

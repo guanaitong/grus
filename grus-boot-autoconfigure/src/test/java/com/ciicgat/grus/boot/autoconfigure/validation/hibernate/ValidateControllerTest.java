@@ -7,15 +7,15 @@ package com.ciicgat.grus.boot.autoconfigure.validation.hibernate;
 
 import com.ciicgat.grus.json.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -27,7 +27,7 @@ import java.util.List;
  * @author wanchongyang
  * @date 2020/5/9 4:55 下午
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = HibernateValidationApplication.class,
         properties = {"spring.application.name=grus-demo", "grus.hibernate.validator.enabled=true"})
 @AutoConfigureMockMvc
@@ -35,17 +35,19 @@ public class ValidateControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Test(expected = ConstraintViolationException.class)
+    @Test
     public void testRequestParams() throws Throwable {
         MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post("/validate/testRequestParams")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .accept(MediaType.APPLICATION_JSON);
 
-        try {
-            mockMvc.perform(post);
-        } catch (Exception ex) {
-            throw ex.getCause();
-        }
+        Assertions.assertThrows(ConstraintViolationException.class, () -> {
+            try {
+                mockMvc.perform(post);
+            } catch (Exception ex) {
+                throw ex.getCause();
+            }
+        });
     }
 
     @Test
@@ -57,8 +59,8 @@ public class ValidateControllerTest {
         try {
             mockMvc.perform(post);
         } catch (Exception ex) {
-            Assert.assertTrue(ex.getCause() instanceof ConstraintViolationException);
-            Assert.assertTrue(ex.getMessage().contains("null"));
+            Assertions.assertTrue(ex.getCause() instanceof ConstraintViolationException);
+            Assertions.assertTrue(ex.getMessage().contains("null"));
         }
     }
 
@@ -72,12 +74,12 @@ public class ValidateControllerTest {
         MockHttpServletResponse response = mockMvc.perform(post).andReturn().getResponse();
         response.setCharacterEncoding("UTF-8");
         String content = response.getContentAsString();
-        Assert.assertTrue(content.contains("personId"));
-        Assert.assertTrue(content.contains("null"));
+        Assertions.assertTrue(content.contains("personId"));
+        Assertions.assertTrue(content.contains("null"));
 
         List<String> errorMsgList = JSON.parse(content, new TypeReference<>() {
         });
-        Assert.assertEquals(1, errorMsgList.size());
+        Assertions.assertEquals(1, errorMsgList.size());
 
         // 参数有效，验证通过
         post = MockMvcRequestBuilders.post("/validate/testFormData")
@@ -89,11 +91,11 @@ public class ValidateControllerTest {
         response = mockMvc.perform(post).andReturn().getResponse();
         response.setCharacterEncoding("UTF-8");
         content = response.getContentAsString();
-        Assert.assertEquals("[]", content);
+        Assertions.assertEquals("[]", content);
 
         errorMsgList = JSON.parse(content, new TypeReference<>() {
         });
-        Assert.assertTrue(errorMsgList.isEmpty());
+        Assertions.assertTrue(errorMsgList.isEmpty());
     }
 
     @Test
@@ -115,11 +117,11 @@ public class ValidateControllerTest {
         MockHttpServletResponse response = mockMvc.perform(post).andReturn().getResponse();
         response.setCharacterEncoding("UTF-8");
         String content = response.getContentAsString();
-        Assert.assertTrue(content.contains("personPlusRequest.portrait"));
-        Assert.assertTrue(content.contains("URL"));
+        Assertions.assertTrue(content.contains("personPlusRequest.portrait"));
+        Assertions.assertTrue(content.contains("URL"));
 
         List<String> errorMsgList = JSON.parse(content, new TypeReference<>() {
         });
-        Assert.assertEquals(1, errorMsgList.size());
+        Assertions.assertEquals(1, errorMsgList.size());
     }
 }

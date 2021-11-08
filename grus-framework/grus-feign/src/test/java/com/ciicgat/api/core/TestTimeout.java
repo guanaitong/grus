@@ -14,9 +14,9 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.AfterClass;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -66,8 +66,8 @@ public class TestTimeout {
         } catch (FeignException e1) {
             e = e1;
         }
-        Assert.assertNotNull(e);
-        Assert.assertTrue(e.getCause() instanceof SocketTimeoutException);
+        Assertions.assertNotNull(e);
+        Assertions.assertTrue(e.getCause() instanceof SocketTimeoutException);
 
     }
 
@@ -84,7 +84,7 @@ public class TestTimeout {
                 .setResponseCode(200);
         mockWebServer.enqueue(mockResponse);
         int j = testService.get();
-        Assert.assertEquals(i, j);
+        Assertions.assertEquals(i, j);
     }
 
     @Test
@@ -100,10 +100,10 @@ public class TestTimeout {
                 .setResponseCode(200);
         mockWebServer1.enqueue(mockResponse);
         int j = testService1.get();
-        Assert.assertEquals(i, j);
+        Assertions.assertEquals(i, j);
     }
 
-    @Test(expected = FeignException.class)
+    @Test
     public void testConfigNotTimeOut() {
         int i = new Random().nextInt(100000);
         MockResponse mockResponse = new MockResponse()
@@ -112,7 +112,6 @@ public class TestTimeout {
                 .setBody(String.valueOf(i))
                 .setResponseCode(200);
         mockWebServer1.enqueue(mockResponse);
-        int j = testService1.get();
-        Assert.assertEquals(i, j);
+        Assertions.assertThrows(FeignException.class, () -> testService1.get());
     }
 }

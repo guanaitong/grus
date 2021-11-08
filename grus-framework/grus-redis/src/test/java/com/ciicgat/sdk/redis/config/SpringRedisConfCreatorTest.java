@@ -9,8 +9,8 @@ import com.ciicgat.sdk.gconf.ConfigCollection;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
 import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.lang.tool.Bytes;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -36,7 +36,7 @@ public class SpringRedisConfCreatorTest {
 
         execute(redisConnectionFactory, redisConnection -> redisConnection.set(key, value));
         byte[] value2 = execute(redisConnectionFactory, redisConnection -> redisConnection.get(key));
-        Assert.assertArrayEquals(value, value2);
+        Assertions.assertArrayEquals(value, value2);
     }
 
 

@@ -5,16 +5,16 @@
 
 package com.ciicgat.grus.boot.autoconfigure.feign;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Created by August.Zhou on 2019-04-02 9:45.
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
         classes = FeignApplication.class,
         properties = {"spring.application.name=grus-demo", "grus.feign.log-req=true"})
@@ -29,9 +29,9 @@ public class FeignAutoConfigurationTests {
 
     @Test
     public void test() {
-        Assert.assertNotNull(personService);
-        Assert.assertNotNull(personService2);
-        Assert.assertSame(personService2.getPersonById(1), personService2.getPersonById(1));
+        Assertions.assertNotNull(personService);
+        Assertions.assertNotNull(personService2);
+        Assertions.assertSame(personService2.getPersonById(1), personService2.getPersonById(1));
     }
 
 }

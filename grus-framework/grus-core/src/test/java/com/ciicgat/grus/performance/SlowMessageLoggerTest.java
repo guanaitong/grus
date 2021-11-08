@@ -6,8 +6,8 @@
 package com.ciicgat.grus.performance;
 
 import com.ciicgat.grus.core.Module;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by August.Zhou on 2019-06-26 13:54.
@@ -17,13 +17,13 @@ public class SlowMessageLoggerTest {
     @Test
     public void test() {
         Module module = Module.HTTP_CLIENT;
-        Assert.assertFalse(SlowLogger.logEvent(module, 1, "xxxx"));
-        Assert.assertFalse(SlowLogger.logEvent(module, 50, "xxxx"));
-        Assert.assertFalse(SlowLogger.logEvent(module, 60, "xxxx"));
-        Assert.assertFalse(SlowLogger.logEvent(module, 300, "xxxx"));
-        Assert.assertTrue(SlowLogger.logEvent(module, 350, "xxxx"));
-        Assert.assertTrue(SlowLogger.logEvent(module, 2500, "xxxx"));
-        Assert.assertTrue(SlowLogger.logEvent(module, 3500, "xxxx"));
+        Assertions.assertFalse(SlowLogger.logEvent(module, 1, "xxxx"));
+        Assertions.assertFalse(SlowLogger.logEvent(module, 50, "xxxx"));
+        Assertions.assertFalse(SlowLogger.logEvent(module, 60, "xxxx"));
+        Assertions.assertFalse(SlowLogger.logEvent(module, 300, "xxxx"));
+        Assertions.assertTrue(SlowLogger.logEvent(module, 350, "xxxx"));
+        Assertions.assertTrue(SlowLogger.logEvent(module, 2500, "xxxx"));
+        Assertions.assertTrue(SlowLogger.logEvent(module, 3500, "xxxx"));
 
 
     }
@@ -37,13 +37,13 @@ public class SlowMessageLoggerTest {
 
         boolean alertLevel = level.biggerThan(module.getAlertLevel());
 
-        Assert.assertTrue(alertLevel);
+        Assertions.assertTrue(alertLevel);
 
         level = module.getLevelByDuration(1500);
 
         alertLevel = level.biggerThan(module.getAlertLevel());
 
-        Assert.assertFalse(alertLevel);
+        Assertions.assertFalse(alertLevel);
 
 
     }

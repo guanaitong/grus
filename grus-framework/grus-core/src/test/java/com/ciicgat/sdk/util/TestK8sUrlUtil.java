@@ -5,8 +5,8 @@
 
 package com.ciicgat.sdk.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author wanchongyang
@@ -17,6 +17,6 @@ public class TestK8sUrlUtil {
     public void test() {
         String url = "http://userdoor.services.dev.ofc/person/get";
         String convertUrl = K8sUrlUtil.convert(url);
-        Assert.assertSame(url, convertUrl);
+        Assertions.assertSame(url, convertUrl);
     }
 }

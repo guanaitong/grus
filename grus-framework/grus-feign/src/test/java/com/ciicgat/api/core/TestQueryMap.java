@@ -13,9 +13,9 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.AfterClass;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -57,7 +57,7 @@ public class TestQueryMap {
         Map<String, Object> map = new HashMap<>();
         map.put("other", 123123);
         Boolean r = queryMapService.get("asdfasdfasdf", map);
-        Assert.assertTrue(r);
+        Assertions.assertTrue(r);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -65,8 +65,8 @@ public class TestQueryMap {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/send?parameterName=asdfasdfasdf&other=123123", recordedRequest.getPath());
-        Assert.assertEquals("GET", recordedRequest.getMethod());
+        Assertions.assertEquals("/send?parameterName=asdfasdfasdf&other=123123", recordedRequest.getPath());
+        Assertions.assertEquals("GET", recordedRequest.getMethod());
 
 
     }
@@ -87,7 +87,7 @@ public class TestQueryMap {
         Map<String, Object> map = new HashMap<>();
         map.put("other", 123123);
         Boolean r = queryMapService.post("asdfasdfasdf", map);
-        Assert.assertTrue(r);
+        Assertions.assertTrue(r);
 
 
         RecordedRequest recordedRequest = null;
@@ -96,10 +96,10 @@ public class TestQueryMap {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/send?other=123123", recordedRequest.getPath());
-        Assert.assertEquals("POST", recordedRequest.getMethod());
+        Assertions.assertEquals("/send?other=123123", recordedRequest.getPath());
+        Assertions.assertEquals("POST", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("parameterName=asdfasdfasdf", bodyString);
+        Assertions.assertEquals("parameterName=asdfasdfasdf", bodyString);
 
     }
 

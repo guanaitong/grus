@@ -8,7 +8,7 @@ package com.ciicgat.grus.boot.autoconfigure.validation.validate;
 import com.ciicgat.grus.boot.autoconfigure.validation.ValidationAroundAdvice;
 import com.ciicgat.grus.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.validation.ValidationPointcutAdvisor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;

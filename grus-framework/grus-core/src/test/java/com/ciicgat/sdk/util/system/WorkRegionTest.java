@@ -5,8 +5,8 @@
 
 package com.ciicgat.sdk.util.system;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Stanley Shen stanley.shen@guanaitong.com
@@ -19,16 +19,16 @@ public class WorkRegionTest {
      */
     @Test
     public void isTest() {
-        Assert.assertFalse(WorkRegion.getCurrentWorkRegion().isTest());
+        Assertions.assertFalse(WorkRegion.getCurrentWorkRegion().isTest());
     }
 
     @Test
     public void isDevelop() {
-        Assert.assertTrue(WorkRegion.getCurrentWorkRegion().isDevelop());
+        Assertions.assertTrue(WorkRegion.getCurrentWorkRegion().isDevelop());
     }
 
     @Test
     public void isDevelopOrTest() {
-        Assert.assertTrue(WorkRegion.getCurrentWorkRegion().isDevelopOrTest());
+        Assertions.assertTrue(WorkRegion.getCurrentWorkRegion().isDevelopOrTest());
     }
 }

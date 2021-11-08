@@ -8,19 +8,19 @@ package com.ciicgat.grus.boot.autoconfigure.zk;
 import com.ciicgat.grus.idgen.IdGenerator;
 import com.ciicgat.grus.lock.DistLock;
 import com.ciicgat.grus.lock.DistLockFactory;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.concurrent.TimeUnit;
 
 /**
  * Created by August.Zhou on 2019-04-08 13:44.
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
         properties = {"spring.application.name=grus-demo", "grus.idgen.dateFormat=yyMMdd", "grus.zk.serverLists=app-zk.servers.dev.ofc:2181", "grus.zk.namespace=grus-test-job"})
 public class ZKConfigurationTests {
@@ -34,10 +34,10 @@ public class ZKConfigurationTests {
     @Test
     public void testIdGen() {
         String orderNo = idGenerator.makeNo();
-        Assert.assertNotNull(orderNo);
+        Assertions.assertNotNull(orderNo);
 
         long id = idGenerator.makeId();
-        Assert.assertTrue(id > 0);
+        Assertions.assertTrue(id > 0);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class ZKConfigurationTests {
         distLock.acquire();
         distLock.release();
         boolean result = distLock.tryAcquire(1, TimeUnit.SECONDS);
-        Assert.assertTrue(result);
+        Assertions.assertTrue(result);
         distLock.release();
     }
 }

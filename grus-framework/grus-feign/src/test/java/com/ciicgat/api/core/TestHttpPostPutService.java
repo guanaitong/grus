@@ -22,9 +22,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.AfterClass;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class TestHttpPostPutService {
                 .setBody(JSON.toJSONString(bean1));
         mockWebServer.enqueue(mockResponse);
         TestBean bean = testService.post("我的xx@", 456);
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -71,10 +71,10 @@ public class TestHttpPostPutService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/post", recordedRequest.getPath());
-        Assert.assertEquals("POST", recordedRequest.getMethod());
+        Assertions.assertEquals("/post", recordedRequest.getPath());
+        Assertions.assertEquals("POST", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("text=" + UrlCoder.encode("我的xx@") +
+        Assertions.assertEquals("text=" + UrlCoder.encode("我的xx@") +
                 "&integer=" + 456, bodyString);
     }
 
@@ -90,7 +90,7 @@ public class TestHttpPostPutService {
                 .setBody(JSON.toJSONString(bean1));
         mockWebServer.enqueue(mockResponse);
         TestBean bean = testService.postWithUrlParams("我的xx@", 456);
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -98,10 +98,10 @@ public class TestHttpPostPutService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/postWithUrlParams?text=" + UrlCoder.encode("我的xx@"), recordedRequest.getPath());
-        Assert.assertEquals("POST", recordedRequest.getMethod());
+        Assertions.assertEquals("/postWithUrlParams?text=" + UrlCoder.encode("我的xx@"), recordedRequest.getPath());
+        Assertions.assertEquals("POST", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("integer=" + 456, bodyString);
+        Assertions.assertEquals("integer=" + 456, bodyString);
     }
 
     @Test
@@ -117,7 +117,7 @@ public class TestHttpPostPutService {
         mockWebServer.enqueue(mockResponse);
         BodyBean bodyBean = new BodyBean("我的xx@", 456);
         TestBean bean = testService.postBean(bodyBean);
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -125,10 +125,10 @@ public class TestHttpPostPutService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/postBean", recordedRequest.getPath());
-        Assert.assertEquals("POST", recordedRequest.getMethod());
+        Assertions.assertEquals("/postBean", recordedRequest.getPath());
+        Assertions.assertEquals("POST", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("integer=" + 456 + "&text=" + UrlCoder.encode("我的xx@"), bodyString);
+        Assertions.assertEquals("integer=" + 456 + "&text=" + UrlCoder.encode("我的xx@"), bodyString);
     }
 
     @Test
@@ -147,7 +147,7 @@ public class TestHttpPostPutService {
         list.add(2);
         BodyBean2 bodyBean = new BodyBean2("我的xx@", 456, list);
         TestBean bean = testService.postBean2(bodyBean);
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -155,10 +155,10 @@ public class TestHttpPostPutService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/postBean2", recordedRequest.getPath());
-        Assert.assertEquals("POST", recordedRequest.getMethod());
+        Assertions.assertEquals("/postBean2", recordedRequest.getPath());
+        Assertions.assertEquals("POST", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("idList=" + UrlCoder.encode("1,2") + "&integer=" + 456 + "&text=" + UrlCoder.encode("我的xx@"), bodyString);
+        Assertions.assertEquals("idList=" + UrlCoder.encode("1,2") + "&integer=" + 456 + "&text=" + UrlCoder.encode("我的xx@"), bodyString);
     }
 
     @Test
@@ -174,7 +174,7 @@ public class TestHttpPostPutService {
         mockWebServer.enqueue(mockResponse);
         BodyBean bodyBean = new BodyBean("我的xx@", 456);
         TestBean bean = testService.postJson(bodyBean);
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -182,10 +182,10 @@ public class TestHttpPostPutService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/postJson", recordedRequest.getPath());
-        Assert.assertEquals("POST", recordedRequest.getMethod());
+        Assertions.assertEquals("/postJson", recordedRequest.getPath());
+        Assertions.assertEquals("POST", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals(bodyString, JSON.toJSONString(bodyBean));
+        Assertions.assertEquals(bodyString, JSON.toJSONString(bodyBean));
     }
 
     @Test
@@ -201,7 +201,7 @@ public class TestHttpPostPutService {
         mockWebServer.enqueue(mockResponse);
         BodyBean bodyBean = new BodyBean("我的xx@", 456);
         TestBean bean = testService.postJsonWithUrlParams("xxxyyy", bodyBean);
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -209,10 +209,10 @@ public class TestHttpPostPutService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/postJsonWithUrlParams?text=xxxyyy", recordedRequest.getPath());
-        Assert.assertEquals("POST", recordedRequest.getMethod());
+        Assertions.assertEquals("/postJsonWithUrlParams?text=xxxyyy", recordedRequest.getPath());
+        Assertions.assertEquals("POST", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals(bodyString, JSON.toJSONString(bodyBean));
+        Assertions.assertEquals(bodyString, JSON.toJSONString(bodyBean));
     }
 
     @Test
@@ -227,7 +227,7 @@ public class TestHttpPostPutService {
                 .setBody(JSON.toJSONString(bean1));
         mockWebServer.enqueue(mockResponse);
         TestBean bean = testService.put("我的xx@", 456);
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -235,10 +235,10 @@ public class TestHttpPostPutService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/put", recordedRequest.getPath());
-        Assert.assertEquals("PUT", recordedRequest.getMethod());
+        Assertions.assertEquals("/put", recordedRequest.getPath());
+        Assertions.assertEquals("PUT", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("text=" + UrlCoder.encode("我的xx@") +
+        Assertions.assertEquals("text=" + UrlCoder.encode("我的xx@") +
                 "&integer=" + 456, bodyString);
     }
 
@@ -255,7 +255,7 @@ public class TestHttpPostPutService {
         mockWebServer.enqueue(mockResponse);
         List<String> stringList = Arrays.asList("我的xx@111", "我的xx@222");
         TestBean bean = testService.postWithListParams(stringList, 456);
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -263,10 +263,10 @@ public class TestHttpPostPutService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/postWithListParams", recordedRequest.getPath());
-        Assert.assertEquals("POST", recordedRequest.getMethod());
+        Assertions.assertEquals("/postWithListParams", recordedRequest.getPath());
+        Assertions.assertEquals("POST", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("texts=" + UrlCoder.encode(StringUtils.join(stringList, ",")) +
+        Assertions.assertEquals("texts=" + UrlCoder.encode(StringUtils.join(stringList, ",")) +
                 "&integer=" + 456, bodyString);
     }
 
@@ -279,7 +279,7 @@ public class TestHttpPostPutService {
                 .setBody("");
         mockWebServer.enqueue(mockResponse);
         TestBean bean = testService.requestWithDate(dateBean);
-        Assert.assertNull(bean);
+        Assertions.assertNull(bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -287,9 +287,9 @@ public class TestHttpPostPutService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/requestWithDate", recordedRequest.getPath());
-        Assert.assertEquals("POST", recordedRequest.getMethod());
+        Assertions.assertEquals("/requestWithDate", recordedRequest.getPath());
+        Assertions.assertEquals("POST", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertTrue(bodyString.contains(UrlCoder.encode("2020-01-01 00:00:00")));
+        Assertions.assertTrue(bodyString.contains(UrlCoder.encode("2020-01-01 00:00:00")));
     }
 }

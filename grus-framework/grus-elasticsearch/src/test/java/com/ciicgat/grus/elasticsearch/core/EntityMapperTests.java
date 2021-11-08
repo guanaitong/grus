@@ -6,8 +6,8 @@
 package com.ciicgat.grus.elasticsearch.core;
 
 import com.ciicgat.grus.elasticsearch.Message;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
@@ -27,8 +27,8 @@ public class EntityMapperTests {
         message.setDocIndex("as;ldjfsadf");
 
         String s = entityMapper.mapToString(message);
-        Assert.assertTrue(!s.contains("docId"));
-        Assert.assertTrue(!s.contains("docIndex"));
+        Assertions.assertTrue(!s.contains("docId"));
+        Assertions.assertTrue(!s.contains("docIndex"));
         System.out.println(s);
     }
 }

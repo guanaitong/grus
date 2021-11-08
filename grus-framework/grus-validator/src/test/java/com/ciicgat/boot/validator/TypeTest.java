@@ -5,8 +5,8 @@
 
 package com.ciicgat.boot.validator;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
@@ -17,9 +17,9 @@ public class TypeTest {
 
     @Test
     public void test() throws Exception {
-        Assert.assertTrue(ObjectValidator.isIterableType(ArrayList.class));
-        Assert.assertFalse(ObjectValidator.isIterableType(String.class));
-        Assert.assertTrue(ObjectValidator.isArrayType(String[].class));
+        Assertions.assertTrue(ObjectValidator.isIterableType(ArrayList.class));
+        Assertions.assertFalse(ObjectValidator.isIterableType(String.class));
+        Assertions.assertTrue(ObjectValidator.isArrayType(String[].class));
 
         Class<?> componentType = String[].class.getComponentType();
         System.out.println(componentType);

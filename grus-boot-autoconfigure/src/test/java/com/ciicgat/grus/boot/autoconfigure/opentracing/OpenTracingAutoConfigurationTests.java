@@ -8,7 +8,7 @@ package com.ciicgat.grus.boot.autoconfigure.opentracing;
 import com.ciicgat.grus.boot.autoconfigure.condition.ServerEnvCondition;
 import com.ciicgat.grus.boot.autoconfigure.core.GrusCoreContextInitializer;
 import io.opentracing.contrib.tracerresolver.TracerFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -5,8 +5,8 @@
 
 package com.ciicgat.sdk.lang.digest;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Base64;
 import java.util.Random;
@@ -23,7 +23,7 @@ public class TestAESCrypt {
         new Random().nextBytes(random);
         String plainText = Base64.getEncoder().encodeToString(random);
         String text = AESCrypt.encode(key, plainText);
-        Assert.assertEquals(plainText, AESCrypt.decode(key, text));
+        Assertions.assertEquals(plainText, AESCrypt.decode(key, text));
     }
 
 
@@ -33,7 +33,7 @@ public class TestAESCrypt {
         byte[] random = new byte[new Random().nextInt(1000)];
         new Random().nextBytes(random);
         byte[] text = AESCrypt.encode(key, random);
-        Assert.assertArrayEquals(random, AESCrypt.decode(key, text));
+        Assertions.assertArrayEquals(random, AESCrypt.decode(key, text));
     }
 
 }

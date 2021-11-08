@@ -5,8 +5,8 @@
 
 package com.ciicgat.sdk.util.concurrent;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Iterator;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -62,7 +62,7 @@ public class LoopAtomicLongTest {
         }
 
         for (int i = 0; i < maxSequence; i++) {
-            Assert.assertEquals(threadNums * maxSequence, times[i]);
+            Assertions.assertEquals(threadNums * maxSequence, times[i]);
         }
     }
 }

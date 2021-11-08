@@ -5,8 +5,8 @@
 
 package com.ciicgat.grus.idgen;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -35,10 +35,10 @@ public class SnowflakeIdGeneratorTest {
         Set<String> set = new HashSet<>();
         for (int i = 0; i < 10000; i++) {
             String orderNo = generator.makeNo();
-            Assert.assertEquals(24, orderNo.length());
+            Assertions.assertEquals(24, orderNo.length());
             set.add(orderNo);
         }
-        Assert.assertEquals(10000, set.size());
+        Assertions.assertEquals(10000, set.size());
     }
 
     @Test
@@ -51,6 +51,6 @@ public class SnowflakeIdGeneratorTest {
             Long id = generator.makeId();
             set.add(id);
         }
-        Assert.assertEquals(10000, set.size());
+        Assertions.assertEquals(10000, set.size());
     }
 }

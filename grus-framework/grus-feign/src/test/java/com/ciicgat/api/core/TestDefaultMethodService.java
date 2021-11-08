@@ -16,9 +16,9 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.AfterClass;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
@@ -56,7 +56,7 @@ public class TestDefaultMethodService {
         mockWebServer.enqueue(mockResponse);
 
         TestBean bean = testService.get1("我的xx@", 456);
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -66,9 +66,9 @@ public class TestDefaultMethodService {
         }
 
         //path encode的时候，
-        Assert.assertEquals("/get/" + UrlCoder.encode("我的xx@") + "?count=456", recordedRequest.getPath());
-        Assert.assertEquals("GET", recordedRequest.getMethod());
+        Assertions.assertEquals("/get/" + UrlCoder.encode("我的xx@") + "?count=456", recordedRequest.getPath());
+        Assertions.assertEquals("GET", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("", bodyString);
+        Assertions.assertEquals("", bodyString);
     }
 }

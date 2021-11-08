@@ -5,9 +5,9 @@
 
 package com.ciicgat.grus.boot.autoconfigure.web.logger;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 import org.springframework.aop.framework.AopProxy;
 import org.springframework.aop.framework.DefaultAopProxyFactory;
@@ -24,7 +24,7 @@ public class GrusWebLogPrinterTest {
     private WebLogController3 webLogController3;
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         grusWebLogPrinter.LOGGER = testLogger;
         DefaultAopProxyFactory proxyFactory = new DefaultAopProxyFactory();
@@ -50,41 +50,41 @@ public class GrusWebLogPrinterTest {
         webLogController.test("id", null, null);
         String msg = testLogger.getMsg();
 
-        Assert.assertEquals(msg, "WEB_REQ METHOD: WebLogController.test PARAM: [\"id\"]\n" +
+        Assertions.assertEquals(msg, "WEB_REQ METHOD: WebLogController.test PARAM: [\"id\"]\n" +
                 "WEB_RSP METHOD: WebLogController.test RESULT: {\"code\":0,\"msg\":\"OK\",\"data\":\"I am OK ...\"}");
         webLogController.test1("id1", null);
         msg = testLogger.getMsg();
-        Assert.assertEquals(msg, "WEB_REQ METHOD: WebLogController.test1 PARAM: [\"id1\",null]\n" +
+        Assertions.assertEquals(msg, "WEB_REQ METHOD: WebLogController.test1 PARAM: [\"id1\",null]\n" +
                 "WEB_RSP METHOD: WebLogController.test1 RESULT: {\"code\":0,\"msg\":\"OK\",\"data\":\"I am OK2 ...\"}");
         webLogController.test2("id1", "id2", "id3");
         msg = testLogger.getMsg();
-        Assert.assertEquals(msg, "WEB_REQ METHOD: WebLogController.test2 PARAM: [\"id1\",\"id3\"]\n" +
+        Assertions.assertEquals(msg, "WEB_REQ METHOD: WebLogController.test2 PARAM: [\"id1\",\"id3\"]\n" +
                 "WEB_RSP METHOD: WebLogController.test2 RESULT: null");
         webLogController.test3("id3");
         msg = testLogger.getMsg();
-        Assert.assertEquals(msg, "WEB_REQ METHOD: WebLogController.test3 PARAM: [\"id3\"]\n" +
+        Assertions.assertEquals(msg, "WEB_REQ METHOD: WebLogController.test3 PARAM: [\"id3\"]\n" +
                 "WEB_RSP METHOD: WebLogController.test3 RESULT: {\"code\":0,\"msg\":\"OK\",\"data\":\"I am OK3 ...\"}");
         webLogController.test4("id");
         msg = testLogger.getMsg();
-        Assert.assertEquals(msg, "");
+        Assertions.assertEquals(msg, "");
         try {
             webLogController.test5("id");
-            Assert.fail();
+            Assertions.fail();
         } catch (Exception e) {
             msg = testLogger.getMsg();
-            Assert.assertEquals(msg, "WEB_EX METHOD: WebLogController.test5 ERROR");
+            Assertions.assertEquals(msg, "WEB_EX METHOD: WebLogController.test5 ERROR");
         }
 
 
         webLogController2.test("id");
         msg = testLogger.getMsg();
-        Assert.assertEquals(msg, "");
+        Assertions.assertEquals(msg, "");
         webLogController3.test("id");
         msg = testLogger.getMsg();
-        Assert.assertEquals(msg, "");
+        Assertions.assertEquals(msg, "");
 
         msg = testLogger.getMsg();
-        Assert.assertEquals(msg, "");
+        Assertions.assertEquals(msg, "");
     }
 
 }

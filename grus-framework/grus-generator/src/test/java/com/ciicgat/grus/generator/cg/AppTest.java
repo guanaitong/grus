@@ -5,7 +5,7 @@
 
 package com.ciicgat.grus.generator.cg;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Clive Yuan

@@ -6,9 +6,9 @@
 package com.ciicgat.grus.excel;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -177,13 +177,13 @@ public class ExcelUtilsTest {
 
         List<TestExcelBo> list = ExcelUtils.readExcel(inputStream, TestExcelBo.class);
 
-        Assert.assertEquals(4, list.size());
-        Assert.assertEquals("张三", list.get(0).getName());
-        Assert.assertEquals(null, list.get(3).getName()); // 允许将空单元格读出来
-        Assert.assertEquals(25, list.get(1).getAge());
-        Assert.assertEquals(true, list.get(1).getParty());
-        Assert.assertEquals(DateUtils.parseDate("1991-11-10 10:00:13", "yyyy-MM-dd HH:mm:ss"), list.get(2).getBirth());
-        Assert.assertEquals(BigDecimal.valueOf(79.85), list.get(3).getWeight());
+        Assertions.assertEquals(4, list.size());
+        Assertions.assertEquals("张三", list.get(0).getName());
+        Assertions.assertEquals(null, list.get(3).getName()); // 允许将空单元格读出来
+        Assertions.assertEquals(25, list.get(1).getAge());
+        Assertions.assertEquals(true, list.get(1).getParty());
+        Assertions.assertEquals(DateUtils.parseDate("1991-11-10 10:00:13", "yyyy-MM-dd HH:mm:ss"), list.get(2).getBirth());
+        Assertions.assertEquals(BigDecimal.valueOf(79.85), list.get(3).getWeight());
     }
 
     @Test
@@ -196,9 +196,9 @@ public class ExcelUtilsTest {
 
         List<TestExcelBo> list = ExcelUtils.readExcel(inputStream, TestExcelBo.class);
 
-        Assert.assertEquals(2, list.size());
-        Assert.assertEquals(dataList.get(0), list.get(0));
-        Assert.assertEquals(dataList.get(1), list.get(1));
+        Assertions.assertEquals(2, list.size());
+        Assertions.assertEquals(dataList.get(0), list.get(0));
+        Assertions.assertEquals(dataList.get(1), list.get(1));
     }
 
     @Test
@@ -210,8 +210,8 @@ public class ExcelUtilsTest {
 
         List<List<?>> list = ExcelUtils.readExcelMultiSheets(inputStream, Arrays.asList(TestExcelBo.class, TestExcelBo2.class));
 
-        Assert.assertEquals(2, list.size());
-        Assert.assertEquals(dataList.get(0), list.get(0).get(0));
+        Assertions.assertEquals(2, list.size());
+        Assertions.assertEquals(dataList.get(0), list.get(0).get(0));
     }
 
 }

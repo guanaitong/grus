@@ -5,8 +5,8 @@
 
 package com.ciicgat.sdk.lang.convert;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
@@ -18,8 +18,8 @@ public class TestPageInfo {
     @Test
     public void test() {
         PageInfo<String> pageInfo = new PageInfo<>(2, 25);
-        Assert.assertEquals(pageInfo.getStart(), 25);
-        Assert.assertEquals(pageInfo.getEnd(), 50);
+        Assertions.assertEquals(pageInfo.getStart(), 25);
+        Assertions.assertEquals(pageInfo.getEnd(), 50);
 
         pageInfo.setOrder(PageInfo.ASC);
         pageInfo.setOrderBy("name");
@@ -27,11 +27,11 @@ public class TestPageInfo {
         System.out.println(pageInfo.toString());
 
 
-        Assert.assertNotNull(pageInfo.toString());
+        Assertions.assertNotNull(pageInfo.toString());
         PageInfo<String> pageInfo1 = new PageInfo<>();
 
-        Assert.assertEquals(pageInfo1.getStart(), 0);
-        Assert.assertEquals(pageInfo1.getEnd(), 25);
+        Assertions.assertEquals(pageInfo1.getStart(), 0);
+        Assertions.assertEquals(pageInfo1.getEnd(), 25);
 
     }
 }

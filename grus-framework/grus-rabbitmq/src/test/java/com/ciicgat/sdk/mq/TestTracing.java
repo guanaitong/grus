@@ -19,15 +19,15 @@ import io.opentracing.Tracer;
 import io.opentracing.propagation.Format;
 import io.opentracing.tag.Tags;
 import io.opentracing.util.GlobalTracer;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
 public class TestTracing {
 
-    @BeforeClass
+    @BeforeAll
     public static void registerJaegerTracer() {
         Configuration.SenderConfiguration senderConfiguration =
                 new Configuration
@@ -66,10 +66,10 @@ public class TestTracing {
         Map<String, Object> headerMap = properties.getHeaders();
 
         String traceHeader = String.valueOf(headerMap.get("uber-trace-id"));
-        Assert.assertNotNull(traceHeader);
+        Assertions.assertNotNull(traceHeader);
 
         SpanContext spanContext = tracer.extract(Format.Builtin.TEXT_MAP, new MapHeadersAdapter(properties.getHeaders()));
-        Assert.assertTrue(traceHeader.contains(spanContext.toTraceId()));
+        Assertions.assertTrue(traceHeader.contains(spanContext.toTraceId()));
     }
 
 }

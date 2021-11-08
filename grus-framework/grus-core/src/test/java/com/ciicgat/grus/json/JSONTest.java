@@ -9,8 +9,8 @@ package com.ciicgat.grus.json;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -90,18 +90,18 @@ public class JSONTest {
         System.out.println(s);
 
         User u1 = JSON.parse(s, User.class);
-        Assert.assertEquals(user, u1);
+        Assertions.assertEquals(user, u1);
 
         User u2 = JSON.parse(s, new TypeReference<>() {
         });
-        Assert.assertEquals(u2, user);
+        Assertions.assertEquals(u2, user);
 
         JsonNode jsonNode = JSON.parse(s);
-        Assert.assertTrue(jsonNode.isObject());
-        Assert.assertNotNull(jsonNode.get("id")); //取id节点
-        Assert.assertNull(jsonNode.get("id1")); //不存在id1节点，所以返回为null
-        Assert.assertEquals(jsonNode.get("id").asInt(), 1); //取id的值
-        Assert.assertEquals(jsonNode.get("name").asText(), "a"); //取name的值
+        Assertions.assertTrue(jsonNode.isObject());
+        Assertions.assertNotNull(jsonNode.get("id")); //取id节点
+        Assertions.assertNull(jsonNode.get("id1")); //不存在id1节点，所以返回为null
+        Assertions.assertEquals(jsonNode.get("id").asInt(), 1); //取id的值
+        Assertions.assertEquals(jsonNode.get("name").asText(), "a"); //取name的值
 
         Iterator<Map.Entry<String, JsonNode>> fields = jsonNode.fields();
         for (Iterator<Map.Entry<String, JsonNode>> it = fields; it.hasNext(); ) {
@@ -119,7 +119,7 @@ public class JSONTest {
                 "\t\"date\": 1586959364189\n" +
                 "}";
         User u1 = JSON.parse(s, User.class);
-        Assert.assertEquals(new User(1, null, new Date()), u1);
+        Assertions.assertEquals(new User(1, null, new Date()), u1);
     }
 
     @Test
@@ -132,18 +132,18 @@ public class JSONTest {
 
         List<User> list = JSON.parse(s, new TypeReference<List<User>>() {
         });
-        Assert.assertEquals(users, list);
+        Assertions.assertEquals(users, list);
 
         JsonNode jsonNode = JSON.parse(s);
-        Assert.assertTrue(jsonNode.isArray());
+        Assertions.assertTrue(jsonNode.isArray());
 
         //通过迭代器遍历
         for (Iterator<JsonNode> it = jsonNode.iterator(); it.hasNext(); ) {
             JsonNode node = it.next();
             JsonNode idJsonNode = node.get("id");
             JsonNode nameJsonNode = node.get("name");
-            Assert.assertTrue(idJsonNode.isInt());
-            Assert.assertTrue(nameJsonNode.isTextual());
+            Assertions.assertTrue(idJsonNode.isInt());
+            Assertions.assertTrue(nameJsonNode.isTextual());
         }
 
         //通过index遍历
@@ -151,8 +151,8 @@ public class JSONTest {
             JsonNode node = jsonNode.get(i);
             JsonNode idJsonNode = node.get("id");
             JsonNode nameJsonNode = node.get("name");
-            Assert.assertTrue(idJsonNode.isInt());
-            Assert.assertTrue(nameJsonNode.isTextual());
+            Assertions.assertTrue(idJsonNode.isInt());
+            Assertions.assertTrue(nameJsonNode.isTextual());
         }
     }
 
@@ -163,6 +163,6 @@ public class JSONTest {
         List<Integer> list1 = JSON.parse(t, javaType);
         List<Integer> list2 = JSON.parse(t, new TypeReference<>() {
         });
-        Assert.assertEquals(list1, list2);
+        Assertions.assertEquals(list1, list2);
     }
 }

@@ -18,9 +18,9 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.AfterClass;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -62,7 +62,7 @@ public class TestLanguageInterceptor {
         mockWebServer.enqueue(mockResponse);
 
         TestBean bean = testService.get("我的xx@");
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -72,12 +72,12 @@ public class TestLanguageInterceptor {
         }
 
         // path encode的时候，
-        Assert.assertEquals("/get/" + UrlCoder.encode("我的xx@"), recordedRequest.getPath());
-        Assert.assertEquals("POST", recordedRequest.getMethod());
+        Assertions.assertEquals("/get/" + UrlCoder.encode("我的xx@"), recordedRequest.getPath());
+        Assertions.assertEquals("POST", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("", bodyString);
+        Assertions.assertEquals("", bodyString);
 
         // gconf开关未打开，无header
-        Assert.assertNull(recordedRequest.getHeader(LanguageConstant.LANG_HEADER));
+        Assertions.assertNull(recordedRequest.getHeader(LanguageConstant.LANG_HEADER));
     }
 }

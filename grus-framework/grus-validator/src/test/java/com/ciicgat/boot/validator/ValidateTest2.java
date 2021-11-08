@@ -5,8 +5,8 @@
 
 package com.ciicgat.boot.validator;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
@@ -31,7 +31,7 @@ public class ValidateTest2 {
 
         ValidateResult validateResult = rootObjectValidator.validate(testBean);
 
-        Assert.assertTrue(validateResult.isValid());
+        Assertions.assertTrue(validateResult.isValid());
 
     }
 
@@ -57,7 +57,7 @@ public class ValidateTest2 {
 
         ValidateResult validateResult = rootObjectValidator.validate(testBean2);
 
-        Assert.assertTrue(validateResult.isValid());
+        Assertions.assertTrue(validateResult.isValid());
 
     }
 
@@ -75,7 +75,7 @@ public class ValidateTest2 {
 
         ValidateResult validateResult = rootObjectValidator.validate(testBean);
 
-        Assert.assertTrue(!validateResult.isValid());
+        Assertions.assertTrue(!validateResult.isValid());
     }
 
     @Test
@@ -92,7 +92,7 @@ public class ValidateTest2 {
 
         ValidateResult validateResult = rootObjectValidator.validate(testBean);
 
-        Assert.assertTrue(!validateResult.isValid());
+        Assertions.assertTrue(!validateResult.isValid());
     }
 
 }

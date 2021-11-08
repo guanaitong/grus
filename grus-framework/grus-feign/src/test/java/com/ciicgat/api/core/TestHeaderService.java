@@ -16,9 +16,9 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
@@ -55,7 +55,7 @@ public class TestHeaderService {
         mockWebServer.enqueue(mockResponse);
 
         TestBean bean = testService.get("我的xx@");
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -65,11 +65,11 @@ public class TestHeaderService {
         }
 
         //path encode的时候，
-        Assert.assertEquals("/get/" + UrlCoder.encode("我的xx@"), recordedRequest.getPath());
-        Assert.assertEquals("POST", recordedRequest.getMethod());
-        Assert.assertEquals("application/json", recordedRequest.getHeader("Content-Type"));
+        Assertions.assertEquals("/get/" + UrlCoder.encode("我的xx@"), recordedRequest.getPath());
+        Assertions.assertEquals("POST", recordedRequest.getMethod());
+        Assertions.assertEquals("application/json", recordedRequest.getHeader("Content-Type"));
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("", bodyString);
+        Assertions.assertEquals("", bodyString);
     }
 
     @Test
@@ -85,19 +85,19 @@ public class TestHeaderService {
         mockWebServer.enqueue(mockResponse);
 
         TestBean bean = testService.getDefault("我的xx@");
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
 
         // path encode的时候，
-        Assert.assertEquals("/get/default/" + UrlCoder.encode("我的xx@"), recordedRequest.getPath());
-        Assert.assertEquals("POST", recordedRequest.getMethod());
-        Assert.assertEquals("application/x-www-form-urlencoded", recordedRequest.getHeader("Content-Type"));
+        Assertions.assertEquals("/get/default/" + UrlCoder.encode("我的xx@"), recordedRequest.getPath());
+        Assertions.assertEquals("POST", recordedRequest.getMethod());
+        Assertions.assertEquals("application/x-www-form-urlencoded", recordedRequest.getHeader("Content-Type"));
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("", bodyString);
+        Assertions.assertEquals("", bodyString);
     }
 
-    @Test(expected = BusinessFeignException.class)
+    @Test
     public synchronized void testResponseHeader() throws InterruptedException {
         TestBean bean1 = new TestBean("jasdlfj", 91823);
         MockResponse mockResponse = new MockResponse()
@@ -108,13 +108,15 @@ public class TestHeaderService {
                 .setResponseCode(200)
                 .setBody(JSON.toJSONString(bean1));
         mockWebServer.enqueue(mockResponse);
+        Assertions.assertThrows(BusinessFeignException.class, () -> {
+            try {
+                testService.get("我的xx@");
+            } catch (RuntimeException ex) {
+                mockWebServer.takeRequest();
+                throw ex;
+            }
+        });
 
-        try {
-            testService.get("我的xx@");
-        } catch (RuntimeException ex) {
-            mockWebServer.takeRequest();
-            throw ex;
-        }
     }
 
 }

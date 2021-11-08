@@ -7,8 +7,8 @@ package com.ciicgat.sdk.data.datasource;
 
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.util.system.EnvHook;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -59,8 +59,8 @@ public class DataSourcesTest {
 
         DataSource slaveDataSource = DataSourceBuilder.newBuilder().setDbName("userdoor").setPreferSlave(true).newDataSource();
 
-        Assert.assertNotNull(masterDataSource.getConnection());
-        Assert.assertNotNull(slaveDataSource.getConnection());
+        Assertions.assertNotNull(masterDataSource.getConnection());
+        Assertions.assertNotNull(slaveDataSource.getConnection());
 
     }
 
@@ -70,9 +70,9 @@ public class DataSourcesTest {
 //        DataSource masterDataSource = DataSourceFactory.createMasterDataSource("userdoor");
 //
 //
-//        Assert.assertNotNull(masterDataSource.getConnection());
-//        Assert.assertNotNull(masterDataSource.getConnection());
-//        Assert.assertNotNull(masterDataSource.getConnection());
+//        Assertions.assertNotNull(masterDataSource.getConnection());
+//        Assertions.assertNotNull(masterDataSource.getConnection());
+//        Assertions.assertNotNull(masterDataSource.getConnection());
 //
 //    }
 }

@@ -6,8 +6,8 @@
 package com.ciicgat.sdk.util;
 
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author wanchongyang
@@ -18,15 +18,15 @@ public class TestShortUrlUtil {
     public void test() {
         String originUrl = "https://a.guanaitong.cc/festival/card-datails?greetingId=906";
         String shortUrl = ShortUrlUtil.create(originUrl);
-        Assert.assertNotNull(shortUrl);
+        Assertions.assertNotNull(shortUrl);
 
         String reverseUrl = ShortUrlUtil.reverse(shortUrl);
-        Assert.assertEquals(originUrl, reverseUrl);
+        Assertions.assertEquals(originUrl, reverseUrl);
     }
 
-    @Test(expected = BusinessRuntimeException.class)
+    @Test
     public void testException() {
         String url = "中华人民共和国";
-        ShortUrlUtil.create(url);
+        Assertions.assertThrows(BusinessRuntimeException.class, () -> ShortUrlUtil.create(url));
     }
 }

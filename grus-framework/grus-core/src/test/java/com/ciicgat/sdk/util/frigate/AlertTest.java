@@ -7,7 +7,7 @@ package com.ciicgat.sdk.util.frigate;
 
 import com.ciicgat.grus.alert.Alert;
 import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.Objects;

@@ -8,7 +8,7 @@ package com.ciicgat.grus.boot.autoconfigure.data;
 import com.ciicgat.grus.boot.autoconfigure.core.GrusCoreContextInitializer;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 

@@ -7,7 +7,7 @@ package com.ciicgat.sdk.util.frigate;
 
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 

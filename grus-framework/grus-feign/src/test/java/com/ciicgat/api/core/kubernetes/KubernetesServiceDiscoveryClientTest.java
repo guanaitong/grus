@@ -13,8 +13,8 @@ import io.kubernetes.client.util.ClientBuilder;
 import io.kubernetes.client.util.credentials.AccessTokenAuthentication;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -74,12 +74,12 @@ public class KubernetesServiceDiscoveryClientTest {
 //            Threads.sleepSeconds(5);
 //        }
             List<ServiceInstance> instances = kubernetesServiceDiscoveryClient.getInstances("newapp");
-            Assert.assertTrue(instances != null);
-            Assert.assertTrue(instances.size() >= 1);
+            Assertions.assertTrue(instances != null);
+            Assertions.assertTrue(instances.size() >= 1);
             System.out.println(instances);
         } catch (Exception e) {
             LOG.error("error", e);
-            Assert.assertTrue(false);
+            Assertions.assertTrue(false);
         }
     }
 }

@@ -5,8 +5,8 @@
 
 package com.ciicgat.sdk.lang.threads;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ThreadFactory;
 
@@ -20,11 +20,11 @@ public class TestThreads {
         long start = System.currentTimeMillis();
         Threads.sleepSeconds(1);
 
-        Assert.assertEquals(1, (System.currentTimeMillis() - start) / 1000);
+        Assertions.assertEquals(1, (System.currentTimeMillis() - start) / 1000);
 
         long start2 = System.currentTimeMillis();
         Threads.sleep(348);
-        Assert.assertTrue(348 - ((System.currentTimeMillis() - start2)) < 100);
+        Assertions.assertTrue(348 - ((System.currentTimeMillis() - start2)) < 100);
 
     }
 
@@ -37,11 +37,11 @@ public class TestThreads {
         Thread thread = threadFactory.newThread(() -> System.out.println(System.currentTimeMillis()));
 
 
-        Assert.assertTrue(thread.getName().startsWith("testXXX"));
+        Assertions.assertTrue(thread.getName().startsWith("testXXX"));
 
-        Assert.assertEquals(thread.getPriority(), Thread.NORM_PRIORITY);
+        Assertions.assertEquals(thread.getPriority(), Thread.NORM_PRIORITY);
 
-        Assert.assertEquals(thread.getUncaughtExceptionHandler(), Threads.LOGGER_UNCAUGHTEXCEPTIONHANDLER);
+        Assertions.assertEquals(thread.getUncaughtExceptionHandler(), Threads.LOGGER_UNCAUGHTEXCEPTIONHANDLER);
     }
 
     @Test
@@ -50,10 +50,10 @@ public class TestThreads {
         Thread thread = Threads.newThread(() -> System.out.println(System.currentTimeMillis()), "testXXX", Thread.MAX_PRIORITY);
 
 
-        Assert.assertTrue(thread.getName().startsWith("testXXX"));
+        Assertions.assertTrue(thread.getName().startsWith("testXXX"));
 
-        Assert.assertEquals(thread.getPriority(), Thread.MAX_PRIORITY);
+        Assertions.assertEquals(thread.getPriority(), Thread.MAX_PRIORITY);
 
-        Assert.assertEquals(thread.getUncaughtExceptionHandler(), Threads.LOGGER_UNCAUGHTEXCEPTIONHANDLER);
+        Assertions.assertEquals(thread.getUncaughtExceptionHandler(), Threads.LOGGER_UNCAUGHTEXCEPTIONHANDLER);
     }
 }

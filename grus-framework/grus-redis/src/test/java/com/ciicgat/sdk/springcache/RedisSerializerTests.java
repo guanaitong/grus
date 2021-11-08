@@ -5,8 +5,8 @@
 
 package com.ciicgat.sdk.springcache;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.SerializationException;
@@ -120,25 +120,25 @@ public class RedisSerializerTests {
             System.out.println(bytes.length);
             if (redisSerializer instanceof GenericJackson2JsonRedisSerializer) {
                 String s = new String(bytes);
-                Assert.assertTrue(s.contains("@class"));
-                Assert.assertTrue(s.contains(RedisSerializerTests.class.getName()));
+                Assertions.assertTrue(s.contains("@class"));
+                Assertions.assertTrue(s.contains(RedisSerializerTests.class.getName()));
                 System.out.println(s);
             }
-            Assert.assertEquals(user, redisSerializer.deserialize(bytes));
+            Assertions.assertEquals(user, redisSerializer.deserialize(bytes));
         }
     }
 
-    @Test(expected = SerializationException.class)
+    @Test
     public void testWithException() {
         User2 user = new User2("aaa", new Date());
         GzipRedisSerializer redisSerializer = new GzipRedisSerializer(RedisSerializer.java());
-        redisSerializer.serialize(user);
+        Assertions.assertThrows(SerializationException.class, () -> redisSerializer.serialize(user));
     }
 
-    @Test(expected = SerializationException.class)
+    @Test
     public void testWithException2() {
         GzipRedisSerializer redisSerializer = new GzipRedisSerializer(RedisSerializer.java());
-        redisSerializer.deserialize(new byte[]{1, 2});
+        Assertions.assertThrows(SerializationException.class, () ->redisSerializer.deserialize(new byte[]{1, 2}));
     }
 
 }

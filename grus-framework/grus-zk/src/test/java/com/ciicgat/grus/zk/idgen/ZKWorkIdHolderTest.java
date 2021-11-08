@@ -8,8 +8,8 @@ package com.ciicgat.grus.zk.idgen;
 import com.ciicgat.grus.zk.TestZkConfig;
 import com.ciicgat.grus.zk.ZKUtils;
 import org.apache.curator.framework.CuratorFramework;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,6 +30,6 @@ public class ZKWorkIdHolderTest {
             long workId = zkWorkIdHolder.getId();
             ids.add(workId);
         }
-        Assert.assertEquals(n, ids.size());
+        Assertions.assertEquals(n, ids.size());
     }
 }

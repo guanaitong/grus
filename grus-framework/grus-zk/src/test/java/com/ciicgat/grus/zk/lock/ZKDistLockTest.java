@@ -9,8 +9,8 @@ import com.ciicgat.grus.lock.DistLock;
 import com.ciicgat.grus.zk.TestZkConfig;
 import com.ciicgat.grus.zk.ZKUtils;
 import org.apache.curator.framework.CuratorFramework;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
@@ -76,6 +76,6 @@ public class ZKDistLockTest {
         }
 
         latch.await();
-        Assert.assertEquals(threadNums * repeat, count);
+        Assertions.assertEquals(threadNums * repeat, count);
     }
 }

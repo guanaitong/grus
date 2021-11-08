@@ -5,18 +5,18 @@
 
 package com.ciicgat.grus.boot.autoconfigure.gconf;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.env.Environment;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Created by August.Zhou on 2019-02-21 14:47.
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
         classes = GconfApplication.class,
         properties = {"spring.application.name=grus-demo", "grus.gconf.appId=grus-demo"})
@@ -50,16 +50,16 @@ public class GconfAutoConfigurationTests {
 
     @Test
     public void test() {
-        Assert.assertNotNull(redisPropClazz.getMyHost());
+        Assertions.assertNotNull(redisPropClazz.getMyHost());
 
-        Assert.assertEquals(redisPropClazz.getMyHost(), redisPropWithValue.getMyHost());
+        Assertions.assertEquals(redisPropClazz.getMyHost(), redisPropWithValue.getMyHost());
     }
 
     @Test
     public void testLocalConfig() {
-        Assert.assertNotNull(environment.getProperty("local.name"));
+        Assertions.assertNotNull(environment.getProperty("local.name"));
 
-        Assert.assertEquals("test", environment.getRequiredProperty("local.name"));
+        Assertions.assertEquals("test", environment.getRequiredProperty("local.name"));
     }
 
 }

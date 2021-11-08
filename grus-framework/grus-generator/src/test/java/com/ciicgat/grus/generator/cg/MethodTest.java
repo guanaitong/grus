@@ -6,8 +6,8 @@
 package com.ciicgat.grus.generator.cg;
 
 import com.ciicgat.grus.generator.cg.util.GeneratorUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Clive Yuan
@@ -37,7 +37,7 @@ public class MethodTest {
             String expected = split[1];
             String result = GeneratorUtils.getLowerCamelName(target);
             System.out.printf("%s => %s%n", target, result);
-            Assert.assertEquals(expected, result);
+            Assertions.assertEquals(expected, result);
         }
     }
 }

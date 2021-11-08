@@ -5,8 +5,8 @@
 
 package com.ciicgat.sdk.lang.constant;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by August.Zhou on 2018-10-19 17:20.
@@ -16,16 +16,16 @@ public class TestGatBoolean {
     @Test
     public void test() {
 
-        Assert.assertTrue(GatBoolean.isTrue(1));
+        Assertions.assertTrue(GatBoolean.isTrue(1));
 
-        Assert.assertTrue(!GatBoolean.isTrue(2));
+        Assertions.assertTrue(!GatBoolean.isTrue(2));
 
-        Assert.assertTrue(!GatBoolean.isTrue(3));
+        Assertions.assertTrue(!GatBoolean.isTrue(3));
 
-        Assert.assertTrue(GatBoolean.isFalse(2));
+        Assertions.assertTrue(GatBoolean.isFalse(2));
 
-        Assert.assertTrue(!GatBoolean.isFalse(1));
+        Assertions.assertTrue(!GatBoolean.isFalse(1));
 
-        Assert.assertTrue(!GatBoolean.isFalse(3));
+        Assertions.assertTrue(!GatBoolean.isFalse(3));
     }
 }

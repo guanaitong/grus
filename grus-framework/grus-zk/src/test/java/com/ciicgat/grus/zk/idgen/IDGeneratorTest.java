@@ -7,8 +7,8 @@ package com.ciicgat.grus.zk.idgen;
 
 import com.ciicgat.grus.idgen.SnowflakeIdGenerator;
 import com.ciicgat.grus.zk.TestZkConfig;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,9 +27,9 @@ public class IDGeneratorTest {
         Set<String> set = new HashSet<>();
         for (int i = 0; i < 10240; i++) {
             String orderNo = generator.makeNo();
-            Assert.assertEquals(24, orderNo.length());
+            Assertions.assertEquals(24, orderNo.length());
             set.add(orderNo);
         }
-        Assert.assertEquals(10240, set.size());
+        Assertions.assertEquals(10240, set.size());
     }
 }

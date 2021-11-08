@@ -13,9 +13,9 @@ import feign.Client;
 import feign.Request;
 import feign.Response;
 import org.junit.After;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.IOException;
@@ -74,11 +74,11 @@ public class TestCacheService {
         //第一次调用，没有缓存
         CacheService cacheService = FeignServiceFactory.newInstance(CacheService.class, mockClient);
         TestBean bean = cacheService.getBean();
-        Assert.assertEquals(result, bean);
+        Assertions.assertEquals(result, bean);
 
         //第二次调用，有缓存
         TestBean bean2 = cacheService.getBean();
-        Assert.assertSame(bean2, bean);
+        Assertions.assertSame(bean2, bean);
 
         //客户端有且仅被调用一次
         Mockito.verify(mockClient, Mockito.times(1)).execute(Mockito.any(), Mockito.any());
@@ -90,11 +90,11 @@ public class TestCacheService {
         CacheService cacheService = FeignServiceFactory.newInstance(CacheService.class, mockClient);
         //第一次调用，没有缓存
         TestBean bean = cacheService.getBeanWithTwoParams(1, 2);
-        Assert.assertEquals(result, bean);
+        Assertions.assertEquals(result, bean);
 
         //第二次调用，有缓存
         TestBean bean2 = cacheService.getBeanWithTwoParams(1, 2);
-        Assert.assertSame(bean2, bean);
+        Assertions.assertSame(bean2, bean);
 
         //客户端有且仅被调用一次
         Mockito.verify(mockClient, Mockito.times(1)).execute(Mockito.any(), Mockito.any());
@@ -122,11 +122,11 @@ public class TestCacheService {
 
         //第一次调用，没有缓存
         TestBean bean = cacheService.getBeanWithTwoParams(1, 2);
-        Assert.assertEquals(result, bean);
+        Assertions.assertEquals(result, bean);
 
         //第二次调用，有缓存
         TestBean bean2 = cacheService.getBeanWithTwoParams(1, 2);
-        Assert.assertEquals(result, bean2);
+        Assertions.assertEquals(result, bean2);
 
         Mockito.verify(mockClient, Mockito.times(1)).execute(Mockito.any(), Mockito.any());
     }
@@ -137,11 +137,11 @@ public class TestCacheService {
 
         //第一次调用，没有缓存
         TestBean bean = cacheService.getBeanWithTwoParams(1, 2);
-        Assert.assertNull(bean);
+        Assertions.assertNull(bean);
 
         //第二次调用，有缓存
         TestBean bean2 = cacheService.getBeanWithTwoParams(1, 2);
-        Assert.assertNull(bean2);
+        Assertions.assertNull(bean2);
 
         Mockito.verify(mockClient1, Mockito.times(1)).execute(Mockito.any(), Mockito.any());
     }
@@ -152,10 +152,10 @@ public class TestCacheService {
         CacheService cacheService = FeignServiceFactory.newInstance(CacheService.class, mockClient1);
         //第一次调用，没有缓存
         TestBean bean = cacheService.getBeanNotCacheNullValue();
-        Assert.assertNull(bean);
+        Assertions.assertNull(bean);
         //第二次调用，没有缓存
         TestBean bean2 = cacheService.getBeanNotCacheNullValue();
-        Assert.assertNull(bean2);
+        Assertions.assertNull(bean2);
 
         Mockito.verify(mockClient1, Mockito.times(2)).execute(Mockito.any(), Mockito.any());
     }

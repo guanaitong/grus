@@ -12,8 +12,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -45,7 +45,7 @@ public class JacksonTest {
         JsonParser jsonParser = objectMapper.treeAsTokens(rootNode);
         TestModel dest = objectMapper.readValue(jsonParser, javaType);
         //修复精度问题
-        Assert.assertEquals("5.00", dest.getBalance().toPlainString());
+        Assertions.assertEquals("5.00", dest.getBalance().toPlainString());
     }
 
     @Test
@@ -65,12 +65,12 @@ public class JacksonTest {
         String json = JSON.toJSONString(jsonObject);
 
         TestModel result = JSON.parse(json, TestModel.class);
-        Assert.assertEquals(t, DateFormatUtils.format(result.getTime(), "yyyy-MM-dd HH:mm:ss"));
-        //Assert.assertEquals("2018-06-13 10:48:52.000", DateFormatUtils.format(result.getTime2(), "yyyy-MM-dd HH:mm:ss.SSS"));
-        Assert.assertEquals("2018-06-13", DateFormatUtils.format(result.getTime3(), "yyyy-MM-dd"));
-        Assert.assertEquals("2015-12-06 11:18:57", DateFormatUtils.format(result.getTime4(), "yyyy-MM-dd HH:mm:ss"));
-        Assert.assertEquals(DateFormatUtils.format(date5, "yyyy-MM-dd HH:mm:ss"), DateFormatUtils.format(result.getTime5(), "yyyy-MM-dd HH:mm:ss"));
-        Assert.assertEquals(DateFormatUtils.format(date5, "yyyy-MM-dd HH:mm:ss"), DateFormatUtils.format(result.getTime6(), "yyyy-MM-dd HH:mm:ss"));
+        Assertions.assertEquals(t, DateFormatUtils.format(result.getTime(), "yyyy-MM-dd HH:mm:ss"));
+        //Assertions.assertEquals("2018-06-13 10:48:52.000", DateFormatUtils.format(result.getTime2(), "yyyy-MM-dd HH:mm:ss.SSS"));
+        Assertions.assertEquals("2018-06-13", DateFormatUtils.format(result.getTime3(), "yyyy-MM-dd"));
+        Assertions.assertEquals("2015-12-06 11:18:57", DateFormatUtils.format(result.getTime4(), "yyyy-MM-dd HH:mm:ss"));
+        Assertions.assertEquals(DateFormatUtils.format(date5, "yyyy-MM-dd HH:mm:ss"), DateFormatUtils.format(result.getTime5(), "yyyy-MM-dd HH:mm:ss"));
+        Assertions.assertEquals(DateFormatUtils.format(date5, "yyyy-MM-dd HH:mm:ss"), DateFormatUtils.format(result.getTime6(), "yyyy-MM-dd HH:mm:ss"));
 
     }
 
@@ -87,7 +87,7 @@ public class JacksonTest {
         JsonParser jsonParser = objectMapper.treeAsTokens(rootNode);
         TestModel dest = objectMapper.readValue(jsonParser, javaType);
 
-        Assert.assertEquals("123123.1234", dest.getRate().toString());
+        Assertions.assertEquals("123123.1234", dest.getRate().toString());
     }
 
     @Test
@@ -98,8 +98,8 @@ public class JacksonTest {
 
         String jsonStr = JSON.toJSONString(jsonObject);
         TestModel dest = JSON.parse(jsonStr, TestModel.class);
-        Assert.assertEquals("5000000000.00", dest.getWeight().toString());
-        Assert.assertNull(dest.getScore());
+        Assertions.assertEquals("5000000000.00", dest.getWeight().toString());
+        Assertions.assertNull(dest.getScore());
     }
 
     @Test
@@ -110,8 +110,8 @@ public class JacksonTest {
 
         String jsonStr = JSON.toJSONString(jsonObject);
         TestModel dest = JSON.parse(jsonStr, TestModel.class);
-        Assert.assertEquals("2021-04-23 22:16:19", DateFormatUtils.format(new Date(timeMs), "yyyy-MM-dd HH:mm:ss"));
-        Assert.assertEquals("2021-04-23 14:16:19", DateFormatUtils.format(dest.getTimeCreated(), "yyyy-MM-dd HH:mm:ss"));
+        Assertions.assertEquals("2021-04-23 22:16:19", DateFormatUtils.format(new Date(timeMs), "yyyy-MM-dd HH:mm:ss"));
+        Assertions.assertEquals("2021-04-23 14:16:19", DateFormatUtils.format(dest.getTimeCreated(), "yyyy-MM-dd HH:mm:ss"));
     }
 
     @Test
@@ -120,11 +120,11 @@ public class JacksonTest {
         jsonObject.put("username", "clive");
         jsonObject.put("age", 20);
         String noPrettyFormatJson = JSON.toJSONString(jsonObject);
-        Assert.assertEquals("{\"age\":20,\"username\":\"clive\"}", noPrettyFormatJson);
+        Assertions.assertEquals("{\"age\":20,\"username\":\"clive\"}", noPrettyFormatJson);
 
         String prettyFormatJson = JSON.toJSONString(jsonObject, true);
         String line = System.getProperty("line.separator");
-        Assert.assertEquals("{" + line +
+        Assertions.assertEquals("{" + line +
                 "  \"age\" : 20," + line +
                 "  \"username\" : \"clive\"" + line +
                 "}", prettyFormatJson);
@@ -135,24 +135,24 @@ public class JacksonTest {
         String s = "{\"1\":123,\"2\":null}";
         JsonNode jsonNode = JSON.parse(s);
         //1节点存在
-        Assert.assertNotNull(jsonNode.get("1"));
-        Assert.assertFalse(jsonNode.get("1").isNull());
+        Assertions.assertNotNull(jsonNode.get("1"));
+        Assertions.assertFalse(jsonNode.get("1").isNull());
 
         //2节点存在，但是值为null，对应jsonnode类型为NullNode，它不是null
-        Assert.assertNotNull(jsonNode.get("2"));
-        Assert.assertTrue(jsonNode.get("2").isNull());
-        Assert.assertSame(jsonNode.get("2"), NullNode.getInstance());
-        Assert.assertEquals("null", jsonNode.get("2").asText());
+        Assertions.assertNotNull(jsonNode.get("2"));
+        Assertions.assertTrue(jsonNode.get("2").isNull());
+        Assertions.assertSame(jsonNode.get("2"), NullNode.getInstance());
+        Assertions.assertEquals("null", jsonNode.get("2").asText());
 
         //不存在的3节点为null
-        Assert.assertNull(jsonNode.get("3"));
+        Assertions.assertNull(jsonNode.get("3"));
 
         //下面演示JSON.of方法的使用
         int v1 = JSON.of(jsonNode.get("1")).map(JsonNode::asInt).orElse(0);
-        Assert.assertEquals(123, v1);
+        Assertions.assertEquals(123, v1);
 
         String v2 = JSON.of(jsonNode.get("2")).map(JsonNode::asText).orElse("defaultValue");
-        Assert.assertEquals("defaultValue", v2);
+        Assertions.assertEquals("defaultValue", v2);
     }
 
     static class TestFeature {
@@ -181,7 +181,7 @@ public class JacksonTest {
     public void testFeature() {
         String text = "{ hello:\"1\", nums: 2}";
         TestFeature testFeature = JSON.parse(text, TestFeature.class);
-        Assert.assertEquals("1", testFeature.hello);
-        Assert.assertEquals(Integer.valueOf(2), testFeature.nums.get(0));
+        Assertions.assertEquals("1", testFeature.hello);
+        Assertions.assertEquals(Integer.valueOf(2), testFeature.nums.get(0));
     }
 }

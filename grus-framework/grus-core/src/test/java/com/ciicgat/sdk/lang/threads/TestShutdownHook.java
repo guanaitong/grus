@@ -5,18 +5,17 @@
 
 package com.ciicgat.sdk.lang.threads;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by August.Zhou on 2018-10-22 13:47.
  */
 public class TestShutdownHook {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void test() {
-
         ShutdownHook.addShutdownHook(() -> System.out.println(System.currentTimeMillis()));
-
-        ShutdownHook.addShutdownHook(new Thread(() -> System.out.println(System.currentTimeMillis())));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> ShutdownHook.addShutdownHook(new Thread(() -> System.out.println(System.currentTimeMillis()))));
     }
 }

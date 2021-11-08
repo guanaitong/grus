@@ -11,9 +11,9 @@ import feign.RetryableException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.commons.lang3.tuple.Pair;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +42,7 @@ public class TestRetry {
         mockWebServer.enqueue(mockResponse);
         Integer i = retryService.get();
 
-        Assert.assertEquals(2, i.intValue());
+        Assertions.assertEquals(2, i.intValue());
 
         mockResponse = new MockResponse()
                 .addHeader("Content-Type", "application/json;charset=utf-8")
@@ -54,11 +54,11 @@ public class TestRetry {
         try {
             i = retryService.get();
             System.out.println(i);
-            Assert.fail();
+            Assertions.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof RetryableException);
+            Assertions.assertTrue(e instanceof RetryableException);
             final KubernetesClientConfig config = KubernetesClientConfig.getConfig();
-            Assert.assertFalse(config.couldRetry(e.getCause()));
+            Assertions.assertFalse(config.couldRetry(e.getCause()));
         }
 
 
@@ -67,11 +67,11 @@ public class TestRetry {
         try {
             i = retryService.get();
             System.out.println(i);
-            Assert.fail();
+            Assertions.fail();
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof RetryableException);
+            Assertions.assertTrue(e instanceof RetryableException);
             final KubernetesClientConfig config = KubernetesClientConfig.getConfig();
-            Assert.assertTrue(config.couldRetry(e.getCause()));
+            Assertions.assertTrue(config.couldRetry(e.getCause()));
         }
     }
 

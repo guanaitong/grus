@@ -5,8 +5,8 @@
 
 package com.ciicgat.sdk.lang.tool;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
@@ -20,48 +20,48 @@ public class TestBytes {
         SessionIdGenerator sessionIdGenerator = new SessionIdGenerator();
         String text = sessionIdGenerator.generateSessionId(200);
         byte[] bytes = Bytes.toBytes(text);
-        Assert.assertEquals(text, Bytes.toString(bytes));
+        Assertions.assertEquals(text, Bytes.toString(bytes));
     }
 
     @Test
     public void testBoolean() {
         boolean b = new Random().nextBoolean();
         byte[] bytes = Bytes.toBytes(b);
-        Assert.assertEquals(b, Bytes.toBoolean(bytes));
+        Assertions.assertEquals(b, Bytes.toBoolean(bytes));
     }
 
     @Test
     public void testShort() {
         short b = (short) new Random().nextLong();
         byte[] bytes = Bytes.toBytes(b);
-        Assert.assertEquals(b, Bytes.toShort(bytes));
+        Assertions.assertEquals(b, Bytes.toShort(bytes));
     }
 
     @Test
     public void testInt() {
         int b = new Random().nextInt();
         byte[] bytes = Bytes.toBytes(b);
-        Assert.assertEquals(b, Bytes.toInt(bytes));
+        Assertions.assertEquals(b, Bytes.toInt(bytes));
     }
 
     @Test
     public void testLong() {
         long b = new Random().nextLong();
         byte[] bytes = Bytes.toBytes(b);
-        Assert.assertEquals(b, Bytes.toLong(bytes));
+        Assertions.assertEquals(b, Bytes.toLong(bytes));
     }
 
     @Test
     public void testFloat() {
         float b = new Random().nextFloat();
         byte[] bytes = Bytes.toBytes(b);
-        Assert.assertEquals(b, Bytes.toFloat(bytes), 0.001d);
+        Assertions.assertEquals(b, Bytes.toFloat(bytes), 0.001d);
     }
 
     @Test
     public void testDouble() {
         double b = new Random().nextDouble();
         byte[] bytes = Bytes.toBytes(b);
-        Assert.assertEquals(b, Bytes.toDouble(bytes), 0.001d);
+        Assertions.assertEquals(b, Bytes.toDouble(bytes), 0.001d);
     }
 }

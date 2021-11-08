@@ -7,10 +7,10 @@ package com.ciicgat.sdk.gfs;
 
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class GfsClientTest {
     private File imgFile;
     private File audioFile;
 
-    @Before
+    @BeforeAll
     public void setUp() {
 
         {
@@ -80,7 +80,7 @@ public class GfsClientTest {
     }
 
 
-    @Ignore
+    @Disabled("Disabled until is up!")
     @Test
     public void uploadPublicFile2() {
 
@@ -108,7 +108,7 @@ public class GfsClientTest {
             IOUtils.closeQuietly(fileOutputStream);
 
             // 检查文件是否存在
-            Assert.assertTrue(new File(tmpFile).exists());
+            Assertions.assertTrue(new File(tmpFile).exists());
 
         } catch (FileNotFoundException e) {
             throw new BusinessRuntimeException(-1, "文件下载失败");

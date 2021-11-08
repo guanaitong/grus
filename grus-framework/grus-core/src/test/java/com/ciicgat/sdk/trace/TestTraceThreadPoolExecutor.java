@@ -13,9 +13,9 @@ import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.tag.Tags;
 import io.opentracing.util.GlobalTracer;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 
 import java.util.concurrent.Callable;
@@ -82,13 +82,13 @@ public class TestTraceThreadPoolExecutor {
         Spans.setRootSpan(span);
 
         String spanId = MDC.get("spanId");
-        Assert.assertNotNull(spanId);
+        Assertions.assertNotNull(spanId);
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                Assert.assertEquals(spanId, MDC.get("spanId"));
+                Assertions.assertEquals(spanId, MDC.get("spanId"));
                 countDownLatch.countDown();
             }
         });
@@ -105,15 +105,15 @@ public class TestTraceThreadPoolExecutor {
         Spans.setRootSpan(span);
 
         String spanId = MDC.get("spanId");
-        Assert.assertNotNull(spanId);
+        Assertions.assertNotNull(spanId);
 
         Callable<Integer> callable = () -> {
-            Assert.assertEquals(spanId, MDC.get("spanId"));
+            Assertions.assertEquals(spanId, MDC.get("spanId"));
             return 10086;
         };
         Future<Integer> result = executorService.submit(callable);
 
-        Assert.assertEquals(Integer.valueOf(10086), result.get());
+        Assertions.assertEquals(Integer.valueOf(10086), result.get());
         executorService.shutdown();
     }
 }

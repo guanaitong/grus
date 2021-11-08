@@ -7,7 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.validation.hibernate;
 
 import com.ciicgat.grus.validation.constraints.Decimal;
 import org.assertj.core.api.Assertions;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;

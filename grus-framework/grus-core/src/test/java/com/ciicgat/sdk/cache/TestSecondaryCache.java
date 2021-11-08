@@ -6,9 +6,9 @@
 package com.ciicgat.sdk.cache;
 
 import com.ciicgat.sdk.lang.exception.CacheDataException;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -51,7 +51,7 @@ public class TestSecondaryCache {
             return new IdObject<>(person3.getId(), person3);
         });
 
-        Assert.assertSame(person, person1);
+        Assertions.assertSame(person, person1);
     }
 
     @Test
@@ -75,10 +75,10 @@ public class TestSecondaryCache {
 
         }, () -> new IdObject<>(person.getId(), person)); //命中二级缓存
 
-        Assert.assertSame(person, person1);
+        Assertions.assertSame(person, person1);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testGet_miss_Cache_withException() throws RuntimeException {
         final Person person = new Person();
         person.setId(1);
@@ -98,7 +98,7 @@ public class TestSecondaryCache {
             throw new RuntimeException("DB error");
         });
 
-        Assert.assertSame(person, person1);
+        Assertions.assertSame(person, person1);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class TestSecondaryCache {
             throw new RuntimeException("异常");
         }, () -> new IdObject<>(person.getId(), person));
 
-        Assert.assertSame(person, person1);
+        Assertions.assertSame(person, person1);
     }
 
     @Test
@@ -140,7 +140,7 @@ public class TestSecondaryCache {
             return person3;
         }, () -> new IdObject<>(person.getId(), person));
 
-        Assert.assertSame(person, person1);
+        Assertions.assertSame(person, person1);
     }
 
     @Test
@@ -165,7 +165,7 @@ public class TestSecondaryCache {
             return person3;
         }, () -> new IdObject<>(person.getId(), person));
 
-        Assert.assertSame(person, person1);
+        Assertions.assertSame(person, person1);
 
         Person person2 = secondaryCache.get(key, (id) -> {
             Person person3 = new Person();
@@ -181,10 +181,10 @@ public class TestSecondaryCache {
             return new IdObject<Person>(person3.getId(), person3);
         });
 
-        Assert.assertNotSame(person, person2);
+        Assertions.assertNotSame(person, person2);
 
-        Assert.assertEquals(person.getId(), person2.getId());
-        Assert.assertEquals(person.getMemberId(), person2.getMemberId());
-        Assert.assertEquals(person.getName(), person2.getName());
+        Assertions.assertEquals(person.getId(), person2.getId());
+        Assertions.assertEquals(person.getMemberId(), person2.getMemberId());
+        Assertions.assertEquals(person.getName(), person2.getName());
     }
 }

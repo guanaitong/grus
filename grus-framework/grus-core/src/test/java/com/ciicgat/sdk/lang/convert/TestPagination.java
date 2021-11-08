@@ -6,8 +6,8 @@
 package com.ciicgat.sdk.lang.convert;
 
 import com.ciicgat.grus.json.JSON;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
@@ -29,21 +29,21 @@ public class TestPagination {
 
         Pagination<String> pagination1 = new Pagination(1000, Arrays.asList("123", "456"));
 
-        Assert.assertEquals(pagination, pagination1);
-        Assert.assertEquals(pagination.hashCode(), pagination1.hashCode());
+        Assertions.assertEquals(pagination, pagination1);
+        Assertions.assertEquals(pagination.hashCode(), pagination1.hashCode());
 
-        Assert.assertEquals(pagination.toString(), pagination1.toString());
+        Assertions.assertEquals(pagination.toString(), pagination1.toString());
 
-        Assert.assertEquals(JSON.toJSONString(pagination), JSON.toJSONString(pagination1));
+        Assertions.assertEquals(JSON.toJSONString(pagination), JSON.toJSONString(pagination1));
     }
 
     @Test
     public void testHasNext() {
         Pagination pagination = new Pagination(200, null, 10, 20);
-        Assert.assertEquals(Boolean.FALSE, pagination.isHasNext());
+        Assertions.assertEquals(Boolean.FALSE, pagination.isHasNext());
         pagination = new Pagination(200, null, 8, 20);
-        Assert.assertEquals(Boolean.TRUE, pagination.isHasNext());
+        Assertions.assertEquals(Boolean.TRUE, pagination.isHasNext());
         pagination = new Pagination(200, null, 11, 20);
-        Assert.assertEquals(Boolean.FALSE, pagination.isHasNext());
+        Assertions.assertEquals(Boolean.FALSE, pagination.isHasNext());
     }
 }

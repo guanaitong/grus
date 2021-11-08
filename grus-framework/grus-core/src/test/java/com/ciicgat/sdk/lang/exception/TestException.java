@@ -6,8 +6,8 @@
 package com.ciicgat.sdk.lang.exception;
 
 import com.ciicgat.sdk.lang.convert.BaseErrorCode;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by August.Zhou on 2018-10-22 11:05.
@@ -15,49 +15,45 @@ import org.junit.Test;
 public class TestException {
 
 
-    @Test(expected = CacheDataException.class)
+    @Test
     public void testCacheException() {
         CacheDataException cacheException = new CacheDataException();
-        Assert.assertTrue(cacheException instanceof RuntimeException);
+        Assertions.assertTrue(cacheException instanceof RuntimeException);
 
         CacheDataException cacheException1 = new CacheDataException("xx", new Exception("asdf"));
         CacheDataException cacheException2 = new CacheDataException("xx");
         CacheDataException cacheException3 = new CacheDataException(new Exception("asdf"));
-        throw cacheException;
     }
 
-    @Test(expected = DbDataException.class)
+    @Test
     public void testDataLoaderException() {
         DbDataException dataLoaderException = new DbDataException();
-        Assert.assertTrue(dataLoaderException instanceof RuntimeException);
+        Assertions.assertTrue(dataLoaderException instanceof RuntimeException);
 
         DbDataException dataLoaderException1 = new DbDataException("xx", new Exception("asdf"));
         DbDataException dataLoaderException2 = new DbDataException("xx");
         DbDataException dataLoaderException3 = new DbDataException(new Exception("asdf"));
-        throw dataLoaderException;
     }
 
-    @Test(expected = BusinessRuntimeException.class)
+    @Test
     public void testBusinessRuntimeException() {
         BusinessRuntimeException businessRuntimeException = new BusinessRuntimeException(22, "asdf");
-        Assert.assertNotNull(businessRuntimeException.toString());
-        Assert.assertTrue(businessRuntimeException instanceof RuntimeException);
+        Assertions.assertNotNull(businessRuntimeException.toString());
+        Assertions.assertTrue(businessRuntimeException instanceof RuntimeException);
 
         BusinessRuntimeException businessRuntimeException1 = new BusinessRuntimeException(new BaseErrorCode(22, "asdf"));
-        Assert.assertTrue(businessRuntimeException.getErrorCode() == businessRuntimeException1.getErrorCode());
-        Assert.assertTrue(businessRuntimeException.getErrorMsg() == businessRuntimeException1.getErrorMsg());
-        throw businessRuntimeException;
+        Assertions.assertTrue(businessRuntimeException.getErrorCode() == businessRuntimeException1.getErrorCode());
+        Assertions.assertTrue(businessRuntimeException.getErrorMsg() == businessRuntimeException1.getErrorMsg());
     }
 
-    @Test(expected = BusinessException.class)
+    @Test
     public void testBusinessException() throws BusinessException {
         BusinessException businessException = new BusinessException(22, "asdf");
-        Assert.assertNotNull(businessException.toString());
-        Assert.assertTrue(businessException instanceof Exception);
+        Assertions.assertNotNull(businessException.toString());
+        Assertions.assertTrue(businessException instanceof Exception);
 
         BusinessException businessException1 = new BusinessException(new BaseErrorCode(22, "asdf"));
-        Assert.assertTrue(businessException.getErrorCode() == businessException1.getErrorCode());
-        Assert.assertTrue(businessException.getErrorMsg() == businessException1.getErrorMsg());
-        throw businessException;
+        Assertions.assertTrue(businessException.getErrorCode() == businessException1.getErrorCode());
+        Assertions.assertTrue(businessException.getErrorMsg() == businessException1.getErrorMsg());
     }
 }

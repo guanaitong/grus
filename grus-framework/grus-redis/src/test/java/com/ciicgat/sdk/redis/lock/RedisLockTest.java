@@ -6,8 +6,8 @@
 package com.ciicgat.sdk.redis.lock;
 
 import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.LongAdder;
@@ -30,8 +30,8 @@ public class RedisLockTest {
         SessionIdGenerator sessionIdGenerator = new SessionIdGenerator();
         String key = sessionIdGenerator.generateSessionId();
         String v = redisLock.tryAcquire(key);
-        Assert.assertNotNull(v);
-        Assert.assertTrue(redisLock.release(key, v));
+        Assertions.assertNotNull(v);
+        Assertions.assertTrue(redisLock.release(key, v));
     }
 
     @Test
@@ -66,7 +66,7 @@ public class RedisLockTest {
 
         }
         countDownLatch.await();
-        Assert.assertTrue(1 == longAdder.longValue());
+        Assertions.assertTrue(1 == longAdder.longValue());
     }
 
 

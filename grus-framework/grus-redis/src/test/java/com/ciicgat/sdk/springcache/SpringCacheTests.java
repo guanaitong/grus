@@ -9,10 +9,10 @@ import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
 import com.ciicgat.sdk.lang.threads.Threads;
 import com.fasterxml.jackson.core.type.TypeReference;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -20,7 +20,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.annotation.Resource;
 import java.net.URL;
@@ -30,7 +30,7 @@ import java.util.UUID;
 /**
  * Created by August.Zhou on 2018-11-15 13:19.
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = CacheApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SpringCacheTests {
     @LocalServerPort
@@ -49,7 +49,7 @@ public class SpringCacheTests {
     @Resource
     private Cache frequencyAsyncCache;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         String url = String.format("http://127.0.0.1:%d/", port);
         System.out.println(String.format("port is : [%d]", port));
@@ -85,7 +85,7 @@ public class SpringCacheTests {
     }
 
     private void assertResp(String randomText, ResponseEntity<String> responseEntity) {
-        Assert.assertEquals(randomText, JSON.parse(responseEntity.getBody(), new TypeReference<ApiResponse<String>>() {
+        Assertions.assertEquals(randomText, JSON.parse(responseEntity.getBody(), new TypeReference<ApiResponse<String>>() {
         }).getData());
     }
 
@@ -128,25 +128,25 @@ public class SpringCacheTests {
 
         // 第二次访问，from local cache
         String second = cacheService.get(uid, 2);
-        Assert.assertSame(first, second);
-        Assert.assertTrue(second.startsWith("1"));
+        Assertions.assertSame(first, second);
+        Assertions.assertTrue(second.startsWith("1"));
 
         // 第三次访问，evict local cache, from redis cache
         Cache cache = cacheManager2.getCache("caffeineRedisCache");
         Optional.ofNullable(cache).ifPresent(Cache::clear);
         String third = cacheService.get(uid, 3);
-        Assert.assertNotSame(second, third);
-        Assert.assertEquals(second, third);
+        Assertions.assertNotSame(second, third);
+        Assertions.assertEquals(second, third);
 
         // 第四次访问，evict cache，new cache
         cacheService.update(uid);
         String fourth = cacheService.get(uid, 4);
-        Assert.assertTrue(fourth.startsWith("4"));
+        Assertions.assertTrue(fourth.startsWith("4"));
 
         // 第五次访问，from new cache
         String fifth = cacheService.get(uid, 5);
-        Assert.assertSame(fourth, fifth);
-        Assert.assertTrue(fifth.startsWith("4"));
+        Assertions.assertSame(fourth, fifth);
+        Assertions.assertTrue(fifth.startsWith("4"));
     }
 
     @Test
@@ -158,8 +158,8 @@ public class SpringCacheTests {
 
         // 第二次访问，from local cache
         String second = cacheService.getFromDefault(uid, 2);
-        Assert.assertSame(first, second);
-        Assert.assertTrue(second.startsWith("1"));
+        Assertions.assertSame(first, second);
+        Assertions.assertTrue(second.startsWith("1"));
 
         // use redis cache
         // 第一次访问，走目标方法，Miss cache
@@ -167,8 +167,8 @@ public class SpringCacheTests {
 
         // 第二次访问，from redis cache
         String secondFromUseRedisCache = cacheService.getFromUseRedisCache(uid, 2);
-        Assert.assertNotSame(firstFromUseRedisCache, secondFromUseRedisCache);
-        Assert.assertEquals(firstFromUseRedisCache, secondFromUseRedisCache);
+        Assertions.assertNotSame(firstFromUseRedisCache, secondFromUseRedisCache);
+        Assertions.assertEquals(firstFromUseRedisCache, secondFromUseRedisCache);
 
         // use local cache serialize
         // 第一次访问，走目标方法，Miss cache
@@ -176,8 +176,8 @@ public class SpringCacheTests {
 
         // 第二次访问，from local cache serialize
         String secondFromUseLocalCacheSerialize = cacheService.getFromUseLocalCacheSerialize(uid, 2);
-        Assert.assertNotSame(firstFromUseLocalCacheSerialize, secondFromUseLocalCacheSerialize);
-        Assert.assertEquals(firstFromUseLocalCacheSerialize, secondFromUseLocalCacheSerialize);
+        Assertions.assertNotSame(firstFromUseLocalCacheSerialize, secondFromUseLocalCacheSerialize);
+        Assertions.assertEquals(firstFromUseLocalCacheSerialize, secondFromUseLocalCacheSerialize);
 
         // use local cache
         // 第一次访问，走目标方法，Miss cache
@@ -185,15 +185,15 @@ public class SpringCacheTests {
 
         // 第二次访问，from local cache
         String secondFromUseLocalCache = cacheService.getFromUseLocalCache(uid, 2);
-        Assert.assertSame(firstFromUseLocalCache, secondFromUseLocalCache);
-        Assert.assertTrue(second.startsWith("1"));
+        Assertions.assertSame(firstFromUseLocalCache, secondFromUseLocalCache);
+        Assertions.assertTrue(second.startsWith("1"));
 
         // 第三次访问，evict local cache, from redis cache
         Cache cache = cacheManager3.getCache("useLocalCache");
         Optional.ofNullable(cache).ifPresent(Cache::clear);
         String thirdFromUseLocalCache = cacheService.getFromUseLocalCache(uid, 3);
-        Assert.assertNotSame(secondFromUseLocalCache, thirdFromUseLocalCache);
-        Assert.assertTrue(thirdFromUseLocalCache.startsWith("3"));
+        Assertions.assertNotSame(secondFromUseLocalCache, thirdFromUseLocalCache);
+        Assertions.assertTrue(thirdFromUseLocalCache.startsWith("3"));
 
         // use Local Cache No Expire
         // 第一次访问，走目标方法，Miss cache
@@ -201,34 +201,34 @@ public class SpringCacheTests {
 
         // 第二次访问，from local cache
         String secondFromUseLocalCacheNoExpire = cacheService.getFromUseLocalCacheNoExpire(uid, 2);
-        Assert.assertSame(firstFromUseLocalCacheNoExpire, secondFromUseLocalCacheNoExpire);
-        Assert.assertTrue(second.startsWith("1"));
+        Assertions.assertSame(firstFromUseLocalCacheNoExpire, secondFromUseLocalCacheNoExpire);
+        Assertions.assertTrue(second.startsWith("1"));
     }
 
     @Test
     public void test_null() {
         String uid = "testCache";
         String first = cacheService.get(uid, 1);
-        Assert.assertNull(first);
+        Assertions.assertNull(first);
 
         String nullVal = cacheService.get2(uid, 0);
-        Assert.assertNull(nullVal);
+        Assertions.assertNull(nullVal);
 
         uid = UUID.randomUUID().toString();
         String second = cacheService.get(uid, 2);
-        Assert.assertNotNull(second);
+        Assertions.assertNotNull(second);
 
         uid = "testNull";
         String third = cacheService.getFromUseLocalCache(uid, 3);
-        Assert.assertNull(third);
+        Assertions.assertNull(third);
 
         String fourth = cacheService.getFromUseLocalCache2(uid, 4);
-        Assert.assertNull(fourth);
+        Assertions.assertNull(fourth);
 
         uid = UUID.randomUUID().toString();
         String fifth = cacheService.getFromUseLocalCache2(uid, 5);
-        Assert.assertNotNull(fifth);
-        Assert.assertTrue(fifth.startsWith("5"));
+        Assertions.assertNotNull(fifth);
+        Assertions.assertTrue(fifth.startsWith("5"));
     }
 
     @Test
@@ -238,8 +238,8 @@ public class SpringCacheTests {
         // cacheKey test
         String firstUseCacheKey = cacheService.getUseCacheKey(() -> uid2, uid, 1);
         String secondUseCacheKey = frequencyAsyncCache.get(uid2, () -> "customCacheKey");
-        Assert.assertSame(firstUseCacheKey, secondUseCacheKey);
-        Assert.assertTrue(secondUseCacheKey.startsWith("1"));
+        Assertions.assertSame(firstUseCacheKey, secondUseCacheKey);
+        Assertions.assertTrue(secondUseCacheKey.startsWith("1"));
     }
 
     @Test
@@ -252,20 +252,20 @@ public class SpringCacheTests {
 //        Threads.sleepSeconds(10);
         // 第二次访问，from local cache,trigger async refresh,but ignored refresh
         String second = cacheService.getUseFrequencyAsyncCacheRefresher(uid, 2);
-        Assert.assertEquals(first, second);
-        Assert.assertTrue(second.startsWith("1"));
+        Assertions.assertEquals(first, second);
+        Assertions.assertTrue(second.startsWith("1"));
 
         // wait frequency interval time
         Threads.sleepSeconds(3);
         // 第三次访问，from refreshed local cache,but trigger async refresh
         String third = cacheService.getUseFrequencyAsyncCacheRefresher(uid, 3);
-        Assert.assertEquals(second, third);
-        Assert.assertTrue(third.startsWith("1"));
+        Assertions.assertEquals(second, third);
+        Assertions.assertTrue(third.startsWith("1"));
 
         // get new value of previous refresh
         String four = cacheService.getUseFrequencyAsyncCacheRefresher(uid, 4);
-//        Assert.assertEquals(four, third);
-        Assert.assertTrue(four.startsWith("3"));
+//        Assertions.assertEquals(four, third);
+        Assertions.assertTrue(four.startsWith("3"));
     }
 
 
@@ -281,7 +281,7 @@ public class SpringCacheTests {
         }
         // get new value of previous refresh
         String four = cacheService.getRandomCacheRefresher(uid, 4);
-//        Assert.assertEquals(four, third);
-        Assert.assertTrue(four.startsWith("3"));
+//        Assertions.assertEquals(four, third);
+        Assertions.assertTrue(four.startsWith("3"));
     }
 }

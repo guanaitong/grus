@@ -5,23 +5,23 @@
 
 package com.ciicgat.grus.boot.autoconfigure.validation.validate;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.net.URL;
 
 /**
  * Created by Josh on 17-11-9.
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = ValidationApplication.class,
         properties = {"spring.application.name=grus-demo", "grus.validation.errorCode=88888"})
@@ -35,7 +35,7 @@ public class ValidateTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         String url = String.format("http://127.0.0.1:%d/", port);
         System.out.println(String.format("port is : [%d]", port));
@@ -47,16 +47,16 @@ public class ValidateTest {
 
         ResponseEntity<String> response = restTemplate.getForEntity(this.base.toString() + "/testPrimitive?testString=12&testLong=2", String.class, "");
 
-        Assert.assertTrue(response.getStatusCodeValue() == 200);
-        Assert.assertTrue(response.getBody().contains("success"));
+        Assertions.assertTrue(response.getStatusCodeValue() == 200);
+        Assertions.assertTrue(response.getBody().contains("success"));
     }
 
     @Test
     public void testPojoNotNullSuccess() throws Exception {
         ResponseEntity<String> response = restTemplate.getForEntity(this.base.toString() + "/testPojo?testString=12&testLong=1", String.class, "");
 
-        Assert.assertTrue(response.getStatusCodeValue() == 200);
-        Assert.assertTrue(response.getBody().contains("success"));
+        Assertions.assertTrue(response.getStatusCodeValue() == 200);
+        Assertions.assertTrue(response.getBody().contains("success"));
 
     }
 
@@ -64,8 +64,8 @@ public class ValidateTest {
     public void testPojoNotMinFailed() throws Exception {
         ResponseEntity<String> response = restTemplate.getForEntity(this.base.toString() + "/testPojo?testString=12&testLong=0", String.class, "");
 
-        Assert.assertTrue(response.getStatusCodeValue() == 200);
-        Assert.assertTrue(response.getBody().contains("参数验证不通过"));
+        Assertions.assertTrue(response.getStatusCodeValue() == 200);
+        Assertions.assertTrue(response.getBody().contains("参数验证不通过"));
 
     }
 

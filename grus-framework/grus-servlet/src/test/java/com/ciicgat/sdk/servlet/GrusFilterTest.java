@@ -12,10 +12,10 @@ import io.jaegertracing.Configuration;
 import io.jaegertracing.internal.JaegerTracer;
 import io.jaegertracing.internal.samplers.RateLimitingSampler;
 import io.opentracing.util.GlobalTracer;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,7 +33,7 @@ import org.springframework.util.MultiValueMap;
 public class GrusFilterTest {
     private MockMvc mockMvc;
 
-    @BeforeClass
+    @BeforeAll
     public static void registerJaegerTracer() {
         Configuration.SenderConfiguration senderConfiguration =
                 new Configuration
@@ -59,11 +59,9 @@ public class GrusFilterTest {
         GlobalTracer.register(tracer);
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);
-
-
         this.mockMvc = MockMvcBuilders.standaloneSetup(new TestController()).addFilters(new GrusFilter()).build();
     }
 
@@ -85,10 +83,10 @@ public class GrusFilterTest {
                 .accept(MediaType.APPLICATION_JSON_UTF8_VALUE);
 
         MockHttpServletResponse httpResp = mockMvc.perform(post).andReturn().getResponse();
-        Assert.assertEquals(HttpStatus.OK.value(), httpResp.getStatus());
-        Assert.assertTrue(!httpResp.getHeader("x-trace-id").isEmpty());
+        Assertions.assertEquals(HttpStatus.OK.value(), httpResp.getStatus());
+        Assertions.assertTrue(!httpResp.getHeader("x-trace-id").isEmpty());
         String firstRequestTraceId = httpResp.getHeader("uber-trace-id");
-        Assert.assertTrue(!firstRequestTraceId.isEmpty());
+        Assertions.assertTrue(!firstRequestTraceId.isEmpty());
         System.out.println(firstRequestTraceId);
 
 
@@ -100,9 +98,9 @@ public class GrusFilterTest {
         MockHttpServletResponse httpResp1 = mockMvc.perform(post1).andReturn().getResponse();
 
         //两个请求，traceId应该相同
-        Assert.assertEquals(httpResp.getHeader("x-trace-id"), httpResp1.getHeader("x-trace-id"));
+        Assertions.assertEquals(httpResp.getHeader("x-trace-id"), httpResp1.getHeader("x-trace-id"));
         //第一请求的span，是下一个请求的parent
-        Assert.assertEquals(httpResp.getHeader("x-span-id"), httpResp1.getHeader("x-parent-id"));
+        Assertions.assertEquals(httpResp.getHeader("x-span-id"), httpResp1.getHeader("x-parent-id"));
 
     }
 
@@ -117,7 +115,7 @@ public class GrusFilterTest {
                 .accept(MediaType.APPLICATION_JSON);
 
         MockHttpServletResponse httpResp = mockMvc.perform(post).andReturn().getResponse();
-        Assert.assertEquals(HttpStatus.OK.value(), httpResp.getStatus());
-        Assert.assertTrue(!httpResp.getHeader("x-trace-id").isEmpty());
+        Assertions.assertEquals(HttpStatus.OK.value(), httpResp.getStatus());
+        Assertions.assertTrue(!httpResp.getHeader("x-trace-id").isEmpty());
     }
 }

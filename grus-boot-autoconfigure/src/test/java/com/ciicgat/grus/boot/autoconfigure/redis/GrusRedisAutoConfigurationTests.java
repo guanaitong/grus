@@ -9,7 +9,7 @@ import com.ciicgat.grus.boot.autoconfigure.core.GrusCoreContextInitializer;
 import com.ciicgat.sdk.redis.RedisExecutor;
 import com.ciicgat.sdk.redis.RedisService;
 import com.ciicgat.sdk.redis.config.RedisSetting;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.data.redis.core.StringRedisTemplate;
 

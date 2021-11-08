@@ -11,8 +11,8 @@ import junit.framework.TestCase;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,17 +50,17 @@ public class HttpClientHelperTest extends TestCase {
 
         long start1 = System.currentTimeMillis();
         String str = HttpClientHelper.get(String.format("https://passport.guanaitong.%s/", publicDomainSuffix));
-        Assert.assertTrue(str.contains("关爱通"));
+        Assertions.assertTrue(str.contains("关爱通"));
         System.out.println(System.currentTimeMillis() - start1);
 
         long start2 = System.currentTimeMillis();
         str = HttpClientHelper.get(String.format("https://cas.ciicgat.%s/", publicDomainSuffix));
-        Assert.assertTrue(str.contains("html"));
+        Assertions.assertTrue(str.contains("html"));
         System.out.println(System.currentTimeMillis() - start2);
 
         long start3 = System.currentTimeMillis();
         str = HttpClientHelper.get(String.format("https://nj.4008885818.%s/", publicDomainSuffix));
-        Assert.assertTrue(str.contains("html"));
+        Assertions.assertTrue(str.contains("html"));
         System.out.println(System.currentTimeMillis() - start3);
     }
 

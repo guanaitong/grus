@@ -7,8 +7,8 @@ package com.ciicgat.grus.util;
 
 import com.ciicgat.sdk.lang.convert.BaseErrorCode;
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +33,8 @@ public class BizAssertTest {
                 LOGGER.error("empty");
             });
         } catch (BusinessRuntimeException exception) {
-            Assert.assertEquals(-1, exception.getErrorCode());
-            Assert.assertEquals("empty", exception.getErrorMsg());
+            Assertions.assertEquals(-1, exception.getErrorCode());
+            Assertions.assertEquals("empty", exception.getErrorMsg());
         }
     }
 
@@ -46,9 +46,9 @@ public class BizAssertTest {
         try {
             BizAssert.notBlank("", new BaseErrorCode(-1, "empty"), () -> index.addAndGet(1));
         } catch (BusinessRuntimeException exception) {
-            Assert.assertEquals(-1, exception.getErrorCode());
-            Assert.assertEquals("empty", exception.getErrorMsg());
-            Assert.assertEquals(1, index.get());
+            Assertions.assertEquals(-1, exception.getErrorCode());
+            Assertions.assertEquals("empty", exception.getErrorMsg());
+            Assertions.assertEquals(1, index.get());
         }
     }
 

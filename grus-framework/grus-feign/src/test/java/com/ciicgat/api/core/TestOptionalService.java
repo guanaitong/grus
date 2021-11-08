@@ -15,9 +15,9 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.AfterClass;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -56,7 +56,7 @@ public class TestOptionalService {
         mockWebServer.enqueue(mockResponse);
 
         Optional<TestBean> optional = optionalService.get();
-        Assert.assertEquals(bean1, optional.get());
+        Assertions.assertEquals(bean1, optional.get());
     }
 
     @Test
@@ -68,7 +68,7 @@ public class TestOptionalService {
         mockWebServer.enqueue(mockResponse);
 
         Optional<TestBean> optional = optionalService.get();
-        Assert.assertFalse(optional.isPresent());
+        Assertions.assertFalse(optional.isPresent());
     }
 
     @Test
@@ -83,7 +83,7 @@ public class TestOptionalService {
         mockWebServer.enqueue(mockResponse);
 
         Optional<TestBean> optional = optionalService.getRespWithDataNull();
-        Assert.assertFalse(optional.isPresent());
+        Assertions.assertFalse(optional.isPresent());
     }
 
     @Test
@@ -94,6 +94,6 @@ public class TestOptionalService {
                 .setBody("");
         mockWebServer.enqueue(mockResponse);
         Optional<TestBean> optional = optionalService.getRespWithWrongHttpStatus();
-        Assert.assertFalse(optional.isPresent());
+        Assertions.assertFalse(optional.isPresent());
     }
 }

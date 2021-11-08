@@ -6,8 +6,8 @@
 package com.ciicgat.sdk.mq;
 
 import com.rabbitmq.client.BuiltinExchangeType;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -80,7 +80,7 @@ public class TestMq {
 
         while (atomicInteger.get() > 0) {
             if ((System.currentTimeMillis() - start) > 30 * 1000) {
-                Assert.fail("timeout");
+                Assertions.fail("timeout");
                 return;
             }
         }
@@ -89,14 +89,14 @@ public class TestMq {
     }
 
     private void compare(List<String> a, List<String> b) {
-        Assert.assertEquals(a.size(), b.size());
+        Assertions.assertEquals(a.size(), b.size());
         List<String> aa = new ArrayList<>(a);
         Collections.sort(aa);
 
         List<String> bb = new ArrayList<>(b);
         Collections.sort(bb);
         for (int i = 0; i < a.size(); i++) {
-            Assert.assertEquals(aa.get(i), bb.get(i));
+            Assertions.assertEquals(aa.get(i), bb.get(i));
         }
     }
 }

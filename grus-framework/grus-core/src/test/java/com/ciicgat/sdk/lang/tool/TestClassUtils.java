@@ -9,8 +9,8 @@ import com.ciicgat.sdk.lang.constant.GatBoolean;
 import com.ciicgat.sdk.lang.convert.BaseErrorCode;
 import com.ciicgat.sdk.lang.convert.ErrorCode;
 import com.ciicgat.sdk.lang.convert.StandardErrorCode;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -23,13 +23,13 @@ public class TestClassUtils {
     @Test
     public void test() {
         List<Class<?>> classes = ClassUtils.getClasses("com.ciicgat.sdk.lang.constant");
-        Assert.assertTrue(classes.contains(GatBoolean.class));
+        Assertions.assertTrue(classes.contains(GatBoolean.class));
     }
 
     @Test
     public void test1() {
         List<Class> classes = ClassUtils.getAllClassByInterface(ErrorCode.class);
-        Assert.assertTrue(classes.contains(BaseErrorCode.class));
-        Assert.assertTrue(classes.contains(StandardErrorCode.class));
+        Assertions.assertTrue(classes.contains(BaseErrorCode.class));
+        Assertions.assertTrue(classes.contains(StandardErrorCode.class));
     }
 }

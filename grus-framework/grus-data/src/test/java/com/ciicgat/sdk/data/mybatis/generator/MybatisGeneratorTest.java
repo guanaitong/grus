@@ -10,12 +10,12 @@ import com.ciicgat.sdk.data.mybatis.generator.condition.Example;
 import com.ciicgat.sdk.data.mybatis.generator.entity.ShopTip;
 import com.ciicgat.sdk.data.mybatis.generator.mapper.ShopTipMapper;
 import org.apache.commons.lang3.RandomUtils;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.UUID;
  * @author Clive Yuan
  * @date 2020/12/22
  */
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = MybatisGeneratorApplication.class)
 @TestPropertySource("classpath:mg-application.properties")
 public class MybatisGeneratorTest {
@@ -48,7 +48,7 @@ public class MybatisGeneratorTest {
 
         ShopTip shopTip = getById(id);
 
-        Assert.assertNull(shopTip);
+        Assertions.assertNull(shopTip);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class MybatisGeneratorTest {
 
         ShopTip newShopTip = getById(entity.getId());
 
-        Assert.assertEquals(content, newShopTip.getContent());
+        Assertions.assertEquals(content, newShopTip.getContent());
 
     }
 
@@ -85,9 +85,9 @@ public class MybatisGeneratorTest {
         Example<ShopTip> example = new ConditionExample<>();
         example.createLambdaCriteria().eq(ShopTip::getContent, content);
         List<ShopTip> list = shopTipMapper.list(example);
-        Assert.assertTrue(list.size() > 0);
+        Assertions.assertTrue(list.size() > 0);
         list.forEach(System.out::println);
-        Assert.assertEquals(content, list.get(0).getContent());
+        Assertions.assertEquals(content, list.get(0).getContent());
     }
 
     private ShopTip buildShopTip() {
@@ -104,16 +104,16 @@ public class MybatisGeneratorTest {
         ShopTip entity = buildShopTip();
         shopTipMapper.insert(entity);
         Long id = entity.getId();
-        Assert.assertNotNull(id);
+        Assertions.assertNotNull(id);
         return id;
     }
 
     private void checkExist(Long id) {
-        Assert.assertNotNull(getById(id));
+        Assertions.assertNotNull(getById(id));
     }
 
     private ShopTip getById(Long id) {
-        Assert.assertNotNull(id);
+        Assertions.assertNotNull(id);
         return shopTipMapper.get(id);
     }
 

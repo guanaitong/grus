@@ -7,7 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.elasticsearch;
 
 import com.ciicgat.grus.boot.autoconfigure.core.GrusCoreContextInitializer;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import static com.ciicgat.grus.boot.autoconfigure.test.TestConstants.TEST_APP_PAIRS;

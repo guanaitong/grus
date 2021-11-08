@@ -13,9 +13,9 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -41,7 +41,7 @@ public class TestIgnoreError {
         mockWebServer.shutdown();
     }
 
-    @Test(expected = FeignException.class)
+    @Test
     public synchronized void testWithoutIgnoreErrorMeetRealError() {
         MockResponse mockResponse = new MockResponse()
                 .addHeader("Content-Type", "application/json;charset=utf-8")
@@ -49,8 +49,7 @@ public class TestIgnoreError {
                 .setResponseCode(501);
         mockWebServer.enqueue(mockResponse);
 
-
-        Integer i = errorService.getWithOutIgnoreError();
+        Assertions.assertThrows(FeignException.class, () -> errorService.getWithOutIgnoreError());
     }
 
     @Test
@@ -62,7 +61,7 @@ public class TestIgnoreError {
 
 
         Integer i = errorService.getWithIgnoreError();
-        Assert.assertNull(i);
+        Assertions.assertNull(i);
     }
 
     @Test
@@ -78,7 +77,7 @@ public class TestIgnoreError {
 
 
         Integer i = errorService.getWithIgnoreError();
-        Assert.assertEquals(i.intValue(), 2);
+        Assertions.assertEquals(i.intValue(), 2);
     }
 
 
@@ -91,7 +90,7 @@ public class TestIgnoreError {
 
 
         int i = errorService.getIntWithIgnoreError();
-        Assert.assertEquals(i, 0);
+        Assertions.assertEquals(i, 0);
     }
 
     @Test
@@ -102,7 +101,7 @@ public class TestIgnoreError {
         mockWebServer.enqueue(mockResponse);
 
         boolean i = errorService.getBoolenWithIgnoreError();
-        Assert.assertTrue(!i);
+        Assertions.assertTrue(!i);
     }
 
     @Test
@@ -121,7 +120,7 @@ public class TestIgnoreError {
                 .setResponseCode(411);
         mockWebServer.enqueue(mockResponse);
         Optional<Integer> i = errorService.getOptionalWithIgnoreError();
-        Assert.assertTrue(!i.isPresent());
+        Assertions.assertTrue(!i.isPresent());
     }
 
 

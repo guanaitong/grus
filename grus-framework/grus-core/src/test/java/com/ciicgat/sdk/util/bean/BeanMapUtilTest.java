@@ -6,8 +6,8 @@
 package com.ciicgat.sdk.util.bean;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -95,10 +95,10 @@ public class BeanMapUtilTest {
         bean.setDate(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"));
 
         Map<String, Object> beanMap = BeanMapUtil.bean2Map(bean);
-        Assert.assertEquals(5, beanMap.size());
-        Assert.assertEquals("111", beanMap.get("app"));
-        Assert.assertEquals(4, beanMap.get("num"));
-        Assert.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), beanMap.get("date"));
+        Assertions.assertEquals(5, beanMap.size());
+        Assertions.assertEquals("111", beanMap.get("app"));
+        Assertions.assertEquals(4, beanMap.get("num"));
+        Assertions.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), beanMap.get("date"));
 
         System.out.println("finished");
     }
@@ -112,9 +112,9 @@ public class BeanMapUtilTest {
 
         Bean bean = BeanMapUtil.map2Bean(beanMap, Bean.class);
 
-        Assert.assertEquals("111", bean.getApp());
-        Assert.assertEquals(Integer.valueOf(4), bean.getNum());
-        Assert.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), bean.getDate());
+        Assertions.assertEquals("111", bean.getApp());
+        Assertions.assertEquals(Integer.valueOf(4), bean.getNum());
+        Assertions.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), bean.getDate());
         System.out.println("finished");
     }
 }

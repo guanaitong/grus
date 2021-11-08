@@ -17,8 +17,9 @@ import org.apache.shardingsphere.elasticjob.lite.lifecycle.internal.settings.Job
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration;
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperRegistryCenter;
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
-import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ public class TraceableJobTest implements SimpleJob {
     private static AtomicInteger atomicInteger = new AtomicInteger();
     private static CountDownLatch countDownLatch = new CountDownLatch(1);
 
-    @BeforeClass
+    @BeforeAll
     public static void registerJaegerTracer() {
         Configuration.SenderConfiguration senderConfiguration =
                 new Configuration
@@ -75,7 +76,7 @@ public class TraceableJobTest implements SimpleJob {
     }
 
 
-    @org.junit.Test
+    @Test
     public void test() throws InterruptedException {
         logger.info("test");
         ZookeeperRegistryCenter zookeeperRegistryCenter = new ZookeeperRegistryCenter(new ZookeeperConfiguration("app-zk.servers.dev.ofc", "test2"));
@@ -111,6 +112,6 @@ public class TraceableJobTest implements SimpleJob {
 //        springJobScheduler.init();
 
 
-        Assert.assertTrue(TraceableJobTest.getValue() > 0);
+        Assertions.assertTrue(TraceableJobTest.getValue() > 0);
     }
 }

@@ -7,7 +7,7 @@ package com.ciicgat.sdk.util.base;
 
 import com.ciicgat.sdk.lang.digest.AESCrypt;
 import com.ciicgat.sdk.lang.tool.Bytes;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 

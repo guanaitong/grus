@@ -6,8 +6,8 @@
 package com.ciicgat.sdk.util.bean;
 
 import com.ciicgat.sdk.lang.convert.Pagination;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,13 +112,13 @@ public class BeanCopyUtilTest {
         Bean2 bean2 = BeanCopyUtil.copy(bean1, Bean2.class);
         Bean2 bean3 = BeanCopyUtil.copy(bean1, Bean2.class, testExtraConverter);
 
-        Assert.assertEquals("支付", bean2.getApp());
-        Assert.assertEquals(Integer.valueOf(1), bean2.getNum());
-        Assert.assertEquals("wjj", bean2.getAttr().getName());
+        Assertions.assertEquals("支付", bean2.getApp());
+        Assertions.assertEquals(Integer.valueOf(1), bean2.getNum());
+        Assertions.assertEquals("wjj", bean2.getAttr().getName());
 
-        Assert.assertEquals("改过了", bean3.getApp());
-        Assert.assertEquals(Integer.valueOf(1), bean3.getNum());
-        Assert.assertEquals("wjj", bean3.getAttr().getName());
+        Assertions.assertEquals("改过了", bean3.getApp());
+        Assertions.assertEquals(Integer.valueOf(1), bean3.getNum());
+        Assertions.assertEquals("wjj", bean3.getAttr().getName());
     }
 
     @Test
@@ -137,15 +137,15 @@ public class BeanCopyUtilTest {
         List<Bean2> bean2s = BeanCopyUtil.copyList(bean1s, Bean2.class, testExtraConverter);
         List<Bean2> bean3s = BeanCopyUtil.copyList(bean1s, Bean2.class);
 
-        Assert.assertEquals(5, bean2s.size());
-        Assert.assertEquals("改过了", bean2s.get(2).getApp());
-        Assert.assertEquals(Integer.valueOf(2), bean2s.get(2).getNum());
-        Assert.assertEquals("wjj", bean2s.get(2).getAttr().getName());
+        Assertions.assertEquals(5, bean2s.size());
+        Assertions.assertEquals("改过了", bean2s.get(2).getApp());
+        Assertions.assertEquals(Integer.valueOf(2), bean2s.get(2).getNum());
+        Assertions.assertEquals("wjj", bean2s.get(2).getAttr().getName());
 
-        Assert.assertEquals(5, bean3s.size());
-        Assert.assertEquals("我们2", bean3s.get(2).getApp());
-        Assert.assertEquals(Integer.valueOf(2), bean3s.get(2).getNum());
-        Assert.assertEquals("wjj", bean3s.get(2).getAttr().getName());
+        Assertions.assertEquals(5, bean3s.size());
+        Assertions.assertEquals("我们2", bean3s.get(2).getApp());
+        Assertions.assertEquals(Integer.valueOf(2), bean3s.get(2).getNum());
+        Assertions.assertEquals("wjj", bean3s.get(2).getAttr().getName());
     }
 
     @Test
@@ -168,14 +168,14 @@ public class BeanCopyUtilTest {
             dst.setApp("lamda");
         });
 
-        Assert.assertTrue(bean2P.isHasNext());
-        Assert.assertEquals("我们2", bean2P.getDataList().get(2).getApp());
-        Assert.assertEquals(Integer.valueOf(2), bean2P.getDataList().get(2).getNum());
-        Assert.assertEquals(10, bean2P.getTotalCount());
+        Assertions.assertTrue(bean2P.isHasNext());
+        Assertions.assertEquals("我们2", bean2P.getDataList().get(2).getApp());
+        Assertions.assertEquals(Integer.valueOf(2), bean2P.getDataList().get(2).getNum());
+        Assertions.assertEquals(10, bean2P.getTotalCount());
 
-        Assert.assertTrue(bean3P.isHasNext());
-        Assert.assertEquals("lamda", bean3P.getDataList().get(2).getApp());
-        Assert.assertEquals(Integer.valueOf(2), bean3P.getDataList().get(2).getNum());
-        Assert.assertEquals(10, bean3P.getTotalCount());
+        Assertions.assertTrue(bean3P.isHasNext());
+        Assertions.assertEquals("lamda", bean3P.getDataList().get(2).getApp());
+        Assertions.assertEquals(Integer.valueOf(2), bean3P.getDataList().get(2).getNum());
+        Assertions.assertEquals(10, bean3P.getTotalCount());
     }
 }

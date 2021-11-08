@@ -5,8 +5,8 @@
 
 package com.ciicgat.sdk.lang.tool;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Properties;
 
@@ -20,10 +20,10 @@ public class TestReadResourceUtils {
     public void test() {
         Properties properties = ReadResourceUtils.getPropertyFile("test.properties");
 
-        Assert.assertEquals("456", properties.getProperty("age"));
-        Assert.assertEquals("August", properties.getProperty("name"));
+        Assertions.assertEquals("456", properties.getProperty("age"));
+        Assertions.assertEquals("August", properties.getProperty("name"));
         Properties properties2 = ReadResourceUtils.getPropertyFile("test.properties");
-        Assert.assertEquals("456", properties2.getProperty("age"));
-        Assert.assertEquals("August", properties2.getProperty("name"));
+        Assertions.assertEquals("456", properties2.getProperty("age"));
+        Assertions.assertEquals("August", properties2.getProperty("name"));
     }
 }

@@ -8,8 +8,8 @@ package com.ciicgat.sdk.redis.config;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.gconf.ConfigCollection;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author August
@@ -60,8 +60,8 @@ public class RedisSettingTest {
         String config = configCollection.getConfig("redis-config.json");
         System.out.println("config = " + config);
         RedisSetting redisSetting = configCollection.getBean("redis-config.json", RedisSetting.class);
-//        Assert.assertEquals(redisSetting.getPassword(), "LKmaqJy22KQf");
-        Assert.assertNotEquals(redisSetting.getPassword(), "LKmaqJy22KQf");
+//        Assertions.assertEquals(redisSetting.getPassword(), "LKmaqJy22KQf");
+        Assertions.assertNotEquals(redisSetting.getPassword(), "LKmaqJy22KQf");
 
     }
 

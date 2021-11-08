@@ -13,14 +13,15 @@ import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
 import com.ciicgat.sdk.lang.convert.Pagination;
 import com.ciicgat.sdk.lang.url.UrlCoder;
+import feign.FeignException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.AfterClass;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -60,7 +61,7 @@ public class TestHttpGetDeleteService {
         mockWebServer.enqueue(mockResponse);
 
         TestBean bean = testService.get("我的xx@", 456);
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -70,16 +71,16 @@ public class TestHttpGetDeleteService {
         }
 
         //path encode的时候，
-        Assert.assertEquals("/get/" + UrlCoder.encode("我的xx@") + "?count=456", recordedRequest.getPath());
-        Assert.assertEquals("GET", recordedRequest.getMethod());
+        Assertions.assertEquals("/get/" + UrlCoder.encode("我的xx@") + "?count=456", recordedRequest.getPath());
+        Assertions.assertEquals("GET", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("", bodyString);
+        Assertions.assertEquals("", bodyString);
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public synchronized void testGetUnNormal() {
-        testService.getUnNormal("我的xx@", 456);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> testService.getUnNormal("我的xx@", 456));
     }
 
     @Test
@@ -95,7 +96,7 @@ public class TestHttpGetDeleteService {
         mockWebServer.enqueue(mockResponse);
 
         TestBean bean = testService.delete("我的xx@", 456);
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -103,10 +104,10 @@ public class TestHttpGetDeleteService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/delete/" + UrlCoder.encode("我的xx@") + "?count=456", recordedRequest.getPath());
-        Assert.assertEquals("DELETE", recordedRequest.getMethod());
+        Assertions.assertEquals("/delete/" + UrlCoder.encode("我的xx@") + "?count=456", recordedRequest.getPath());
+        Assertions.assertEquals("DELETE", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("", bodyString);
+        Assertions.assertEquals("", bodyString);
     }
 
     @Test
@@ -122,7 +123,7 @@ public class TestHttpGetDeleteService {
         mockWebServer.enqueue(mockResponse);
 
         TestBean bean = testService.getWithApiRespData();
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -130,10 +131,10 @@ public class TestHttpGetDeleteService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/getWithApiRespData", recordedRequest.getPath());
-        Assert.assertEquals("GET", recordedRequest.getMethod());
+        Assertions.assertEquals("/getWithApiRespData", recordedRequest.getPath());
+        Assertions.assertEquals("GET", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("", bodyString);
+        Assertions.assertEquals("", bodyString);
     }
 
     @Test
@@ -154,9 +155,9 @@ public class TestHttpGetDeleteService {
             e = e1;
         }
 
-        Assert.assertNotNull(e);
-        Assert.assertNull(bean);
-        Assert.assertEquals(222, e.getErrorCode());
+        Assertions.assertNotNull(e);
+        Assertions.assertNull(bean);
+        Assertions.assertEquals(222, e.getErrorCode());
 
         try {
             mockWebServer.takeRequest();
@@ -180,7 +181,7 @@ public class TestHttpGetDeleteService {
         mockWebServer.enqueue(mockResponse);
 
         List<TestBean> beans = testService.getBeanList();
-        Assert.assertEquals(bean1, beans.get(0));
+        Assertions.assertEquals(bean1, beans.get(0));
 
         RecordedRequest recordedRequest = null;
         try {
@@ -188,8 +189,8 @@ public class TestHttpGetDeleteService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/getBeanList", recordedRequest.getPath());
-        Assert.assertEquals("GET", recordedRequest.getMethod());
+        Assertions.assertEquals("/getBeanList", recordedRequest.getPath());
+        Assertions.assertEquals("GET", recordedRequest.getMethod());
     }
 
     @Test
@@ -205,7 +206,7 @@ public class TestHttpGetDeleteService {
         mockWebServer.enqueue(mockResponse);
 
         Pagination<TestBean> beans = testService.getBeanPagination();
-        Assert.assertEquals(bean1, beans.getDataList().get(0));
+        Assertions.assertEquals(bean1, beans.getDataList().get(0));
 
         RecordedRequest recordedRequest = null;
         try {
@@ -213,8 +214,8 @@ public class TestHttpGetDeleteService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/getBeanPagination", recordedRequest.getPath());
-        Assert.assertEquals("GET", recordedRequest.getMethod());
+        Assertions.assertEquals("/getBeanPagination", recordedRequest.getPath());
+        Assertions.assertEquals("GET", recordedRequest.getMethod());
     }
 
 
@@ -228,7 +229,7 @@ public class TestHttpGetDeleteService {
         mockWebServer.enqueue(mockResponse);
 
         ApiResponse<List<TestBean>> bean = testService.getApiResponseOfBeanList();
-        Assert.assertEquals(bean1, bean.getData().get(0));
+        Assertions.assertEquals(bean1, bean.getData().get(0));
 
         RecordedRequest recordedRequest = null;
         try {
@@ -236,8 +237,8 @@ public class TestHttpGetDeleteService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/getApiResponseOfBeanList", recordedRequest.getPath());
-        Assert.assertEquals("GET", recordedRequest.getMethod());
+        Assertions.assertEquals("/getApiResponseOfBeanList", recordedRequest.getPath());
+        Assertions.assertEquals("GET", recordedRequest.getMethod());
 
     }
 
@@ -254,7 +255,7 @@ public class TestHttpGetDeleteService {
         mockWebServer.enqueue(mockResponse);
 
         List<TestBean> bean = testService.getBeanListWithApiRespData();
-        Assert.assertEquals(bean1, bean.get(0));
+        Assertions.assertEquals(bean1, bean.get(0));
 
         RecordedRequest recordedRequest = null;
         try {
@@ -262,8 +263,8 @@ public class TestHttpGetDeleteService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/getBeanListWithApiRespData", recordedRequest.getPath());
-        Assert.assertEquals("GET", recordedRequest.getMethod());
+        Assertions.assertEquals("/getBeanListWithApiRespData", recordedRequest.getPath());
+        Assertions.assertEquals("GET", recordedRequest.getMethod());
     }
 
 
@@ -281,7 +282,7 @@ public class TestHttpGetDeleteService {
 
 
         TestBean bean = testService.getWithListParams(Arrays.asList("server1", "server2"), 456);
-        Assert.assertEquals(bean1, bean);
+        Assertions.assertEquals(bean1, bean);
 
         RecordedRequest recordedRequest = null;
         try {
@@ -289,10 +290,10 @@ public class TestHttpGetDeleteService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        Assert.assertEquals("/get?serverIds=server1&serverIds=server2&count=456", recordedRequest.getPath());
-        Assert.assertEquals("GET", recordedRequest.getMethod());
+        Assertions.assertEquals("/get?serverIds=server1&serverIds=server2&count=456", recordedRequest.getPath());
+        Assertions.assertEquals("GET", recordedRequest.getMethod());
         String bodyString = recordedRequest.getBody().readUtf8();
-        Assert.assertEquals("", bodyString);
+        Assertions.assertEquals("", bodyString);
     }
 
 }

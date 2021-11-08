@@ -5,8 +5,8 @@
 
 package com.ciicgat.boot.validator;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 
@@ -35,7 +35,7 @@ public class ValidateTest {
 
         ValidateResult validateResult = methodValidator.validate(new Object[]{"12", 2L, testBean});
 
-        Assert.assertTrue(validateResult.isValid());
+        Assertions.assertTrue(validateResult.isValid());
 
     }
 
@@ -65,7 +65,7 @@ public class ValidateTest {
         MethodValidator methodValidator = new MethodValidator(declaredMethod, parameterNameDiscoverer.getParameterNames(declaredMethod));
 
         ValidateResult validateResult = methodValidator.validate(new Object[]{null, 2L, testBean});
-        Assert.assertTrue(!validateResult.isValid());
+        Assertions.assertTrue(!validateResult.isValid());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class ValidateTest {
         MethodValidator methodValidator = new MethodValidator(declaredMethod, parameterNameDiscoverer.getParameterNames(declaredMethod));
 
         ValidateResult validateResult = methodValidator.validate(new Object[]{"12", 0L, testBean});
-        Assert.assertTrue(!validateResult.isValid());
+        Assertions.assertTrue(!validateResult.isValid());
     }
 
 //    @Test
@@ -93,9 +93,9 @@ public class ValidateTest {
 //                    .andExpect(MockMvcResultMatchers.status().isOk())
 //                    .andDo(MockMvcResultHandlers.print())
 //                    .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("success")));
-//            Assert.fail();
+//            Assertions.fail();
 //        } catch (Exception e) {
-//            Assert.assertTrue(e.getCause() instanceof ValidateRuntimeException);
+//            Assertions.assertTrue(e.getCause() instanceof ValidateRuntimeException);
 //            ValidateRuntimeException ex = (ValidateRuntimeException) e.getCause();
 //            System.out.println(ex.getMessage());
 //        }
@@ -110,9 +110,9 @@ public class ValidateTest {
 //                    .andExpect(MockMvcResultMatchers.status().isOk())
 //                    .andDo(MockMvcResultHandlers.print())
 //                    .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("success")));
-//            Assert.fail();
+//            Assertions.fail();
 //        } catch (Exception e) {
-//            Assert.assertTrue(e.getCause() instanceof ValidateRuntimeException);
+//            Assertions.assertTrue(e.getCause() instanceof ValidateRuntimeException);
 //            ValidateRuntimeException ex = (ValidateRuntimeException) e.getCause();
 //            System.out.println(ex.getMessage());
 //        }
@@ -128,7 +128,7 @@ public class ValidateTest {
 //                    .andDo(MockMvcResultHandlers.print())
 //                    .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("success")));
 //        } catch (Exception e) {
-//            Assert.fail();
+//            Assertions.fail();
 //            System.out.println(e.getMessage());
 //        }
 //    }
@@ -142,9 +142,9 @@ public class ValidateTest {
 //                    .andExpect(MockMvcResultMatchers.status().isOk())
 //                    .andDo(MockMvcResultHandlers.print())
 //                    .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("success")));
-//            Assert.fail();
+//            Assertions.fail();
 //        } catch (Exception e) {
-//            Assert.assertTrue(e.getCause() instanceof ValidateRuntimeException);
+//            Assertions.assertTrue(e.getCause() instanceof ValidateRuntimeException);
 //            ValidateRuntimeException ex = (ValidateRuntimeException) e.getCause();
 //            System.out.println(ex.getMessage());
 //        }
@@ -171,9 +171,9 @@ public class ValidateTest {
 //                    .andExpect(MockMvcResultMatchers.status().isOk())
 //                    .andDo(MockMvcResultHandlers.print())
 //                    .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("success")));
-//            Assert.fail();
+//            Assertions.fail();
 //        } catch (Exception e) {
-//            Assert.assertTrue(e.getCause() instanceof ValidateRuntimeException);
+//            Assertions.assertTrue(e.getCause() instanceof ValidateRuntimeException);
 //            ValidateRuntimeException ex = (ValidateRuntimeException) e.getCause();
 //            System.out.println(ex.getMessage());
 //        }
@@ -189,9 +189,9 @@ public class ValidateTest {
 //                    .andExpect(MockMvcResultMatchers.status().isOk())
 //                    .andDo(MockMvcResultHandlers.print())
 //                    .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("success")));
-//            Assert.fail();
+//            Assertions.fail();
 //        } catch (Exception e) {
-//            Assert.assertTrue(e.getCause() instanceof ValidateRuntimeException);
+//            Assertions.assertTrue(e.getCause() instanceof ValidateRuntimeException);
 //            ValidateRuntimeException ex = (ValidateRuntimeException) e.getCause();
 //            System.out.println(ex.getMessage());
 //        }
@@ -207,9 +207,9 @@ public class ValidateTest {
 //                    .andExpect(MockMvcResultMatchers.status().isOk())
 //                    .andDo(MockMvcResultHandlers.print())
 //                    .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("success")));
-//            Assert.fail();
+//            Assertions.fail();
 //        } catch (Exception e) {
-//            Assert.assertTrue(e.getCause() instanceof ValidateRuntimeException);
+//            Assertions.assertTrue(e.getCause() instanceof ValidateRuntimeException);
 //            ValidateRuntimeException ex = (ValidateRuntimeException) e.getCause();
 //            System.out.println(ex.getMessage());
 //        }
@@ -225,9 +225,9 @@ public class ValidateTest {
 //                    .andExpect(MockMvcResultMatchers.status().isOk())
 //                    .andDo(MockMvcResultHandlers.print())
 //                    .andExpect(MockMvcResultMatchers.content().string(Matchers.containsString("success")));
-//            Assert.fail();
+//            Assertions.fail();
 //        } catch (Exception e) {
-//            Assert.assertTrue(e.getCause() instanceof ValidateRuntimeException);
+//            Assertions.assertTrue(e.getCause() instanceof ValidateRuntimeException);
 //            ValidateRuntimeException ex = (ValidateRuntimeException) e.getCause();
 //            System.out.println(ex.getMessage());
 //        }
