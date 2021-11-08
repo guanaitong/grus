@@ -78,7 +78,8 @@
         <revision>2021.2.0-SNAPSHOT</revision>
         <java.version>11</java.version>
         <resource.delimiter>@</resource.delimiter>
-        <spring-boot.version>2.5.6</spring-boot.version>
+<!--        <spring-boot.version>2.5.6</spring-boot.version>-->
+        <spring-boot.version>2.3.12.RELEASE</spring-boot.version>
         <spring-boot-admin.version>2.3.1</spring-boot-admin.version>
         <gconf.version>1.0.0</gconf.version>
         <elasticsearch.version>7.3.1</elasticsearch.version>
