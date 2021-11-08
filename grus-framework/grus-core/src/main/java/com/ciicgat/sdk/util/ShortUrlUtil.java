@@ -6,6 +6,7 @@
 package com.ciicgat.sdk.util;
 
 import com.ciicgat.grus.json.JSON;
+import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
 import com.ciicgat.sdk.util.http.HttpClientHelper;
@@ -22,14 +23,13 @@ import java.util.Map;
  */
 public class ShortUrlUtil {
     private static final String PRIVATE_TOKEN_HEADER_NAME = "Private-Token";
-    private static final String PRIVATE_TOKEN_HEADER_VALUE = "wjdxavE4UUsJqGBtGxFT";
     private static final String SHORT_URL_DOMAIN = "https://g-url.cn";
     private static final String CREATE_URL = SHORT_URL_DOMAIN.concat("/api/create");
     private static final String REVERSE_URL = SHORT_URL_DOMAIN.concat("/api/reverse");
     private static final Map<String, String> HEADER_MAP = new HashMap<>(16);
 
     static {
-        HEADER_MAP.put(PRIVATE_TOKEN_HEADER_NAME, PRIVATE_TOKEN_HEADER_VALUE);
+        HEADER_MAP.put(PRIVATE_TOKEN_HEADER_NAME, GlobalGconfConfig.getConfig().getProperties("security.properties").getProperty("shorturl_token"));
     }
 
     private ShortUrlUtil() {
