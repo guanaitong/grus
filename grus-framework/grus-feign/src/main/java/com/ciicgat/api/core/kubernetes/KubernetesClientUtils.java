@@ -94,7 +94,7 @@ public class KubernetesClientUtils {
     public static String getCurrentNamespace() {
         try {
             String namespace = Files.readString(Paths.get(SERVICEACCOUNT_NAMESPACE_PATH), StandardCharsets.UTF_8);
-            LOGGER.info("currentNamespace is " + namespace);
+            LOGGER.info("currentNamespace is {}", namespace);
             return namespace;
         } catch (Exception e) {
             throw new RuntimeException(e);

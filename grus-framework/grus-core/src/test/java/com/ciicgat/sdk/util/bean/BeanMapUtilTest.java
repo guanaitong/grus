@@ -95,7 +95,7 @@ public class BeanMapUtilTest {
         bean.setDate(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"));
 
         Map<String, Object> beanMap = BeanMapUtil.bean2Map(bean);
-        Assert.assertEquals(beanMap.size(), 5);
+        Assert.assertEquals(5, beanMap.size());
         Assert.assertEquals("111", beanMap.get("app"));
         Assert.assertEquals(4, beanMap.get("num"));
         Assert.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), beanMap.get("date"));

@@ -8,13 +8,11 @@ package com.ciicgat.sdk.util.bean;
 import com.google.common.collect.Maps;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.FatalBeanException;
-import org.springframework.cglib.beans.BeanMap;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -25,23 +23,12 @@ import java.util.Objects;
  */
 public class BeanMapUtil {
 
-    public static Map<String, Object> oldBean2Map(Object bean) {
-        if (bean == null) {
-            return null;
-        }
-        Map<String, Object> map = new HashMap<>();
-
-        BeanMap beanMap = BeanMap.create(bean);
-        map.putAll(beanMap);
-
-        return map;
-    }
     public static Map<String, Object> bean2Map(Object bean) {
         if (bean == null) {
             return null;
         }
         PropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(bean.getClass());
-        if (propertyDescriptors == null || propertyDescriptors.length == 0) {
+        if (propertyDescriptors.length == 0) {
             return Collections.emptyMap();
         }
         Map<String, Object> map = Maps.newHashMapWithExpectedSize(propertyDescriptors.length);
@@ -60,7 +47,7 @@ public class BeanMapUtil {
                     if (Objects.nonNull(value)) {
                         map.put(name, value);
                     }
-                } catch (Throwable ex) {
+                } catch (Exception ex) {
                     throw new FatalBeanException(
                             "Could not copy property '" + name + "' from source to target", ex);
                 }
@@ -75,7 +62,7 @@ public class BeanMapUtil {
             return bean;
         }
         PropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(beanClass);
-        if (propertyDescriptors == null || propertyDescriptors.length == 0) {
+        if (propertyDescriptors.length == 0) {
             return bean;
         }
         for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
@@ -93,7 +80,7 @@ public class BeanMapUtil {
                         }
                         writeMethod.invoke(bean, value);
                     }
-                } catch (Throwable ex) {
+                } catch (Exception ex) {
                     throw new FatalBeanException(
                             "Could not copy property '" + name + "' from source to target", ex);
                 }
