@@ -25,12 +25,9 @@ public class BeanMapUtil {
 
     public static Map<String, Object> bean2Map(Object bean) {
         if (bean == null) {
-            return null;
-        }
-        PropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(bean.getClass());
-        if (propertyDescriptors.length == 0) {
             return Collections.emptyMap();
         }
+        PropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(bean.getClass());
         Map<String, Object> map = Maps.newHashMapWithExpectedSize(propertyDescriptors.length);
         for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
             String name = propertyDescriptor.getName();
@@ -58,13 +55,7 @@ public class BeanMapUtil {
 
     public static <T> T map2Bean(Map<String, Object> map, Class<T> beanClass) {
         T bean = BeanUtils.instantiateClass(beanClass);
-        if (map.size() == 0) {
-            return bean;
-        }
         PropertyDescriptor[] propertyDescriptors = BeanUtils.getPropertyDescriptors(beanClass);
-        if (propertyDescriptors.length == 0) {
-            return bean;
-        }
         for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
             String name = propertyDescriptor.getName();
             if ("class".equals(name)) {
@@ -86,7 +77,6 @@ public class BeanMapUtil {
                 }
             }
         }
-
         return bean;
     }
 
