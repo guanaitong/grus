@@ -25,7 +25,7 @@ import java.util.Objects;
  */
 public class BeanMapUtil {
 
-    public static Map<String, Object> bean2Map(Object bean) {
+    public static Map<String, Object> oldBean2Map(Object bean) {
         if (bean == null) {
             return null;
         }
@@ -36,7 +36,7 @@ public class BeanMapUtil {
 
         return map;
     }
-    public static Map<String, Object> bean2Map2(Object bean) {
+    public static Map<String, Object> bean2Map(Object bean) {
         if (bean == null) {
             return null;
         }
