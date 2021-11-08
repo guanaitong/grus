@@ -14,6 +14,7 @@ import io.kubernetes.client.util.credentials.AccessTokenAuthentication;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class KubernetesServiceDiscoveryClientTest {
     private static final Log LOG = LogFactory.getLog(KubernetesServiceDiscoveryClientTest.class);
 
     @Test
+    @Ignore
     public void testGetKubernetesTargetContext1() {
         testGetKubernetesTargetContext("https://10.101.11.201:6443", "default", "eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJjcmFiLXRva2VuLXI5bjR6Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImNyYWIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI5MzA4ZDI2OS01YTAxLTExZWEtYjc0Yi0wMDUwNTY5YWU1Y2IiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06Y3JhYiJ9.ZV4TmxJ3JUVrr-rcwHqeuBblNe8NVdEUMX-GO_P6fuoRqvrC4m-da1jCOmkq74pHDwexzomvgf2tffRLwfvOWvtpcbL4-EFXeXct6br4Mehmk9reyIgkG2WyAa9sqcVSsri_086SFxPXQgI8nCAFQRPZtUHKEaYP7Sa877udE2AMExBPiTWowphRH53tYXvUCISiIARhm8zR4ahadYVcTQtrxnCvK9FTH2yxtYtzKKKTh0KH0Ej6HW2plANsiGW2GH7gGCUB72Ye9v5LoreRZsVmP2a-ael9WEVFdWqpLHIUHQ6bpyNuInbyi5ya0tIX-YQbTVK3cH9qRXp6Ekt69w");
     }
