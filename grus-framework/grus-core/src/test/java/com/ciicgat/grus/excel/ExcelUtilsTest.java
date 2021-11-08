@@ -7,7 +7,7 @@ package com.ciicgat.grus.excel;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.Assertions;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -143,7 +143,7 @@ public class ExcelUtilsTest {
     private List<TestExcelBo2> dataList2 = new ArrayList<>();
 
 
-    @Before
+    @BeforeEach
     public void prepare() throws Exception {
         TestExcelBo testExcelBo = new TestExcelBo();
         testExcelBo.setAge(33);

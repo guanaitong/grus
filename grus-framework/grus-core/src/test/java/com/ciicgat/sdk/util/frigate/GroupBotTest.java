@@ -6,8 +6,8 @@
 package com.ciicgat.sdk.util.frigate;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -25,12 +25,12 @@ public class GroupBotTest {
      */
     private static final String GROUP_BOT_KEY = "ceed6aa3-ca81-4e9e-9638-9bc23e115a16";
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         MsgClient.setSkip(false);
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         try {
             if (Objects.isNull(System.getenv("CI"))) {

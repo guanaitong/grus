@@ -14,7 +14,7 @@ import io.opentracing.Tracer;
 import io.opentracing.tag.Tags;
 import io.opentracing.util.GlobalTracer;
 import org.junit.jupiter.api.Assertions;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 
@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TestTraceThreadPoolExecutor {
 
-    @BeforeClass
+    @BeforeAll
     public static void registerJaegerTracer() {
         Configuration.SenderConfiguration senderConfiguration =
                 new Configuration

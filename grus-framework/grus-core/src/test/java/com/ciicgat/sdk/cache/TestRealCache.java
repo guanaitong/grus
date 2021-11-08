@@ -7,21 +7,21 @@ package com.ciicgat.sdk.cache;
 
 import com.ciicgat.sdk.lang.exception.CacheDataException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * Created by August.Zhou on 2017/1/4 14:37.
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 public class TestRealCache {
 
 
     private PrimaryCache primaryCache;
 
-    @Before
+    @BeforeEach
     public void setup() {
         primaryCache = new PrimaryCache(new LocalCache(10000));
     }

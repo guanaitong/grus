@@ -5,8 +5,8 @@
 
 package com.ciicgat.sdk.util.frigate;
 
-import org.junit.After;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
@@ -16,7 +16,7 @@ import java.util.Objects;
  */
 public class FrigateNotifierTest {
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         try {
             if (Objects.isNull(System.getenv("CI"))) {
@@ -78,7 +78,7 @@ public class FrigateNotifierTest {
         FrigateNotifier.sendMessage(NotifyChannel.ALL, HUGE_CONTENT, new RuntimeException("都错了"), "HB533", "HB266");
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void beforeClass() throws Exception {
         MsgClient.setSkip(false);
     }

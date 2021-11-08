@@ -7,17 +7,17 @@ package com.ciicgat.sdk.cache;
 
 import com.ciicgat.sdk.lang.exception.CacheDataException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * Created by August.Zhou on 2017/1/4 14:37.
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 public class TestPrimaryCache {
 
     @Mock
@@ -26,7 +26,7 @@ public class TestPrimaryCache {
 
     private PrimaryCache primaryCache;
 
-    @Before
+    @BeforeEach
     public void setup() {
         primaryCache = new PrimaryCache(cache);
     }
@@ -63,18 +63,17 @@ public class TestPrimaryCache {
     }
 
 
-//    @Test(expected = RuntimeException.class)
+    //    @Test(expected = RuntimeException.class)
     @Test
-    public void testGet_MissCache_WithException() throws CacheDataException {
+    public void testGet_MissCache_WithException() {
         String key = "1";
         Mockito.when(cache.getValue(key)).thenReturn(null);
         final Person person = new Person();
         person.setId(1);
         person.setName("huxuan");
-        Person person1 = primaryCache.get(key, () -> {
+        Assertions.assertThrows(RuntimeException.class, () -> primaryCache.get(key, () -> {
             throw new RuntimeException("db error");
-        });
-        Assertions.assertSame(person, person1);
+        }));;
     }
 
 
@@ -95,7 +94,6 @@ public class TestPrimaryCache {
         Assertions.assertSame(person, person1);
     }
 
-//    @Test(expected = CacheDataException.class)
     @Test
     public void testGet_WithCacheSaveException() {
         String key = "1";
@@ -107,20 +105,6 @@ public class TestPrimaryCache {
         } catch (CacheDataException e) {
             e.printStackTrace();
         }
-        Person person1 = primaryCache.get(key, () -> person);
-        Assertions.assertSame(person, person1);
-
-
-        Person person2 = primaryCache.get(key, () -> {
-            final Person person3 = new Person();
-            person3.setId(1);
-            person3.setName("huxuan");
-            return person3;
-        });
-        Assertions.assertNotSame(person, person2);
-
-
-        Assertions.assertEquals(person.getId(), person2.getId());
-        Assertions.assertEquals(person.getName(), person2.getName());
+        Assertions.assertThrows(CacheDataException.class, () -> primaryCache.get(key, () -> person));
     }
 }

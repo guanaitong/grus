@@ -6,7 +6,7 @@
 package com.ciicgat.sdk.util.frigate;
 
 import com.ciicgat.grus.alert.Alert;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
@@ -17,7 +17,7 @@ import java.util.Objects;
  */
 public class AlertTest {
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         try {
             if (Objects.isNull(System.getenv("CI"))) {

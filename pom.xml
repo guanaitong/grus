@@ -101,6 +101,7 @@
         <sentinel.version>1.8.2</sentinel.version>
         <kubernetes-java-client.version>12.0.1</kubernetes-java-client.version>
         <dubbo.version>2.7.3</dubbo.version>
+        <jacoco.skip>true</jacoco.skip>
 
 
         <maven.compiler.source>${java.version}</maven.compiler.source>

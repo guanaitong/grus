@@ -7,15 +7,15 @@ package com.ciicgat.sdk.cache;
 
 import com.ciicgat.sdk.lang.exception.CacheDataException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 public class TestSecondaryCache {
     @Mock
     private LocalCache cache;
@@ -23,7 +23,7 @@ public class TestSecondaryCache {
     private SecondaryCache secondaryCache;
 
 
-    @Before
+    @BeforeEach
     public void setup() {
         secondaryCache = new SecondaryCache(cache);
     }
@@ -79,7 +79,7 @@ public class TestSecondaryCache {
     }
 
     @Test
-    public void testGet_miss_Cache_withException() throws RuntimeException {
+    public void testGet_miss_Cache_withException(){
         final Person person = new Person();
         person.setId(1);
         person.setMemberId(3);
@@ -88,7 +88,7 @@ public class TestSecondaryCache {
         String key = makeKey();
         Mockito.when(cache.getValue(key)).thenReturn(null);
 
-        Person person1 = secondaryCache.get(key, (id) -> {
+        Assertions.assertThrows(RuntimeException.class, () -> secondaryCache.get(key, (id) -> {
             Person person3 = new Person();
             person3.setId(2);
             person3.setMemberId(4);
@@ -96,9 +96,7 @@ public class TestSecondaryCache {
             return person3;
         }, () -> {
             throw new RuntimeException("DB error");
-        });
-
-        Assertions.assertSame(person, person1);
+        }));
     }
 
     @Test

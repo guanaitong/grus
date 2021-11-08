@@ -7,7 +7,6 @@ package com.ciicgat.sdk.util.http;
 
 import com.ciicgat.sdk.lang.tool.CloseUtils;
 import com.ciicgat.sdk.util.system.WorkRegion;
-import junit.framework.TestCase;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
@@ -24,11 +23,13 @@ import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * @author August
  * @date 2021/7/23 13:22
  */
-public class HttpClientHelperTest extends TestCase {
+public class HttpClientHelperTest  {
     private static final Logger log = LoggerFactory.getLogger(HttpClientHelperTest.class);
 
     @Test
@@ -50,17 +51,17 @@ public class HttpClientHelperTest extends TestCase {
 
         long start1 = System.currentTimeMillis();
         String str = HttpClientHelper.get(String.format("https://passport.guanaitong.%s/", publicDomainSuffix));
-        Assertions.assertTrue(str.contains("关爱通"));
+        assertTrue(str.contains("关爱通"));
         System.out.println(System.currentTimeMillis() - start1);
 
         long start2 = System.currentTimeMillis();
         str = HttpClientHelper.get(String.format("https://cas.ciicgat.%s/", publicDomainSuffix));
-        Assertions.assertTrue(str.contains("html"));
+        assertTrue(str.contains("html"));
         System.out.println(System.currentTimeMillis() - start2);
 
         long start3 = System.currentTimeMillis();
         str = HttpClientHelper.get(String.format("https://nj.4008885818.%s/", publicDomainSuffix));
-        Assertions.assertTrue(str.contains("html"));
+        assertTrue(str.contains("html"));
         System.out.println(System.currentTimeMillis() - start3);
     }
 
@@ -89,7 +90,7 @@ public class HttpClientHelperTest extends TestCase {
             assertTrue(e.getCause().getMessage().contains("Failed to connect to"));
             return;
         }
-        fail();
+        Assertions.fail();
     }
 
 //    public void testOkHttpClientOfServerDown() {
@@ -134,7 +135,7 @@ public class HttpClientHelperTest extends TestCase {
             assertTrue(e.getCause().getMessage().contains("Failed to connect to"));
             return;
         }
-        fail();
+        Assertions.fail();
     }
 
 
@@ -171,7 +172,7 @@ public class HttpClientHelperTest extends TestCase {
             assertTrue(e.getCause().getMessage().contains("unexpected end of stream"));
             return;
         }
-        fail();
+        Assertions.fail();
 
     }
 
@@ -189,6 +190,6 @@ public class HttpClientHelperTest extends TestCase {
             assertTrue(e.getCause().getMessage().equals("timeout") || e.getCause().getMessage().equals("Read timed out"));
             return;
         }
-        fail();
+        Assertions.fail();
     }
 }
