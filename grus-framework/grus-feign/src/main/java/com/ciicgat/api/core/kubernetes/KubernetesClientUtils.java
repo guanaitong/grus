@@ -9,8 +9,8 @@ import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.util.ClientBuilder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -33,8 +33,7 @@ import static io.kubernetes.client.util.Config.SERVICEACCOUNT_NAMESPACE_PATH;
  * @Date: 2021/7/8 16:07
  */
 public class KubernetesClientUtils {
-
-    private static final Log LOG = LogFactory.getLog(KubernetesClientUtils.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KubernetesClientUtils.class);
 
     private KubernetesClientUtils() {
     }
@@ -44,12 +43,12 @@ public class KubernetesClientUtils {
             // Assume we are running in a cluster
             ApiClient apiClient = ClientBuilder.cluster().build();
             if (testClient(apiClient)) {
-                LOG.info("Created API client in the cluster.");
+                LOGGER.info("Created API client in the cluster.");
                 return apiClient;
             }
             apiClient = apiClientFromConfig();
             if (testClient(apiClient)) {
-                LOG.info("Create API client from config");
+                LOGGER.info("Create API client from config");
                 return apiClient;
             }
         } catch (Exception e) {
@@ -87,7 +86,7 @@ public class KubernetesClientUtils {
                     null);
             return true;
         } catch (ApiException e) {
-            LOG.warn("test failed", e);
+            LOGGER.warn("test failed", e);
         }
         return false;
     }
@@ -95,7 +94,7 @@ public class KubernetesClientUtils {
     public static String getCurrentNamespace() {
         try {
             String namespace = Files.readString(Paths.get(SERVICEACCOUNT_NAMESPACE_PATH), StandardCharsets.UTF_8);
-            LOG.info("currentNamespace is " + namespace);
+            LOGGER.info("currentNamespace is " + namespace);
             return namespace;
         } catch (Exception e) {
             throw new RuntimeException(e);
