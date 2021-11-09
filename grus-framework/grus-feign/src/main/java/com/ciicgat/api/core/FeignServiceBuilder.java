@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by August.Zhou on 2019-03-06 17:12.
@@ -158,7 +159,7 @@ public class FeignServiceBuilder {
 
     private <T> T create() {
         if (options == null) {
-            options = new Request.Options(TimeOutConstants.DEFAULT_CONNECT_TIMEOUT_MILLIS, TimeOutConstants.DEFAULT_READ_TIMEOUT_MILLIS);
+            options = new Request.Options(TimeOutConstants.DEFAULT_CONNECT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, TimeOutConstants.DEFAULT_READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS, true);
         }
         if (retryer == null) {
             retryer = new ConfigRetryer();
