@@ -177,24 +177,28 @@ public class FeignServiceBuilder {
         GrusServiceStatus grusServiceStatus = grusRuntimeManager.registerDownstreamService(serviceName.value(), "");
 
 
-        Object serviceInstance = Feign.builder()
-                .logger(new Slf4jLogger())
-                .contract(GrusFeignContractUtil.getFeignContract(serviceClazz))
-                .options(options)
-                .logLevel(feign.Logger.Level.NONE)
-                .requestInterceptors(requestInterceptors)
-                .decoder(new OptionalDecoder(new JacksonDecoder(OBJECT_MAPPER)))
-                .encoder(new FormEncoder(new JacksonEncoder(OBJECT_MAPPER)))
-                .errorDecoder(new ErrorDecoder.Default())
-                .invocationHandlerFactory(new GInvocationHandlerFactory(grusServiceStatus, cacheOptions, fallbackFactory, this.logReq, this.logResp))
-                .client(client)
-                .retryer(retryer)//默认不retry
-                .target(new GrusTarget(serviceClazz, serviceName, namingService));
+        try {
+            Object serviceInstance = Feign.builder()
+                    .logger(new Slf4jLogger())
+                    .contract(GrusFeignContractUtil.getFeignContract(serviceClazz))
+                    .options(options)
+                    .logLevel(feign.Logger.Level.NONE)
+                    .requestInterceptors(requestInterceptors)
+                    .decoder(new OptionalDecoder(new JacksonDecoder(OBJECT_MAPPER)))
+                    .encoder(new FormEncoder(new JacksonEncoder(OBJECT_MAPPER)))
+                    .errorDecoder(new ErrorDecoder.Default())
+                    .invocationHandlerFactory(new GInvocationHandlerFactory(grusServiceStatus, cacheOptions, fallbackFactory, this.logReq, this.logResp))
+                    .client(client)
+                    .retryer(retryer)//默认不retry
+                    .target(new GrusTarget(serviceClazz, serviceName, namingService));
 //                .target(serviceClazz, baseUrl);
 
-        return (T) serviceInstance;
+            return (T) serviceInstance;
+        } catch (RuntimeException ex) {
+            LOGGER.error("create bean error,serviceName {} class {}", serviceName, serviceClazz);
+            throw ex;
+        }
     }
-
 
 
     /**
