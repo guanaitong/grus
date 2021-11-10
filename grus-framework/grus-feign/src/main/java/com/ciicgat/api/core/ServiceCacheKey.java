@@ -27,7 +27,9 @@ public class ServiceCacheKey {
 
     private boolean logResp;
 
-    public ServiceCacheKey(Class<?> serviceClazz, CacheOptions cacheOptions, Request.Options reqoptions, boolean logReq, boolean logResp) {
+    private boolean enableSentinel;
+
+    public ServiceCacheKey(Class<?> serviceClazz, CacheOptions cacheOptions, Request.Options reqoptions, boolean logReq, boolean logResp, boolean enableSentinel) {
         this.serviceClazz = serviceClazz;
         this.cacheOptions = cacheOptions;
         if (reqoptions != null) {
@@ -36,6 +38,7 @@ public class ServiceCacheKey {
         }
         this.logReq = logReq;
         this.logResp = logResp;
+        this.enableSentinel = enableSentinel;
     }
 
     @Override
@@ -47,12 +50,13 @@ public class ServiceCacheKey {
                 readTimeoutMillis == that.readTimeoutMillis &&
                 logReq == that.logReq &&
                 logResp == that.logResp &&
+                enableSentinel == that.enableSentinel &&
                 Objects.equals(serviceClazz, that.serviceClazz) &&
                 Objects.equals(cacheOptions, that.cacheOptions);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(serviceClazz, cacheOptions, connectTimeoutMillis, readTimeoutMillis, logReq, logResp);
+        return Objects.hash(serviceClazz, cacheOptions, connectTimeoutMillis, readTimeoutMillis, logReq, logResp, enableSentinel);
     }
 }

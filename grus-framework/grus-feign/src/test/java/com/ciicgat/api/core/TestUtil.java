@@ -40,5 +40,15 @@ public class TestUtil {
                 .build());
     }
 
+    public static <T> Pair<T, MockWebServer> newInstance(final String appName, final Class<T> serviceClazz, boolean enableSentinel) {
+        return newInstance(appName, () -> FeignServiceBuilder
+                .newBuilder()
+                .serviceClazz(serviceClazz)
+                .logReq(true)
+                .logResp(true)
+                .enableSentinel(enableSentinel)
+                .build());
+    }
+
 
 }
