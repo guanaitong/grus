@@ -11,6 +11,7 @@ import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.redis.config.RedisSetting;
 import com.ciicgat.sdk.springcache.refresh.FrequencyCacheRefresher;
 import com.ciicgat.sdk.springcache.refresh.RandomCacheRefresher;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -68,7 +69,7 @@ public class CacheApplication {
     public CacheManager cacheManager1(RedisSetting redisSetting) {
         RedisCacheConfig redisCacheConfig = new RedisCacheConfig();
         redisCacheConfig.setRedisSetting(redisSetting);
-        redisCacheConfig.setPrefix("GRUS_DEMO_1_");
+        redisCacheConfig.setPrefix("GRUS_DEMO_1_" + RandomStringUtils.random(2));
         redisCacheConfig.setSerializer(RedisSerializer.java());
         redisCacheConfig.setUseGzip(true);
         redisCacheConfig.setCacheConfigFunc(name -> {
@@ -92,7 +93,7 @@ public class CacheApplication {
     public CacheManager cacheManager2(RedisSetting redisSetting) {
         RedisCacheConfig redisCacheConfig = new RedisCacheConfig();
         redisCacheConfig.setRedisSetting(redisSetting);
-        redisCacheConfig.setPrefix("GRUS_DEMO_2_");
+        redisCacheConfig.setPrefix("GRUS_DEMO_2_" + RandomStringUtils.random(2));
         redisCacheConfig.setSerializer(RedisSerializer.java());
         redisCacheConfig.setUseGzip(true);
         redisCacheConfig.setCacheConfigFunc(name -> {
@@ -117,7 +118,7 @@ public class CacheApplication {
     public CacheManager cacheManager3(RedisSetting redisSetting) {
         RedisCacheConfig redisCacheConfig = new RedisCacheConfig();
         redisCacheConfig.setRedisSetting(redisSetting);
-        redisCacheConfig.setPrefix("GRUS_DEMO_3_");
+        redisCacheConfig.setPrefix("GRUS_DEMO_3_" + RandomStringUtils.random(2));
         redisCacheConfig.setSerializer(RedisSerializer.java());
         redisCacheConfig.setUseGzip(true);
         redisCacheConfig.setCacheConfigFunc(name -> {
@@ -127,7 +128,7 @@ public class CacheApplication {
                 case "useLocalCacheSerialize":
                     return CacheConfig.localRedis().setExpireSeconds(600).setLocalExpireSeconds(120).setSerialize(true);
                 case "useLocalCache":
-                    return CacheConfig.local().setExpireSeconds(60);
+                    return CacheConfig.local().setCacheNull(true).setExpireSeconds(60);
                 case "useLocalCacheNoExpire":
                     return CacheConfig.local().setExpireSeconds(0);
             }
@@ -148,7 +149,7 @@ public class CacheApplication {
     public CacheManager cacheManager4(RedisSetting redisSetting) {
         RedisCacheConfig redisCacheConfig = new RedisCacheConfig();
         redisCacheConfig.setRedisSetting(redisSetting);
-        redisCacheConfig.setPrefix("GRUS_DEMO_4_");
+        redisCacheConfig.setPrefix("GRUS_DEMO_4_" + RandomStringUtils.random(2));
         redisCacheConfig.setSerializer(RedisSerializer.java());
         redisCacheConfig.setUseGzip(true);
         redisCacheConfig.setCacheConfigFunc(name -> CacheConfig.redis());

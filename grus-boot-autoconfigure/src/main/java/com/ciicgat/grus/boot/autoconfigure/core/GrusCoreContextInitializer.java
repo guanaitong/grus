@@ -73,7 +73,7 @@ public class GrusCoreContextInitializer implements ApplicationContextInitializer
 
         initGlobalGconfConfig(appName);
         if (!WorkRegion.getCurrentWorkRegion().isDevelopOrTest()) {
-            Alert.send(String.format("应用（%s）正在发布", appName));
+            Alert.send(String.format("应用（%s）正在启动", appName));
         }
     }
 

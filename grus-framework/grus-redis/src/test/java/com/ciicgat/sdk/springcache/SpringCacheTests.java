@@ -212,7 +212,7 @@ public class SpringCacheTests {
         Assertions.assertNull(first);
 
         String nullVal = cacheService.get2(uid, 0);
-        Assertions.assertNull(nullVal);
+        Assertions.assertNotNull(nullVal);
 
         uid = UUID.randomUUID().toString();
         String second = cacheService.get(uid, 2);

@@ -11,7 +11,38 @@ package com.ciicgat.sdk.springcache;
  * @author wanchongyang
  * @date 2021/1/15 11:05 下午
  */
-public abstract class CacheConfig {
+public abstract class CacheConfig<CONFIG extends CacheConfig> {
+
+
+    /**
+     * 是否cacheNull值。
+     * 非NULL时，优先级最高
+     */
+    private Boolean cacheNull;
+
+    /**
+     * 使用gzip压缩存储缓存数据，缓存数据大时建议开启
+     * 非NULL时，优先级最高
+     */
+    private Boolean useGzip;
+
+    public Boolean getCacheNull() {
+        return cacheNull;
+    }
+
+    public CONFIG setCacheNull(Boolean cacheNull) {
+        this.cacheNull = cacheNull;
+        return (CONFIG) this;
+    }
+
+    public Boolean getUseGzip() {
+        return useGzip;
+    }
+
+    public CONFIG setUseGzip(Boolean useGzip) {
+        this.useGzip = useGzip;
+        return (CONFIG) this;
+    }
 
     private static final int DEFAULT_LOCAL_INIT_SIZE = 128;
     private static final int DEFAULT_LOCAL_EXPIRE_SECONDS = 3600;
@@ -34,7 +65,7 @@ public abstract class CacheConfig {
     /**
      * Local specific cache properties.
      */
-    public static class Local extends CacheConfig {
+    public static class Local extends CacheConfig<Local> {
         /**
          * 是否序列化value，如果为否，那么缓存的value为对象，如果是，那么缓存的value为对象序列化后的字节数组
          * 不使用序列化性能更加高。但是需要保证返回的值，不能做修改。
@@ -104,13 +135,7 @@ public abstract class CacheConfig {
     /**
      * Redis-specific cache properties.
      */
-    public static class Redis<R extends Redis> extends CacheConfig {
-        /**
-         * 使用gzip压缩存储缓存数据，缓存数据大时建议开启
-         * <p>
-         * 非NULL时，优先级最高
-         */
-        private Boolean useGzip;
+    public static class Redis<R extends Redis> extends CacheConfig<R> {
 
         /**
          * 过期时间，单位s
@@ -118,15 +143,6 @@ public abstract class CacheConfig {
         private int expireSeconds = 3600;
 
         Redis() {
-        }
-
-        public Boolean getUseGzip() {
-            return useGzip;
-        }
-
-        public R setUseGzip(Boolean useGzip) {
-            this.useGzip = useGzip;
-            return (R) this;
         }
 
         public int getExpireSeconds() {

@@ -13,9 +13,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 
@@ -34,6 +36,8 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
     private final RedisConnectionFactory redisConnectionFactory;
     // use caffeine stats counter
     private final ConcurrentStatsCounter statsCounter = new ConcurrentStatsCounter();
+    protected final boolean cacheNull;
+    protected final RedisSerializer<Object> valueSerializer;
 
     public AbstractCache(String name, RedisCacheManager redisCacheManager, C config) {
         this.name = name;
@@ -41,6 +45,10 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         this.config = config;
         this.cacheRefresher = this.redisCacheManager.getCacheRefresher();
         this.redisConnectionFactory = this.redisCacheManager.getRedisConnectionFactory();
+        final RedisCacheConfig redisCacheConfig = redisCacheManager.getRedisCacheConfig();
+        boolean useGzip = Objects.isNull(config.getUseGzip()) ? redisCacheConfig.isUseGzip() : config.getUseGzip().booleanValue();
+        this.valueSerializer = useGzip ? new GzipRedisSerializer(redisCacheConfig.getSerializer()) : redisCacheConfig.getSerializer();
+        this.cacheNull = Objects.isNull(config.getCacheNull()) ? redisCacheConfig.isCacheNull() : config.getCacheNull().booleanValue();
     }
 
     public final CacheStats stats() {
@@ -82,7 +90,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
     @Override
     public final void put(Object key, Object value) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
                     putIgnoreException(key, value);
@@ -95,12 +103,17 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
 
     public abstract void putNewValue(Object key, Object value);
 
-    protected void putIgnoreException(Object key, Object value) {
+    protected boolean putIgnoreException(Object key, Object value) {
         try {
+            if (Objects.isNull(value) && !cacheNull) {
+                return false;
+            }
             put0(key, value);
+            return true;
         } catch (Exception e) {
             LOGGER.warn("save value failed,key=" + key, e);
         }
+        return false;
     }
 
     protected abstract void put0(Object key, Object value);
@@ -109,7 +122,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
     public final void evict(Object key) {
         evictIgnoreException(key);
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
                     evictIgnoreException(key);

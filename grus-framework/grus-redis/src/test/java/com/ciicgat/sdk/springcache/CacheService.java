@@ -92,7 +92,7 @@ public class CacheService {
         return randomAsyncCache.get(uid, () -> num + "_" + uid);
     }
 
-    public String getUseCacheKey(CacheKey cacheKey, String uid,  int num) {
+    public String getUseCacheKey(CacheKey cacheKey, String uid, int num) {
         return frequencyAsyncCache.get(cacheKey, () -> num + "_" + uid);
     }
 }

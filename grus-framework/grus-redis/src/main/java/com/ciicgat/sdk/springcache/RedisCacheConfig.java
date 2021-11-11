@@ -27,6 +27,10 @@ public class RedisCacheConfig {
      * 使用gzip压缩存储缓存数据，缓存数据大时建议开启
      */
     private boolean useGzip;
+    /**
+     * 是否cacheNull值
+     */
+    private boolean cacheNull;
 
     /**
      * enableLocalCache=true时，用于订阅删除key的通道名，如果不填写，默认使用应用名
@@ -34,6 +38,7 @@ public class RedisCacheConfig {
     private String channel;
 
     private RedisSetting redisSetting;
+
 
     public RedisCacheConfig() {
     }
@@ -107,6 +112,15 @@ public class RedisCacheConfig {
 
     public RedisCacheConfig setChannel(String channel) {
         this.channel = channel;
+        return this;
+    }
+
+    public boolean isCacheNull() {
+        return cacheNull;
+    }
+
+    public RedisCacheConfig setCacheNull(boolean cacheNull) {
+        this.cacheNull = cacheNull;
         return this;
     }
 

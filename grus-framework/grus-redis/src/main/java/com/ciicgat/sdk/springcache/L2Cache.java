@@ -53,6 +53,9 @@ public class L2Cache extends RedisCache<CacheConfig.LocalRedis> implements ILoca
             if (redisBytesValue == null) {
                 return null;
             }
+            if (NULL_BYTES_VALUE == redisBytesValue && !cacheNull) {
+                return NULL_BYTES_VALUE;
+            }
             localCache.put(key, this.config.isSerialize() ? redisBytesValue.getBytes() : redisBytesValue.getValue());
             return redisBytesValue;
         } else if (value == NULL) {
@@ -86,8 +89,9 @@ public class L2Cache extends RedisCache<CacheConfig.LocalRedis> implements ILoca
 
     @Override
     public void putNewValue(Object key, Object value) {
-        putIgnoreException(key, value);
-        sendEvictMessage(key);
+        if (putIgnoreException(key, value)) {
+            sendEvictMessage(key);
+        }
     }
 
     @Override

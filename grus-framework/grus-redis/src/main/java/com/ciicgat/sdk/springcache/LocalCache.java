@@ -10,7 +10,6 @@ import com.github.benmanes.caffeine.cache.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.support.SimpleValueWrapper;
-import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.util.concurrent.TimeUnit;
 
@@ -23,12 +22,10 @@ import java.util.concurrent.TimeUnit;
 public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILocalCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalCache.class);
     private final com.github.benmanes.caffeine.cache.Cache<Object, Object> localCache;
-    protected final RedisSerializer<Object> valueSerializer;
+
 
     public LocalCache(String name, RedisCacheManager redisCacheManager, CacheConfig.Local local) {
         super(name, redisCacheManager, local);
-        this.valueSerializer = redisCacheManager.getRedisCacheConfig().getSerializer();
-
         Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
                 .maximumSize(local.getMaximumSize())
                 .initialCapacity(local.getInitialCapacity());
@@ -57,8 +54,9 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
 
     @Override
     public void putNewValue(Object key, Object value) {
-        putIgnoreException(key, value);
-        sendEvictMessage(key);
+        if (putIgnoreException(key, value)) {
+            sendEvictMessage(key);
+        }
     }
 
     @Override
