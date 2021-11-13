@@ -13,7 +13,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
  * @author wanchongyang
  * @date 2021/1/15 11:05 下午
  */
-public abstract class CacheConfig<CONFIG extends CacheConfig<CONFIG>> {
+public abstract class CacheConfig<C extends CacheConfig<C>> {
 
 
     /**
@@ -39,9 +39,9 @@ public abstract class CacheConfig<CONFIG extends CacheConfig<CONFIG>> {
         return cacheNull;
     }
 
-    public CONFIG setCacheNull(Boolean cacheNull) {
+    public C setCacheNull(Boolean cacheNull) {
         this.cacheNull = cacheNull;
-        return (CONFIG) this;
+        return (C) this;
     }
 
     public Boolean getUseGzip() {
@@ -49,18 +49,18 @@ public abstract class CacheConfig<CONFIG extends CacheConfig<CONFIG>> {
     }
 
 
-    public CONFIG setUseGzip(Boolean useGzip) {
+    public C setUseGzip(Boolean useGzip) {
         this.useGzip = useGzip;
-        return (CONFIG) this;
+        return (C) this;
     }
 
     public RedisSerializer<Object> getSerializer() {
         return serializer;
     }
 
-    public CONFIG setSerializer(RedisSerializer<Object> serializer) {
+    public C setSerializer(RedisSerializer<Object> serializer) {
         this.serializer = serializer;
-        return (CONFIG) this;
+        return (C) this;
     }
 
     private static final int DEFAULT_LOCAL_INIT_SIZE = 128;
@@ -154,7 +154,7 @@ public abstract class CacheConfig<CONFIG extends CacheConfig<CONFIG>> {
     /**
      * Redis-specific cache properties.
      */
-    public static class Redis<CONFIG extends Redis<CONFIG>> extends CacheConfig<CONFIG> {
+    public static class Redis<C extends Redis<C>> extends CacheConfig<C> {
 
         /**
          * 过期时间，单位s
@@ -168,9 +168,9 @@ public abstract class CacheConfig<CONFIG extends CacheConfig<CONFIG>> {
             return expireSeconds;
         }
 
-        public CONFIG setExpireSeconds(int expireSeconds) {
+        public C setExpireSeconds(int expireSeconds) {
             this.expireSeconds = expireSeconds;
-            return (CONFIG) this;
+            return (C) this;
         }
 
         @Override
