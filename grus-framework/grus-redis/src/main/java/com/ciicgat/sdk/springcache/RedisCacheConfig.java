@@ -13,7 +13,7 @@ import org.springframework.data.redis.serializer.RedisSerializer;
  */
 public class RedisCacheConfig {
 
-    private RedisSerializer serializer = RedisSerializer.java();
+    private RedisSerializer<Object> serializer = RedisSerializer.java();
 
     private String prefix;
 
@@ -43,11 +43,11 @@ public class RedisCacheConfig {
     public RedisCacheConfig() {
     }
 
-    public RedisSerializer getSerializer() {
+    public RedisSerializer<Object> getSerializer() {
         return serializer;
     }
 
-    public RedisCacheConfig setSerializer(RedisSerializer serializer) {
+    public RedisCacheConfig setSerializer(RedisSerializer<Object> serializer) {
         this.serializer = serializer;
         return this;
     }

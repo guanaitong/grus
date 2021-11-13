@@ -32,7 +32,7 @@ public abstract class CacheConfig<CONFIG extends CacheConfig<CONFIG>> {
      * 序列化
      * 非NULL时，优先级最高
      */
-    private RedisSerializer serializer;
+    private RedisSerializer<Object> serializer;
 
 
     public Boolean getCacheNull() {
@@ -54,11 +54,11 @@ public abstract class CacheConfig<CONFIG extends CacheConfig<CONFIG>> {
         return (CONFIG) this;
     }
 
-    public RedisSerializer getSerializer() {
+    public RedisSerializer<Object> getSerializer() {
         return serializer;
     }
 
-    public CONFIG setSerializer(RedisSerializer serializer) {
+    public CONFIG setSerializer(RedisSerializer<Object> serializer) {
         this.serializer = serializer;
         return (CONFIG) this;
     }

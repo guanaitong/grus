@@ -46,7 +46,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         this.cacheRefresher = this.redisCacheManager.getCacheRefresher();
         this.redisConnectionFactory = this.redisCacheManager.getRedisConnectionFactory();
         final RedisCacheConfig redisCacheConfig = redisCacheManager.getRedisCacheConfig();
-        RedisSerializer redisSerializer = Objects.isNull(config.getSerializer()) ? redisCacheConfig.getSerializer() : config.getSerializer();
+        RedisSerializer<Object> redisSerializer = Objects.isNull(config.getSerializer()) ? redisCacheConfig.getSerializer() : config.getSerializer();
         if (redisSerializer instanceof GzipRedisSerializer) {
             this.valueSerializer = redisSerializer;
         } else {

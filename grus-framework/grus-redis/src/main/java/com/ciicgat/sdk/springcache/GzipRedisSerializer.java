@@ -19,11 +19,11 @@ import java.util.zip.GZIPOutputStream;
  * 对于一些大key、value，可以使用gzip压缩
  * Created by August.Zhou on 2020-04-14 13:01.
  */
-public class GzipRedisSerializer implements RedisSerializer {
+public class GzipRedisSerializer implements RedisSerializer<Object> {
 
-    private final RedisSerializer redisSerializer;
+    private final RedisSerializer<Object> redisSerializer;
 
-    public GzipRedisSerializer(RedisSerializer redisSerializer) {
+    public GzipRedisSerializer(RedisSerializer<Object> redisSerializer) {
         this.redisSerializer = redisSerializer;
     }
 
