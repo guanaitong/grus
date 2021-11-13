@@ -71,11 +71,10 @@ public class CacheApplication {
         redisCacheConfig.setRedisSetting(redisSetting);
         redisCacheConfig.setPrefix("GRUS_DEMO_1_" + RandomStringUtils.random(2));
         redisCacheConfig.setSerializer(RedisSerializer.java());
-        redisCacheConfig.setUseGzip(true);
         redisCacheConfig.setCacheConfigFunc(name -> {
             switch (name) {
                 case "uidCache":
-                    return CacheConfig.redis().setExpireSeconds(600);
+                    return CacheConfig.redis().setUseGzip(true).setSerializer(RedisSerializer.json()).setExpireSeconds(600);
             }
 
             return CacheConfig.redis();

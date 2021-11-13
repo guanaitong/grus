@@ -5,13 +5,15 @@
 
 package com.ciicgat.sdk.springcache;
 
+import org.springframework.data.redis.serializer.RedisSerializer;
+
 /**
  * Cache 配置参数
  *
  * @author wanchongyang
  * @date 2021/1/15 11:05 下午
  */
-public abstract class CacheConfig<CONFIG extends CacheConfig> {
+public abstract class CacheConfig<CONFIG extends CacheConfig<CONFIG>> {
 
 
     /**
@@ -26,6 +28,13 @@ public abstract class CacheConfig<CONFIG extends CacheConfig> {
      */
     private Boolean useGzip;
 
+    /**
+     * 序列化
+     * 非NULL时，优先级最高
+     */
+    private RedisSerializer serializer;
+
+
     public Boolean getCacheNull() {
         return cacheNull;
     }
@@ -39,8 +48,18 @@ public abstract class CacheConfig<CONFIG extends CacheConfig> {
         return useGzip;
     }
 
+
     public CONFIG setUseGzip(Boolean useGzip) {
         this.useGzip = useGzip;
+        return (CONFIG) this;
+    }
+
+    public RedisSerializer getSerializer() {
+        return serializer;
+    }
+
+    public CONFIG setSerializer(RedisSerializer serializer) {
+        this.serializer = serializer;
         return (CONFIG) this;
     }
 
@@ -52,7 +71,7 @@ public abstract class CacheConfig<CONFIG extends CacheConfig> {
         return new Local();
     }
 
-    public static Redis<Redis> redis() {
+    public static Redis<? extends Redis> redis() {
         return new Redis<>();
     }
 
@@ -135,7 +154,7 @@ public abstract class CacheConfig<CONFIG extends CacheConfig> {
     /**
      * Redis-specific cache properties.
      */
-    public static class Redis<R extends Redis> extends CacheConfig<R> {
+    public static class Redis<CONFIG extends Redis<CONFIG>> extends CacheConfig<CONFIG> {
 
         /**
          * 过期时间，单位s
@@ -149,9 +168,9 @@ public abstract class CacheConfig<CONFIG extends CacheConfig> {
             return expireSeconds;
         }
 
-        public R setExpireSeconds(int expireSeconds) {
+        public CONFIG setExpireSeconds(int expireSeconds) {
             this.expireSeconds = expireSeconds;
-            return (R) this;
+            return (CONFIG) this;
         }
 
         @Override
