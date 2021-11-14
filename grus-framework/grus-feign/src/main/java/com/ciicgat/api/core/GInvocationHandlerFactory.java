@@ -10,11 +10,9 @@ import com.ciicgat.api.core.annotation.IgnoreError;
 import com.ciicgat.api.core.interceptor.FallbackInterceptor;
 import com.ciicgat.api.core.interceptor.GHandlerInterceptor;
 import com.ciicgat.grus.alert.Alert;
-import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.logger.LogExclude;
 import com.ciicgat.grus.logger.LogUtil;
-import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeConfig;
 import com.ciicgat.grus.service.GrusService;
@@ -149,16 +147,7 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
             if (logReq && LogUtil.checkPrintReq(logExclude)) {
                 LOGGER.info("FEIGN_REQ METHOD: {} PARAM: {}", getPrintMethod(method), args == null ? "" : LogUtil.truncate(JSON.toJSONString(args)));
             }
-            long start = System.currentTimeMillis();
-            Object resp;
-            try {
-                resp = invoke0(proxy, method, args);
-            } finally {
-                long cost = System.currentTimeMillis() - start;
-                SlowLogger.logEvent(Module.FEIGN,
-                        cost,
-                        "type:" + target.type() + ",method:" + method.getName());
-            }
+            Object resp = invoke0(proxy, method, args);
             if (logResp && LogUtil.checkPrintResp(logExclude)) {
                 LOGGER.info("FEIGN_RSP METHOD: {} RESULT: {}", getPrintMethod(method), resp == null ? "" : LogUtil.truncate(JSON.toJSONString(resp)));
             }
