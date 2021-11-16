@@ -9,6 +9,7 @@ import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.kafka.consumer.debezium.DebeziumMsgProcessor;
 import com.ciicgat.grus.kafka.consumer.debezium.meta.DebeziumRawRecord;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
@@ -27,8 +28,9 @@ public class TestDebeziumRecord {
     }
 
     @Test
+    @Disabled
     public void testConsumer() throws Exception {
-        Consumer consumer = Consumer.newBuilder().setPullThreadNum(2)
+        Consumer consumer = Consumer.newBuilder().setPullThreadNum(1)
                 .setGroupId("test-consumer-group" + Math.random())
                 .setTopics(new String[]{"devapp57.jifenpay.Trade"})
                 .build();
