@@ -63,12 +63,15 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
 
     private final boolean logResp;
 
+    private final boolean enableSentinel;
+
 
     GInvocationHandlerFactory(GrusServiceStatus grusServiceStatus,
                               CacheOptions cacheOptions,
                               FallbackFactory<?> fallbackFactory,
                               boolean logReq,
-                              boolean logResp) {
+                              boolean logResp,
+                              boolean enableSentinel) {
         this.serviceName = Objects.requireNonNull(grusServiceStatus.getGrusService().getServiceName());
         this.cacheOptions = cacheOptions;
         this.grusServiceStatus = grusServiceStatus;
@@ -76,6 +79,7 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
         this.fallbackFactory = fallbackFactory;
         this.logReq = logReq;
         this.logResp = logResp;
+        this.enableSentinel = enableSentinel;
     }
 
     static Map<Method, Method> toFallbackMethod(Map<Method, MethodHandler> dispatch) {

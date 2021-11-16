@@ -216,6 +216,11 @@
             <optional>true</optional>
         </dependency>
 
-
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-core</artifactId>
+            <version>${sentinel.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

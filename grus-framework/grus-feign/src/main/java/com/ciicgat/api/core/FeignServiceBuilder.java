@@ -8,6 +8,7 @@ package com.ciicgat.api.core;
 import com.ciicgat.api.core.annotation.ServiceName;
 import com.ciicgat.api.core.contants.TimeOutConstants;
 import com.ciicgat.api.core.form.FormEncoder;
+import com.ciicgat.api.core.interceptor.SentinelInterceptor;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.GrusServiceStatus;
@@ -23,6 +24,7 @@ import feign.RequestInterceptor;
 import feign.Retryer;
 import feign.codec.ErrorDecoder;
 import feign.slf4j.Slf4jLogger;
+import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +71,7 @@ public class FeignServiceBuilder {
 
     private boolean logResp;
 
+    private boolean enableSentinel;
 
     public FeignServiceBuilder serviceClazz(Class<?> serviceClazz) {
         this.serviceClazz = serviceClazz;
@@ -128,6 +131,11 @@ public class FeignServiceBuilder {
         return this;
     }
 
+    public FeignServiceBuilder enableSentinel(boolean enableSentinel) {
+        this.enableSentinel = enableSentinel;
+        return this;
+    }
+
     @VisibleForTesting
     public FeignServiceBuilder client(Client client) {
         this.client = client;
@@ -141,7 +149,7 @@ public class FeignServiceBuilder {
         if (!fromCache) {
             return (T) create();
         }
-        ServiceCacheKey serviceCacheKey = new ServiceCacheKey(serviceClazz, cacheOptions, options, logReq, logResp);
+        ServiceCacheKey serviceCacheKey = new ServiceCacheKey(serviceClazz, cacheOptions, options, logReq, logResp, enableSentinel);
         Object serviceInstance = SERVICE_CACHE.get(serviceCacheKey);
         if (serviceInstance != null) {
             return (T) serviceInstance;
@@ -170,7 +178,12 @@ public class FeignServiceBuilder {
 
 
         if (client == null) {
-            client = new OkHttpClientWrapper(FeignHttpClient.getOkHttpClient());
+            OkHttpClient okHttpClient = FeignHttpClient.getOkHttpClient();
+            // 添加sentinel拦截器
+            if (enableSentinel) {
+                okHttpClient = okHttpClient.newBuilder().addInterceptor(new SentinelInterceptor(serviceName.value())).build();
+            }
+            client = new OkHttpClientWrapper(okHttpClient);
         }
 
         GrusRuntimeManager grusRuntimeManager = GrusFramework.getGrusRuntimeManager();
@@ -188,7 +201,7 @@ public class FeignServiceBuilder {
                     .decoder(new OptionalDecoder(new JacksonDecoder(OBJECT_MAPPER)))
                     .encoder(new FormEncoder(new JacksonEncoder(OBJECT_MAPPER)))
                     .errorDecoder(new ErrorDecoder.Default())
-                    .invocationHandlerFactory(new GInvocationHandlerFactory(grusServiceStatus, cacheOptions, fallbackFactory, this.logReq, this.logResp))
+                    .invocationHandlerFactory(new GInvocationHandlerFactory(grusServiceStatus, cacheOptions, fallbackFactory, this.logReq, this.logResp, this.enableSentinel))
                     .client(client)
                     .retryer(retryer)//默认不retry
                     .target(new GrusTarget(serviceClazz, serviceName, namingService));
