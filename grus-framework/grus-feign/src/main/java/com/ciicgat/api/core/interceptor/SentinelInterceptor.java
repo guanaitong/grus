@@ -40,29 +40,43 @@ public class SentinelInterceptor implements Interceptor {
         // 获取请求
         Request originalRequest = chain.request();
         // 拼装资源
-        StringBuilder resourceNameBuilder = new StringBuilder("/").append(serviceName);
+        StringBuilder resourceNameBuilder = new StringBuilder(originalRequest.method()).append(":").append(serviceName);
         String path = originalRequest.url().encodedPath();
         if (Objects.nonNull(path)) {
             resourceNameBuilder.append(path);
         }
         String resourceName = resourceNameBuilder.toString();
-
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.info("resourceName: {}", resourceName);
+        }
         // 获取请求参数，用于热点限流规则，参数需要加@RequestParam注解，不支持@RequestBody注解
         Set<String> parameterSet = originalRequest.url().queryParameterNames();
-        // 注入调用方appName
-        ContextUtil.enter(resourceName, Systems.APP_NAME);
 
         // sentinel处理
-        try (Entry entry = SphU.entry(resourceName, EntryType.OUT, 1, parameterSet)) {
+        Entry entry = null;
+        try {
+            // 注入调用方appName，需要在SphU.entry方法之前执行才生效，并且需要放到try代码块，故无法使用try resources写法
+            ContextUtil.enter(resourceName, Systems.APP_NAME);
+            entry = SphU.entry(resourceName, EntryType.OUT, 1, parameterSet);
             return chain.proceed(originalRequest);
         } catch (BlockException e) {
-            LOGGER.error("SENTINEL BLOCKED: ", e);
+            LOGGER.error("SENTINEL BLOCKED ", e);
             throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK);
         } catch (Throwable ex) {
-            LOGGER.error("SENTINEL TRACE: ", ex);
+            if (BlockException.isBlockException(ex)) {
+                LOGGER.error("SENTINEL BLOCKED WITH MSG ", ex);
+                throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK);
+            }
+            LOGGER.error("SENTINEL ERROR TRACE ", ex);
             // 降级跟踪必备代码
             Tracer.trace(ex);
             throw ex;
+        } finally {
+            // 推出资源
+            if (entry != null) {
+                entry.exit(1, parameterSet);
+            }
+            ContextUtil.exit();
         }
     }
 }
