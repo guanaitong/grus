@@ -16,7 +16,6 @@ import com.alibaba.csp.sentinel.slots.block.flow.param.ParamFlowItem;
 import com.alibaba.csp.sentinel.slots.block.flow.param.ParamFlowRule;
 import com.alibaba.csp.sentinel.slots.block.flow.param.ParamFlowRuleManager;
 import com.ciicgat.api.core.service.SentinelService;
-import com.ciicgat.sdk.lang.convert.ErrorCode;
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -44,17 +43,8 @@ public class TestSentinel {
                 .setBody("1")
                 .setResponseCode(200);
         initFlowRule();
-        while (true) {
-            mockWebServer.enqueue(mockResponse);
-            try {
-                sentinelService.testFlow();
-            } catch (BusinessRuntimeException e) {
-                Assertions.assertTrue(e.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode());
-                break;
-            } catch (Exception e) {
-
-            }
-        }
+        mockWebServer.enqueue(mockResponse);
+        Assertions.assertThrows(BusinessRuntimeException.class, () -> sentinelService.testFlow());
         mockWebServer.shutdown();
     }
 
@@ -64,16 +54,14 @@ public class TestSentinel {
         mockWebServer = pair.getRight();
         sentinelService = pair.getLeft();
         initDegradeRule();
-        while (true) {
+        for (int i = 0; i < 10; i++) {
             try {
                 sentinelService.testDegrade();
-            } catch (BusinessRuntimeException e) {
-                Assertions.assertTrue(e.getErrorCode() ==  ErrorCode.REQUEST_BLOCK.getErrorCode());
-                break;
             } catch (Exception e) {
 
             }
         }
+        Assertions.assertThrows(BusinessRuntimeException.class, () -> sentinelService.testDegrade());
         mockWebServer.shutdown();
     }
 
@@ -87,17 +75,8 @@ public class TestSentinel {
                 .setBody("4")
                 .setResponseCode(200);
         initAuthorityRule();
-        while (true) {
-            mockWebServer.enqueue(mockResponse);
-            try {
-                sentinelService.testAuthority();
-            } catch (BusinessRuntimeException e) {
-                Assertions.assertTrue(e.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode());
-                break;
-            } catch (Exception e) {
-
-            }
-        }
+        mockWebServer.enqueue(mockResponse);
+        Assertions.assertThrows(BusinessRuntimeException.class, () -> sentinelService.testAuthority());
         mockWebServer.shutdown();
     }
 
@@ -111,24 +90,16 @@ public class TestSentinel {
                 .setBody("5")
                 .setResponseCode(200);
         initParamFlowRule();
-        while (true) {
-            mockWebServer.enqueue(mockResponse);
-            try {
-                sentinelService.testParamFlow(5, 5);
-            } catch (BusinessRuntimeException e) {
-                Assertions.assertTrue(e.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode());
-                break;
-            } catch (Exception e) {
-
-            }
-        }
+        mockWebServer.enqueue(mockResponse);
+        sentinelService.testParamFlow(5, 5);
+        Assertions.assertThrows(BusinessRuntimeException.class, () -> sentinelService.testParamFlow(5, 5));
         mockWebServer.shutdown();
     }
 
     private void initFlowRule() {
         List<FlowRule> rules = new ArrayList<>();
         FlowRule rule = new FlowRule();
-        rule.setResource("/sentinel-test/testFlow");
+        rule.setResource("POST:sentinel-test/testFlow");
         rule.setGrade(RuleConstant.FLOW_GRADE_THREAD);
         rule.setCount(0);
         rules.add(rule);
@@ -138,7 +109,7 @@ public class TestSentinel {
     private void initDegradeRule() {
         List<DegradeRule> rules = new ArrayList<>();
         DegradeRule rule = new DegradeRule();
-        rule.setResource("/sentinel-test/testDegrade");
+        rule.setResource("POST:sentinel-test/testDegrade");
         rule.setCount(0);
         rule.setGrade(RuleConstant.DEGRADE_GRADE_RT);
         rule.setTimeWindow(1);
@@ -148,14 +119,14 @@ public class TestSentinel {
 
     private void initAuthorityRule() {
         AuthorityRule rule = new AuthorityRule();
-        rule.setResource("/sentinel-test/testAuthority");
+        rule.setResource("POST:sentinel-test/testAuthority");
         rule.setStrategy(RuleConstant.AUTHORITY_BLACK);
         rule.setLimitApp("grus-demo");
         AuthorityRuleManager.loadRules(Collections.singletonList(rule));
     }
 
     private void initParamFlowRule() {
-        ParamFlowRule rule = new ParamFlowRule("/sentinel-test/testParamFlow")
+        ParamFlowRule rule = new ParamFlowRule("POST:sentinel-test/testParamFlow")
                 .setParamIdx(0)
                 .setCount(1);
         // 针对 int 类型的参数 PARAM_B，单独设置限流 QPS 阈值为 10，而不是全局的阈值 5.
