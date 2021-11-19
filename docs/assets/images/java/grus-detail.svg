@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 grus-detail.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="15.9657in" height="12.6911in"
+		viewBox="0 0 1149.53 913.756" xml:space="preserve" color-interpolation-filters="sRGB" class="st27">
+	<v:documentProperties v:langID="2052" v:metric="true" v:viewMarkup="false"/>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:#ffffff;stroke:#4672c4;stroke-dasharray:3.75,2.25;stroke-width:0.25}
+		.st2 {fill:#ffffff;stroke:#3c63ac;stroke-dasharray:11.25,6.75;stroke-width:0.75}
+		.st3 {fill:#41719c;stroke:#c7c8c8;stroke-width:0.25}
+		.st4 {fill:#feffff;font-family:Calibri;font-size:0.75em}
+		.st5 {fill:#ed7d31;stroke:#c7c8c8;stroke-width:0.25}
+		.st6 {marker-end:url(#mrkr4-18);stroke:#4672c4;stroke-dasharray:7,5;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st7 {fill:#4672c4;fill-opacity:1;stroke:#4672c4;stroke-opacity:1;stroke-width:0.28409090909091}
+		.st8 {marker-end:url(#mrkr4-36);stroke:#ed7d31;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st9 {fill:#ed7d31;fill-opacity:1;stroke:#ed7d31;stroke-opacity:1;stroke-width:0.28409090909091}
+		.st10 {font-size:1em}
+		.st11 {fill:#ff0000;stroke:#3c63ac;stroke-width:0.75}
+		.st12 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:7.2}
+		.st13 {fill:#d06d29;font-family:黑体;font-size:0.666664em}
+		.st14 {font-family:Calibri;font-size:1em}
+		.st15 {fill:#fec000;stroke:#c7c8c8;stroke-width:0.25}
+		.st16 {fill:url(#grad0-101);stroke:#3c63ac;stroke-width:0.75}
+		.st17 {fill:#3c63ac;font-family:Calibri;font-size:0.75em}
+		.st18 {fill:#deebf6;stroke:#3c63ac;stroke-width:0.75}
+		.st19 {fill:#3d64ac;font-family:Calibri;font-size:0.75em}
+		.st20 {marker-end:url(#mrkr4-18);stroke:#4672c4;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st21 {marker-end:url(#mrkr4-142);stroke:#70ad47;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st22 {fill:#70ad47;fill-opacity:1;stroke:#70ad47;stroke-opacity:1;stroke-width:0.28409090909091}
+		.st23 {fill:#00b0f0;stroke:#3c63ac;stroke-width:0.75}
+		.st24 {fill:#ed329d;stroke:#3c63ac;stroke-width:0.75}
+		.st25 {fill:#ffffff;font-family:Calibri;font-size:0.75em}
+		.st26 {fill:#70ad47;stroke:#c7c8c8;stroke-width:0.25}
+		.st27 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Patterns_And_Gradients">
+		<linearGradient id="grad0-101" x1="0" y1="0" x2="1" y2="0" gradientTransform="rotate(60 0.5 0.5)">
+			<stop offset="0" stop-color="#e8ebf4" stop-opacity="1"/>
+			<stop offset="0.24" stop-color="#f4f5f9" stop-opacity="1"/>
+			<stop offset="0.54" stop-color="#feffff" stop-opacity="1"/>
+		</linearGradient>
+	</defs>
+	<defs id="Markers">
+		<g id="lend4">
+			<path d="M 2 1 L 0 0 L 2 -1 L 2 1 " style="stroke:none"/>
+		</g>
+		<marker id="mrkr4-18" class="st7" v:arrowType="4" v:arrowSize="2" v:setback="7.04" refX="-7.04" orient="auto"
+				markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend4" transform="scale(-3.52,-3.52) "/>
+		</marker>
+		<marker id="mrkr4-36" class="st9" v:arrowType="4" v:arrowSize="2" v:setback="7.04" refX="-7.04" orient="auto"
+				markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend4" transform="scale(-3.52,-3.52) "/>
+		</marker>
+		<marker id="mrkr4-142" class="st22" v:arrowType="4" v:arrowSize="2" v:setback="7.04" refX="-7.04" orient="auto"
+				markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend4" transform="scale(-3.52,-3.52) "/>
+		</marker>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<title>页-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="连接线" v:index="0"/>
+		<g id="shape120-1" v:mID="120" v:groupContext="shape" transform="translate(463.364,-498.23)">
+			<title>矩形.120</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<path d="M0 913.76 L529.51 913.76 L529.51 854.23 L0 854.23 L0 913.76 Z" class="st1"/>
+		</g>
+		<g id="shape117-3" v:mID="117" v:groupContext="shape" transform="translate(335.805,-356.498)">
+			<title>矩形.117</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<path d="M0 913.76 L657.07 913.76 L657.07 824.46 L0 824.46 L0 913.76 Z" class="st1"/>
+		</g>
+		<g id="shape103-5" v:mID="103" v:groupContext="shape" transform="translate(454.293,-630.041)">
+			<title>矩形</title>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<path d="M0 913.76 L694.49 913.76 L694.49 701.16 L0 701.16 L0 913.76 Z" class="st2"/>
+		</g>
+		<g id="shape2-7" v:mID="2" v:groupContext="shape" transform="translate(610.199,-780.278)">
+			<title>矩形.2</title>
+			<desc>grus-framework</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st3"/>
+			<text x="20.28" y="899.45" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-framework</text>		</g>
+		<g id="shape3-10" v:mID="3" v:groupContext="shape" transform="translate(794.451,-879.49)">
+			<title>矩形.3</title>
+			<desc>spring-framework</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st5"/>
+			<text x="16.88" y="899.45" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>spring-framework</text>		</g>
+		<g id="shape4-13" v:mID="4" v:groupContext="shape" v:layerMember="0" transform="translate(709.411,-797.285)">
+			<title>动态连接线</title>
+			<path d="M0 913.76 L134.65 913.76 L134.65 838.59" class="st6"/>
+		</g>
+		<g id="shape5-19" v:mID="5" v:groupContext="shape" transform="translate(489.726,-709.411)">
+			<title>矩形.5</title>
+			<desc>grus-framework-gconf</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st3"/>
+			<text x="8.77" y="899.45" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-framework-gconf</text>		</g>
+		<g id="shape6-22" v:mID="6" v:groupContext="shape" transform="translate(610.199,-709.411)">
+			<title>矩形.6</title>
+			<desc>grus-framework-gfs</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st3"/>
+			<text x="13.65" y="899.45" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-framework-gfs</text>		</g>
+		<g id="shape7-25" v:mID="7" v:groupContext="shape" transform="translate(730.671,-709.411)">
+			<title>矩形.7</title>
+			<desc>grus-framework-api</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st3"/>
+			<text x="13.35" y="899.45" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-framework-api</text>		</g>
+		<g id="shape9-28" v:mID="9" v:groupContext="shape" transform="translate(851.144,-709.411)">
+			<title>矩形.9</title>
+			<desc>grus-framework-xxx</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st3"/>
+			<text x="13.06" y="899.45" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-framework-xxx</text>		</g>
+		<g id="shape11-31" v:mID="11" v:groupContext="shape" v:layerMember="0" transform="translate(652.719,-743.427)">
+			<title>动态连接线.11</title>
+			<path d="M7.09 913.76 L7.09 883.95" class="st8"/>
+		</g>
+		<g id="shape12-37" v:mID="12" v:groupContext="shape" v:layerMember="0" transform="translate(539.333,-743.427)">
+			<title>动态连接线.12</title>
+			<path d="M0 913.76 L0 887.54 L120.47 887.54 L120.47 883.95" class="st8"/>
+		</g>
+		<g id="shape13-42" v:mID="13" v:groupContext="shape" v:layerMember="0" transform="translate(780.278,-743.427)">
+			<title>动态连接线.13</title>
+			<path d="M0 913.76 L0 887.54 L-120.47 887.54 L-120.47 883.95" class="st8"/>
+		</g>
+		<g id="shape15-47" v:mID="15" v:groupContext="shape" v:layerMember="0" transform="translate(900.75,-743.427)">
+			<title>动态连接线.15</title>
+			<path d="M0 913.76 L0 903.13 L-118.11 903.13 A2.3622 2.3622 -180 0 0 -122.83 903.13 L-240.94 903.13 L-240.94 883.95"
+					class="st8"/>
+		</g>
+		<g id="shape16-52" v:mID="16" v:groupContext="shape" transform="translate(1028.31,-709.411)">
+			<title>矩形.16</title>
+			<desc>grus-framework-bom</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st3"/>
+			<text x="10.57" y="899.45" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-framework-bom</text>		</g>
+		<g id="shape18-55" v:mID="18" v:groupContext="shape" transform="translate(270.041,-751.931)">
+			<title>矩形.18</title>
+			<desc>spring-boot-starter-parent</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st5"/>
+			<text x="13.34" y="894.05" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>spring-boot-starter-<tspan
+						x="37.41" dy="1.2em" class="st10">parent</tspan></text>		</g>
+		<g id="shape20-59" v:mID="20" v:groupContext="shape" transform="translate(270.041,-630.041)">
+			<title>矩形.20</title>
+			<desc>grus-boot-parent</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st11"/>
+			<text x="18.22" y="899.45" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-parent</text>		</g>
+		<g id="shape21-62" v:mID="21" v:groupContext="shape" v:layerMember="0" transform="translate(312.561,-664.057)">
+			<title>动态连接线.21</title>
+			<desc>定义boot版本</desc>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="7.08661" cy="869.819" width="57.14" height="18.6536"/>
+			<path d="M7.09 913.76 L7.09 832.92" class="st8"/>
+			<rect v:rectContext="textBkgnd" x="-16.5733" y="864.494" width="47.32" height="10.6501" class="st12"/>
+			<text x="-16.57" y="872.48" class="st13" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>定义<tspan
+						class="st14">boot</tspan>版本</text>		</g>
+		<g id="shape22-70" v:mID="22" v:groupContext="shape" transform="translate(610.199,-587.522)">
+			<title>矩形.22</title>
+			<desc>grus-boot-autoconfigure</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st15"/>
+			<text x="4.69" y="899.45" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-autoconfigure</text>		</g>
+		<g id="shape24-73" v:mID="24" v:groupContext="shape" v:layerMember="0" transform="translate(610.199,-604.53)">
+			<title>动态连接线.24</title>
+			<path d="M0 913.76 L-68.5 913.76 A2.3622 2.3622 -180 1 0 -73.23 913.76 L-290.55 913.76 L-290.55 895.28" class="st8"/>
+		</g>
+		<g id="shape25-78" v:mID="25" v:groupContext="shape" v:layerMember="0" transform="translate(652.719,-621.537)">
+			<title>动态连接线.25</title>
+			<path d="M7.09 913.76 L7.09 832.92" class="st6"/>
+		</g>
+		<g id="shape26-83" v:mID="26" v:groupContext="shape" v:layerMember="0" transform="translate(659.805,-621.537)">
+			<title>动态连接线.26</title>
+			<path d="M0 913.76 L0 836.51 L-120.47 836.51 L-120.47 832.92" class="st6"/>
+		</g>
+		<g id="shape27-88" v:mID="27" v:groupContext="shape" v:layerMember="0" transform="translate(659.805,-621.537)">
+			<title>动态连接线.27</title>
+			<path d="M0 913.76 L0 836.51 L120.47 836.51 L120.47 832.92" class="st6"/>
+		</g>
+		<g id="shape29-93" v:mID="29" v:groupContext="shape" v:layerMember="0" transform="translate(659.805,-621.537)">
+			<title>动态连接线.29</title>
+			<path d="M0 913.76 L0 840.35 L181.89 840.35 A2.3622 2.3622 0 0 1 186.61 840.35 L240.94 840.35 L240.94 832.92"
+					class="st6"/>
+		</g>
+		<g id="shape30-98" v:mID="30" v:groupContext="shape" transform="translate(163.742,-573.348)">
+			<title>矩形.30</title>
+			<desc>grus-boot-starters</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st16"/>
+			<text x="16.36" y="899.45" class="st17" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-starters</text>		</g>
+		<g id="shape31-103" v:mID="31" v:groupContext="shape" v:layerMember="0" transform="translate(262.955,-590.356)">
+			<title>动态连接线.31</title>
+			<path d="M0 913.76 L56.69 913.76 L56.69 881.11" class="st8"/>
+		</g>
+		<g id="shape32-108" v:mID="32" v:groupContext="shape" transform="translate(489.726,-510.986)">
+			<title>矩形.32</title>
+			<desc>grus-boot-gconf-starter</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st18"/>
+			<text x="6.61" y="899.45" class="st17" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot<tspan
+						class="st10" v:langID="2052">-</tspan><tspan class="st10" v:langID="2052">gconf</tspan>-starter</text>		</g>
+		<g id="shape33-113" v:mID="33" v:groupContext="shape" transform="translate(610.199,-510.986)">
+			<title>矩形.33</title>
+			<desc>grus-boot-gfs-starter</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st18"/>
+			<text x="11.49" y="899.45" class="st19" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-gfs-starter</text>		</g>
+		<g id="shape34-116" v:mID="34" v:groupContext="shape" transform="translate(730.671,-510.986)">
+			<title>矩形.34</title>
+			<desc>grus-boot-api-starter</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st18"/>
+			<text x="11.18" y="899.45" class="st19" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-api-starter</text>		</g>
+		<g id="shape35-119" v:mID="35" v:groupContext="shape" transform="translate(851.144,-510.986)">
+			<title>矩形.35</title>
+			<desc>grus-boot-xxx-starter</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st18"/>
+			<text x="10.89" y="899.45" class="st19" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-xxx-starter</text>		</g>
+		<g id="shape37-122" v:mID="37" v:groupContext="shape" v:layerMember="0" transform="translate(539.333,-545.002)">
+			<title>动态连接线.37</title>
+			<path d="M0 913.76 L0 903.13 L-325.98 903.13 L-325.98 892.45" class="st8"/>
+		</g>
+		<g id="shape38-127" v:mID="38" v:groupContext="shape" v:layerMember="0" transform="translate(539.333,-545.002)">
+			<title>动态连接线.38</title>
+			<path d="M0 913.76 L0 881.87 L120.47 881.87 L120.47 878.28" class="st20"/>
+		</g>
+		<g id="shape39-132" v:mID="39" v:groupContext="shape" v:layerMember="0" transform="translate(532.246,-545.002)">
+			<title>动态连接线.39</title>
+			<path d="M7.09 913.76 L7.09 756.39" class="st20"/>
+		</g>
+		<g id="shape40-137" v:mID="40" v:groupContext="shape" v:layerMember="0" transform="translate(950.356,-719.333)">
+			<title>动态连接线.40</title>
+			<path d="M0 906.67 L70.91 906.67" class="st21"/>
+		</g>
+		<g id="shape41-143" v:mID="41" v:groupContext="shape" transform="translate(610.199,-272.876)">
+			<title>矩形.41</title>
+			<desc>grus-boot-bom</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st16"/>
+			<text x="22.09" y="899.45" class="st17" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-bom</text>		</g>
+		<g id="shape42-147" v:mID="42" v:groupContext="shape" v:layerMember="0" transform="translate(900.75,-510.986)">
+			<title>动态连接线.42</title>
+			<path d="M0 913.76 L0 971.87 L-177.17 971.87 L-177.17 1107.22 L-240.94 1107.22 L-240.94 1110.81" class="st21"/>
+		</g>
+		<g id="shape43-152" v:mID="43" v:groupContext="shape" transform="translate(610.199,-204.844)">
+			<title>矩形.43</title>
+			<desc>grus-boot-starter-parent</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st16"/>
+			<text x="4.54" y="899.45" class="st17" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-starter-parent</text>		</g>
+		<g id="shape44-156" v:mID="44" v:groupContext="shape" v:layerMember="0" transform="translate(652.719,-238.86)">
+			<title>动态连接线.44</title>
+			<path d="M7.09 913.76 L7.09 886.78" class="st20"/>
+		</g>
+		<g id="shape45-161" v:mID="45" v:groupContext="shape" v:layerMember="0" transform="translate(829.884,-719.333)">
+			<title>动态连接线.45</title>
+			<path d="M0 906.67 L14.17 906.67 L14.17 984.64 L187.8 984.64 L187.8 906.67 L191.39 906.67" class="st21"/>
+		</g>
+		<g id="shape47-166" v:mID="47" v:groupContext="shape" v:layerMember="0" transform="translate(780.278,-510.986)">
+			<title>动态连接线.47</title>
+			<path d="M0 913.76 L0 962.12 L-93.62 962.12 L-93.62 1107.22 L-120.47 1107.22 L-120.47 1110.81" class="st21"/>
+		</g>
+		<g id="shape48-171" v:mID="48" v:groupContext="shape" transform="translate(355.081,-386.262)">
+			<title>矩形.48</title>
+			<desc>grus-boot-web-starter</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st23"/>
+			<text x="8.92" y="899.45" class="st19" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-web-starter</text>		</g>
+		<g id="shape49-174" v:mID="49" v:groupContext="shape" transform="translate(489.726,-386.262)">
+			<title>矩形.49</title>
+			<desc>grus-boot-data-starter</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st23"/>
+			<text x="8.55" y="899.45" class="st19" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-data-starter</text>		</g>
+		<g id="shape50-177" v:mID="50" v:groupContext="shape" transform="translate(730.671,-386.262)">
+			<title>矩形.50</title>
+			<desc>grus-boot-cache-starter</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st23"/>
+			<text x="6.17" y="899.45" class="st19" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-cache-starter</text>		</g>
+		<g id="shape51-180" v:mID="51" v:groupContext="shape" transform="translate(355.081,-510.986)">
+			<title>矩形.51</title>
+			<desc>spring-boot-xxx-starter</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st5"/>
+			<text x="7.49" y="899.45" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>spring-boot-xxx-starter</text>		</g>
+		<g id="shape52-183" v:mID="52" v:groupContext="shape" transform="translate(851.144,-386.262)">
+			<title>矩形.52</title>
+			<desc>grus-boot-admin-starter</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st23"/>
+			<text x="5.23" y="899.45" class="st17" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot<tspan
+						class="st10" v:langID="2052">-</tspan>admin-starter</text>		</g>
+		<g id="shape56-187" v:mID="56" v:groupContext="shape" v:layerMember="0" transform="translate(404.687,-420.278)">
+			<title>动态连接线.56</title>
+			<path d="M0 913.76 L128.81 826.98" class="st20"/>
+		</g>
+		<g id="shape57-192" v:mID="57" v:groupContext="shape" v:layerMember="0" transform="translate(397.6,-420.278)">
+			<title>动态连接线.57</title>
+			<path d="M7.09 913.76 L7.09 830.09" class="st20"/>
+		</g>
+		<g id="shape58-197" v:mID="58" v:groupContext="shape" v:layerMember="0" transform="translate(404.687,-386.262)">
+			<title>动态连接线.58</title>
+			<path d="M0 913.76 L0 1010.13 L198.47 1010.13" class="st21"/>
+		</g>
+		<g id="shape59-202" v:mID="59" v:groupContext="shape" v:layerMember="0" transform="translate(900.75,-386.262)">
+			<title>动态连接线.59</title>
+			<path d="M0 913.76 L0 1010.13 L-184.3 1010.13" class="st21"/>
+		</g>
+		<g id="shape60-207" v:mID="60" v:groupContext="shape" v:layerMember="0" transform="translate(404.687,-420.278)">
+			<title>动态连接线.60</title>
+			<path d="M0 913.76 L0 874.07 L-191.34 874.07 L-191.34 767.73" class="st8"/>
+		</g>
+		<g id="shape61-212" v:mID="61" v:groupContext="shape" v:layerMember="0" transform="translate(539.333,-420.278)">
+			<title>动态连接线.61</title>
+			<path d="M0 913.76 L0 874.07 L-73.38 874.07 A2.3622 2.3622 -180 0 0 -78.1 874.07 L-132.28 874.07 A2.3622 2.3622 -180
+						 1 0 -137.01 874.07 L-325.98 874.07 L-325.98 767.73" class="st8"/>
+		</g>
+		<g id="shape90-217" v:mID="90" v:groupContext="shape" transform="translate(489.726,-91.4587)">
+			<title>矩形.90</title>
+			<desc>grus-boot-samples</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st24"/>
+			<text x="15.52" y="899.45" class="st25" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-samples</text>		</g>
+		<g id="shape91-220" v:mID="91" v:groupContext="shape" transform="translate(709.411,-91.4587)">
+			<title>矩形.91</title>
+			<desc>Userdoor</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st26"/>
+			<text x="32.47" y="899.45" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Userdoor</text>		</g>
+		<g id="shape92-223" v:mID="92" v:groupContext="shape" transform="translate(872.404,-91.4587)">
+			<title>矩形.92</title>
+			<desc>xxx</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st26"/>
+			<text x="43.76" y="899.45" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>xxx</text>		</g>
+		<g id="shape94-226" v:mID="94" v:groupContext="shape" v:layerMember="0" transform="translate(539.333,-125.474)">
+			<title>动态连接线.94</title>
+			<path d="M0 913.76 L0 870.49 L120.47 870.49 L120.47 841.43" class="st8"/>
+		</g>
+		<g id="shape95-231" v:mID="95" v:groupContext="shape" v:layerMember="0" transform="translate(759.018,-125.474)">
+			<title>动态连接线.95</title>
+			<path d="M0 913.76 L0 869.82 L-99.21 869.82 L-99.21 841.43" class="st8"/>
+		</g>
+		<g id="shape96-236" v:mID="96" v:groupContext="shape" v:layerMember="0" transform="translate(922.01,-125.474)">
+			<title>动态连接线.96</title>
+			<path d="M0 913.76 L0 869.82 L-262.2 869.82 L-262.2 841.43" class="st8"/>
+		</g>
+		<g id="shape97-241" v:mID="97" v:groupContext="shape" transform="translate(355.081,-0.75)">
+			<title>矩形.97</title>
+			<desc>grus-boot-sample-gconf</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st24"/>
+			<text x="5.77" y="899.45" class="st25" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-sample<tspan
+						class="st10" v:langID="2052">-</tspan><tspan class="st10" v:langID="2052">gconf</tspan></text>		</g>
+		<g id="shape98-246" v:mID="98" v:groupContext="shape" transform="translate(489.726,-0.75)">
+			<title>矩形.98</title>
+			<desc>grus-boot-sample-gfs</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st24"/>
+			<text x="10.65" y="899.45" class="st25" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-sample<tspan
+						class="st10" v:langID="2052">-</tspan>gfs</text>		</g>
+		<g id="shape99-250" v:mID="99" v:groupContext="shape" v:layerMember="0" transform="translate(532.246,-34.7657)">
+			<title>动态连接线.99</title>
+			<path d="M7.09 913.76 L7.09 864.1" class="st8"/>
+		</g>
+		<g id="shape100-255" v:mID="100" v:groupContext="shape" v:layerMember="0" transform="translate(404.687,-34.7657)">
+			<title>动态连接线.100</title>
+			<path d="M0 913.76 L0 903.13 L134.65 903.13 L134.65 864.1" class="st8"/>
+		</g>
+		<g id="shape101-260" v:mID="101" v:groupContext="shape" transform="translate(624.372,-0.75)">
+			<title>矩形.101</title>
+			<desc>grus-boot-sample-xxx</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st24"/>
+			<text x="10.05" y="899.45" class="st25" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-sample<tspan
+						class="st10" v:langID="2052">-</tspan>xxx</text>		</g>
+		<g id="shape102-264" v:mID="102" v:groupContext="shape" v:layerMember="0" transform="translate(673.978,-34.7657)">
+			<title>动态连接线.102</title>
+			<path d="M0 913.76 L0 903.13 L-134.65 903.13 L-134.65 864.1" class="st8"/>
+		</g>
+		<g id="shape105-269" v:mID="105" v:groupContext="shape" transform="translate(0.75,-573.348)">
+			<title>矩形.105</title>
+			<desc>grus-boot-test</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st16"/>
+			<text x="23.41" y="899.45" class="st17" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-boot-test</text>		</g>
+		<g id="shape106-273" v:mID="106" v:groupContext="shape" v:layerMember="0" transform="translate(99.9626,-590.356)">
+			<title>动态连接线.106</title>
+			<path d="M0 913.76 L56.69 913.76 L56.69 889.66 L219.69 889.66 L219.69 881.11" class="st8"/>
+		</g>
+		<g id="shape126-278" v:mID="126" v:groupContext="shape" transform="translate(234.608,-272.876)">
+			<title>矩形.126</title>
+			<desc>grus-third-dependencies</desc>
+			<v:userDefs>
+				<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+			</v:userDefs>
+			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+			<v:textRect cx="49.6063" cy="896.748" width="99.22" height="34.0157"/>
+			<rect x="0" y="879.74" width="99.2126" height="34.0157" class="st16"/>
+			<text x="4.73" y="899.45" class="st17" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>grus-<tspan
+						class="st10" v:langID="2052">third</tspan><tspan class="st10" v:langID="2052">-</tspan>dependencies</text>		</g>
+		<g id="shape127-284" v:mID="127" v:groupContext="shape" v:layerMember="0" transform="translate(659.805,-238.86)">
+			<title>动态连接线.127</title>
+			<path d="M0 913.76 L0 903.13 L-375.59 903.13 L-375.59 886.78" class="st20"/>
+		</g>
+	</g>
+</svg>

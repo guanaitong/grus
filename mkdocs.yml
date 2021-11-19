@@ -1,0 +1,175 @@
+# Project information
+site_name: Java Guide
+site_url: https://java.guide.wuxingdev.cn/
+site_author: August Zhou
+site_description: >-
+  Create a static site from a set of Markdown files to host the
+  documentation of Java
+# Repository
+repo_name: java/framework/grus
+repo_url: https://gitlab.wuxingdev.cn/java/framework/grus
+edit_uri: ""
+
+# Copyright
+copyright: Copyright &copy; 2016 - 2021 guanaitong
+
+theme:
+  name: material
+  logo: assets/logo.ico
+  favicon: assets/favicon.ico
+
+  # Static files
+  static_templates:
+    - 404.html
+
+  # Don't include MkDocs' JavaScript
+  include_search_page: false
+  search_index_only: true
+
+  features:
+    - content.code.annotate
+    # - content.tabs.link
+    # - header.autohide
+    # - navigation.expand
+    - navigation.indexes
+    # - navigation.instant
+    - navigation.sections
+    - navigation.tabs
+    # - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    # - toc.integrate
+    -
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - scheme: slate
+      primary: red
+      accent: red
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+# Extensions
+markdown_extensions:
+  - admonition
+  - abbr
+  - attr_list
+  - def_list
+  - footnotes
+  - meta
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: squidfunk
+      repo: mkdocs-material
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid-experimental
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+nav:
+  - 首页:
+      - index.md
+  - 序言:
+      - 开发管理: prepare/contribute/manage.md
+      - TODO列表: prepare/contribute/todolist.md
+      - 环境安装:
+          - Java安装: prepare/develop-env/java-install.md
+          - Maven安装: prepare/develop-env/maven-install.md
+      - 规范:
+          - Maven规范: prepare/specs/maven.md
+          - 项目规范: prepare/specs/app-framework-spec.md
+          - 连接池规范: prepare/specs/jdbc-pool-config.md
+          - 日志规范: prepare/specs/app-log.md
+      - 技巧:
+          - IDEA使用技巧: prepare/skill/LearningIdea.md
+          - Sonarlint配置指南: prepare/skill/sonar.md
+          - Checksyle配置: prepare/skill/checkstyle.md
+  - grus框架:
+      - 简介: grus/introduction/origin.md
+      - 项目结构: grus/introduction/project-structure.md
+      - Starter模块: grus/introduction/project-starter.md
+      - Autoconfigure模块: grus/introduction/autoconfigure.md
+      - Condition条件注解: grus/introduction/condition.md
+      - 配置文件: grus/introduction/config.md
+      - Gconf:
+          - grus/gconf/index.md
+      - 巨灵神规范:
+          - grus/api/index.md
+          - feign: grus/api/grus-feign-use.md
+          - 使用指南: grus/api/grus-feign-guide.md
+          - 最佳实践: grus/api/grus-feign-best-practice.md
+          - Feign协议升级: grus/api/grus-feign-contract.md
+      - data:
+          - grus/data/index.md
+          - Mybatis分页插件: grus/data/mybatis-pagehelper.md
+          - Mybatis增加: grus/data/mybatis-enhance.md
+      - redis:
+          - grus/redis/index.md
+      - zookeeper:
+          - grus/zk/index.md
+      - kafka:
+          - grus/kafka/index.md
+      - web:
+          - grus/web/index.md
+          - Validator模块: grus/web/grus-validator.md
+          - Swagger使用说明: grus/web/grus-swagger.md
+          - Freemarker使用说明: grus/web/grus-freemarker.md
+          - Velocity使用说明: grus/web/grus-velocity.md
+      - job:
+          - grus/job/index.md
+          - ElasticJob介绍: grus/job/elasticjob.md
+      - 单元测试:
+          - grus/test/index.md
+      - 微服务流量控制:
+          - grus/limit/index.md
+      - 分布式session:
+          - grus/session/index.md
+      - 分布式存储gfs:
+          - grus/gfs/index.md
+          - gfs-client使用说明: grus/gfs/gfs-sdk.md
+      - frigate消息:
+          - grus/frigate/index.md
+          - gfs-client使用说明: grus/frigate/grus-frigate-message-handle.md
+      - others:
+          - grus/others/index.md
+          - bean复制工具: grus/others/grus-core.md
+          - JSON使用说明: grus/others/grus-json.md
+          - Java17升级指南: grus/others/grus-17.md
+  - 其他:
+      - 应用开发指南: others/develop-guide.md
+      - 安全基础: others/security-base.md
+      - 短链接: others/short-url.md
