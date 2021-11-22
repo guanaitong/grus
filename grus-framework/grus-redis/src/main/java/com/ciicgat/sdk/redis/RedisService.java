@@ -149,7 +149,7 @@ public class RedisService {
     public Set<String> scan(String matchKey) {
         return stringRedisTemplate.execute((RedisCallback<Set<String>>) connection -> {
             Set<String> keysTmp = new HashSet<>(64);
-            Cursor<byte[]> cursor = connection.scan(new ScanOptions.ScanOptionsBuilder().match(matchKey).count(1000).build());
+            Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions().match(matchKey).count(1000).build());
             while (cursor.hasNext()) {
                 keysTmp.add(new String(cursor.next(), StandardCharsets.UTF_8));
             }
