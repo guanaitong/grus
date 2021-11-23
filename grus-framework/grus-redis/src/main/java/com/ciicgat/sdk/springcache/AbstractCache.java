@@ -38,6 +38,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
     private final ConcurrentStatsCounter statsCounter = new ConcurrentStatsCounter();
     protected final boolean cacheNull;
     protected final RedisSerializer<Object> valueSerializer;
+    private boolean bind = false;
 
     public AbstractCache(String name, RedisCacheManager redisCacheManager, C config) {
         this.name = name;
@@ -54,6 +55,14 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
             this.valueSerializer = useGzip ? new GzipRedisSerializer(redisSerializer) : redisSerializer;
         }
         this.cacheNull = Objects.isNull(config.getCacheNull()) ? redisCacheConfig.isCacheNull() : config.getCacheNull().booleanValue();
+    }
+
+    public boolean isBind() {
+        return bind;
+    }
+
+    public void setBind(boolean bind) {
+        this.bind = bind;
     }
 
     public final CacheStats stats() {
