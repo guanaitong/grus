@@ -4,17 +4,10 @@ variables:
 
 
 stages:
-  - testOnJava11
   - testOnJava17
-  - sonarOnJava11
+  - sonarOnJava17
   - deploy
 
-testOnJava11:
-  image: maven:3.8.3-eclipse-temurin-11
-  stage: testOnJava11
-  script:
-    - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
-    - mvn $MAVEN_CLI_OPTS test -Djava.version=11 -Djacoco.skip=true
 
 testOnJava17:
   image: maven:3.8.3-eclipse-temurin-17
@@ -23,8 +16,8 @@ testOnJava17:
     - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
     - mvn $MAVEN_CLI_OPTS test -Djava.version=17 -Djacoco.skip=true
 
-sonarOnJava11:
-  image: maven:3.8.3-eclipse-temurin-11
+sonarOnJava17:
+  image: maven:3.8.3-eclipse-temurin-17
   stage: sonarOnJava11
   script:
     - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
@@ -32,7 +25,7 @@ sonarOnJava11:
 
 
 deploy:
-  image: maven:3.8.3-eclipse-temurin-11
+  image: maven:3.8.3-eclipse-temurin-17
   stage: deploy
   script:
     - mvn $MAVEN_CLI_OPTS deploy -Dmaven.test.skip=true
