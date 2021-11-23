@@ -25,7 +25,7 @@ testOnJava17:
 
 sonarOnJava11:
   image: maven:3.8.3-eclipse-temurin-11
-  stage: buildOnJava11
+  stage: sonarOnJava11
   script:
     - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
     - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dsonar.projectKey=grus-2 -Dsonar.projectName=grus-2 -Djacoco.skip=false
