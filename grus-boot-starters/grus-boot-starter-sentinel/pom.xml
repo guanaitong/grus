@@ -15,6 +15,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>grus-boot-starter-sentinel</artifactId>
+    <properties>
+        <fastjson.version>1.2.75</fastjson.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -57,6 +60,23 @@
                 <exclusion>
                     <groupId>com.alibaba.cloud</groupId>
                     <artifactId>spring-cloud-circuitbreaker-sentinel</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-transport-common</artifactId>
+            <version>${sentinel.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.alibaba</groupId>
+                    <artifactId>fastjson</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
