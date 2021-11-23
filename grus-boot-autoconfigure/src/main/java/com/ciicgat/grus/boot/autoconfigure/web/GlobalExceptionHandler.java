@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(BusinessFeignException.class)
-    public ApiResponse handleBusinessFeignException(BusinessFeignException e) {
+    public ApiResponse<Object> handleBusinessFeignException(BusinessFeignException e) {
         if (webProperties.isPrintBusinessErrorStack()) {
             LOGGER.warn(e.toString(), e);
         } else {
@@ -77,7 +77,7 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(FeignException.class)
-    public ApiResponse handleFeignException(FeignException e) {
+    public ApiResponse<Object> handleFeignException(FeignException e) {
         LOGGER.error("error", e);
         return ApiResponse.fail(new StandardErrorCode(webProperties.getErrorCodePrefix(), 4, 0, "依赖服务异常"));
     }
@@ -90,7 +90,7 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(BusinessRuntimeException.class)
-    public ApiResponse handleBusinessRuntimeException(BusinessRuntimeException e) {
+    public ApiResponse<Object> handleBusinessRuntimeException(BusinessRuntimeException e) {
         if (webProperties.isPrintBusinessErrorStack()) {
             LOGGER.warn(e.toString(), e);
         } else {
@@ -111,7 +111,7 @@ public class GlobalExceptionHandler {
             MissingServletRequestParameterException.class,
             HttpRequestMethodNotSupportedException.class,
             NoHandlerFoundException.class})
-    public ApiResponse handleServletException(ServletException e) {
+    public ApiResponse<Object> handleServletException(ServletException e) {
         LOGGER.warn("error", e);
         String errorMsg = "请求格式不正确";
         if (e.getClass() == MissingServletRequestParameterException.class) {
@@ -132,24 +132,24 @@ public class GlobalExceptionHandler {
             TypeMismatchException.class,
             MethodArgumentTypeMismatchException.class,
             MethodArgumentConversionNotSupportedException.class})
-    public ApiResponse handleTypeMismatchException(TypeMismatchException e) {
+    public ApiResponse<Object> handleTypeMismatchException(TypeMismatchException e) {
         LOGGER.warn("TypeMismatchException, error: " + e.getMessage());
         return ApiResponse.fail(new StandardErrorCode(webProperties.getErrorCodePrefix(), 2, 0, "前端参数错误"));
     }
 
     @ExceptionHandler(BindException.class)
-    public ApiResponse handleBindException(BindException e) {
+    public ApiResponse<Object> handleBindException(BindException e) {
         LOGGER.warn("BindException, param validate error: " + e.getMessage());
         return handleBindingResult(e.getBindingResult());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ApiResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public ApiResponse<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         LOGGER.warn("MethodArgumentNotValidException, param validate error: " + e.getMessage());
         return handleBindingResult(e.getBindingResult());
     }
 
-    private ApiResponse handleBindingResult(BindingResult bindingResult) {
+    private ApiResponse<Object> handleBindingResult(BindingResult bindingResult) {
         String errorMsg = "前端参数错误";
         if (bindingResult.hasErrors()) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -176,7 +176,7 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(ConstraintViolationException.class)
-    public ApiResponse handleValidationException(ConstraintViolationException e) {
+    public ApiResponse<Object> handleValidationException(ConstraintViolationException e) {
         LOGGER.warn("ConstraintViolationException param validate error: " + e.getMessage());
         Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
         StringBuilder stringBuilder = new StringBuilder();
