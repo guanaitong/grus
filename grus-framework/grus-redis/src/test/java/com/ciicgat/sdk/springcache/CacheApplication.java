@@ -11,6 +11,7 @@ import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.redis.config.RedisSetting;
 import com.ciicgat.sdk.springcache.refresh.FrequencyCacheRefresher;
 import com.ciicgat.sdk.springcache.refresh.RandomCacheRefresher;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -79,7 +80,9 @@ public class CacheApplication {
 
             return CacheConfig.redis();
         });
-        return new RedisCacheManager(redisCacheConfig);
+        RedisCacheManager redisCacheManager = new RedisCacheManager(redisCacheConfig);
+        redisCacheManager.bindTo(new SimpleMeterRegistry());
+        return redisCacheManager;
     }
 
     /**
@@ -100,7 +103,6 @@ public class CacheApplication {
                 case "uidCache":
                     return CacheConfig.localRedis().setExpireSeconds(600);
             }
-
             return CacheConfig.localRedis();
         });
         return new RedisCacheManager(redisCacheConfig);

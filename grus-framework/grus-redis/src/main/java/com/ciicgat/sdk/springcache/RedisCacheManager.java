@@ -24,9 +24,8 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -35,8 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RedisCacheManager implements CacheManager, MeterBinder {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisCacheManager.class);
     private final RedisCacheConfig redisCacheConfig;
-    private Set<String> names = new HashSet<>();
-    private ConcurrentHashMap<String, AbstractCache> redisCacheMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, AbstractCache<?>> redisCacheMap = new ConcurrentHashMap<>();
     private final RedisConnectionFactory redisConnectionFactory;
     private volatile LocalCacheEvictMessageListener localCacheEvictMessageListener;
     private byte[] channel = null;
@@ -63,7 +61,7 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
 
     @Override
     public Cache getCache(String name) {
-        AbstractCache redisCache = redisCacheMap.get(name);
+        AbstractCache<?> redisCache = redisCacheMap.get(name);
         if (null != redisCache) {
             return redisCache;
         }
@@ -73,13 +71,9 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
                 return redisCache;
             }
             return redisCacheMap.computeIfAbsent(name, cacheName -> {
-                names.add(cacheName);
-                CacheConfig cacheConfig = redisCacheConfig.getCacheConfig(cacheName);
-                AbstractCache newCache = cacheConfig.newCache(cacheName, RedisCacheManager.this);
-                if (meterRegistry != null) {
-                    Tags tags = Tags.of("name", cacheName);
-                    new GrusCacheMeterBinder(newCache, cacheName, tags).bindTo(meterRegistry);
-                }
+                CacheConfig<?> cacheConfig = redisCacheConfig.getCacheConfig(cacheName);
+                AbstractCache<?> newCache = cacheConfig.newCache(cacheName, RedisCacheManager.this);
+                cacheBindTo(newCache);
                 return newCache;
             });
         }
@@ -126,7 +120,7 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
 
     @Override
     public Collection<String> getCacheNames() {
-        return names;
+        return redisCacheMap.keySet();
     }
 
     public RedisCacheConfig getRedisCacheConfig() {
@@ -140,6 +134,17 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
     @Override
     public void bindTo(MeterRegistry registry) {
         this.meterRegistry = registry;
+        for (Map.Entry<String, AbstractCache<?>> cacheEntry : redisCacheMap.entrySet()) {
+            cacheBindTo(cacheEntry.getValue());
+        }
+    }
+
+    private void cacheBindTo(AbstractCache<?> newCache) {
+        if (meterRegistry != null && !newCache.isBind()) {
+            Tags tags = Tags.of("name", newCache.getName());
+            new GrusCacheMeterBinder(newCache, newCache.getName(), tags).bindTo(meterRegistry);
+            newCache.setBind(true);
+        }
     }
 
     public class LocalCacheEvictMessageListener implements MessageListener {
