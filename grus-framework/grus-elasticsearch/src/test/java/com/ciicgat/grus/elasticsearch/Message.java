@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Created by August.Zhou on 2019-09-11 13:12.
@@ -227,4 +228,60 @@ public class Message implements Serializable, IndexAble {
         this.timeCreated = timeCreated;
     }
 
+    @Override
+    public Supplier<Date> getTimestampSupplier() {
+        return () -> this.timeCreated;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Message message = (Message) o;
+
+        if (oldWay != message.oldWay) return false;
+        if (docId != null ? !docId.equals(message.docId) : message.docId != null) return false;
+        if (docIndex != null ? !docIndex.equals(message.docIndex) : message.docIndex != null) return false;
+        if (userIdList != null ? !userIdList.equals(message.userIdList) : message.userIdList != null) return false;
+        if (channel != null ? !channel.equals(message.channel) : message.channel != null) return false;
+        if (title != null ? !title.equals(message.title) : message.title != null) return false;
+        if (content != null ? !content.equals(message.content) : message.content != null) return false;
+        if (stack != null ? !stack.equals(message.stack) : message.stack != null) return false;
+        if (hostIp != null ? !hostIp.equals(message.hostIp) : message.hostIp != null) return false;
+        if (traceId != null ? !traceId.equals(message.traceId) : message.traceId != null) return false;
+        if (appName != null ? !appName.equals(message.appName) : message.appName != null) return false;
+        if (appInstance != null ? !appInstance.equals(message.appInstance) : message.appInstance != null) return false;
+        if (workEnv != null ? !workEnv.equals(message.workEnv) : message.workEnv != null) return false;
+        if (workIdc != null ? !workIdc.equals(message.workIdc) : message.workIdc != null) return false;
+        if (module != null ? !module.equals(message.module) : message.module != null) return false;
+        if (tags != null ? !tags.equals(message.tags) : message.tags != null) return false;
+        if (source != null ? !source.equals(message.source) : message.source != null) return false;
+        if (status != null ? !status.equals(message.status) : message.status != null) return false;
+        return timeCreated != null ? timeCreated.equals(message.timeCreated) : message.timeCreated == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = docId != null ? docId.hashCode() : 0;
+        result = 31 * result + (docIndex != null ? docIndex.hashCode() : 0);
+        result = 31 * result + (userIdList != null ? userIdList.hashCode() : 0);
+        result = 31 * result + (channel != null ? channel.hashCode() : 0);
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (content != null ? content.hashCode() : 0);
+        result = 31 * result + (stack != null ? stack.hashCode() : 0);
+        result = 31 * result + (hostIp != null ? hostIp.hashCode() : 0);
+        result = 31 * result + (traceId != null ? traceId.hashCode() : 0);
+        result = 31 * result + (appName != null ? appName.hashCode() : 0);
+        result = 31 * result + (appInstance != null ? appInstance.hashCode() : 0);
+        result = 31 * result + (workEnv != null ? workEnv.hashCode() : 0);
+        result = 31 * result + (workIdc != null ? workIdc.hashCode() : 0);
+        result = 31 * result + (module != null ? module.hashCode() : 0);
+        result = 31 * result + (tags != null ? tags.hashCode() : 0);
+        result = 31 * result + (source != null ? source.hashCode() : 0);
+        result = 31 * result + (status != null ? status.hashCode() : 0);
+        result = 31 * result + (timeCreated != null ? timeCreated.hashCode() : 0);
+        result = 31 * result + (oldWay ? 1 : 0);
+        return result;
+    }
 }

@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.action.DocWriteRequest;
+import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.indices.alias.Alias;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -25,6 +26,8 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.WriteRequest;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.IndicesClient;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -204,11 +207,36 @@ public class ElasticsearchTemplate<T extends IndexAble> {
         }
     }
 
-    public int save(T value) {
-        return save(false, value);
+
+    public int update(T value) {
+        return update(value, false);
     }
 
-    public int save(boolean sync, T value) {
+    /**
+     * 单条doc根据docId更新
+     * @param value
+     * @param sync
+     * @return
+     */
+    public int update(T value, boolean sync) {
+        String index = getCurrentIndex(value);
+        UpdateRequest updateRequest = new UpdateRequest(index, value.getDocId())
+                .doc(entityMapper.mapToString(value), XContentType.JSON)
+                .setRefreshPolicy(sync ? WriteRequest.RefreshPolicy.WAIT_UNTIL : WriteRequest.RefreshPolicy.NONE);
+
+        try {
+            UpdateResponse updateResponse = restHighLevelClient.update(updateRequest, options);
+            return updateResponse.getResult() == DocWriteResponse.Result.UPDATED ? 1 : 0;
+        } catch (IOException e) {
+            throw new EsDataException(e);
+        }
+    }
+
+    public int save(T value) {
+        return save(value, false);
+    }
+
+    public int save(T value, boolean sync) {
         String index = getCurrentIndex(value);
         IndexRequest request = new IndexRequest(index)
                 .id(value.getDocId())
@@ -230,12 +258,12 @@ public class ElasticsearchTemplate<T extends IndexAble> {
     }
 
     public void save(T[] value) {
-        save(false, Arrays.asList(value));
+        save(Arrays.asList(value), false);
     }
 
-    public int save(boolean sync, List<T> dataList) {
+    public int save(List<T> dataList, boolean sync) {
         if (dataList.size() == 1) {
-            return save(sync, dataList.get(0));
+            return save(dataList.get(0), sync);
         }
 
         BulkRequest bulkRequest = new BulkRequest();
@@ -275,17 +303,6 @@ public class ElasticsearchTemplate<T extends IndexAble> {
             throw new EsDataException(e);
         }
     }
-
-//    public int update(T value) {
-//        String index = indexSuffixType.getCurrentIndex(this.index, value.getTimestampSupplier());
-//        try {
-//            UpdateRequest indexRequest = new UpdateRequest(index, value.getDocId()).doc(entityMapper.mapToString(value), XContentType.JSON);
-//            UpdateResponse updateResponse = restHighLevelClient.update(indexRequest, options);
-//            return updateResponse.status() == RestStatus.OK ? 1 : 0;
-//        } catch (IOException e) {
-//            throw new EsDataException(e);
-//        }
-//    }
 
     public int delete(String id) {
         String index = getCurrentIndex();

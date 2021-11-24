@@ -1,0 +1,29 @@
+{
+  "properties": {
+    "channel": {
+      "type": "integer"
+    },
+    "appName": {
+      "type": "keyword"
+    },
+    "workIdc": {
+      "type": "keyword"
+    },
+    "workEnv": {
+      "type": "keyword"
+    },
+    "title": {
+      "type": "keyword"
+    },
+    "content": {
+      "type": "text"
+    },
+    "status": {
+      "type": "integer"
+    },
+    "timeCreated": {
+      "type": "date",
+      "format": "yyyy-MM-dd'T'HH:mm:ss.SSSZZ"
+    }
+  }
+}
