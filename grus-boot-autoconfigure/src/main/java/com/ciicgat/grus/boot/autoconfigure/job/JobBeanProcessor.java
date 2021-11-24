@@ -93,8 +93,8 @@ public class JobBeanProcessor implements BeanPostProcessor, BeanFactoryAware {
 
     @Override
     public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-        if (beanFactory instanceof ConfigurableBeanFactory) {
-            this.configurableBeanFactory = (ConfigurableBeanFactory) beanFactory;
+        if (beanFactory instanceof ConfigurableBeanFactory configurableBeanFactory) {
+            this.configurableBeanFactory = configurableBeanFactory;
         }
 
     }

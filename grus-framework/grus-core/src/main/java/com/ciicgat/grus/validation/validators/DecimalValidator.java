@@ -45,8 +45,8 @@ public class DecimalValidator implements ConstraintValidator<Decimal, Object> {
                 || value.getClass().equals(double.class) || value.getClass().equals(float.class)) {
             input = new BigDecimal(value.toString());
         }
-        if (value instanceof BigDecimal) {
-            input = (BigDecimal) value;
+        if (value instanceof BigDecimal v) {
+            input = v;
         }
         if (input == null) {
             LOGGER.warn("该注解只支持BigDecimal, Double和Float类型, 请勿使用在别的类型参数上");

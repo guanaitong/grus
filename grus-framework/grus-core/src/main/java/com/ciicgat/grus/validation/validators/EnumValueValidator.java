@@ -40,10 +40,9 @@ public class EnumValueValidator implements ConstraintValidator<EnumValue, Object
 
         if (value instanceof String) {
             return Arrays.asList(strValues).contains(value);
-        } else if (value instanceof Integer) {
-            Integer integerVal = (Integer) value;
+        } else if (value instanceof Integer integerVal) {
             for (int i : intValues) {
-                if (i == integerVal) {
+                if (i == integerVal.intValue()) {
                     return true;
                 }
             }
