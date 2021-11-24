@@ -1,3 +1,8 @@
+/*
+ * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * All rights reserved.
+ */
+
 package com.ciicgat.grus.elasticsearch.core;
 
 import com.ciicgat.grus.elasticsearch.Message;
