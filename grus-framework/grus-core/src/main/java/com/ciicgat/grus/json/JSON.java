@@ -205,4 +205,21 @@ public class JSON {
         }
         return Optional.of(jsonNode);
     }
+
+    /**
+     * 将对象转化为JsonNode做相等比较,能够实现deepEquals目的.
+     * 对象不需要实现equals方法
+     *
+     * @param a
+     * @param b
+     * @return
+     */
+    public static boolean equals(Object a, Object b) {
+        if (a == b) {
+            return true;
+        }
+        JsonNode nodeA = OBJECT_MAPPER.convertValue(a, JsonNode.class);
+        JsonNode nodeB = OBJECT_MAPPER.convertValue(b, JsonNode.class);
+        return nodeA.equals(nodeB);
+    }
 }

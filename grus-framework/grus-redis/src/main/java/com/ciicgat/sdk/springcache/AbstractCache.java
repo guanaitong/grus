@@ -5,7 +5,12 @@
 
 package com.ciicgat.sdk.springcache;
 
+import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.lang.tool.Bytes;
+import com.ciicgat.sdk.springcache.event.CacheChangeEvent;
+import com.ciicgat.sdk.springcache.event.CacheChangeListener;
+import com.ciicgat.sdk.springcache.event.CacheChangeType;
+import com.ciicgat.sdk.springcache.refresh.RefreshPolicy;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.github.benmanes.caffeine.cache.stats.ConcurrentStatsCounter;
 import org.slf4j.Logger;
@@ -32,7 +37,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
     protected final String name;
     private final RedisCacheManager redisCacheManager;
     protected final C config;
-    private final CacheRefresher cacheRefresher;
+
     private final RedisConnectionFactory redisConnectionFactory;
     // use caffeine stats counter
     private final ConcurrentStatsCounter statsCounter = new ConcurrentStatsCounter();
@@ -40,13 +45,17 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
     protected final RedisSerializer<Object> valueSerializer;
     private boolean bind = false;
 
+    private final RefreshPolicy refreshPolicy;
+    private final boolean isGlobalRefreshPolicy;
+    private final CacheChangeListener cacheChangeListener;
+
     public AbstractCache(String name, RedisCacheManager redisCacheManager, C config) {
         this.name = name;
         this.redisCacheManager = redisCacheManager;
         this.config = config;
-        this.cacheRefresher = this.redisCacheManager.getCacheRefresher();
         this.redisConnectionFactory = this.redisCacheManager.getRedisConnectionFactory();
         final RedisCacheConfig redisCacheConfig = redisCacheManager.getRedisCacheConfig();
+        this.cacheChangeListener = redisCacheConfig.getRedisKeyListener();
         RedisSerializer<Object> redisSerializer = Objects.isNull(config.getSerializer()) ? redisCacheConfig.getSerializer() : config.getSerializer();
         if (redisSerializer instanceof GzipRedisSerializer) {
             this.valueSerializer = redisSerializer;
@@ -55,6 +64,9 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
             this.valueSerializer = useGzip ? new GzipRedisSerializer(redisSerializer) : redisSerializer;
         }
         this.cacheNull = Objects.isNull(config.getCacheNull()) ? redisCacheConfig.isCacheNull() : config.getCacheNull().booleanValue();
+        this.isGlobalRefreshPolicy = Objects.isNull(config.getRefreshPolicy());
+        this.refreshPolicy = isGlobalRefreshPolicy ? redisCacheConfig.getRefreshPolicy() : config.getRefreshPolicy();
+        Objects.requireNonNull(this.refreshPolicy);
     }
 
     public boolean isBind() {
@@ -123,6 +135,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
                 return false;
             }
             put0(key, value);
+            cacheChangeListener.onChanged(new CacheChangeEvent(CacheChangeType.PUT, key, this));
             return true;
         } catch (Exception e) {
             LOGGER.warn("save value failed,key=" + key, e);
@@ -149,6 +162,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         try {
             statsCounter.recordEviction();
             evict0(key);
+            cacheChangeListener.onChanged(new CacheChangeEvent(CacheChangeType.EVICT, key, this));
         } catch (Exception e) {
             LOGGER.warn("evict value failed,key=" + key, e);
         }
@@ -190,11 +204,35 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
             }
 
             put(actualKey, o);
-            this.cacheRefresher.recordCacheInit(this, actualKey);
+            this.refreshPolicy.recordCacheInit(isGlobalRefreshPolicy, this, actualKey);
             return (T) o;
         } else {
-            this.cacheRefresher.mayRefresh(this, actualKey, valueWrapper, (Callable<Object>) valueLoader);
+            boolean mayRefresh = refreshPolicy.mayRefresh(isGlobalRefreshPolicy, this, actualKey);
+            if (mayRefresh) {
+                compareThenRefresh(actualKey, valueWrapper, (Callable<Object>) valueLoader);
+            }
             return (T) valueWrapper.get();
         }
     }
+
+
+    public void compareThenRefresh(String key, Cache.ValueWrapper oldValueWrapper, Callable<Object> valueLoader) {
+        redisCacheManager.getRefreshExecutor().execute(() -> {
+            try {
+                LOGGER.info("start refresh,cache {},key {}", this.name, key);
+                Object newValue = valueLoader.call();
+                Object oldValue = oldValueWrapper.get();
+                if (refreshPolicy.isUseEqualFunction() ? Objects.equals(newValue, oldValue) : JSON.equals(newValue, oldValue)) {
+                    LOGGER.info("no changed,cache {},key {}", this.name, key);
+                    return;
+                }
+                putNewValue(key, newValue);
+                LOGGER.info("refresh success,cache {},key {}", this.name, key);
+            } catch (Exception e) {
+                LOGGER.warn(String.format("refresh failed,cache %s,key %s", this.name, key), e);
+            }
+        });
+    }
+
+
 }

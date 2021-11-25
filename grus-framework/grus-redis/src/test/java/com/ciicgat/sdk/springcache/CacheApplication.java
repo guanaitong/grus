@@ -7,10 +7,9 @@ package com.ciicgat.sdk.springcache;
 
 import com.ciicgat.sdk.gconf.ConfigCollection;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
-import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.redis.config.RedisSetting;
-import com.ciicgat.sdk.springcache.refresh.FrequencyCacheRefresher;
-import com.ciicgat.sdk.springcache.refresh.RandomCacheRefresher;
+import com.ciicgat.sdk.springcache.event.extend.ClearAfterHttpCompletionCacheChangeListener;
+import com.ciicgat.sdk.springcache.refresh.RefreshPolicy;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,12 +24,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.time.Duration;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by August.Zhou on 2018-11-15 13:20.
@@ -39,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 @ComponentScan("com.ciicgat.sdk.springcache")
 @EnableCaching
 public class CacheApplication {
-    private static final ExecutorService EXECUTOR_SERVICE = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), Threads.newDaemonThreadFactory("auto-refresh-cache"));
 
 
     public static void main(String[] args) {
@@ -59,6 +58,26 @@ public class CacheApplication {
         return configCollection.getBean("redis-config.json", RedisSetting.class);
     }
 
+    @Bean
+    public ClearAfterHttpCompletionCacheChangeListener clearAfterHttpCompletionCacheChangeListener() {
+        return new ClearAfterHttpCompletionCacheChangeListener();
+    }
+
+    @Bean
+    public WebMvcConfigurer webMvcConfigurer(ClearAfterHttpCompletionCacheChangeListener clearAfterHttpCompletionCacheChangeListener) {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addInterceptors(InterceptorRegistry registry) {
+                registry.addInterceptor(new HandlerInterceptor() {
+                    @Override
+                    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+                        clearAfterHttpCompletionCacheChangeListener.clear();
+                    }
+                });
+            }
+        };
+    }
+
     /**
      * 默认缓存管理器（redis）
      *
@@ -67,7 +86,7 @@ public class CacheApplication {
      */
     @Bean(name = {"cacheManager1"})
     @Primary
-    public CacheManager cacheManager1(RedisSetting redisSetting) {
+    public CacheManager cacheManager1(RedisSetting redisSetting, ClearAfterHttpCompletionCacheChangeListener clearAfterHttpCompletionCacheChangeListener) {
         RedisCacheConfig redisCacheConfig = new RedisCacheConfig();
         redisCacheConfig.setRedisSetting(redisSetting);
         redisCacheConfig.setPrefix("GRUS_DEMO_1_" + RandomStringUtils.random(2));
@@ -80,6 +99,7 @@ public class CacheApplication {
 
             return CacheConfig.redis();
         });
+        redisCacheConfig.setCacheChangeListener(clearAfterHttpCompletionCacheChangeListener);
         RedisCacheManager redisCacheManager = new RedisCacheManager(redisCacheConfig);
         redisCacheManager.bindTo(new SimpleMeterRegistry());
         return redisCacheManager;
@@ -136,7 +156,8 @@ public class CacheApplication {
 
             return CacheConfig.localRedis().setSerialize(false);
         });
-        redisCacheConfig.setCacheRefresher(new FrequencyCacheRefresher(Runnable::run, 3));
+        redisCacheConfig.setRefreshExecutor(() -> Runnable::run);
+        redisCacheConfig.setRefreshPolicy(RefreshPolicy.frequency(2));
         return new RedisCacheManager(redisCacheConfig);
     }
 
@@ -154,7 +175,8 @@ public class CacheApplication {
         redisCacheConfig.setSerializer(RedisSerializer.java());
         redisCacheConfig.setUseGzip(true);
         redisCacheConfig.setCacheConfigFunc(name -> CacheConfig.redis());
-        redisCacheConfig.setCacheRefresher(new RandomCacheRefresher(Runnable::run, 0.3));
+        redisCacheConfig.setRefreshPolicy(RefreshPolicy.random(0.3));
+        redisCacheConfig.setRefreshExecutor(() -> Runnable::run);
         return new RedisCacheManager(redisCacheConfig);
     }
 

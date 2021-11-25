@@ -9,6 +9,8 @@ import com.ciicgat.sdk.lang.tool.Bytes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.support.SimpleValueWrapper;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
 
 import java.util.Objects;
 
@@ -18,13 +20,13 @@ import java.util.Objects;
 public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> implements IRedisCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisCache.class);
     protected final String prefix;
-    private final RedisKeyListener redisKeyListener;
+
 
     public RedisCache(String name, RedisCacheManager redisCacheManager, R config) {
         super(name, redisCacheManager, config);
         final RedisCacheConfig redisCacheConfig = redisCacheManager.getRedisCacheConfig();
         this.prefix = redisCacheConfig.getPrefix().toUpperCase() + name.toUpperCase() + "_";
-        this.redisKeyListener = redisCacheConfig.getRedisKeyListener();
+
     }
 
     @Override
@@ -84,7 +86,6 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
             }
             return redisConnection.setEx(redisKey, config.getExpireSeconds(), redisValue);
         });
-        redisKeyListener.onPut(redisKey);
     }
 
 
@@ -92,12 +93,23 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
     protected void evict0(Object key) {
         byte[] redisKey = makeKey(key);
         execute(redisConnection -> redisConnection.del(redisKey));
-        redisKeyListener.onDelete(redisKey);
     }
 
     @Override
     public void clear() {
-
+        try {
+            execute(connection -> {
+                Cursor<byte[]> cursor = connection.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(64).build());
+                while (cursor.hasNext()) {
+                    byte[] key = cursor.next();
+                    connection.del(key);
+                    LOGGER.info("delete key for {}", Bytes.toString(key));
+                }
+                return null;
+            });
+        } catch (Exception e) {
+            LOGGER.error("clear failed", e);
+        }
     }
 
 

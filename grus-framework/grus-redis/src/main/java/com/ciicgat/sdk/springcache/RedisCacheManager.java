@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 
 /**
  * Created by August.Zhou on 2017/9/5 15:45.
@@ -38,22 +39,20 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
     private final RedisConnectionFactory redisConnectionFactory;
     private volatile LocalCacheEvictMessageListener localCacheEvictMessageListener;
     private byte[] channel = null;
-    private final CacheRefresher cacheRefresher;
     private final String id;
     private MeterRegistry meterRegistry;
+    private volatile Executor refreshExecutor;
 
     public RedisCacheManager(RedisCacheConfig redisCacheConfig) {
         this.redisCacheConfig = Objects.requireNonNull(redisCacheConfig);
         Objects.requireNonNull(redisCacheConfig.getPrefix());
         Objects.requireNonNull(redisCacheConfig.getSerializer());
         Objects.requireNonNull(redisCacheConfig.getCacheConfigFunc());
-        Objects.requireNonNull(redisCacheConfig.getCacheRefresher());
         RedisSetting redisSetting = redisCacheConfig.getRedisSetting();
         if (redisCacheConfig.getRedisSetting() == null) {
             redisSetting = SpringRedisConfCreator.getDefaultRedisSetting();
         }
         Objects.requireNonNull(redisCacheConfig);
-        this.cacheRefresher = redisCacheConfig.getCacheRefresher();
         this.redisConnectionFactory = SpringRedisConfCreator.newRedisConnectionFactory(redisSetting, true);
         this.id = new SessionIdGenerator().generateSessionId(8);
     }
@@ -99,8 +98,16 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
         return channel;
     }
 
-    public final CacheRefresher getCacheRefresher() {
-        return this.cacheRefresher;
+
+    Executor getRefreshExecutor() {
+        if (refreshExecutor == null) {
+            synchronized (this) {
+                if (refreshExecutor == null) {
+                    refreshExecutor = this.redisCacheConfig.getRefreshExecutor().get();
+                }
+            }
+        }
+        return refreshExecutor;
     }
 
     /**

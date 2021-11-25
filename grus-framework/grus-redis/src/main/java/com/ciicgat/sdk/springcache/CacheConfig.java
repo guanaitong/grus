@@ -5,6 +5,7 @@
 
 package com.ciicgat.sdk.springcache;
 
+import com.ciicgat.sdk.springcache.refresh.RefreshPolicy;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
 /**
@@ -34,6 +35,11 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
      */
     private RedisSerializer<Object> serializer;
 
+    /**
+     * 单挑缓存的异步刷新策略，非NULL时，优先级高于全局
+     */
+    private RefreshPolicy refreshPolicy;
+
 
     public Boolean getCacheNull() {
         return cacheNull;
@@ -60,6 +66,15 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
 
     public C setSerializer(RedisSerializer<Object> serializer) {
         this.serializer = serializer;
+        return (C) this;
+    }
+
+    public RefreshPolicy getRefreshPolicy() {
+        return refreshPolicy;
+    }
+
+    public C setRefreshPolicy(RefreshPolicy refreshPolicy) {
+        this.refreshPolicy = refreshPolicy;
         return (C) this;
     }
 
