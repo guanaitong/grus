@@ -168,16 +168,16 @@ public class JSONTest {
 
     @Test
     public void deepEquals() {
-        Assert.assertTrue(JSON.equals(null, null));
-        Assert.assertTrue(JSON.equals(1, 1));
-        Assert.assertTrue(JSON.equals(1L, 1L));
-        Assert.assertTrue(JSON.equals(Integer.valueOf(123), 123));
-        Assert.assertTrue(JSON.equals(Integer.valueOf(123), 123));
-        Assert.assertTrue(JSON.equals(true, true));
-        Assert.assertTrue(JSON.equals('a', 'a'));
-        Assert.assertTrue(JSON.equals("adsfasdf", "adsfasdf"));
-        Assert.assertFalse(JSON.equals(true, null));
-        Assert.assertFalse(JSON.equals(null, true));
+        Assertions.assertTrue(JSON.equals(null, null));
+        Assertions.assertTrue(JSON.equals(1, 1));
+        Assertions.assertTrue(JSON.equals(1L, 1L));
+        Assertions.assertTrue(JSON.equals(Integer.valueOf(123), 123));
+        Assertions.assertTrue(JSON.equals(Integer.valueOf(123), 123));
+        Assertions.assertTrue(JSON.equals(true, true));
+        Assertions.assertTrue(JSON.equals('a', 'a'));
+        Assertions.assertTrue(JSON.equals("adsfasdf", "adsfasdf"));
+        Assertions.assertFalse(JSON.equals(true, null));
+        Assertions.assertFalse(JSON.equals(null, true));
         System.out.println(JSON.toJSONString(1));
         System.out.println(JSON.toJSONString(true));
         System.out.println(JSON.toJSONString("adsfasdf"));
@@ -191,20 +191,20 @@ public class JSONTest {
         arrayListB.add("1231");
         arrayListB.add("1232");
 
-        Assert.assertTrue(JSON.equals(arrayListA, arrayListB));
+        Assertions.assertTrue(JSON.equals(arrayListA, arrayListB));
 
         ArrayList<String> arrayListC = new ArrayList<>();
         arrayListC.add("123xx");
         arrayListC.add("1231");
         arrayListC.add("1232");
-        Assert.assertFalse(JSON.equals(arrayListA, arrayListC));
+        Assertions.assertFalse(JSON.equals(arrayListA, arrayListC));
 
         System.out.println(JSON.toJSONString(arrayListA));
 
         Object[] arrayA = new Object[]{1, true, "123", arrayListA};
 
         Object[] arrayB = new Object[]{1, true, "123", arrayListB};
-        Assert.assertTrue(JSON.equals(arrayA, arrayB));
+        Assertions.assertTrue(JSON.equals(arrayA, arrayB));
 
         Map<String, Object> mapA = Map.of("123", true, "445", 123, "789", arrayA, "7890", arrayListA);
 
@@ -213,11 +213,11 @@ public class JSONTest {
         Map<String, Object> mapB = Map.of("123", true, "445", 123, "789", arrayB, "7890", arrayListA);
         TestB testB2 = new TestB("123", 123, arrayListB, mapB);
 
-        Assert.assertTrue(JSON.equals(testB1, testB2));
+        Assertions.assertTrue(JSON.equals(testB1, testB2));
 
         TestB testB3 = new TestB("123", 1234, arrayListB, mapB);
 
-        Assert.assertFalse(JSON.equals(testB1, testB3));
+        Assertions.assertFalse(JSON.equals(testB1, testB3));
 
 
         ArrayList<Object> arrayListAA = new ArrayList<>();
@@ -228,7 +228,7 @@ public class JSONTest {
         arrayListBB.add(testB2);
         arrayListBB.add(testB1);
 
-        Assert.assertTrue(JSON.equals(arrayListAA, arrayListBB));
+        Assertions.assertTrue(JSON.equals(arrayListAA, arrayListBB));
 
     }
 

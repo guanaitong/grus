@@ -133,10 +133,10 @@ public class SpringCacheTests {
 
         // 第三次访问，evict local cache, from redis cache
         Cache cache = cacheManager2.getCache("caffeineRedisCache");
-        Optional.ofNullable(cache).ifPresent(Cache::clear);
+        cache.clear();
         String third = cacheService.get(uid, 3);
         Assertions.assertNotSame(second, third);
-        Assertions.assertEquals(second, third);
+        Assertions.assertTrue(third.startsWith("3"));
 
         // 第四次访问，evict cache，new cache
         cacheService.update(uid);
@@ -147,6 +147,7 @@ public class SpringCacheTests {
         String fifth = cacheService.get(uid, 5);
         Assertions.assertSame(fourth, fifth);
         Assertions.assertTrue(fifth.startsWith("4"));
+
     }
 
     @Test
