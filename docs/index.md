@@ -23,51 +23,42 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
 
 目前推荐的版本为 **`2021.1.11`**，基于`spring-boot-version`为`2.3.12.RELEASE`
 
-<Alert type="warning">
-  1.0.0-SNAPSHOT 和早期版本已不再维护，请及时升级到推荐版本，保持技术栈的统一和程序的安全
-</Alert>
+!!! warning
 
-自`2021.2`开始，框架和巨灵神的引用不再放在一起，并支持了`jdk-17`，即使用`2021.2`及后面的版本，需要在父POM添加如下并指定`java.version`：
+    1.0.0-SNAPSHOT 和早期版本已不再维护，请及时升级到推荐版本，保持技术栈的统一和程序的安全.
 
-```xml
-<projecp>
-  <properties>
-    <java.version>17</java.version>
-  </properties>
-  
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.ciicgat.api</groupId>
-        <artifactId>ciicgat-agg</artifactId>
-        <version>2.0-SNAPSHOT</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-</projecp>
-```
+    自`2021.2`开始，框架和巨灵神的引用不再放在一起，并支持了`jdk-17`，即使用`2021.2`及后面的版本，需要在父POM添加如下并指定`java.version`：
+
+    ```xml
+    <projecp>
+        <properties>
+            <java.version>17</java.version>
+        </properties>
+
+        <dependencyManagement>
+            <dependencies>
+                <dependency>
+                    <groupId>com.ciicgat.api</groupId>
+                    <artifactId>ciicgat-agg</artifactId>
+                    <version>2.0-SNAPSHOT</version>
+                    <type>pom</type>
+                    <scope>import</scope>
+                </dependency>
+            </dependencies>
+        </dependencyManagement>
+    </projecp>
+    ```
 
 ## 发布版本
 
 - 2021.2 - 在开发中 `2021.2.0-SNAPSHOT`
 - 2021.1 - 推荐使用 `2021.1.11`
 
-<details>
-<summary markdown="span">Old versions（不推荐使用）</summary>
-<ul dir="auto">
-  <li>
-    <p>2020.9 - 推荐使用 2020.9.2.RELEASE，于2021年6月1日不再维护</p>
-  </li>
-  <li>
-    <p>2020.7 - 推荐使用 2020.7.3.RELEASE，于2021年3月1日不再维护</p>
-  </li>
-  <li>
-    <p>2020.6 - 于2021年1月1日不再维护，已于2021年9月28日从maven仓库移除</p>
-  </li>
-</ul>
-</details>
+??? abstract "Old versions(不推荐使用)"
+
+    - 2020.9 - 推荐使用 2020.9.2.RELEASE，于2021年6月1日不再维护
+    - 2020.7 - 推荐使用 2020.7.3.RELEASE，于2021年3月1日不再维护
+    - 2020.6 - 于2021年1月1日不再维护，已于2021年9月28日从maven仓库移除
 
 ## 升级日志
 
