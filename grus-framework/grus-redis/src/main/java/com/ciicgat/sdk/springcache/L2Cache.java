@@ -103,18 +103,19 @@ public class L2Cache extends RedisCache<CacheConfig.LocalRedis> implements ILoca
 
 
     @Override
-    public void clear() {
-        super.clear();
+    protected void clear0() {
+        super.clear0();
         localCache.invalidateAll();
         sendEvictMessage(null);
     }
 
     @Override
     public void clearLocal(Object key) {
-        LOGGER.info("clear local cache, the key is : {}", key);
         if (key == null) {
+            LOGGER.info("invalidateAll cache {}", name);
             localCache.invalidateAll();
         } else {
+            LOGGER.info("invalidateKey cache {},key {}", name, key);
             localCache.invalidate(key);
         }
     }

@@ -106,7 +106,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
             return valueWrapper;
         } catch (Exception e) {
             statsCounter.recordLoadFailure(System.nanoTime() - start);
-            LOGGER.warn("get value failed,key=" + key, e);
+            LOGGER.warn("get value failed,cache {},key {}", this.name, key, e);
         }
         return null;
     }
@@ -138,7 +138,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
             cacheChangeListener.onChanged(new CacheChangeEvent(CacheChangeType.PUT, key, this));
             return true;
         } catch (Exception e) {
-            LOGGER.warn("save value failed,key=" + key, e);
+            LOGGER.warn("save value failed,cache {},key {}", this.name, key, e);
         }
         return false;
     }
@@ -164,11 +164,26 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
             evict0(key);
             cacheChangeListener.onChanged(new CacheChangeEvent(CacheChangeType.EVICT, key, this));
         } catch (Exception e) {
-            LOGGER.warn("evict value failed,key=" + key, e);
+            LOGGER.warn("evict value failed,cache {},key {}", this.name, key, e);
         }
     }
 
     protected abstract void evict0(Object key);
+
+
+    @Override
+    public final void clear() {
+        try {
+            LOGGER.info("cache {} start clear...", this.name);
+            clear0();
+            LOGGER.info("cache {} clear success", this.name);
+        } catch (Exception e) {
+            LOGGER.error("cache {} clear failed", this.name, e);
+        }
+    }
+
+    protected abstract void clear0();
+
 
     @Override
     public final <T> T get(final Object key, final Class<T> type) {
@@ -194,15 +209,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         }
         final Cache.ValueWrapper valueWrapper = get(actualKey);
         if (valueWrapper == null) {
-            final Object o;
-            try {
-                o = valueLoader.call();
-            } catch (RuntimeException ex) {
-                throw ex;
-            } catch (Exception ex) {
-                throw new RuntimeException(ex.getCause());
-            }
-
+            Object o = applyCall(valueLoader);
             put(actualKey, o);
             this.refreshPolicy.recordCacheInit(isGlobalRefreshPolicy, this, actualKey);
             return (T) o;
@@ -211,7 +218,25 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
             if (mayRefresh) {
                 compareThenRefresh(actualKey, valueWrapper, (Callable<Object>) valueLoader);
             }
-            return (T) valueWrapper.get();
+            Object cacheValue = valueWrapper.get();
+            try {
+                return (T) cacheValue;
+            } catch (ClassCastException ex) {
+                if (cacheValue != null) {
+                    LOGGER.error("NOTICE:class has changed,original class from cache is {}, you can update cache name to avoid this exception", cacheValue.getClass());
+                }
+                return applyCall(valueLoader);
+            }
+        }
+    }
+
+    private <T> T applyCall(final Callable<T> valueLoader) {
+        try {
+            return valueLoader.call();
+        } catch (RuntimeException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new RuntimeException(ex.getCause());
         }
     }
 
@@ -229,10 +254,9 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
                 putNewValue(key, newValue);
                 LOGGER.info("refresh success,cache {},key {}", this.name, key);
             } catch (Exception e) {
-                LOGGER.warn(String.format("refresh failed,cache %s,key %s", this.name, key), e);
+                LOGGER.warn("refresh failed,cache {},key {}", this.name, key, e);
             }
         });
     }
-
 
 }

@@ -74,9 +74,8 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
         sendEvictMessage(key);
     }
 
-
     @Override
-    public void clear() {
+    protected void clear0() {
         localCache.invalidateAll();
         sendEvictMessage(null);
     }
@@ -88,10 +87,11 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
      */
     @Override
     public void clearLocal(Object key) {
-        LOGGER.info("clear local cache, the key is : {}", key);
         if (key == null) {
+            LOGGER.info("invalidateAll cache {}", name);
             localCache.invalidateAll();
         } else {
+            LOGGER.info("invalidateKey cache {},key {}", name, key);
             localCache.invalidate(key);
         }
     }

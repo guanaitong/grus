@@ -95,21 +95,18 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
         execute(redisConnection -> redisConnection.del(redisKey));
     }
 
+
     @Override
-    public void clear() {
-        try {
-            execute(connection -> {
-                Cursor<byte[]> cursor = connection.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(64).build());
-                while (cursor.hasNext()) {
-                    byte[] key = cursor.next();
-                    connection.del(key);
-                    LOGGER.info("delete key for {}", Bytes.toString(key));
-                }
-                return null;
-            });
-        } catch (Exception e) {
-            LOGGER.error("clear failed", e);
-        }
+    protected void clear0() {
+        execute(connection -> {
+            Cursor<byte[]> cursor = connection.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(64).build());
+            while (cursor.hasNext()) {
+                byte[] key = cursor.next();
+                connection.del(key);
+                LOGGER.info("delete redisKey cache {},key {}", this.name, Bytes.toString(key));
+            }
+            return null;
+        });
     }
 
 

@@ -8,6 +8,8 @@ package com.ciicgat.sdk.springcache.event.extend;
 import com.ciicgat.sdk.springcache.event.CacheChangeEvent;
 import com.ciicgat.sdk.springcache.event.CacheChangeListener;
 import com.ciicgat.sdk.springcache.event.CacheChangeType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -20,6 +22,7 @@ import java.util.List;
  * Created by August.Zhou on 2021/11/26 13:18.
  */
 public class ClearAfterHttpCompletionCacheChangeListener implements CacheChangeListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClearAfterHttpCompletionCacheChangeListener.class);
     private static final String CACHE_KEY = "__CHANGE_CACHE_KEY__";
 
     public ClearAfterHttpCompletionCacheChangeListener() {
@@ -66,6 +69,7 @@ public class ClearAfterHttpCompletionCacheChangeListener implements CacheChangeL
         CacheChangeEvent[] cacheChangeEventsCopy = cacheChangeEvents.toArray(new CacheChangeEvent[cacheChangeEvents.size()]);
         for (CacheChangeEvent cacheChangeEvent : cacheChangeEventsCopy) {
             cacheChangeEvent.getCache().evict(cacheChangeEvent.getKey());
+            LOGGER.info("evicted,cache {},key {}", cacheChangeEvent.getCache().getName(), cacheChangeEvent.getKey());
         }
     }
 }
