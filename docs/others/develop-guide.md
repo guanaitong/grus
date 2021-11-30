@@ -272,7 +272,7 @@ appId 指某应用，memberId 指访问的用户。如果该用户无权限访�
 - MGR 权限地址：获取应用的所有权限信息，返回一个标准的 json，方便 MGR 统一的权限管理使用；
 - MGR 地址：MGR 后台的应用入口地址
 
-<img src="../assets/images/develop-guide/edit-software-1.png" alt="编辑软件" width = "70%" height = "70%" />
+![编辑软件](../assets/images/develop-guide/edit-software-1.png)
 
 应用类型：标准还是定制，看业务需求。
 
