@@ -4,13 +4,11 @@ title: IDEA使用技巧
 
 # IntelliJ IDEA 使用技巧
 
-<Alert type="error">
-  关爱通 Java 开发全部使用 IDEA，禁止使用 Eclipse
-</Alert>
+!!! danger "禁止"
+
+    关爱通 Java 开发全部使用 IDEA，禁止使用 Eclipse
 
 [IDEA 官网下载](https://www.jetbrains.com/idea/download/)
-
-> 破解方法：https://zhile.io/2018/08/25/jetbrains-license-server-crack.html
 
 ## 版本选择
 

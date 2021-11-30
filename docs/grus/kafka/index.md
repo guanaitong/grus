@@ -10,11 +10,12 @@
 
 框架针对 `kafka` 进行了 `Consumer` 能力的封装，对基于 `Kafka` 实现的 `Debezium` 消息处理进行了封装。
 
-## 如何使用？
+## 使用说明
 
 ### 版本要求
 
-> grus 版本 `2021.1.7+`
+:octicons-tag-24: 2021.1.7+ ·
+:octicons-unlock-24: Feature flag
 
 依赖坐标
 

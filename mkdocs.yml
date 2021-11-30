@@ -15,6 +15,7 @@ copyright: Copyright &copy; 2016 - 2021 guanaitong
 
 theme:
   name: material
+  language: zh
   logo: assets/logo.ico
   favicon: assets/favicon.ico
 
@@ -111,7 +112,6 @@ nav:
       - index.md
   - 序言:
       - 开发管理: prepare/contribute/manage.md
-      - TODO列表: prepare/contribute/todolist.md
       - 环境安装:
           - Java安装: prepare/develop-env/java-install.md
           - Maven安装: prepare/develop-env/maven-install.md
