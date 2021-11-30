@@ -39,7 +39,9 @@ mall
 
 登录 **mgr 后台**，访问 **应用管理系统 new**，软件应用库菜单-软件管理，滑倒最下面，创建软件。
 
-![创建软件地址](../assets/images/develop-guide/create-software-path.png)
+[![Language selector preview]][Language selector preview]
+
+  [Language selector preview]: ../assets/images/develop-guide/create-software-path.png
 
 一个关爱通应用，目前有 5 种类型，如下，请选择合适的类型：
 
