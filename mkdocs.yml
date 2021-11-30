@@ -60,8 +60,6 @@ theme:
     text: Roboto
     code: Roboto Mono
 
-use_directory_urls: false
-
 # Plugins
 plugins:
   - search
