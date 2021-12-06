@@ -71,7 +71,7 @@ public class TestElasticsearchTemplate {
         Assertions.assertEquals(1, saveResult);
 
         // 查询
-        Message searchResult = elasticsearchTemplate.get(docId);
+        Message searchResult = elasticsearchTemplate.get(docId, docIndex);
         Assertions.assertEquals(message, searchResult);
 
         // 更新
@@ -81,7 +81,7 @@ public class TestElasticsearchTemplate {
         updateMessage.setDocIndex(docIndex);
         int update = elasticsearchTemplate.update(updateMessage, true);
         Assertions.assertEquals(1, update);
-        Message updateSearchResult = elasticsearchTemplate.get(docId);
+        Message updateSearchResult = elasticsearchTemplate.get(docId, docIndex);
         // 只更新变更字段
         Assertions.assertEquals(1, updateSearchResult.getStatus());
         // 其他字段不更新
