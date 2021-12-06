@@ -18,19 +18,19 @@ public interface SentinelService {
 
     @RequestLine("POST /testFlow")
     @ApiTimeout(readTimeoutMillis = 100)
-    void testFlow();
+    int testFlow();
 
     @RequestLine("POST /testDegrade")
     @ApiTimeout(readTimeoutMillis = 100)
-    void testDegrade();
+    int testDegrade();
 
     @RequestLine("POST /testAuthority")
     @ApiTimeout(readTimeoutMillis = 100)
-    void testAuthority();
+    int testAuthority();
 
     @RequestLine("POST /testParamFlow?personId={personId}&id={id}")
     @ApiTimeout(readTimeoutMillis = 100)
-    void testParamFlow(@Param("personId") Integer personId, @Param("id") Integer id);
+    int testParamFlow(@Param("personId") Integer personId, @Param("id") Integer id);
 
 
 
