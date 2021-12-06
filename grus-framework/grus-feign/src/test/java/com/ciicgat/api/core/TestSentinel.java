@@ -96,6 +96,77 @@ public class TestSentinel {
         mockWebServer.shutdown();
     }
 
+    @Test
+    public void testFlowFallback() throws IOException {
+        TestSentinelFallback fallback = new TestSentinelFallback();
+        Pair<SentinelService, MockWebServer> pair = TestUtil.newInstance("sentinel-test", SentinelService.class, true, fallback);
+        mockWebServer = pair.getRight();
+        sentinelService = pair.getLeft();
+        MockResponse mockResponse = new MockResponse()
+                .addHeader("Content-Type", "application/json;charset=utf-8")
+                .setBody("1")
+                .setResponseCode(200);
+        initFlowRule();
+        mockWebServer.enqueue(mockResponse);
+        int i = sentinelService.testFlow();
+        Assertions.assertEquals(i, 1);
+        mockWebServer.shutdown();
+    }
+
+    @Test
+    public void testDegradeFallback() throws IOException {
+        TestSentinelFallback fallback = new TestSentinelFallback();
+        Pair<SentinelService, MockWebServer> pair = TestUtil.newInstance("sentinel-test", SentinelService.class, true, fallback);
+        mockWebServer = pair.getRight();
+        sentinelService = pair.getLeft();
+        initDegradeRule();
+        for (int i = 0; i < 10; i++) {
+            try {
+                sentinelService.testDegrade();
+            } catch (Exception e) {
+
+            }
+        }
+        int i = sentinelService.testDegrade();
+        Assertions.assertEquals(i, 2);
+        mockWebServer.shutdown();
+    }
+
+    @Test
+    public void testAuthorityFallback() throws IOException {
+        TestSentinelFallback fallback = new TestSentinelFallback();
+        Pair<SentinelService, MockWebServer> pair = TestUtil.newInstance("sentinel-test", SentinelService.class, true, fallback);
+        mockWebServer = pair.getRight();
+        sentinelService = pair.getLeft();
+        MockResponse mockResponse = new MockResponse()
+                .addHeader("Content-Type", "application/json;charset=utf-8")
+                .setBody("4")
+                .setResponseCode(200);
+        initAuthorityRule();
+        mockWebServer.enqueue(mockResponse);
+        int i = sentinelService.testAuthority();
+        Assertions.assertEquals(i, 3);
+        mockWebServer.shutdown();
+    }
+
+    @Test
+    public void testParamFlowFallback() throws IOException {
+        TestSentinelFallback fallback = new TestSentinelFallback();
+        Pair<SentinelService, MockWebServer> pair = TestUtil.newInstance("sentinel-test", SentinelService.class, true, fallback);
+        mockWebServer = pair.getRight();
+        sentinelService = pair.getLeft();
+        MockResponse mockResponse = new MockResponse()
+                .addHeader("Content-Type", "application/json;charset=utf-8")
+                .setBody("5")
+                .setResponseCode(200);
+        initParamFlowRule();
+        mockWebServer.enqueue(mockResponse);
+        sentinelService.testParamFlow(5, 5);
+        int i = sentinelService.testParamFlow(5, 5);
+        Assertions.assertEquals(i, 4);
+        mockWebServer.shutdown();
+    }
+
     private void initFlowRule() {
         List<FlowRule> rules = new ArrayList<>();
         FlowRule rule = new FlowRule();
