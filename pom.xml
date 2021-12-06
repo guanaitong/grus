@@ -14,12 +14,12 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
 
-    <url>https://gitlab.wuxingdev.cn/java/grus</url>
+    <url>https://github.com/guanaitong/grus</url>
     <description>Guanaitong Grus Java Framework</description>
     <scm>
-        <connection>scm:git:git://gitlab.wuxingdev.cn/java/grus.git</connection>
-        <developerConnection>scm:git:ssh://git@gitlab.wuxingdev.cn/java/grus.git</developerConnection>
-        <url>https://gitlab.wuxingdev.cn/java/grus</url>
+        <connection>scm:git:git://github.com/java/grus.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/java/grus.git</developerConnection>
+        <url>https://github.com/guanaitong/grus</url>
     </scm>
 
     <developers>
@@ -266,6 +266,17 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
                 <configuration>
@@ -443,15 +454,15 @@
 
 
     <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <name>reg.wuxingdev.cn-releases</name>
-            <url>http://repo.wuxingdev.cn/artifactory/libs-release</url>
-        </repository>
         <snapshotRepository>
-            <id>snapshots</id>
-            <name>reg.wuxingdev.cn-snapshots</name>
-            <url>http://repo.wuxingdev.cn/artifactory/libs-snapshot</url>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/guanaitong/REPOSITORY</url>
+        </repository>
     </distributionManagement>
+
 </project>
