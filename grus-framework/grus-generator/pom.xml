@@ -8,14 +8,12 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <artifactId>grus-framework</artifactId>
         <groupId>com.ciicgat.grus</groupId>
         <version>${revision}</version>
     </parent>
     <artifactId>grus-generator</artifactId>
-    <description>Grus Generator</description>
 
     <dependencies>
         <dependency>
