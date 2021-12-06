@@ -19,13 +19,13 @@
     <version>GRUS_VERSION</version>
     <packaging>pom</packaging>
     <name>Grus Starter Parent</name>
-    <url>https://java.guide.wuxingdev.cn/</url>
+    <url>https://github.com/guanaitong/grus</url>
     <description>Parent pom providing dependency and plugin management for applications
         built with Maven</description>
     <scm>
-        <connection>scm:git:git://gitlab.wuxingdev.cn/java/grus.git</connection>
-        <developerConnection>scm:git:ssh://git@gitlab.wuxingdev.cn/java/grus.git</developerConnection>
-        <url>https://gitlab.wuxingdev.cn/java/grus</url>
+        <connection>scm:git:git://github.com/java/grus.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/java/grus.git</developerConnection>
+        <url>https://github.com/guanaitong/grus</url>
     </scm>
 
     <developers>
