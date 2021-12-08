@@ -218,15 +218,14 @@
     </pluginRepositories>
 
     <distributionManagement>
-        <repository>
-            <id>releases</id>
-            <name>reg.wuxingdev.cn-releases</name>
-            <url>http://repo.wuxingdev.cn/artifactory/libs-release</url>
-        </repository>
         <snapshotRepository>
-            <id>snapshots</id>
-            <name>reg.wuxingdev.cn-snapshots</name>
-            <url>http://repo.wuxingdev.cn/artifactory/libs-snapshot</url>
+            <id>ossrh</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/guanaitong/REPOSITORY</url>
+        </repository>
     </distributionManagement>
 </project>
