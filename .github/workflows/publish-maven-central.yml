@@ -36,9 +36,9 @@ jobs:
           key: ${{ runner.os }}-maven-${{ matrix.java }}-${{ hashFiles('pom.xml', '**/pom.xml') }}
       - name: Build And Publish to Maven central
         run: |
-          mvn deploy -DskipTests
+          mvn deploy -DskipTests -Poss
           sh generate_parent_pom.sh
-          mvn -f tmp/.flattened-pom.xml -DskipTests deploy
+          mvn -f tmp/.flattened-pom.xml -DskipTests deploy -Poss
         env:
           MAVEN_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           MAVEN_CENTRAL_TOKEN: ${{ secrets.SONATYPE_PASSWORD }}

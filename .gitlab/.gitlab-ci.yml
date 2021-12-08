@@ -28,9 +28,9 @@ deploy:
   image: maven:3.8.3-eclipse-temurin-17
   stage: deploy
   script:
-    - mvn $MAVEN_CLI_OPTS deploy -Dmaven.test.skip=true
+    - mvn $MAVEN_CLI_OPTS deploy -DskipTests -Pgitlab
     - sh generate_parent_pom.sh
-    - mvn $MAVEN_CLI_OPTS -f tmp/.flattened-pom.xml -Dmaven.test.skip=true deploy
+    - mvn $MAVEN_CLI_OPTS -f tmp/.flattened-pom.xml  deploy -DskipTests -Pgitlab
   only:
     - master
     - 2021.1.x
