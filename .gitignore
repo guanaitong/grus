@@ -31,3 +31,4 @@ target/
 Thumbs.db
 .flattened-pom.xml
 grusgenerator
+site/
