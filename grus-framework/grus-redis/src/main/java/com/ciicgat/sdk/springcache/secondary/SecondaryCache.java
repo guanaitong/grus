@@ -15,6 +15,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
+ * 二级缓存。假设Person表有id主键和username唯一索引。getById和getByUsername是经常的查询方式。
+ * 假如分别根据id->person和username->person建立两个缓存。则person对象中的任意属性变化时，需要更新两个缓存。
+ * 此类的解决方式是：分别建立id->person和username->id
+ *
  * Created by August.Zhou on 2016/12/27 13:35.
  */
 public class SecondaryCache {
