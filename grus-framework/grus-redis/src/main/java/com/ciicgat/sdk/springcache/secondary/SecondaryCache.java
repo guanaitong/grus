@@ -15,14 +15,14 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * 二级缓存的cache是用来存储key和一级缓存ID的对应关系的，
- * 而这个对应关系我们一般保持不变，所以二级缓存的cache可以有个LocalCache的实现
- * <p>
  * Created by August.Zhou on 2016/12/27 13:35.
  */
 public class SecondaryCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(SecondaryCache.class);
 
+    /**
+     * 这个cache是用来存储二级缓存key和一级缓存ID的对应关系的，而这个对应关系我们一般保持不变,所以可用本地缓存或者二级缓存
+     */
     private Cache secondaryKeyToPrimaryIdCache;
 
     public SecondaryCache(Cache secondaryKeyToPrimaryIdCache) {
