@@ -72,6 +72,7 @@
         <!--DO NOT change kafka version,because server version is 2.8.0-->
         <kafka.version>2.8.0</kafka.version>
         <poi.version>3.17</poi.version>
+        <log4j2.version>2.16.0</log4j2.version>
     </properties>
 
     <dependencyManagement>
