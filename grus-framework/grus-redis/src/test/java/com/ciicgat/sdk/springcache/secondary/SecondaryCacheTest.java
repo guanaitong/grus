@@ -3,29 +3,41 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.cache;
+package com.ciicgat.sdk.springcache.secondary;
 
-import com.ciicgat.sdk.lang.exception.CacheDataException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.Cache;
+import org.springframework.cache.support.SimpleValueWrapper;
 
-
-@ExtendWith(MockitoExtension.class)
-public class TestSecondaryCache {
-    @Mock
-    private LocalCache cache;
-
+/**
+ * Created by August.Zhou on 2021/12/17 10:56.
+ */
+class SecondaryCacheTest {
     private SecondaryCache secondaryCache;
+
+    private Cache cache;
 
 
     @BeforeEach
     public void setup() {
+        cache = Mockito.mock(Cache.class);
         secondaryCache = new SecondaryCache(cache);
+    }
+
+    @Test
+    void get() {
+    }
+
+    @Test
+    void invalidate() {
+        Mockito.doNothing().when(cache).evict(Mockito.any());
+        secondaryCache.invalidate(makeKey());
+        Mockito.doThrow(new RuntimeException()).when(cache).evict(Mockito.any());
+        secondaryCache.invalidate(makeKey());
+        Mockito.verify(cache, Mockito.times(2)).evict(Mockito.any());
     }
 
     private static String makeKey() {
@@ -41,9 +53,9 @@ public class TestSecondaryCache {
 
         String key = makeKey();
         //命中了一级缓存
-        Mockito.when(cache.getValue(key)).thenReturn(person.getId());
+        Mockito.when(cache.get(key)).thenReturn(new SimpleValueWrapper(person.getId()));
 
-        Person person1 = secondaryCache.get(key, (id) -> person, () -> {
+        Person person1 = secondaryCache.get(key, id -> person, () -> {
             Person person3 = new Person();
             person3.setId(2);
             person3.setMemberId(3);
@@ -55,7 +67,7 @@ public class TestSecondaryCache {
     }
 
     @Test
-    public void testGet_hit_secondaryL2Cache() throws CacheDataException {
+    public void testGet_hit_secondaryL2Cache() {
         final Person person = new Person();
         person.setId(1);
         person.setMemberId(3);
@@ -63,7 +75,7 @@ public class TestSecondaryCache {
 
         String key = makeKey();
         //未命中一级缓存
-        Mockito.when(cache.getValue(key)).thenReturn(null);
+        Mockito.when(cache.get(key)).thenReturn(null);
 
         Person person1 = secondaryCache.get(key, (id) -> {
             //这个方法不执行
@@ -86,7 +98,7 @@ public class TestSecondaryCache {
         person.setName("huxuan");
 
         String key = makeKey();
-        Mockito.when(cache.getValue(key)).thenReturn(null);
+        Mockito.when(cache.get(key)).thenReturn(null);
 
         Assertions.assertThrows(RuntimeException.class, () -> secondaryCache.get(key, (id) -> {
             Person person3 = new Person();
@@ -100,20 +112,19 @@ public class TestSecondaryCache {
     }
 
     @Test
-    public void testGet_hit_secondaryL1Cache_withException() throws CacheDataException {
+    public void testGet_hit_secondaryL1Cache_withException() {
         final Person person = new Person();
         person.setId(1);
         person.setMemberId(3);
         person.setName("huxuan");
 
         String key = makeKey();
-        Mockito.when(cache.getValue(key)).thenReturn(person.getId());
+        Mockito.when(cache.get(key)).thenReturn(new SimpleValueWrapper(person.getId()));
 
-        Person person1 = secondaryCache.get(key, (id) -> {
+        Assertions.assertThrows(RuntimeException.class, () -> secondaryCache.get(key, (id) -> {
             throw new RuntimeException("异常");
-        }, () -> new IdObject<>(person.getId(), person));
+        }, () -> new IdObject<>(person.getId(), person)));
 
-        Assertions.assertSame(person, person1);
     }
 
     @Test
@@ -125,8 +136,8 @@ public class TestSecondaryCache {
 
         String key = makeKey();
         try {
-            Mockito.when(cache.getValue(key)).thenThrow(new CacheDataException());
-        } catch (CacheDataException e) {
+            Mockito.when(cache.get(key)).thenThrow(new RuntimeException());
+        } catch (RuntimeException e) {
             e.printStackTrace();
         }
 
@@ -150,8 +161,8 @@ public class TestSecondaryCache {
 
         String key = makeKey();
         try {
-            Mockito.doThrow(new CacheDataException()).when(cache).setValue(key, person.getId());
-        } catch (CacheDataException e) {
+            Mockito.doThrow(new RuntimeException()).when(cache).put(key, person.getId());
+        } catch (RuntimeException e) {
             e.printStackTrace();
         }
 
@@ -176,7 +187,7 @@ public class TestSecondaryCache {
             person3.setId(1);
             person3.setMemberId(3);
             person3.setName("huxuan");
-            return new IdObject<Person>(person3.getId(), person3);
+            return new IdObject<>(person3.getId(), person3);
         });
 
         Assertions.assertNotSame(person, person2);
