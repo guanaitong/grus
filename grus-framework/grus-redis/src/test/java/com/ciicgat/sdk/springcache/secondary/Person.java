@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.cache;
+package com.ciicgat.sdk.springcache.secondary;
 
 import java.io.Serializable;
 
