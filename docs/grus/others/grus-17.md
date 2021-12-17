@@ -1,10 +1,13 @@
 # Java17升级指南
 
-使用 `https://adoptium.net/` 下载`jdk17`。它原来叫`adoptopenjdk`，后来项目归到`eclipse`旗下，改名为`eclipse temurin`，这也是我们线上采用的发行版。
+## Jdk安装
 
+使用 `https://adoptium.net/` 下载`jdk17`。它原来叫`adoptopenjdk`，后来项目归到`eclipse`旗下，改名为`eclipse temurin`，这也是我们线上采用的发行版。
 也可以使用`idea`自带的jdk下载功能下载，选择`Eclipse Temurin`（idea最好配置下翻墙的http proxy）。
 
-## POM修改
+## 升级与更新
+
+### POM修改
 
 1. grus版本必须使用`2021.2.0-SNAPTSHOT`
 2. `pom.xml`里增加以下配置：
@@ -27,11 +30,11 @@
         </dependencyManagement>
     </project>
     ```
-   
+
 3. maven-compiler-plugin里的11配置要去掉（如果有）：
 
-    === "old"
-    
+   === "old"
+
         ```xml
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -44,9 +47,9 @@
             </configuration>
         </plugin>
         ```
-    
-    === "new"
-    
+
+   === "new"
+
         ```xml
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -54,7 +57,12 @@
         </plugin>
         ```
 
-大家可以查看示例项目 [open-business-travel](https://gitlab.wuxingdev.cn/biz/open/open-business-travel/blob/master/pom.xml)
+大家可以参考示例项目 [open-business-travel](https://gitlab.wuxingdev.cn/biz/open/open-business-travel/blob/master/pom.xml)
+
+### Bean复制工具
+
+java17没法再使用`cglib`的`beancopier`，故`grus-core`中的`BeanCopyUtil`的实现方式略微变化，直接使用了`org.springframework.beans.BeanUtils`
+，而不再是`org.springframework.cglib.beans.BeanCopier`。
 
 ## 依赖项升级
 
@@ -62,7 +70,6 @@
 - elasticJob升级为最新的`shardingsphere elasticjob`，相关包需要改为`org.apache.shardingsphere.elasticjob`；
 - feign升级为11.6版本；
 - TODO
-
 
 ## 兼容问题
 
