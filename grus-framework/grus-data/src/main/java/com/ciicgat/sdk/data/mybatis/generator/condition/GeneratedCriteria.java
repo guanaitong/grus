@@ -47,7 +47,7 @@ public abstract class GeneratedCriteria<T, R, Children> implements Compare<Child
         this.criteria = criteria;
     }
 
-    protected void addCriterion(String condition) {
+    public void addCriterion(String condition) {
         if (condition == null) {
             throw new RuntimeException("Value for condition cannot be null");
         }
@@ -93,14 +93,15 @@ public abstract class GeneratedCriteria<T, R, Children> implements Compare<Child
     protected void addLikeCriterion(SqlKeyword sqlKeyword, SqlLike sqlLike, Object value, R column) {
         String columnName = this.columnToString(column);
         if (value == null) {
-            throw new RuntimeException("Value for " + columnName + " cannot be null");
+            LOGGER.debug("Value for '{}' is null, just skip this condition", columnName);
+            return;
         }
         criteria.add(new Criterion(this.contactCondition(columnName, sqlKeyword), value, sqlLike));
     }
 
     protected void addCriterion(String condition, Object value1, Object value2, String property) {
         if (value1 == null || value2 == null) {
-            throw new RuntimeException("Between values for " + property + " cannot be null");
+            throw new RuntimeException("Between values for `" + property + "` cannot be null");
         }
         criteria.add(new Criterion(condition, value1, value2));
     }
