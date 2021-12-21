@@ -74,7 +74,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <!--@see https://maven.apache.org/maven-ci-friendly.html-->
+        <!--@see https://maven.apache.org/maven-ci-friendly.html -->
         <revision>2021.2.0-SNAPSHOT</revision>
         <java.version>17</java.version>
         <resource.delimiter>@</resource.delimiter>
@@ -134,7 +134,6 @@
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 
     </properties>
-
 
     <build>
         <plugins>

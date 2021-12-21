@@ -20,7 +20,6 @@ import static java.util.stream.Collectors.toList;
  */
 public interface Func<Children, R> extends Serializable {
 
-
     /**
      * 字段 IS NULL
      * <p>例: isNull("name")</p>
@@ -38,6 +37,24 @@ public interface Func<Children, R> extends Serializable {
      * @return children
      */
     Children isNotNull(R column);
+
+    /**
+     * 字段 = 空字符串("")
+     * <p>例: isBlank("name")</p>
+     *
+     * @param column 字段
+     * @return children
+     */
+    Children isBlank(R column);
+
+    /**
+     * 字段 != 空字符串("")
+     * <p>例: isNotBlank("name")</p>
+     *
+     * @param column 字段
+     * @return children
+     */
+    Children isNotBlank(R column);
 
     /**
      * 字段 IN (value.get(0), value.get(1), ...)

@@ -90,6 +90,21 @@ public class MybatisGeneratorTest {
         Assertions.assertEquals(content, list.get(0).getContent());
     }
 
+    @Test
+    public void condition() {
+        String content = "condition-" + UUID.randomUUID();
+        ShopTip entity = buildShopTip();
+        entity.setContent(content);
+        shopTipMapper.insert(entity);
+        Integer type = null;
+        Example<ShopTip> example = new ConditionExample<>();
+        example.createLambdaCriteria().eq(ShopTip::getContent, content).eq(ShopTip::getType, type).neBlankable(ShopTip::getEcappId, "");
+        List<ShopTip> list = shopTipMapper.list(example);
+        Assert.assertTrue(list.size() > 0);
+        list.forEach(System.out::println);
+        Assert.assertEquals(content, list.get(0).getContent());
+    }
+
     private ShopTip buildShopTip() {
         ShopTip shopTip = new ShopTip();
         shopTip.setEcappId(RandomUtils.nextLong(10000000, 999999999));
