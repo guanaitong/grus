@@ -6,6 +6,9 @@
 package com.ciicgat.sdk.data.mybatis.generator.condition;
 
 import com.ciicgat.sdk.data.mybatis.generator.util.SqlUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +23,7 @@ import java.util.Objects;
  */
 @SuppressWarnings({"serial", "unchecked"})
 public abstract class GeneratedCriteria<T, R, Children> implements Compare<Children, R>, Func<Children, R> {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneratedCriteria.class);
     /**
      * 占位符
      */
@@ -60,14 +63,28 @@ public abstract class GeneratedCriteria<T, R, Children> implements Compare<Child
         this.addCriterion(this.contactCondition(columnName, sqlKeyword), value, columnName);
     }
 
+    protected void addCriterion(R column, SqlKeyword sqlKeyword, Object value, boolean ignoreBlankValue) {
+        String columnName = this.columnToString(column);
+        this.addCriterion(this.contactCondition(columnName, sqlKeyword), value, columnName, ignoreBlankValue);
+    }
+
     protected void addCriterion(R column, SqlKeyword sqlKeyword, Object value1, Object value2) {
         String columnName = this.columnToString(column);
         this.addCriterion(this.contactCondition(columnName, sqlKeyword), value1, value2, columnName);
     }
 
     protected void addCriterion(String condition, Object value, String property) {
+        addCriterion(condition, value, property, true);
+    }
+
+    protected void addCriterion(String condition, Object value, String property, boolean ignoreBlankValue) {
         if (value == null) {
-            throw new RuntimeException("Value for " + property + " cannot be null");
+            LOGGER.debug("Value for '{}' is null, just skip this condition", property);
+            return;
+        }
+        if (ignoreBlankValue && (value instanceof String) && StringUtils.isBlank((String) value)) {
+            LOGGER.debug("Value for '{}' is blank, just skip this condition", property);
+            return;
         }
         criteria.removeIf(x -> Objects.equals(x.getCondition(), condition));
         criteria.add(new Criterion(condition, value));
@@ -104,6 +121,18 @@ public abstract class GeneratedCriteria<T, R, Children> implements Compare<Child
     @Override
     public Children ne(R column, Object val) {
         addCriterion(column, SqlKeyword.NE, val);
+        return typedThis;
+    }
+
+    @Override
+    public Children eqBlankable(R column, Object val) {
+        addCriterion(column, SqlKeyword.EQ, val, false);
+        return typedThis;
+    }
+
+    @Override
+    public Children neBlankable(R column, Object val) {
+        addCriterion(column, SqlKeyword.NE, val, false);
         return typedThis;
     }
 
@@ -176,6 +205,18 @@ public abstract class GeneratedCriteria<T, R, Children> implements Compare<Child
     @Override
     public Children isNotNull(R column) {
         addCriterion(column, SqlKeyword.IS_NOT_NULL);
+        return typedThis;
+    }
+
+    @Override
+    public Children isBlank(R column) {
+        addCriterion(column, SqlKeyword.EQ, "", false);
+        return typedThis;
+    }
+
+    @Override
+    public Children isNotBlank(R column) {
+        addCriterion(column, SqlKeyword.NE, "", false);
         return typedThis;
     }
 
