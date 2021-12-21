@@ -7,6 +7,7 @@ package com.ciicgat.sdk.data.mybatis.generator;
 
 import com.ciicgat.sdk.data.mybatis.generator.condition.ConditionExample;
 import com.ciicgat.sdk.data.mybatis.generator.condition.Example;
+import com.ciicgat.sdk.data.mybatis.generator.condition.LambdaCriteria;
 import com.ciicgat.sdk.data.mybatis.generator.entity.ShopTip;
 import com.ciicgat.sdk.data.mybatis.generator.mapper.ShopTipMapper;
 import org.apache.commons.lang3.RandomUtils;
@@ -18,6 +19,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -103,6 +105,51 @@ public class MybatisGeneratorTest {
         Assert.assertTrue(list.size() > 0);
         list.forEach(System.out::println);
         Assert.assertEquals(content, list.get(0).getContent());
+    }
+
+    @Test
+    public void codeCover() {
+        Example<ShopTip> example = new ConditionExample<>();
+        LambdaCriteria<ShopTip> criteria = example.createLambdaCriteria()
+                .eq(ShopTip::getContent, "")
+                .eq(ShopTip::getType, null)
+                .ne(ShopTip::getEnable, false)
+                .gt(ShopTip::getId, 100L)
+                .ge(ShopTip::getId, 100L)
+                .le(ShopTip::getId, 1000L)
+                .lt(ShopTip::getId, 1000L)
+                .neBlankable(ShopTip::getEcappId, "")
+                .eqBlankable(ShopTip::getContent, "")
+                .isBlank(ShopTip::getEnable)
+                .isNotBlank(ShopTip::getTitle)
+                .isNull(ShopTip::getEnable)
+                .isNotNull(ShopTip::getEnable)
+                .between(ShopTip::getId, 1L, 100L)
+                .notBetween(ShopTip::getType, 1, 10)
+                .like(ShopTip::getTitle, "gmall")
+                .notLike(ShopTip::getTitle, "gmall")
+                .likeLeft(ShopTip::getTitle, "gmall")
+                .likeRight(ShopTip::getTitle, "gmall")
+                .in(ShopTip::getId, 1, 2, 3)
+                .notIn(ShopTip::getId, 4, 5, 6);
+        Assert.assertTrue(criteria.isValid());
+        LambdaCriteria<ShopTip> criteria1 = example.createLambdaCriteria();
+        Assert.assertFalse(criteria1.isValid());
+        criteria1.setCriteria(Collections.emptyList());
+        try {
+            criteria1.addCriterion(null);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+        try {
+            criteria1.between(ShopTip::getTimeCreated, null, "2")
+                    .notBetween(ShopTip::getTimeCreated, "null", null);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+
+        ShopTip shopTip = shopTipMapper.getByExample(example);
+        Assert.assertNull(shopTip);
     }
 
     private ShopTip buildShopTip() {
