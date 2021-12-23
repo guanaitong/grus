@@ -5,11 +5,6 @@
 
 package com.ciicgat.grus.job;
 
-import com.ciicgat.sdk.util.system.Systems;
-import io.jaegertracing.Configuration;
-import io.jaegertracing.internal.JaegerTracer;
-import io.jaegertracing.internal.samplers.RateLimitingSampler;
-import io.opentracing.util.GlobalTracer;
 import org.apache.shardingsphere.elasticjob.api.JobConfiguration;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.lite.api.bootstrap.impl.ScheduleJobBootstrap;
@@ -37,28 +32,28 @@ public class TraceableJobTest implements SimpleJob {
 
     @BeforeAll
     public static void registerJaegerTracer() {
-        Configuration.SenderConfiguration senderConfiguration =
-                new Configuration
-                        .SenderConfiguration()
-                        .withAgentHost("127.0.0.1")
-                        .withAgentPort(6831);
-
-        Configuration.ReporterConfiguration reporterConfig =
-                new Configuration
-                        .ReporterConfiguration()
-                        .withSender(senderConfiguration)
-                        .withLogSpans(false);
-
-        Float parm = "unknown".equals(Systems.APP_NAME) ? 0f : 50f;
-        //采样配置
-        Configuration.SamplerConfiguration samplerConfig =
-                new Configuration
-                        .SamplerConfiguration()
-                        .withType(RateLimitingSampler.TYPE)
-                        .withParam(parm);
-
-        JaegerTracer tracer = new Configuration(Systems.APP_NAME).withSampler(samplerConfig).withReporter(reporterConfig).getTracer();
-        GlobalTracer.register(tracer);
+//        Configuration.SenderConfiguration senderConfiguration =
+//                new Configuration
+//                        .SenderConfiguration()
+//                        .withAgentHost("127.0.0.1")
+//                        .withAgentPort(6831);
+//
+//        Configuration.ReporterConfiguration reporterConfig =
+//                new Configuration
+//                        .ReporterConfiguration()
+//                        .withSender(senderConfiguration)
+//                        .withLogSpans(false);
+//
+//        Float parm = "unknown".equals(Systems.APP_NAME) ? 0f : 50f;
+//        //采样配置
+//        Configuration.SamplerConfiguration samplerConfig =
+//                new Configuration
+//                        .SamplerConfiguration()
+//                        .withType(RateLimitingSampler.TYPE)
+//                        .withParam(parm);
+//
+//        JaegerTracer tracer = new Configuration(Systems.APP_NAME).withSampler(samplerConfig).withReporter(reporterConfig).getTracer();
+//        GlobalTracer.register(tracer);
     }
 
     @Override

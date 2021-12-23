@@ -7,22 +7,22 @@ package com.ciicgat.sdk.servlet;
 
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.GrusServiceHttpHeader;
 import com.ciicgat.grus.service.GrusServiceStatus;
-import com.ciicgat.sdk.servlet.trace.HttpServletRequestExtractAdapter;
-import com.ciicgat.sdk.servlet.trace.ServletFilterSpanDecorator;
-import com.ciicgat.sdk.trace.SpanUtil;
-import com.ciicgat.sdk.trace.Spans;
-import io.opentracing.Scope;
-import io.opentracing.Span;
-import io.opentracing.SpanContext;
-import io.opentracing.Tracer;
-import io.opentracing.propagation.Format;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
+import com.ciicgat.sdk.util.system.Systems;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.context.propagation.TextMapGetter;
+import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +45,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GrusFilter implements Filter {
     private static final Logger LOGGER = LoggerFactory.getLogger(GrusFilter.class);
     private static final String SERVER_SPAN_CONTEXT = GrusFilter.class.getName() + ".activeSpanContext";
+    private static final Object TAG_VALUE = new Object();
     private final AtomicInteger current = new AtomicInteger();
 
-    private ServletFilterSpanDecorator spanDecorator = ServletFilterSpanDecorator.STANDARD_TAGS;
+    private static final TextMapPropagator TEXT_MAP_PROPAGATOR = GlobalOpenTelemetry.get().getPropagators().getTextMapPropagator();
 
     public GrusFilter() {
     }
@@ -55,6 +56,23 @@ public class GrusFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
     }
+
+    static final TextMapGetter<HttpServletRequest> getter = new TextMapGetter<>() {
+        @Override
+        public Iterable<String> keys(HttpServletRequest httpServletRequest) {
+            return () -> httpServletRequest.getHeaderNames().asIterator();
+        }
+
+        @Override
+        public String get(HttpServletRequest httpServletRequest, String key) {
+            String header = httpServletRequest.getHeader(key);
+            if (header != null) {
+                return header;
+            }
+            return "";
+        }
+    };
+
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -70,6 +88,9 @@ public class GrusFilter implements Filter {
         // 服务端降级
         final HttpServletRequest request = (HttpServletRequest) servletRequest;
         final HttpServletResponse response = (HttpServletResponse) servletResponse;
+        response.addHeader("x-app-name", Systems.APP_NAME);
+        response.addHeader("x-app-instance", Systems.APP_INSTANCE);
+
         String uri = request.getRequestURI();
         //是否满足排除条件
         if (isExclude(uri)) {
@@ -91,62 +112,60 @@ public class GrusFilter implements Filter {
             grusServiceStatus = grusRuntimeManager.registerUpstreamService(reqAppName, "");
         }
 
-        Tracer tracer = GlobalTracer.get();
+        Context context = TEXT_MAP_PROPAGATOR.extract(Context.current(), request, getter);
+        Tracer tracer = OpenTelemetrys.get();
+        Span span = tracer.spanBuilder(request.getMethod() + " " + uri).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
 
-        SpanContext parentContext = tracer.extract(Format.Builtin.HTTP_HEADERS, new HttpServletRequestExtractAdapter(request));
 
-
-        final Span span = tracer.buildSpan(request.getMethod())
-                .asChildOf(parentContext)
-                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
-                .start();
-
-        request.setAttribute(SERVER_SPAN_CONTEXT, span.context());
+        request.setAttribute(SERVER_SPAN_CONTEXT, TAG_VALUE);
 
         //将Span信息放入容器
-        Spans.setRootSpan(span, parentContext == null ? null : parentContext.baggageItems());
-
-        spanDecorator.onRequest(request, response, span);
+        if (span != Span.getInvalid()) {
+            String traceId = span.getSpanContext().getTraceId();
+            String spanId = span.getSpanContext().getSpanId();
+            String parentId = "";
+            if (span instanceof ReadWriteSpan readWriteSpan) {
+                if (readWriteSpan.getParentSpanContext() != Span.getInvalid().getSpanContext()) {
+                    parentId = readWriteSpan.getParentSpanContext().getSpanId();
+                }
+            }
+            MDC.put("traceId", traceId);
+            MDC.put("spanId", spanId);
+            MDC.put("parentId", parentId);
+            response.addHeader("x-trace-id", traceId);
+            response.addHeader("x-span-id", spanId);
+            response.addHeader("x-parent-id", parentId);
+        }
 
 
         //执行应用处理
-        try (Scope scope = tracer.activateSpan(span)) {
+        try (Scope scope = span.makeCurrent()) {
+            OpenTelemetrys.configSystemTags(span);
+            span.setAttribute("component", "java-web-servlet");
+            span.setAttribute("http.method", request.getMethod());
+            span.setAttribute("http.scheme", request.getScheme());
+            span.setAttribute("http.target", uri);
+
             filterChain.doFilter(request, response);
-            if (!request.isAsyncStarted()) {
-                spanDecorator.onResponse(request, response, span);
-            }
 
             if (grusServiceStatus != null) {
                 grusServiceStatus.incrementSucceeded();
             }
         } catch (Throwable e) {
-            spanDecorator.onError(request, response, e, span);
             if (grusServiceStatus != null) {
                 grusServiceStatus.incrementFailed();
             }
             throw e;
         } finally {
-            if (!request.isAsyncStarted()) {
-                // If not async, then need to explicitly finish the span associated with the scope.
-                // This is necessary, as we don't know whether this request is being handled
-                // asynchronously until after the scope has already been started.
-                span.finish();
-                long duration = SpanUtil.getDurationMilliSeconds(span);
-                SlowLogger.logEvent(Module.SERVLET, duration, request.getRequestURI());
-            }
+            span.end();
+            SlowLogger.logEvent(Module.SERVLET, span, request.getRequestURI());
             //结束清理
             MDC.clear();
-            Spans.remove();
             current.decrementAndGet();
         }
     }
 
     private static boolean isExclude(String uri) {
-        return uri.contains("isLive")
-                || uri.endsWith(".css")
-                || uri.endsWith(".js")
-                || uri.endsWith(".ico")
-                || uri.endsWith(".png")
-                || uri.endsWith(".jpg");
+        return uri.contains("isLive") || uri.endsWith(".css") || uri.endsWith(".js") || uri.endsWith(".ico") || uri.endsWith(".png") || uri.endsWith(".jpg");
     }
 }

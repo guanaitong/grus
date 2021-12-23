@@ -5,7 +5,8 @@
 
 package com.ciicgat.sdk.trace;
 
-import io.opentracing.Span;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
 import org.slf4j.MDC;
 
 import java.util.Map;
@@ -15,9 +16,9 @@ import java.util.Map;
  */
 public class TraceRunnable implements Runnable {
 
-    private final Span rootSpan = Spans.getRootSpan();
     private final Map<String, String> contextMap = MDC.getCopyOfContextMap();
     private final Runnable runnable;
+    private final Context context = Context.current();
 
     public TraceRunnable(Runnable runnable) {
         this.runnable = runnable;
@@ -25,10 +26,11 @@ public class TraceRunnable implements Runnable {
 
     @Override
     public void run() {
-        Spans.setRootSpan(rootSpan);
-        if (contextMap != null) {
-            MDC.setContextMap(contextMap);
+        try (Scope ignored = context.makeCurrent()) {
+            if (contextMap != null) {
+                MDC.setContextMap(contextMap);
+            }
+            this.runnable.run();
         }
-        this.runnable.run();
     }
 }

@@ -13,9 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolAbstract;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisSentinelPool;
+import redis.clients.jedis.util.Pool;
 
 import java.util.Map;
 import java.util.Set;
@@ -38,7 +38,7 @@ public class RedisPoolBuilder implements RedisConstants {
         return new RedisExecutorImpl(this.setting, newPool());
     }
 
-    public JedisPoolAbstract newPool() {
+    public Pool<Jedis> newPool() {
         if (setting.getType() == 0) {
             return newJedisPool();
         } else if (setting.getType() == 1) {

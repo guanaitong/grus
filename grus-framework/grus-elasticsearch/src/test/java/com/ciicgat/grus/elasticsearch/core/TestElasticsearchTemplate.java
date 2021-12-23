@@ -11,7 +11,6 @@ import com.ciicgat.sdk.lang.convert.Pagination;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -44,7 +43,7 @@ public class TestElasticsearchTemplate {
             httpHosts.add(new HttpHost(s[0], Integer.parseInt(s[1])));
         });
 
-        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(httpHosts.toArray(new HttpHost[0])));
+        RestHighLevelClient client = new RestHighLevelClient(RestClients.builder(httpHosts.toArray(new HttpHost[0])));
         elasticsearchTemplate = new ElasticsearchTemplate<>(client, Message.class);
         // 创建索引
         elasticsearchTemplate.createIndex();

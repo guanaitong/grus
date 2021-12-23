@@ -78,7 +78,7 @@
         <revision>2021.2.0-SNAPSHOT</revision>
         <java.version>17</java.version>
         <resource.delimiter>@</resource.delimiter>
-        <spring-boot.version>2.5.7</spring-boot.version>
+        <spring-boot.version>2.5.8</spring-boot.version>
         <spring-boot-admin.version>2.5.4</spring-boot-admin.version>
         <gconf.version>1.0.0</gconf.version>
         <elasticsearch.version>7.3.1</elasticsearch.version>
@@ -86,14 +86,12 @@
         <mybatis.version>3.5.7</mybatis.version>
         <mybatis-spring.version>2.0.6</mybatis-spring.version>
         <mybatis-spring-starter.version>2.2.0</mybatis-spring-starter.version>
-        <jaeger.version>1.0.0</jaeger.version>
         <pagehelper.version>5.3.0</pagehelper.version>
         <jmh.version>1.21</jmh.version>
         <guava.version>29.0-jre</guava.version>
         <feign.version>11.6</feign.version>
         <okhttp.version>3.14.9</okhttp.version>
-        <opentracing.version>0.33.0</opentracing.version>
-        <jaeger.version>1.0.0</jaeger.version>
+        <opentelemetry.version>1.9.1</opentelemetry.version>
         <elastic-job.version>3.0.0</elastic-job.version>
         <curator.version>5.1.0</curator.version>
         <zookeeper.version>3.6.3</zookeeper.version>

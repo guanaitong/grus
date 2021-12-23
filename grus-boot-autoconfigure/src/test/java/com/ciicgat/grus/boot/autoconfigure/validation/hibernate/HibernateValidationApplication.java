@@ -9,7 +9,7 @@ import com.ciicgat.grus.boot.autoconfigure.data.GrusDataAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.feign.FeignAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.gconf.GconfAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.job.ElasticJobAutoConfiguration;
-import com.ciicgat.grus.boot.autoconfigure.opentracing.OpenTracingAutoConfiguration;
+import com.ciicgat.grus.boot.autoconfigure.opentelemetry.OpenTelemetryAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.swagger.SwaggerAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.web.GrusWebAutoConfiguration;
@@ -29,7 +29,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
         GrusDataAutoConfiguration.class,
         DataSourceAutoConfiguration.class,
         GrusWebAutoConfiguration.class,
-        OpenTracingAutoConfiguration.class,
+        OpenTelemetryAutoConfiguration.class,
         ElasticJobAutoConfiguration.class,
         ValidationAutoConfiguration.class,
         ZKAutoConfiguration.class})

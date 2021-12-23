@@ -8,13 +8,12 @@ package com.ciicgat.sdk.data.mybatis;
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.performance.SlowLogger;
-import com.ciicgat.sdk.trace.SpanUtil;
-import com.ciicgat.sdk.trace.Spans;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
-import io.opentracing.noop.NoopSpan;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.plugin.Interceptor;
@@ -27,9 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Statement;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -50,20 +47,15 @@ public class SQLTracingInterceptor implements Interceptor {
             BoundSql boundSql = statementHandler.getBoundSql();
             sql = boundSql.getSql();
         }
-        Span rootSpan = Spans.getRootSpan();
-        Tracer tracer = GlobalTracer.get();
+        Tracer tracer = OpenTelemetrys.get();
+        Span span = tracer.spanBuilder("executeSQL").setSpanKind(SpanKind.CLIENT).setParent(Context.current()).startSpan();
 
-        final Span span = tracer.buildSpan("executeSQL")
-                .asChildOf(rootSpan == NoopSpan.INSTANCE ? null : rootSpan)
-                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT)
-                .start();
+        try (Scope scope = span.makeCurrent()) {
+            OpenTelemetrys.configSystemTags(span);
+            span.setAttribute("db.type", "mysql");
+            span.setAttribute("component", "mysql");
+            span.setAttribute("db.statement", sql);
 
-        Spans.setSystemTags(span);
-        Tags.DB_TYPE.set(span, "mysql");
-        Tags.COMPONENT.set(span, "mysql");
-        Tags.DB_STATEMENT.set(span, sql);
-
-        try {
             Object result = invocation.proceed();
             if (result instanceof List && ((List) result).size() > 10000) {
                 String msg = String.format("too large query result size:[%d] ,sql is %s", ((List) result).size(), sql);
@@ -73,22 +65,11 @@ public class SQLTracingInterceptor implements Interceptor {
             return result;
         } catch (Throwable throwable) {
             LOGGER.error(sql, throwable);
-            Tags.ERROR.set(span, Boolean.TRUE);
-            span.log(errorLogs(throwable));
             throw throwable;
         } finally {
-            span.finish();
-            long duration = SpanUtil.getDurationMilliSeconds(span);
-            SlowLogger.logEvent(Module.DB, duration, sql);
+            span.end();
+            SlowLogger.logEvent(Module.DB, span, sql);
         }
-    }
-
-
-    protected Map<String, Object> errorLogs(Throwable throwable) {
-        Map<String, Object> errorLogs = new HashMap<>(2);
-        errorLogs.put("event", Tags.ERROR.getKey());
-        errorLogs.put("error.object", throwable);
-        return errorLogs;
     }
 
     @Override

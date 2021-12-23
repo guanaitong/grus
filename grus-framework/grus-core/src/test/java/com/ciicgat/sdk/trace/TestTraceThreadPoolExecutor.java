@@ -5,18 +5,14 @@
 
 package com.ciicgat.sdk.trace;
 
-import com.ciicgat.sdk.util.system.Systems;
-import io.jaegertracing.Configuration;
-import io.jaegertracing.internal.JaegerTracer;
-import io.jaegertracing.internal.samplers.RateLimitingSampler;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.MDC;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -34,86 +30,59 @@ public class TestTraceThreadPoolExecutor {
 
     @BeforeAll
     public static void registerJaegerTracer() {
-        Configuration.SenderConfiguration senderConfiguration =
-                new Configuration
-                        .SenderConfiguration()
-                        .withAgentHost("127.0.0.1")
-                        .withAgentPort(6831);
-
-        Configuration.ReporterConfiguration reporterConfig =
-                new Configuration
-                        .ReporterConfiguration()
-                        .withSender(senderConfiguration)
-                        .withLogSpans(false);
-
-        Float parm = "unknown".equals(Systems.APP_NAME) ? 0f : 50f;
-        //采样配置
-        Configuration.SamplerConfiguration samplerConfig =
-                new Configuration
-                        .SamplerConfiguration()
-                        .withType(RateLimitingSampler.TYPE)
-                        .withParam(parm);
-
-        JaegerTracer tracer = new Configuration(Systems.APP_NAME).withSampler(samplerConfig).withReporter(reporterConfig).getTracer();
-        GlobalTracer.register(tracer);
+        OpenTelemetrys.initFoTest();
     }
 
 
     @Test
     public void test() throws ExecutionException, InterruptedException {
 
-        testRunnable(new TraceThreadPoolExecutor(0, Integer.MAX_VALUE,
-                60L, TimeUnit.SECONDS,
-                new SynchronousQueue<>()));
+        testRunnable(new TraceThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>()));
         testRunnable(TraceThreadPoolExecutor.wrap(Executors.newSingleThreadExecutor()));
 
-        testCallable(new TraceThreadPoolExecutor(0, Integer.MAX_VALUE,
-                60L, TimeUnit.SECONDS,
-                new SynchronousQueue<>()));
+        testCallable(new TraceThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>()));
         testCallable(TraceThreadPoolExecutor.wrap(Executors.newCachedThreadPool()));
 
     }
 
     public void testRunnable(ExecutorService executorService) throws InterruptedException {
-        Tracer tracer = GlobalTracer.get();
-        final Span span = tracer.buildSpan("main")
-                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
-                .start();
-        Spans.setRootSpan(span);
+        Tracer tracer = OpenTelemetrys.get();
+        Span span = tracer.spanBuilder("main").setSpanKind(SpanKind.INTERNAL).startSpan();
+        try (Scope ignored = span.makeCurrent()) {
+            String spanId = span.getSpanContext().getSpanId();
+            Assertions.assertNotNull(spanId);
+            final CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        String spanId = MDC.get("spanId");
-        Assertions.assertNotNull(spanId);
-        final CountDownLatch countDownLatch = new CountDownLatch(1);
-
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                Assertions.assertEquals(spanId, MDC.get("spanId"));
-                countDownLatch.countDown();
-            }
-        });
-        countDownLatch.await();
-        executorService.shutdown();
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Assertions.assertEquals(spanId, Span.current().getSpanContext().getSpanId());
+                    } finally {
+                        countDownLatch.countDown();
+                    }
+                }
+            });
+            countDownLatch.await();
+            executorService.shutdown();
+        }
     }
 
 
     public void testCallable(ExecutorService executorService) throws ExecutionException, InterruptedException {
-        Tracer tracer = GlobalTracer.get();
-        final Span span = tracer.buildSpan("main")
-                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
-                .start();
-        Spans.setRootSpan(span);
+        Tracer tracer = OpenTelemetrys.get();
+        Span span = tracer.spanBuilder("main").setSpanKind(SpanKind.INTERNAL).startSpan();
+        try (Scope ignored = span.makeCurrent()) {
+            String spanId = span.getSpanContext().getSpanId();
+            Assertions.assertNotNull(spanId);
+            Callable<Integer> callable = () -> {
+                Assertions.assertEquals(spanId, Span.current().getSpanContext().getSpanId());
+                return 10086;
+            };
+            Future<Integer> result = executorService.submit(callable);
 
-        String spanId = MDC.get("spanId");
-        Assertions.assertNotNull(spanId);
-
-        Callable<Integer> callable = () -> {
-            Assertions.assertEquals(spanId, MDC.get("spanId"));
-            return 10086;
-        };
-        Future<Integer> result = executorService.submit(callable);
-
-        Assertions.assertEquals(Integer.valueOf(10086), result.get());
-        executorService.shutdown();
+            Assertions.assertEquals(Integer.valueOf(10086), result.get());
+            executorService.shutdown();
+        }
     }
 }

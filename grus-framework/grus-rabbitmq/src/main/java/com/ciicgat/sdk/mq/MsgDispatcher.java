@@ -6,24 +6,29 @@
 package com.ciicgat.sdk.mq;
 
 import com.ciicgat.grus.alert.Alert;
-import com.ciicgat.sdk.mq.trace.ProducerSpanDecorator;
-import com.ciicgat.sdk.mq.trace.TracingUtils;
-import com.ciicgat.sdk.trace.Spans;
+import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import com.ciicgat.grus.performance.SlowLogger;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.MessageProperties;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
-import io.opentracing.noop.NoopSpan;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.context.propagation.TextMapSetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -34,6 +39,8 @@ import java.util.Objects;
  */
 public class MsgDispatcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MsgDispatcher.class);
+    private static final TextMapPropagator textMapPropagator = GlobalOpenTelemetry.getPropagators().getTextMapPropagator();
+    private static final TextMapSetter<Map<String, Object>> setter = (carrier, key, value) -> carrier.put(key, value);
     protected final String host;
     /**
      * 交换机类型
@@ -95,30 +102,34 @@ public class MsgDispatcher {
         this.sendMsg(msg, routingKey, MessageProperties.PERSISTENT_BASIC);
     }
 
-    public void sendMsg(String msg, String routingKey, AMQP.BasicProperties properties) throws IOException {
+    public void sendMsg(String msg, String routingKey, final AMQP.BasicProperties properties) throws IOException {
         if (BuiltinExchangeType.FANOUT == exchangeType) {
             routingKey = "";
         }
-        Tracer tracer = GlobalTracer.get();
-        ProducerSpanDecorator producerSpanDecorator = ProducerSpanDecorator.STANDARD_TAGS;
-        Span rootSpan = Spans.getRootSpan();
-        final Span span = tracer.buildSpan("sendMsg")
-                .asChildOf(rootSpan == NoopSpan.INSTANCE ? null : rootSpan)
-                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_PRODUCER)
-                .start();
-        Tags.DB_INSTANCE.set(span, this.host);
-        producerSpanDecorator.onRequest(span);
+        Tracer tracer = OpenTelemetrys.get();
+        Span span = tracer.spanBuilder("sendMsg").setSpanKind(SpanKind.PRODUCER).setParent(Context.current()).startSpan();
+
         Channel channel = null;
-        try {
+        try (Scope scope = span.makeCurrent()) {
+            OpenTelemetrys.configSystemTags(span);
+            span.setAttribute("component", "rabbitmq");
             channel = channelPool.borrowObject();
-            AMQP.BasicProperties traceProperties = TracingUtils.inject(properties, span, tracer);
+            Map<String, Object> headers = new HashMap<>();
+            textMapPropagator.inject(Context.current(), headers, setter);
+            AMQP.BasicProperties traceProperties = properties;
+            if (!headers.isEmpty()) {
+                if (properties == null) {
+                    traceProperties = new AMQP.BasicProperties("application/octet-stream", null, headers, 2, 0, null, null, null, null, null, null, null, null, null);
+                } else {
+                    if (properties.getHeaders() != null) headers.putAll(properties.getHeaders());
+                    traceProperties = properties.builder().headers(headers).build();
+                }
+            }
             channel.basicPublish(exchangeName, routingKey, false, traceProperties, msg.getBytes(StandardCharsets.UTF_8));
             if (this.confirm) {
                 channel.waitForConfirmsOrDie();
             }
-            producerSpanDecorator.onResponse(span);
         } catch (Throwable e) {
-            producerSpanDecorator.onError(e, span);
             Alert.send("send msg error,msg:" + msg, e);
             throw new IOException(e);
         } finally {
@@ -126,10 +137,11 @@ public class MsgDispatcher {
                 if (null != channel) {
                     channelPool.returnObject(channel);
                 }
-                span.finish();
             } catch (Exception e) {
                 // ignored
             }
+            span.end();
+            SlowLogger.logEvent(Module.RABBITMQ, span, "send msg slow");
         }
     }
 

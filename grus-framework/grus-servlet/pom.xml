@@ -61,19 +61,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>io.jaegertracing</groupId>
-            <artifactId>jaeger-client</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.opentracing.contrib</groupId>
-            <artifactId>opentracing-web-servlet-filter</artifactId>
-            <version>0.4.0</version>
-            <scope>test</scope>
-        </dependency>
-
 
     </dependencies>
 </project>

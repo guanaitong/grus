@@ -7,7 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.job;
 
 import com.ciicgat.grus.boot.autoconfigure.data.GrusDataAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.feign.FeignAutoConfiguration;
-import com.ciicgat.grus.boot.autoconfigure.opentracing.OpenTracingAutoConfiguration;
+import com.ciicgat.grus.boot.autoconfigure.opentelemetry.OpenTelemetryAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.redis.GrusRedisAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.swagger.SwaggerAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.validation.GrusValidationAutoConfiguration;
@@ -27,7 +27,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
         GrusDataAutoConfiguration.class,
         DataSourceAutoConfiguration.class,
         GrusWebAutoConfiguration.class,
-        OpenTracingAutoConfiguration.class,
+        OpenTelemetryAutoConfiguration.class,
         ValidationAutoConfiguration.class,
         GrusValidationAutoConfiguration.class,
         GrusRedisAutoConfiguration.class,

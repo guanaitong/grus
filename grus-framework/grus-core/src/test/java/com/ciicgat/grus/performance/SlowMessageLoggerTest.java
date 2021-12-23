@@ -5,6 +5,8 @@
 
 package com.ciicgat.grus.performance;
 
+import com.ciicgat.grus.core.LatencyConfig;
+import com.ciicgat.grus.core.LatencyLevel;
 import com.ciicgat.grus.core.Module;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,34 +19,20 @@ public class SlowMessageLoggerTest {
     @Test
     public void test() {
         Module module = Module.HTTP_CLIENT;
-        Assertions.assertFalse(SlowLogger.logEvent(module, 1, "xxxx"));
-        Assertions.assertFalse(SlowLogger.logEvent(module, 50, "xxxx"));
-        Assertions.assertFalse(SlowLogger.logEvent(module, 60, "xxxx"));
-        Assertions.assertFalse(SlowLogger.logEvent(module, 300, "xxxx"));
-        Assertions.assertTrue(SlowLogger.logEvent(module, 350, "xxxx"));
-        Assertions.assertTrue(SlowLogger.logEvent(module, 2500, "xxxx"));
-        Assertions.assertTrue(SlowLogger.logEvent(module, 3500, "xxxx"));
-
-
+        Assertions.assertFalse(SlowLogger.logEvent(module, 1_000_000L, "xxxx"));
+        Assertions.assertFalse(SlowLogger.logEvent(module, 50_000_000L, "xxxx"));
+        Assertions.assertFalse(SlowLogger.logEvent(module, 60_000_000L, "xxxx"));
+        Assertions.assertFalse(SlowLogger.logEvent(module, 300_000_000L, "xxxx"));
+        Assertions.assertFalse(SlowLogger.logEvent(module, 350_000_000L, "xxxx"));
+        Assertions.assertTrue(SlowLogger.logEvent(module, 2500_000_000L, "xxxx"));
+        Assertions.assertTrue(SlowLogger.logEvent(module, 3500_000_000L, "xxxx"));
     }
 
 
     @Test
     public void test1() {
         Module module = Module.HTTP_CLIENT;
-
-        Level level = module.getLevelByDuration(2500);
-
-        boolean alertLevel = level.biggerThan(module.getAlertLevel());
-
-        Assertions.assertTrue(alertLevel);
-
-        level = module.getLevelByDuration(1500);
-
-        alertLevel = level.biggerThan(module.getAlertLevel());
-
-        Assertions.assertFalse(alertLevel);
-
-
+        LatencyLevel latencyLevel = LatencyConfig.getModuleConfig(module).getLevel(2500_000_000L);
+        Assertions.assertEquals(latencyLevel, LatencyLevel.SLOW);
     }
 }

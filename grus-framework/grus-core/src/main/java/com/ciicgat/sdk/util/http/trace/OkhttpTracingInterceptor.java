@@ -6,15 +6,14 @@
 package com.ciicgat.sdk.util.http.trace;
 
 import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
-import com.ciicgat.sdk.trace.SpanUtil;
-import com.ciicgat.sdk.trace.Spans;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
-import io.opentracing.noop.NoopSpan;
-import io.opentracing.propagation.Format;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
+import com.ciicgat.grus.service.GrusServiceHttpHeader;
+import com.ciicgat.sdk.util.system.Systems;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -28,9 +27,7 @@ import java.io.IOException;
  * Created by August.Zhou on 2018/8/22 18:01.
  */
 public class OkhttpTracingInterceptor implements Interceptor {
-    private static final Logger LOGGER = LoggerFactory.getLogger("OkHttpClient");
-
-    private OkHttpClientSpanDecorator decorator = OkHttpClientSpanDecorator.STANDARD_TAGS;
+    private static final Logger LOGGER = LoggerFactory.getLogger(OkhttpTracingInterceptor.class);
 
 
     @Override
@@ -41,41 +38,34 @@ public class OkhttpTracingInterceptor implements Interceptor {
 
         Response response = null;
 
-        Tracer tracer = GlobalTracer.get();
 
-        Span rootSpan = Spans.getRootSpan();
-        final Span span = tracer.buildSpan(originalRequest.method())
-                .asChildOf(rootSpan == NoopSpan.INSTANCE ? null : rootSpan)
-                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT)
-                .withTag(Tags.COMPONENT.getKey(), "okhttp")
-                .start();
-        Spans.setSystemTags(span);
+        requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_NAME, Systems.APP_NAME);
+        requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_INSTANCE, Systems.APP_INSTANCE);
+        requestBuilder.addHeader(GrusServiceHttpHeader.HTTP_UA_HEADER, "Grus okhttp client");
 
-        tracer.inject(span.context(), Format.Builtin.HTTP_HEADERS, new RequestBuilderInjectAdapter(requestBuilder));
-
-        Request newRequest = requestBuilder.build();
-        decorator.onRequest(originalRequest, span);
+        Tracer tracer = OpenTelemetrys.get();
+        Span span = tracer.spanBuilder(originalRequest.method() + " " + originalRequest.url().encodedPath()).setSpanKind(SpanKind.CLIENT).startSpan();
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Sending request {} on {} {}", originalRequest.url(), chain.connection(), originalRequest.headers());
         }
-        try {
-            response = chain.proceed(newRequest);
-            decorator.onResponse(response, span);
+        try (Scope scope = span.makeCurrent()) {
+            OpenTelemetrys.configSystemTags(span);
+            span.setAttribute("component", "okhttp");
+            span.setAttribute("http.method", originalRequest.method());
+            span.setAttribute("http.url", originalRequest.url().toString());
+            response = chain.proceed(requestBuilder.build());
         } catch (Throwable ex) {
-            decorator.onError(ex, span);
             throw ex;
         } finally {
-            span.finish();
-            long durationMilliSeconds = SpanUtil.getDurationMilliSeconds(span);
-            SlowLogger.logEvent(Module.HTTP_CLIENT, durationMilliSeconds, originalRequest.toString());
+            span.end();
+            SlowLogger.logEvent(Module.HTTP_CLIENT, span, originalRequest.toString());
             if (LOGGER.isDebugEnabled()) {
                 if (response != null) {
                     LOGGER.debug("Received response for {} on {}", response.request().url(), response.headers());
                 }
             }
         }
-
 
         return response;
     }

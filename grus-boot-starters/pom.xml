@@ -20,7 +20,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>grus-boot-starter</module>
-        <module>grus-boot-starter-opentracing</module>
+        <module>grus-boot-starter-opentelemetry</module>
         <module>grus-boot-starter-fegin</module>
         <module>grus-boot-starter-gfs</module>
         <module>grus-boot-starter-rabbitmq</module>

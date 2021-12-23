@@ -6,8 +6,6 @@
 package com.ciicgat.api.core;
 
 import com.ciicgat.api.core.kubernetes.KubernetesClientConfig;
-import com.ciicgat.grus.service.GrusServiceHttpHeader;
-import com.ciicgat.sdk.util.system.Systems;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import feign.Client;
 import okhttp3.Headers;
@@ -100,9 +98,6 @@ public final class OkHttpClientWrapper implements Client {
 
         RequestBody body = inputBody != null ? RequestBody.create(mediaType, inputBody) : null;
         requestBuilder.method(input.httpMethod().name(), body);
-        requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_NAME, Systems.APP_NAME);
-        requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_INSTANCE, Systems.APP_INSTANCE);
-        requestBuilder.addHeader(GrusServiceHttpHeader.HTTP_UA_HEADER, "Grus service client");
         return requestBuilder.build();
     }
 

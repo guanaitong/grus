@@ -3,11 +3,12 @@
  * All rights reserved.
  */
 
-package com.ciicgat.grus.boot.autoconfigure.opentracing;
+package com.ciicgat.grus.boot.autoconfigure.opentelemetry;
 
 import com.ciicgat.grus.boot.autoconfigure.condition.ServerEnvCondition;
 import com.ciicgat.grus.boot.autoconfigure.core.GrusCoreContextInitializer;
-import io.opentracing.contrib.tracerresolver.TracerFactory;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.OpenTelemetry;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
@@ -16,23 +17,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Created by August.Zhou on 2019-04-02 11:30.
  */
-public class OpenTracingAutoConfigurationTests {
+public class OpenTelemetryAutoConfigurationTests {
 
     static {
         ServerEnvCondition.isTest = true;
+        GlobalOpenTelemetry.resetForTest();
     }
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withInitializer(new GrusCoreContextInitializer())
-            .withUserConfiguration(OpenTracingAutoConfiguration.class);
+            .withUserConfiguration(OpenTelemetryAutoConfiguration.class);
 
     @Test
     public void test() {
         this.contextRunner
                 .withPropertyValues("spring.application.name=grus-demo")
                 .run(context -> {
-                    TracerFactory tracerFactory = context.getBean(TracerFactory.class);
-                    assertThat(tracerFactory).isInstanceOf(GconfTracerFactory.class);
+                    OpenTelemetry tracerFactory = context.getBean(OpenTelemetry.class);
+                    assertThat(tracerFactory).isInstanceOf(OpenTelemetry.class);
                 });
     }
 
