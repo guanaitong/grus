@@ -6,7 +6,13 @@
 package com.ciicgat.sdk.servlet;
 
 import com.ciicgat.grus.json.JSON;
-import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
+import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.extension.trace.propagation.JaegerPropagator;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,8 +36,15 @@ public class GrusFilterTest {
     private MockMvc mockMvc;
 
     @BeforeAll
-    public static void registerJaegerTracer() {
-        OpenTelemetrys.initFoTest();
+    public static void registerTracer() {
+        SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder().build();
+        TextMapPropagator textMapPropagator = TextMapPropagator.composite(W3CTraceContextPropagator.getInstance(), JaegerPropagator.getInstance());
+
+        OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(sdkTracerProvider::close));
+        GlobalOpenTelemetry.resetForTest();
+        GlobalOpenTelemetry.set(sdk);
     }
 
     @BeforeEach
