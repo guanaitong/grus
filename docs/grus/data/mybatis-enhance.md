@@ -68,7 +68,7 @@
 spring.application.name=grus-demo
 server.port=8088
 server.tomcat.uri-encoding=UTF-8
-logging.level.com.ciicgat.grusgenerator.codegenerator.example.mapper=debug
+logging.latencyLevel.com.ciicgat.grusgenerator.codegenerator.example.mapper=debug
 spring.jackson.date-format=yyyy-MM-dd HH:mm:ss
 spring.jackson.time-zone=GMT+8
 grus.feign.log-req=true

@@ -5,15 +5,17 @@
 
 package com.ciicgat.grus.job;
 
-import com.ciicgat.sdk.trace.Spans;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.util.Objects;
 
@@ -29,25 +31,30 @@ public class TraceableJob implements SimpleJob {
 
     @Override
     public void execute(ShardingContext shardingContext) {
+        Tracer tracer = OpenTelemetrys.get();
+        Span span = tracer.spanBuilder("handleJob").setSpanKind(SpanKind.SERVER).startSpan();
+        if (span != Span.getInvalid()) {
+            String traceId = span.getSpanContext().getTraceId();
+            String spanId = span.getSpanContext().getSpanId();
+            String parentId = "";
+            if (span instanceof ReadWriteSpan readWriteSpan) {
+                parentId = readWriteSpan.getParentSpanContext().getSpanId();
+            }
+            MDC.put("traceId", traceId);
+            MDC.put("spanId", spanId);
+            MDC.put("parentId", parentId);
+        }
 
-        Tracer tracer = GlobalTracer.get();
-        final Span span = tracer.buildSpan(shardingContext.getJobName())
-                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_SERVER)
-                .start();
-
-        Spans.setRootSpan(span);
-
-        try {
+        try (Scope scope = span.makeCurrent()) {
+            OpenTelemetrys.configSystemTags(span);
             LOGGER.info("JOB_START :{}", shardingContext.getJobName());
             simpleJob.execute(shardingContext);
         } catch (Exception e) {
             LOGGER.error("JOB_EX: {}", shardingContext.getJobName(), e);
-            Tags.ERROR.set(span, Boolean.TRUE);
             throw e;
         } finally {
+            span.end();
             LOGGER.info("JOB_FINISH :{}", shardingContext.getJobName());
-            span.finish();
-            Spans.remove();
         }
     }
 }

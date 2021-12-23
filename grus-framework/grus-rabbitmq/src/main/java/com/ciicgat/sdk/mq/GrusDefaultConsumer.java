@@ -6,24 +6,29 @@
 package com.ciicgat.sdk.mq;
 
 import com.ciicgat.grus.alert.Alert;
-import com.ciicgat.sdk.mq.trace.ConsumerSpanDecorator;
-import com.ciicgat.sdk.mq.trace.MapHeadersAdapter;
-import com.ciicgat.sdk.trace.Spans;
+import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import com.ciicgat.grus.performance.SlowLogger;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
-import io.opentracing.Span;
-import io.opentracing.SpanContext;
-import io.opentracing.Tracer;
-import io.opentracing.propagation.Format;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
+import io.opentelemetry.context.propagation.TextMapGetter;
+import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -36,7 +41,27 @@ public class GrusDefaultConsumer extends DefaultConsumer {
 
     private MsgProcessor msgProcessor;
     private final AtomicBoolean isRunning;
-    private ConsumerSpanDecorator consumerSpanDecorator = ConsumerSpanDecorator.STANDARD_TAGS;
+    private static final TextMapPropagator TEXT_MAP_PROPAGATOR = GlobalOpenTelemetry.get().getPropagators().getTextMapPropagator();
+    static final TextMapGetter<Map<String, Object>> getter = new TextMapGetter<>() {
+        @Override
+        public Iterable<String> keys(Map<String, Object> basicProperties) {
+            return basicProperties.keySet();
+        }
+
+        @Override
+        public String get(Map<String, Object> basicProperties, String key) {
+            if (basicProperties == null) {
+                return "";
+            }
+            Object header = basicProperties.get(key);
+            if (header != null) {
+                return String.valueOf(header);
+            }
+            return "";
+        }
+    };
+
+
     private final String host;
 
     GrusDefaultConsumer(Channel channel, String host, MsgProcessor msgProcessor, AtomicBoolean isRunning) {
@@ -66,22 +91,24 @@ public class GrusDefaultConsumer extends DefaultConsumer {
             getChannel().basicAck(envelope.getDeliveryTag(), false);
             return;
         }
+        Tracer tracer = OpenTelemetrys.get();
+        Context context = TEXT_MAP_PROPAGATOR.extract(Context.current(), properties.getHeaders(), getter);
 
-        Tracer tracer = GlobalTracer.get();
-        SpanContext spanContext = null;
-        if (properties.getHeaders() != null) {
-            spanContext = tracer.extract(Format.Builtin.TEXT_MAP, new MapHeadersAdapter(properties.getHeaders()));
+        Span span = tracer.spanBuilder("handleMsg").setSpanKind(SpanKind.CONSUMER).setParent(context).startSpan();
+        if (span != Span.getInvalid()) {
+            String traceId = span.getSpanContext().getTraceId();
+            String spanId = span.getSpanContext().getSpanId();
+            String parentId = "";
+            if (span instanceof ReadWriteSpan readWriteSpan) {
+                parentId = readWriteSpan.getParentSpanContext().getSpanId();
+            }
+            MDC.put("traceId", traceId);
+            MDC.put("spanId", spanId);
+            MDC.put("parentId", parentId);
         }
-        final Span span = tracer.buildSpan("handleMsg")
-                .asChildOf(spanContext)
-                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CONSUMER)
-                .start();
-        Spans.setRootSpan(span);
 
-        Tags.DB_INSTANCE.set(span, this.host);
-
-        consumerSpanDecorator.onRequest(span);
-        try {
+        try (Scope scope = span.makeCurrent()) {
+            OpenTelemetrys.configSystemTags(span);
             boolean b = msgProcessor.apply(envelope.getRoutingKey(), text);
             if (b) {
                 getChannel().basicAck(envelope.getDeliveryTag(), false);
@@ -92,15 +119,13 @@ public class GrusDefaultConsumer extends DefaultConsumer {
                 Alert.send(msg);
                 LOGGER.warn(msg);
             }
-            consumerSpanDecorator.onResponse(span);
         } catch (Exception e) {
-            consumerSpanDecorator.onError(e, span);
             Alert.send("handle msg error,msg:" + text, e);
             LOGGER.error("handle msg error,msg:" + text, e);
             throw e;
         } finally {
-            span.finish();
-            Spans.remove();
+            span.end();
+            SlowLogger.logEvent(Module.RABBITMQ, span, "handle msg slow");
         }
     }
 }

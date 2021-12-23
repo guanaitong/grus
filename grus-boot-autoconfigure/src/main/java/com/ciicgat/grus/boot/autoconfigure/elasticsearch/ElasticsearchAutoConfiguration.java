@@ -6,9 +6,9 @@
 package com.ciicgat.grus.boot.autoconfigure.elasticsearch;
 
 import com.ciicgat.grus.elasticsearch.core.ElasticsearchTemplate;
+import com.ciicgat.grus.elasticsearch.core.RestClients;
 import com.google.common.base.Preconditions;
 import org.apache.http.HttpHost;
-import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,7 @@ public class ElasticsearchAutoConfiguration {
             Assert.state(s.length == 2, "Must be defined as 'host:port'");
             httpHosts.add(new HttpHost(s[0], Integer.parseInt(s[1])));
         }
-        RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(httpHosts.toArray(new HttpHost[0])));
+        RestHighLevelClient client = new RestHighLevelClient(RestClients.builder(httpHosts.toArray(new HttpHost[0])));
 
         int nodeSize = client.getLowLevelClient().getNodes().size();
         LOGGER.info("nodeSize {}", nodeSize);

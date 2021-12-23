@@ -8,19 +8,18 @@ package com.ciicgat.sdk.redis;
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.performance.SlowLogger;
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.sdk.lang.tool.CloseUtils;
 import com.ciicgat.sdk.redis.config.RedisSetting;
-import com.ciicgat.sdk.trace.SpanUtil;
-import com.ciicgat.sdk.trace.Spans;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
-import io.opentracing.noop.NoopSpan;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPoolAbstract;
+import redis.clients.jedis.util.Pool;
 
 
 /**
@@ -29,12 +28,11 @@ import redis.clients.jedis.JedisPoolAbstract;
 class RedisExecutorImpl implements RedisExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisExecutorImpl.class);
     private final RedisSetting redisSetting;
-    private final JedisPoolAbstract pool;
-    private final RedisSpanDecorator redisSpanDecorator = RedisSpanDecorator.STANDARD_TAGS;
+    private final Pool<Jedis> pool;
 
     private final String instance;
 
-    RedisExecutorImpl(RedisSetting redisSetting, JedisPoolAbstract pool) {
+    RedisExecutorImpl(RedisSetting redisSetting, Pool<Jedis> pool) {
         this.redisSetting = redisSetting;
         this.pool = pool;
         this.instance = redisSetting.instanceName();
@@ -42,33 +40,23 @@ class RedisExecutorImpl implements RedisExecutor {
 
     @Override
     public final <T> T execute(RedisAction<T> redisAction) {
-        Span rootSpan = Spans.getRootSpan();
-        Tracer tracer = GlobalTracer.get();
-        final Span span = tracer.buildSpan("executeRedisCMD")
-                .asChildOf(rootSpan == NoopSpan.INSTANCE ? null : rootSpan)
-                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT)
-                .start();
-
-        Tags.DB_INSTANCE.set(span, instance);
-        Tags.DB_TYPE.set(span, "redis");
-        redisSpanDecorator.onRequest(span);
-
+        Tracer tracer = OpenTelemetrys.get();
+        Span span = tracer.spanBuilder("executeRedisCMD").setSpanKind(SpanKind.CLIENT).setParent(Context.current()).startSpan();
         Jedis jedis = pool.getResource();
-        try {
-            T result = redisAction.apply(jedis);
-            redisSpanDecorator.onResponse(span);
-            return result;
+        try (Scope scope = span.makeCurrent()) {
+            OpenTelemetrys.configSystemTags(span);
+            span.setAttribute("component", "redis");
+            span.setAttribute("db.type", "redis");
+            span.setAttribute("db.instance", instance);
+            return redisAction.apply(jedis);
         } catch (Throwable e) {
             Alert.send("redis error:" + redisSetting.toString(), e);
-            redisSpanDecorator.onError(e, span);
             LOGGER.error("redis error:" + redisSetting, e);
             throw e;
         } finally {
             CloseUtils.close(jedis);
-            span.finish();
-
-            long duration = SpanUtil.getDurationMilliSeconds(span);
-            SlowLogger.logEvent(Module.REDIS, duration, redisAction.toString());
+            span.end();
+            SlowLogger.logEvent(Module.REDIS, span, redisAction.toString());
         }
     }
 

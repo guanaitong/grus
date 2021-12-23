@@ -6,7 +6,11 @@
 package com.ciicgat.grus.performance;
 
 import com.ciicgat.grus.alert.Alert;
+import com.ciicgat.grus.core.LatencyConfig;
+import com.ciicgat.grus.core.LatencyLevel;
 import com.ciicgat.grus.core.Module;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,26 +46,30 @@ public class SlowLogger {
         SlowLogger.sendSlowLog = sendSlowLog;
     }
 
+    public static boolean logEvent(Module module, Span span, String detail) {
+        if (span instanceof ReadWriteSpan readWriteSpan) {
+            return SlowLogger.logEvent(module, readWriteSpan.getLatencyNanos(), detail);
+        }
+        return false;
+    }
 
-    public static boolean logEvent(Module module, long duration, String detail) {
-        Level level = module.getLevelByDuration(duration);
-        boolean isSlow = level.biggerThan(module.getSlowLevel());
-        if (isSlow) {
-            String msg = String.format(FORMAT, module.getName(), level.name(), duration, detail);
+    public static boolean logEvent(Module module, long nanosDuration, String detail) {
+        LatencyConfig latencyConfig = LatencyConfig.getModuleConfig(module);
+        LatencyLevel latencyLevel = latencyConfig.getLevel(nanosDuration);
+        if (latencyLevel == LatencyLevel.SLOW) {
+            String msg = String.format(FORMAT, module.getName(), latencyLevel.name(), nanosDuration / 1000_1000L, detail);
             if (printSlowLog) {
                 LOGGER.warn(msg);
             }
-            if (sendSlowLog) {
-                boolean alertLevel = level.biggerThan(module.getAlertLevel());
-                if (alertLevel && isHttpThread()) {
-                    Alert.send(msg);
-                }
+            if (sendSlowLog && isHttpThread()) {
+                Alert.send(msg);
             }
-        } else if (LOGGER.isDebugEnabled()) {
-            String msg = String.format(FORMAT, module.getName(), level.name(), duration, detail);
-            LOGGER.debug(msg);
+            return true;
+        } else if (latencyLevel == LatencyLevel.MEDIUM) {
+            String msg = String.format(FORMAT, module.getName(), latencyLevel.name(), nanosDuration / 1000_1000L, detail);
+            LOGGER.warn(msg);
         }
-        return isSlow;
+        return false;
     }
 
     private static boolean isHttpThread() {

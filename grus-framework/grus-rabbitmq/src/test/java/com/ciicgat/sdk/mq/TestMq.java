@@ -5,6 +5,7 @@
 
 package com.ciicgat.sdk.mq;
 
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.rabbitmq.client.BuiltinExchangeType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,7 +29,7 @@ public class TestMq {
 
     @Test
     public void test() throws Exception {
-        TestTracing.registerJaegerTracer();
+        OpenTelemetrys.initFoTest();
         List<String> msgList = new ArrayList<>();
 
         int num = 100;

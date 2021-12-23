@@ -10,11 +10,11 @@ package com.ciicgat.sdk.springcache.secondary;
  */
 public record IdObject<Id, Value>(Id id, Value object) {
 
-    public Id getId() {
-        return id;
-    }
-
-    public Value getObject() {
-        return object;
-    }
+//    public Id getId() {
+//        return id;
+//    }
+//
+//    public Value getObject() {
+//        return object;
+//    }
 }

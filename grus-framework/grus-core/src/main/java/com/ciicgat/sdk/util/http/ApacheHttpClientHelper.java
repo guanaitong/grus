@@ -212,7 +212,7 @@ public class ApacheHttpClientHelper {
      * @return
      */
     public static String request(HttpUriRequest httpUriRequest) {
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         CloseableHttpClient closeableHttpClient = HttpClientSingleton.getApacheHttpClient();
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpUriRequest)) {
             int statusCode = response.getStatusLine().getStatusCode(); //NOSONAR
@@ -225,7 +225,7 @@ public class ApacheHttpClientHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            SlowLogger.logEvent(Module.HTTP_CLIENT, System.currentTimeMillis() - start, httpUriRequest.toString());
+            SlowLogger.logEvent(Module.HTTP_CLIENT, System.nanoTime() - start, httpUriRequest.toString());
         }
     }
 

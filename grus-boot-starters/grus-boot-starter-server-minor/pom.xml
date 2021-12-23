@@ -50,7 +50,7 @@
             <groupId>com.ciicgat.grus.boot</groupId>
         </dependency>
         <dependency>
-            <artifactId>grus-boot-starter-opentracing</artifactId>
+            <artifactId>grus-boot-starter-opentelemetry</artifactId>
             <groupId>com.ciicgat.grus.boot</groupId>
         </dependency>
         <dependency>

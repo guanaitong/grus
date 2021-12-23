@@ -8,14 +8,12 @@ package com.ciicgat.sdk.redis.config;
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.performance.SlowLogger;
-import com.ciicgat.sdk.redis.RedisSpanDecorator;
-import com.ciicgat.sdk.trace.SpanUtil;
-import com.ciicgat.sdk.trace.Spans;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
-import io.opentracing.noop.NoopSpan;
-import io.opentracing.tag.Tags;
-import io.opentracing.util.GlobalTracer;
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Context;
+import io.opentelemetry.context.Scope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -55,7 +53,6 @@ class TracingRedisConnection extends AbstractRedisConnection {
     private final RedisSetting redisSetting;
     private final String instance;
 
-    private final RedisSpanDecorator redisSpanDecorator = RedisSpanDecorator.STANDARD_TAGS;
 
     TracingRedisConnection(RedisConnection redisConnection, RedisSetting redisSetting) {
         this.redisConnection = redisConnection;
@@ -64,29 +61,22 @@ class TracingRedisConnection extends AbstractRedisConnection {
     }
 
     private <T> T trace(String commandName, Supplier<T> callback) {
-        Span rootSpan = Spans.getRootSpan();
-        Tracer tracer = GlobalTracer.get();
-        final Span span = tracer.buildSpan("executeRedisCMD")
-                .asChildOf(rootSpan == NoopSpan.INSTANCE ? null : rootSpan)
-                .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT)
-                .withTag("command", commandName == null ? "unknown" : commandName)
-                .start();
-        Tags.DB_INSTANCE.set(span, instance);
-        Tags.DB_TYPE.set(span, "redis");
-        redisSpanDecorator.onRequest(span);
-        try {
-            T result = callback.get();
-            redisSpanDecorator.onResponse(span);
-            return result;
+        Tracer tracer = OpenTelemetrys.get();
+        Span span = tracer.spanBuilder("executeRedisCMD").setSpanKind(SpanKind.CLIENT).setParent(Context.current()).startSpan();
+        try (Scope scope = span.makeCurrent()) {
+            OpenTelemetrys.configSystemTags(span);
+            span.setAttribute("component", "redis");
+            span.setAttribute("db.type", "redis");
+            span.setAttribute("db.instance", instance);
+            span.setAttribute("command", commandName == null ? "unknown" : commandName);
+            return callback.get();
         } catch (Throwable e) {
             Alert.send("redis error:" + redisSetting.toString(), e);
-            redisSpanDecorator.onError(e, span);
             LOGGER.error("redis error:" + redisSetting.toString(), e);
             throw e;
         } finally {
-            span.finish();
-            long duration = SpanUtil.getDurationMilliSeconds(span);
-            SlowLogger.logEvent(Module.REDIS, duration, "lettuce redis slow");
+            span.end();
+            SlowLogger.logEvent(Module.REDIS, span, "lettuce redis slow,cmd:" + commandName);
         }
     }
 

@@ -6,6 +6,7 @@
 package com.ciicgat.grus.boot.autoconfigure.data;
 
 import com.ciicgat.sdk.data.mybatis.SQLLineInterceptor;
+import com.ciicgat.sdk.data.mybatis.SQLTracingInterceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -29,5 +30,12 @@ public class GrusInterceptors {
         return new SQLLineInterceptor();
     }
 
+
+    @Bean
+    @ConditionalOnMissingBean
+    @Order
+    public SQLTracingInterceptor sqlTracingInterceptor() {
+        return new SQLTracingInterceptor();
+    }
 
 }

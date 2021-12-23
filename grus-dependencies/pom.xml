@@ -94,7 +94,7 @@
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <artifactId>grus-boot-starter-opentracing</artifactId>
+                <artifactId>grus-boot-starter-opentelemetry</artifactId>
                 <groupId>com.ciicgat.grus.boot</groupId>
                 <version>${revision}</version>
             </dependency>

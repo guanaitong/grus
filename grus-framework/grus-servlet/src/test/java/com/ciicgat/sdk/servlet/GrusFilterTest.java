@@ -6,12 +6,7 @@
 package com.ciicgat.sdk.servlet;
 
 import com.ciicgat.grus.json.JSON;
-import com.ciicgat.sdk.util.system.Systems;
-import com.fasterxml.jackson.databind.JsonNode;
-import io.jaegertracing.Configuration;
-import io.jaegertracing.internal.JaegerTracer;
-import io.jaegertracing.internal.samplers.RateLimitingSampler;
-import io.opentracing.util.GlobalTracer;
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +21,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 
 /**
  * Created by August.Zhou on 2021/9/24 16:48.
@@ -35,33 +31,12 @@ public class GrusFilterTest {
 
     @BeforeAll
     public static void registerJaegerTracer() {
-        Configuration.SenderConfiguration senderConfiguration =
-                new Configuration
-                        .SenderConfiguration()
-                        .withAgentHost("127.0.0.1")
-                        .withAgentPort(6831);
-
-        Configuration.ReporterConfiguration reporterConfig =
-                new Configuration
-                        .ReporterConfiguration()
-                        .withSender(senderConfiguration)
-                        .withLogSpans(false);
-
-        Float parm = "unknown".equals(Systems.APP_NAME) ? 0f : 50f;
-        //采样配置
-        Configuration.SamplerConfiguration samplerConfig =
-                new Configuration
-                        .SamplerConfiguration()
-                        .withType(RateLimitingSampler.TYPE)
-                        .withParam(parm);
-
-        JaegerTracer tracer = new Configuration(Systems.APP_NAME).withSampler(samplerConfig).withReporter(reporterConfig).getTracer();
-        GlobalTracer.register(tracer);
+        OpenTelemetrys.initFoTest();
     }
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         this.mockMvc = MockMvcBuilders.standaloneSetup(new TestController()).addFilters(new GrusFilter()).build();
     }
 
@@ -71,31 +46,36 @@ public class GrusFilterTest {
         testData.setStringData("abc");
         testData.setIntData(12);
 
-        JsonNode jsonObject = JSON.parse(JSON.toJSONString(testData));
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 //        for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
 //            params.add(entry.getKey(), entry.getValue().toString());
 //        }
 
-        MockHttpServletRequestBuilder post = MockMvcRequestBuilders
-                .post("/test?abc=1").params(params)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .accept(MediaType.APPLICATION_JSON_UTF8_VALUE);
+        MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post("/test?abc=1").params(params).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).accept(MediaType.APPLICATION_JSON);
 
         MockHttpServletResponse httpResp = mockMvc.perform(post).andReturn().getResponse();
         Assertions.assertEquals(HttpStatus.OK.value(), httpResp.getStatus());
         Assertions.assertTrue(!httpResp.getHeader("x-trace-id").isEmpty());
         String firstRequestTraceId = httpResp.getHeader("uber-trace-id");
         Assertions.assertTrue(!firstRequestTraceId.isEmpty());
+
+        String firstRequestTraceId2 = httpResp.getHeader("traceparent");
+        Assertions.assertTrue(!firstRequestTraceId2.isEmpty());
+//        Assertions.assertEquals(firstRequestTraceId, firstRequestTraceId2);
         System.out.println(firstRequestTraceId);
+        Assertions.assertTrue(StringUtils.hasLength(httpResp.getHeader("x-trace-id")));
+        Assertions.assertTrue(StringUtils.hasLength(httpResp.getHeader("x-span-id")));
+        Assertions.assertFalse(StringUtils.hasLength(httpResp.getHeader("x-parent-id")));
 
 
-        MockHttpServletRequestBuilder post1 = MockMvcRequestBuilders
-                .post("/test?abc=1").params(params)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .header("uber-trace-id", firstRequestTraceId)//把uber-trace-id作为链追踪下去
-                .accept(MediaType.APPLICATION_JSON_UTF8_VALUE);
+        MockHttpServletRequestBuilder post1 = MockMvcRequestBuilders.post("/test?abc=1").params(params).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).header("uber-trace-id", firstRequestTraceId)//把uber-trace-id作为链追踪下去
+                .accept(MediaType.APPLICATION_JSON);
         MockHttpServletResponse httpResp1 = mockMvc.perform(post1).andReturn().getResponse();
+
+
+        Assertions.assertTrue(StringUtils.hasLength(httpResp1.getHeader("x-trace-id")));
+        Assertions.assertTrue(StringUtils.hasLength(httpResp1.getHeader("x-span-id")));
+        Assertions.assertTrue(StringUtils.hasLength(httpResp1.getHeader("x-parent-id")));
 
         //两个请求，traceId应该相同
         Assertions.assertEquals(httpResp.getHeader("x-trace-id"), httpResp1.getHeader("x-trace-id"));
@@ -110,9 +90,7 @@ public class GrusFilterTest {
         testData.setStringData("abc");
         testData.setIntData(12);
 
-        MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post("/testJson?abc=1")
-                .contentType(MediaType.APPLICATION_JSON).content(JSON.toJSONString(testData))
-                .accept(MediaType.APPLICATION_JSON);
+        MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post("/testJson?abc=1").contentType(MediaType.APPLICATION_JSON).content(JSON.toJSONString(testData)).accept(MediaType.APPLICATION_JSON);
 
         MockHttpServletResponse httpResp = mockMvc.perform(post).andReturn().getResponse();
         Assertions.assertEquals(HttpStatus.OK.value(), httpResp.getStatus());

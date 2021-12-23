@@ -5,10 +5,8 @@
 
 package com.ciicgat.sdk.util.frigate;
 
-import com.ciicgat.sdk.trace.SpanUtil;
-import com.ciicgat.sdk.trace.Spans;
 import com.ciicgat.sdk.util.system.Systems;
-import io.opentracing.Span;
+import io.opentelemetry.api.trace.Span;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
 import java.util.ArrayList;
@@ -188,9 +186,10 @@ public class FrigateMessage {
         frigateMessage.setWorkEnv(Systems.WORK_ENV);
         frigateMessage.setWorkIdc(Systems.WORK_IDC);
         frigateMessage.setTime(System.currentTimeMillis());
-        Span span = Spans.getRootSpan();
-        if (span != null && !SpanUtil.isNoop(span)) {
-            frigateMessage.setTraceId(SpanUtil.getTraceId(span));
+        Span span = Span.current();
+        if (span != Span.getInvalid()) {
+            String traceId = span.getSpanContext().getTraceId();
+            frigateMessage.setTraceId(traceId);
         }
         return frigateMessage;
     }

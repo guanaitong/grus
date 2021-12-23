@@ -31,10 +31,5 @@
             <groupId>org.apache.shardingsphere.elasticjob</groupId>
             <artifactId>elasticjob-lite-lifecycle</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.jaegertracing</groupId>
-            <artifactId>jaeger-core</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>
