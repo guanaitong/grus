@@ -24,6 +24,7 @@ import feign.RequestInterceptor;
 import feign.Retryer;
 import feign.codec.ErrorDecoder;
 import feign.slf4j.Slf4jLogger;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,7 @@ public class FeignServiceBuilder {
     private NamingService namingService = NamingService.DEFAULT;
     private FallbackFactory<?> fallbackFactory;
     private List<RequestInterceptor> requestInterceptors = new ArrayList<>();
+    private Interceptor interceptor;
     private boolean logReq;
 
     private boolean logResp;
@@ -105,6 +107,11 @@ public class FeignServiceBuilder {
 
     public FeignServiceBuilder fallbackFactory(FallbackFactory<?> fallbackFactory) {
         this.fallbackFactory = fallbackFactory;
+        return this;
+    }
+
+    public FeignServiceBuilder interceptor(Interceptor interceptor) {
+        this.interceptor = interceptor;
         return this;
     }
 
@@ -182,6 +189,9 @@ public class FeignServiceBuilder {
             // 添加sentinel拦截器
             if (enableSentinel) {
                 okHttpClient = okHttpClient.newBuilder().addInterceptor(new SentinelInterceptor(serviceName.value())).build();
+            }
+            if (interceptor != null) {
+                okHttpClient = okHttpClient.newBuilder().addInterceptor(interceptor).build();
             }
             client = new OkHttpClientWrapper(okHttpClient);
         }
