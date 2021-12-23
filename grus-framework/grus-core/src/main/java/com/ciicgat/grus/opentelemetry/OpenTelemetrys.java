@@ -33,6 +33,7 @@ public class OpenTelemetrys {
         OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
 
         Runtime.getRuntime().addShutdownHook(new Thread(sdkTracerProvider::close));
+        GlobalOpenTelemetry.resetForTest();
         GlobalOpenTelemetry.set(sdk);
     }
 
