@@ -102,9 +102,9 @@ public class MybatisGeneratorTest {
         Example<ShopTip> example = new ConditionExample<>();
         example.createLambdaCriteria().eq(ShopTip::getContent, content).eq(ShopTip::getType, type).neBlankable(ShopTip::getEcappId, "");
         List<ShopTip> list = shopTipMapper.list(example);
-        Assert.assertTrue(list.size() > 0);
+        Assertions.assertTrue(list.size() > 0);
         list.forEach(System.out::println);
-        Assert.assertEquals(content, list.get(0).getContent());
+        Assertions.assertEquals(content, list.get(0).getContent());
     }
 
     @Test
@@ -132,9 +132,9 @@ public class MybatisGeneratorTest {
                 .likeRight(ShopTip::getTitle, "gmall")
                 .in(ShopTip::getId, 1, 2, 3)
                 .notIn(ShopTip::getId, 4, 5, 6);
-        Assert.assertTrue(criteria.isValid());
+        Assertions.assertTrue(criteria.isValid());
         LambdaCriteria<ShopTip> criteria1 = example.createLambdaCriteria();
-        Assert.assertFalse(criteria1.isValid());
+        Assertions.assertFalse(criteria1.isValid());
         criteria1.setCriteria(Collections.emptyList());
         try {
             criteria1.addCriterion(null);
@@ -149,7 +149,7 @@ public class MybatisGeneratorTest {
         }
 
         ShopTip shopTip = shopTipMapper.getByExample(example);
-        Assert.assertNull(shopTip);
+        Assertions.assertNull(shopTip);
     }
 
     private ShopTip buildShopTip() {

@@ -6,10 +6,16 @@
 package com.ciicgat.sdk.trace;
 
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.Scope;
+import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -28,9 +34,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class TestTraceThreadPoolExecutor {
 
+
     @BeforeAll
-    public static void registerJaegerTracer() {
-        OpenTelemetrys.initFoTest();
+    public static void registerTracer() {
+        SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder().build();
+
+        TextMapPropagator textMapPropagator = TextMapPropagator.composite(W3CTraceContextPropagator.getInstance());
+        OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(sdkTracerProvider::close));
+        GlobalOpenTelemetry.resetForTest();
+        GlobalOpenTelemetry.set(sdk);
     }
 
 

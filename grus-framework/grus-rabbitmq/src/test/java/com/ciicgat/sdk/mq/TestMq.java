@@ -5,9 +5,15 @@
 
 package com.ciicgat.sdk.mq;
 
-import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.rabbitmq.client.BuiltinExchangeType;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
+import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -26,10 +32,19 @@ public class TestMq {
     private static String forTestRoutingKeyA = "for-test-routingKey-A";
 
     private static String forTestRoutingKeyB = "for-test-routingKey-B";
+    @BeforeAll
+    public static void registerTracer() {
+        SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder().build();
 
+        TextMapPropagator textMapPropagator = TextMapPropagator.composite(W3CTraceContextPropagator.getInstance());
+        OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(sdkTracerProvider::close));
+        GlobalOpenTelemetry.resetForTest();
+        GlobalOpenTelemetry.set(sdk);
+    }
     @Test
     public void test() throws Exception {
-        OpenTelemetrys.initFoTest();
         List<String> msgList = new ArrayList<>();
 
         int num = 100;
