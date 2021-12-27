@@ -124,57 +124,57 @@ nav:
           - IDEA使用技巧: prepare/skill/LearningIdea.md
           - Sonarlint配置指南: prepare/skill/sonar.md
           - Checksyle配置: prepare/skill/checkstyle.md
-  - grus框架:
-      - 简介: grus/introduction/origin.md
-      - 项目结构: grus/introduction/project-structure.md
-      - Starter模块: grus/introduction/project-starter.md
-      - Autoconfigure模块: grus/introduction/autoconfigure.md
-      - Condition条件注解: grus/introduction/condition.md
-      - 配置文件: grus/introduction/config.md
+  - 框架:
+      - 简介: framework/introduction/origin.md
+      - 项目结构: framework/introduction/project-structure.md
+      - Starter模块: framework/introduction/project-starter.md
+      - Autoconfigure模块: framework/introduction/autoconfigure.md
+      - Condition条件注解: framework/introduction/condition.md
+      - 配置文件: framework/introduction/config.md
       - Gconf:
-          - grus/gconf/index.md
+          - framework/gconf/index.md
       - 巨灵神规范:
-          - grus/api/index.md
-          - feign: grus/api/grus-feign-use.md
-          - 使用指南: grus/api/grus-feign-guide.md
-          - 最佳实践: grus/api/grus-feign-best-practice.md
-          - Feign协议升级: grus/api/grus-feign-contract.md
+          - framework/api/index.md
+          - feign: framework/api/grus-feign-use.md
+          - 使用指南: framework/api/grus-feign-guide.md
+          - 最佳实践: framework/api/grus-feign-best-practice.md
+          - Feign协议升级: framework/api/grus-feign-contract.md
       - data:
-          - grus/data/index.md
-          - Mybatis分页插件: grus/data/mybatis-pagehelper.md
-          - Mybatis增加: grus/data/mybatis-enhance.md
+          - framework/data/index.md
+          - Mybatis分页插件: framework/data/mybatis-pagehelper.md
+          - Mybatis增加: framework/data/mybatis-enhance.md
       - redis:
-          - grus/redis/index.md
+          - framework/redis/index.md
       - zookeeper:
-          - grus/zk/index.md
+          - framework/zk/index.md
       - kafka:
-          - grus/kafka/index.md
+          - framework/kafka/index.md
       - web:
-          - grus/web/index.md
-          - Validator模块: grus/web/grus-validator.md
-          - Swagger使用说明: grus/web/grus-swagger.md
-          - Freemarker使用说明: grus/web/grus-freemarker.md
-          - Velocity使用说明: grus/web/grus-velocity.md
+          - framework/web/index.md
+          - Validator模块: framework/web/grus-validator.md
+          - Swagger使用说明: framework/web/grus-swagger.md
+          - Freemarker使用说明: framework/web/grus-freemarker.md
+          - Velocity使用说明: framework/web/grus-velocity.md
       - job:
-          - grus/job/index.md
-          - ElasticJob介绍: grus/job/elasticjob.md
+          - framework/job/index.md
+          - ElasticJob介绍: framework/job/elasticjob.md
       - 单元测试:
-          - grus/test/index.md
+          - framework/test/index.md
       - 微服务流量控制:
-          - grus/limit/index.md
+          - framework/limit/index.md
       - 分布式session:
-          - grus/session/index.md
+          - framework/session/index.md
       - 分布式存储gfs:
-          - grus/gfs/index.md
-          - gfs-client使用说明: grus/gfs/gfs-sdk.md
+          - framework/gfs/index.md
+          - gfs-client使用说明: framework/gfs/gfs-sdk.md
       - frigate消息:
-          - grus/frigate/index.md
-          - gfs-client使用说明: grus/frigate/grus-frigate-message-handle.md
+          - framework/frigate/index.md
+          - gfs-client使用说明: framework/frigate/grus-frigate-message-handle.md
       - others:
-          - grus/others/index.md
-          - bean复制工具: grus/others/grus-core.md
-          - JSON使用说明: grus/others/grus-json.md
-          - Java17升级指南: grus/others/grus-17.md
+          - framework/others/index.md
+          - bean复制工具: framework/others/grus-core.md
+          - JSON使用说明: framework/others/grus-json.md
+          - Java17升级指南: framework/others/grus-17.md
   - 其他:
       - 应用开发指南: others/develop-guide.md
       - 安全基础: others/security-base.md
