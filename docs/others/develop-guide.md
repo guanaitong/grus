@@ -58,7 +58,7 @@ mall
 
 ### 申请 gconf
 
-gconf 是一个统一的配置中心，类似于 Apollo。原理与使用参考：[Grus 框架-gconf](../grus/gconf/index.md)
+gconf 是一个统一的配置中心，类似于 Apollo。原理与使用参考：[Grus 框架-gconf](../framework/gconf/index.md)
 
 联系周智伟/乙克川，创建开发应用的关联组与其下的 app。每个 app 对应一个空间，可以添加多个配置（一般每个应用都会与一个 app 对应）。这些配置内容，可通过框架在应用中获取。
 
@@ -76,11 +76,11 @@ gconf 是一个统一的配置中心，类似于 Apollo。原理与使用参考�
 
 #### gconf 配置
 
-创建好数据库后，需要联系运维（姚亮/杨昆）在对应的 gconf 生成 datasource.json 数据库文件，具体见 [Grus 框架-data](../grus/data/index.md)
+创建好数据库后，需要联系运维（姚亮/杨昆）在对应的 gconf 生成 datasource.json 数据库文件，具体见 [Grus 框架-data](../framework/data/index.md)
 
 ### 申请 redis
 
-联系运维（姚亮/杨昆）在对应的 gconf 生成 redis-config 文件，具体见 [Grus 框架-redis](../grus/redis/index.md)
+联系运维（姚亮/杨昆）在对应的 gconf 生成 redis-config 文件，具体见 [Grus 框架-redis](../framework/redis/index.md)
 
 ### 错误码申请
 
@@ -104,7 +104,7 @@ web 服务根据一级 path 区分应用，根据用户端与 MGR 端区分为�
 
 ## 常用模块
 
-项目结构见 [Grus-项目结构](../grus/introduction/project-structure.md)，这里简单介绍下几个常用的业务模块。
+项目结构见 [Grus-项目结构](../framework/introduction/project-structure.md)，这里简单介绍下几个常用的业务模块。
 
 ### 会员
 

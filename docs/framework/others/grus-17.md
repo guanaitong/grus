@@ -33,7 +33,8 @@
 
 3. maven-compiler-plugin里的11配置要去掉（如果有）：
 
-   === "old"
+
+    === "old"
 
         ```xml
         <plugin>
@@ -48,7 +49,7 @@
         </plugin>
         ```
 
-   === "new"
+    === "new"
 
         ```xml
         <plugin>
@@ -64,9 +65,16 @@
 java17没法再使用`cglib`的`beancopier`，故`grus-core`中的`BeanCopyUtil`的实现方式略微变化，直接使用了`org.springframework.beans.BeanUtils`
 ，而不再是`org.springframework.cglib.beans.BeanCopier`。
 
+### 单元测试
+
+从junit4升级到junit5后，单元测试常用类产生了变更，需要开发者在版本升级后，检查并更新下单元测试。例如`org.junit.Test`需要替换成`org.junit.jupiter.api.Test`，`org.junit.Assert`
+变更为`org.junit.jupiter.api.Assertions`等等。
+
+使用`org.assertj.core.api.Assertions`等别的类库的断言类不会受影响。
+
 ## 依赖项升级
 
-- junit升级到5；
+- junit升级到5（配套的单元测试都需要修改）；
 - elasticJob升级为最新的`shardingsphere elasticjob`，相关包需要改为`org.apache.shardingsphere.elasticjob`；
 - feign升级为11.6版本；
 - TODO
