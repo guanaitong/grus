@@ -14,13 +14,11 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.MessageProperties;
-import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
-import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.context.propagation.TextMapSetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +37,6 @@ import java.util.Objects;
  */
 public class MsgDispatcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MsgDispatcher.class);
-    private static final TextMapPropagator textMapPropagator = GlobalOpenTelemetry.getPropagators().getTextMapPropagator();
     private static final TextMapSetter<Map<String, Object>> setter = (carrier, key, value) -> carrier.put(key, value);
     protected final String host;
     /**
@@ -106,7 +103,7 @@ public class MsgDispatcher {
         if (BuiltinExchangeType.FANOUT == exchangeType) {
             routingKey = "";
         }
-        Tracer tracer = OpenTelemetrys.get();
+        Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder("sendMsg").setSpanKind(SpanKind.PRODUCER).setParent(Context.current()).startSpan();
 
         Channel channel = null;
@@ -115,7 +112,7 @@ public class MsgDispatcher {
             span.setAttribute("component", "rabbitmq");
             channel = channelPool.borrowObject();
             Map<String, Object> headers = new HashMap<>();
-            textMapPropagator.inject(Context.current(), headers, setter);
+            OpenTelemetrys.getTextMapPropagator().inject(Context.current(), headers, setter);
             AMQP.BasicProperties traceProperties = properties;
             if (!headers.isEmpty()) {
                 if (properties == null) {

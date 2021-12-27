@@ -60,7 +60,7 @@ public class TestTraceThreadPoolExecutor {
     }
 
     public void testRunnable(ExecutorService executorService) throws InterruptedException {
-        Tracer tracer = OpenTelemetrys.get();
+        Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder("main").setSpanKind(SpanKind.INTERNAL).startSpan();
         try (Scope ignored = span.makeCurrent()) {
             String spanId = span.getSpanContext().getSpanId();
@@ -84,7 +84,7 @@ public class TestTraceThreadPoolExecutor {
 
 
     public void testCallable(ExecutorService executorService) throws ExecutionException, InterruptedException {
-        Tracer tracer = OpenTelemetrys.get();
+        Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder("main").setSpanKind(SpanKind.INTERNAL).startSpan();
         try (Scope ignored = span.makeCurrent()) {
             String spanId = span.getSpanContext().getSpanId();

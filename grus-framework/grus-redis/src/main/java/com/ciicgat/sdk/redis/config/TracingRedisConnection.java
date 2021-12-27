@@ -61,7 +61,7 @@ class TracingRedisConnection extends AbstractRedisConnection {
     }
 
     private <T> T trace(String commandName, Supplier<T> callback) {
-        Tracer tracer = OpenTelemetrys.get();
+        Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder("executeRedisCMD").setSpanKind(SpanKind.CLIENT).setParent(Context.current()).startSpan();
         try (Scope scope = span.makeCurrent()) {
             OpenTelemetrys.configSystemTags(span);

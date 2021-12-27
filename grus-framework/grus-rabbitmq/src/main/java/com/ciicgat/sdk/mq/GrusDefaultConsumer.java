@@ -13,14 +13,12 @@ import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
-import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapGetter;
-import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +39,6 @@ public class GrusDefaultConsumer extends DefaultConsumer {
 
     private MsgProcessor msgProcessor;
     private final AtomicBoolean isRunning;
-    private static final TextMapPropagator TEXT_MAP_PROPAGATOR = GlobalOpenTelemetry.get().getPropagators().getTextMapPropagator();
     static final TextMapGetter<Map<String, Object>> getter = new TextMapGetter<>() {
         @Override
         public Iterable<String> keys(Map<String, Object> basicProperties) {
@@ -91,8 +88,8 @@ public class GrusDefaultConsumer extends DefaultConsumer {
             getChannel().basicAck(envelope.getDeliveryTag(), false);
             return;
         }
-        Tracer tracer = OpenTelemetrys.get();
-        Context context = TEXT_MAP_PROPAGATOR.extract(Context.current(), properties.getHeaders(), getter);
+        Tracer tracer = OpenTelemetrys.getTracer();
+        Context context = OpenTelemetrys.getTextMapPropagator().extract(Context.current(), properties.getHeaders(), getter);
 
         Span span = tracer.spanBuilder("handleMsg").setSpanKind(SpanKind.CONSUMER).setParent(context).startSpan();
         if (span != Span.getInvalid()) {

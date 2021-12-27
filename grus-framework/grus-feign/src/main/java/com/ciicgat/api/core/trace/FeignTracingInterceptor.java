@@ -10,13 +10,11 @@ import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.service.GrusServiceHttpHeader;
 import com.ciicgat.sdk.util.system.Systems;
-import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
-import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.context.propagation.TextMapSetter;
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -32,7 +30,6 @@ import java.io.IOException;
  */
 public class FeignTracingInterceptor implements Interceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeignTracingInterceptor.class);
-    private static final TextMapPropagator textMapPropagator = GlobalOpenTelemetry.getPropagators().getTextMapPropagator();
     private static final TextMapSetter<Request.Builder> setter = (carrier, key, value) -> carrier.addHeader(key, value);
 
 
@@ -44,13 +41,13 @@ public class FeignTracingInterceptor implements Interceptor {
         requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_INSTANCE, Systems.APP_INSTANCE);
         requestBuilder.addHeader(GrusServiceHttpHeader.HTTP_UA_HEADER, "Grus service client");
 
-        Tracer tracer = OpenTelemetrys.get();
+        Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder(originalRequest.method() + " " + originalRequest.url().encodedPath()).setSpanKind(SpanKind.CLIENT).startSpan();
         try (Scope scope = span.makeCurrent()) {
             OpenTelemetrys.configSystemTags(span);
             span.setAttribute("http.method", originalRequest.method());
             span.setAttribute("component", "feign");
-            textMapPropagator.inject(Context.current(), requestBuilder, setter);
+            OpenTelemetrys.getTextMapPropagator().inject(Context.current(), requestBuilder, setter);
             return chain.proceed(requestBuilder.build());
         } finally {
             span.end();

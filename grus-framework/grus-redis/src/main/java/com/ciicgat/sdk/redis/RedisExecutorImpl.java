@@ -40,7 +40,7 @@ class RedisExecutorImpl implements RedisExecutor {
 
     @Override
     public final <T> T execute(RedisAction<T> redisAction) {
-        Tracer tracer = OpenTelemetrys.get();
+        Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder("executeRedisCMD").setSpanKind(SpanKind.CLIENT).setParent(Context.current()).startSpan();
         Jedis jedis = pool.getResource();
         try (Scope scope = span.makeCurrent()) {
