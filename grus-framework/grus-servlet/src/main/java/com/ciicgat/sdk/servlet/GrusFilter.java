@@ -14,14 +14,12 @@ import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.GrusServiceHttpHeader;
 import com.ciicgat.grus.service.GrusServiceStatus;
 import com.ciicgat.sdk.util.system.Systems;
-import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapGetter;
-import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -47,8 +45,6 @@ public class GrusFilter implements Filter {
     private static final String SERVER_SPAN_CONTEXT = GrusFilter.class.getName() + ".activeSpanContext";
     private static final Object TAG_VALUE = new Object();
     private final AtomicInteger current = new AtomicInteger();
-
-    private static final TextMapPropagator TEXT_MAP_PROPAGATOR = GlobalOpenTelemetry.get().getPropagators().getTextMapPropagator();
 
     public GrusFilter() {
     }
@@ -112,8 +108,8 @@ public class GrusFilter implements Filter {
             grusServiceStatus = grusRuntimeManager.registerUpstreamService(reqAppName, "");
         }
 
-        Context context = TEXT_MAP_PROPAGATOR.extract(Context.current(), request, getter);
-        Tracer tracer = OpenTelemetrys.get();
+        Tracer tracer = OpenTelemetrys.getTracer();
+        Context context = OpenTelemetrys.getTextMapPropagator().extract(Context.current(), request, getter);
         Span span = tracer.spanBuilder(request.getMethod() + " " + uri).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
 
 

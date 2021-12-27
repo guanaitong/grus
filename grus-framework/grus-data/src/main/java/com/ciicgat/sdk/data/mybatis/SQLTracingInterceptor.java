@@ -47,7 +47,7 @@ public class SQLTracingInterceptor implements Interceptor {
             BoundSql boundSql = statementHandler.getBoundSql();
             sql = boundSql.getSql();
         }
-        Tracer tracer = OpenTelemetrys.get();
+        Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder("executeSQL").setSpanKind(SpanKind.CLIENT).setParent(Context.current()).startSpan();
 
         try (Scope scope = span.makeCurrent()) {

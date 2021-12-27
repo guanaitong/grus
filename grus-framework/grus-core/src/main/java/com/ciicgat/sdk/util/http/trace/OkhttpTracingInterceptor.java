@@ -43,7 +43,7 @@ public class OkhttpTracingInterceptor implements Interceptor {
         requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_INSTANCE, Systems.APP_INSTANCE);
         requestBuilder.addHeader(GrusServiceHttpHeader.HTTP_UA_HEADER, "Grus okhttp client");
 
-        Tracer tracer = OpenTelemetrys.get();
+        Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder(originalRequest.method() + " " + originalRequest.url().encodedPath()).setSpanKind(SpanKind.CLIENT).startSpan();
 
         if (LOGGER.isDebugEnabled()) {

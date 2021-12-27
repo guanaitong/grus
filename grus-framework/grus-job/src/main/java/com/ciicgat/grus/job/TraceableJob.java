@@ -31,7 +31,7 @@ public class TraceableJob implements SimpleJob {
 
     @Override
     public void execute(ShardingContext shardingContext) {
-        Tracer tracer = OpenTelemetrys.get();
+        Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder("handleJob").setSpanKind(SpanKind.SERVER).startSpan();
         if (span != Span.getInvalid()) {
             String traceId = span.getSpanContext().getTraceId();
