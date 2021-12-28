@@ -7,7 +7,7 @@ hide:
 
 Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项目，需保证项目的parent，统一使用`grus-boot-starter-parent`，如下：
 
-```xml
+```xml title="pom.xml"
 <parent>
     <groupId>com.ciicgat.grus.boot</groupId>
     <artifactId>grus-boot-starter-parent</artifactId>
@@ -29,8 +29,8 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
 
     自`2021.2`开始，框架和巨灵神的引用不再放在一起，并只支持了`jdk-17`，即使用`2021.2`及后面的版本，需要在父POM添加如下并指定`java.version`：
 
-    ```xml
-    <projecp>
+    ```xml title="pom.xml"
+    <project>
         <properties>
             <java.version>17</java.version>
         </properties>
@@ -46,12 +46,12 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
                 </dependency>
             </dependencies>
         </dependencyManagement>
-    </projecp>
+    </project>
     ```
 
 ## 发布版本
 
-- 2021.2 - 在开发中 `2021.2.0-SNAPSHOT`，基于`spring-boot-version`为`2.5.7`
+- 2021.2 - 在开发中 `2021.2.0-SNAPSHOT`，基于`spring-boot-version`为`2.5.8`
 - 2021.1 - 推荐使用 `2021.1.16`，基于`spring-boot-version`为`2.3.12.RELEASE`
 
 ??? abstract "Old versions(不推荐使用)"
