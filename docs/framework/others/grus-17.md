@@ -14,9 +14,6 @@
 
     ```xml
     <project>
-        <properties>
-            <java.version>17</java.version>
-        </properties>
         <dependencyManagement>
             <dependencies>
                 <dependency>
@@ -67,17 +64,45 @@ java17没法再使用`cglib`的`beancopier`，故`grus-core`中的`BeanCopyUtil`
 
 ### 单元测试
 
-从junit4升级到junit5后，单元测试常用类产生了变更，需要开发者在版本升级后，检查并更新下单元测试。例如`org.junit.Test`需要替换成`org.junit.jupiter.api.Test`，`org.junit.Assert`
-变更为`org.junit.jupiter.api.Assertions`等等。
+从junit4升级到junit5后，单元测试常用类产生了变更，需要开发者在版本升级后，检查并更新下单元测试。例如：
+
+- `org.junit.Test`变更`org.junit.jupiter.api.Test`；
+- `org.junit.Assert`变更`org.junit.jupiter.api.Assertions`等等。
 
 使用`org.assertj.core.api.Assertions`等别的类库的断言类不会受影响。
+
+### 安全检查
+
+使用`Spring Boot Actuator`进行健康检查，替换原来的`isLive`。（`isLive`目前仍会保留）
+
+应用启动时，自动注入的配置如下：
+
+```properties
+management.server.port=8181
+management.endpoints.web.exposure.include=*
+management.endpoint.health.probes.enabled=true
+management.endpoint.health.show-details=always
+management.endpoint.health.group.readiness.include=*
+management.endpoint.health.group.readiness.show-details=always
+management.endpoint.health.group.liveness.include=*
+management.endpoint.health.group.liveness.show-details=always
+```
+
+通过HTTP暴露的endpoint如下：
+
+- `127.0.0.1:8181/actuator/health`: 健康检查及应用的一些相关信息
+- `127.0.0.1:8181/actuator/health/liveness`: 校验应用本身是否ok
+- `127.0.0.1:8181/actuator/health/readiness`: 校验应用依赖的db, redis等是否ok
 
 ## 依赖项升级
 
 - junit升级到5（配套的单元测试都需要修改）；
 - elasticJob升级为最新的`shardingsphere elasticjob`，相关包需要改为`org.apache.shardingsphere.elasticjob`；
 - feign升级为11.6版本；
+- `opentracing`移除，使用`opentelemetry`替代: `1.9.1`
 - TODO
+
+> `opentelemetry`是由两个开源项目`OpenTracing`和`OpenCensus`合并组成
 
 ## 兼容问题
 

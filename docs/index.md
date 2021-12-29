@@ -27,14 +27,10 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
     
     项目目前已经从多个git项目合并成一个（2021-09-01开始），减少维护的成本，提交issue和pr的请注意    
 
-    自`2021.2`开始，框架和巨灵神的引用不再放在一起，并只支持了`jdk-17`，即使用`2021.2`及后面的版本，需要在父POM添加如下并指定`java.version`：
+    自`2021.2`开始，框架和巨灵神的引用不再放在一起，并只支持了`jdk-17`：
 
     ```xml title="pom.xml"
     <project>
-        <properties>
-            <java.version>17</java.version>
-        </properties>
-
         <dependencyManagement>
             <dependencies>
                 <dependency>
@@ -46,13 +42,19 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
                 </dependency>
             </dependencies>
         </dependencyManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+        </plugins>
     </project>
     ```
 
 ## 发布版本
 
 - 2021.2 - 在开发中 `2021.2.0-SNAPSHOT`，基于`spring-boot-version`为`2.5.8`
-- 2021.1 - 推荐使用 `2021.1.16`，基于`spring-boot-version`为`2.3.12.RELEASE`
+- 2021.1 - 推荐使用 `2021.1.17`，基于`spring-boot-version`为`2.3.12.RELEASE`
 
 ??? abstract "Old versions(不推荐使用)"
 
