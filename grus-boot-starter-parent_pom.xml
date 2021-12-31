@@ -67,6 +67,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>17</java.version>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+        <grus.version>GRUS_VERSION</grus.version>
         <!--DO NOT change es version,because server version is 7.3.1-->
         <elasticsearch.version>7.3.1</elasticsearch.version>
         <!--DO NOT change kafka version,because server version is 2.8.0-->
