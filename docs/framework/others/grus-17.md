@@ -30,7 +30,6 @@
 
 3. maven-compiler-plugin里的11配置要去掉（如果有）：
 
-
     === "old"
 
         ```xml
@@ -86,13 +85,28 @@ management.endpoint.health.group.readiness.include=*
 management.endpoint.health.group.readiness.show-details=always
 management.endpoint.health.group.liveness.include=*
 management.endpoint.health.group.liveness.show-details=always
+#info信息，显示一些依赖项版本
+info.build.grus-version=@grus.version@
+info.build.java-version=@java.version@
 ```
 
 通过HTTP暴露的endpoint如下：
 
+- `127.0.0.1:8181/actuator/info`: 应用一些信息
 - `127.0.0.1:8181/actuator/health`: 健康检查及应用的一些相关信息
 - `127.0.0.1:8181/actuator/health/liveness`: 校验应用本身是否ok
 - `127.0.0.1:8181/actuator/health/readiness`: 校验应用依赖的db, redis等是否ok
+
+此时，请求info接口，会展示配置的各个依赖项版本，便于后期了解应用，返回如下：
+
+```json title="GET http://127.0.0.1:8181/actuator/info"
+{
+    "build":{
+        "grus-version":"2021.2.0-SNAPSHOT",
+        "java-version":"17"
+    }
+}
+```
 
 ## 依赖项升级
 
