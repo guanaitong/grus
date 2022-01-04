@@ -8,6 +8,7 @@ package com.ciicgat.grus.boot.autoconfigure.core;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.sdk.util.frigate.GroupBot;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
@@ -17,6 +18,7 @@ import java.util.Objects;
  * Created by August.Zhou on 2019-07-05 10:16.
  */
 @ConfigurationProperties(prefix = "grus.core")
+@Validated
 public class CoreProperties {
 
     /**
