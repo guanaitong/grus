@@ -30,6 +30,15 @@
 
 3. maven-compiler-plugin里的11配置要去掉（如果有）：
 
+    === "new"
+
+        ```xml
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+        </plugin>
+        ```
+
     === "old"
 
         ```xml
@@ -42,15 +51,6 @@
                 <target>11</target>
                 <encoding>UTF-8</encoding>
             </configuration>
-        </plugin>
-        ```
-
-    === "new"
-
-        ```xml
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
         </plugin>
         ```
 
@@ -69,6 +69,30 @@ java17没法再使用`cglib`的`beancopier`，故`grus-core`中的`BeanCopyUtil`
 - `org.junit.Assert`变更`org.junit.jupiter.api.Assertions`等等。
 
 使用`org.assertj.core.api.Assertions`等别的类库的断言类不会受影响。
+
+### Notify Robot
+
+优化了报警通知，使用企业微信的群机器人，替代原来的Frigate消息通知，实现更精准的通知（es中frigate消息仍然存在）。并提供了额外的通知方法，可在项目中使用，将内容发送到对应的企业微信群中。
+
+配置如下：
+
+```properties
+grus.core.group-bot-key=xxx-xx-xx-xx-xxx
+```
+
+> 该key来自于企业微信群机器人webhook地址url上参数key的值
+
+java方法如下：
+
+```
+Alert.send(String content);
+
+Alert.send(String content, Throwable throwable)
+```
+
+自`2021.2`版本开始，会强制要求设置该参数`grus.core.group-bot-key`，否则项目会启动报错。
+
+> 目前企业微信上frigate的消息过多且混在一起，不利于问题的发现与排查，故希望按项目与需要分群关注。一般在企业微信通知上的预警不一定是最全的，可能会因为企业微信的限流有所缺失，想查询全部的话，建议去对应的kibana查询。
 
 ### 安全检查
 
