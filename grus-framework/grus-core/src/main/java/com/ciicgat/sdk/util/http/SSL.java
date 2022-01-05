@@ -104,7 +104,7 @@ public class SSL {
     }
 
     private static SSLSocketFactory systemDefaultSslSocketFactory(X509TrustManager trustManager) throws NoSuchAlgorithmException, KeyManagementException {
-        SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+        SSLContext sslContext = SSLContext.getInstance("TLSv1.3");
         sslContext.init(null, new TrustManager[]{trustManager}, null);
         return sslContext.getSocketFactory();
     }
