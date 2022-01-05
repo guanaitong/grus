@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
@@ -68,12 +68,14 @@ public class ValidateControllerTest {
     public void testFormData() throws Exception {
         // 参数无效，验证失败
         MockHttpServletRequestBuilder post = MockMvcRequestBuilders.post("/validate/testFormData")
+                .param("personName", "我是张三，员工姓名")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .accept(MediaType.APPLICATION_JSON);
 
         MockHttpServletResponse response = mockMvc.perform(post).andReturn().getResponse();
         response.setCharacterEncoding("UTF-8");
         String content = response.getContentAsString();
+        //validation错误返回的顺序是随机的，并不是一定按照属性的顺序
         Assertions.assertTrue(content.contains("personId"));
         Assertions.assertTrue(content.contains("null"));
 
