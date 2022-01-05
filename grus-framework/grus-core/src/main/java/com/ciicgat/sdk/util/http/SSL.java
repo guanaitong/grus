@@ -54,12 +54,6 @@ public class SSL {
                         return;
                     }
                     try {
-                        X509Certificate x509Certificate = chain[0];
-                        String name = x509Certificate.getSubjectX500Principal().getName().toLowerCase();
-                        //信任关爱通的证书
-                        if (name.contains("guanaitong") || name.contains("ciicgat") || name.contains("4008885818")) {
-                            return;
-                        }
                         systemDefaultTrustManager.checkServerTrusted(chain, authType);
                     } catch (CertificateException e) {
                         throw e;
