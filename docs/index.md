@@ -66,7 +66,7 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
 
 升级时，grus 一般都会有较大的变动，并提供一些有用的新特性。升级前建议仔细阅读 Release Notes，如下是相关的跳转链接。
 
-- [2021.1 to 2022.0](https://gitlab.wuxingdev.cn/java/framework/grus/wikis/grus-2021.2-release-notes) - `TODO`
+- [2021.1 to 2022.0](https://gitlab.wuxingdev.cn/java/framework/grus/wikis/grus-2022.0-release-notes) - `TODO`
 - [old to 2021.1](https://gitlab.wuxingdev.cn/java/framework/grus/wikis/grus-2021.1-release-notes), 这是一个从历史老版本升级的简单汇总
 
 ??? example "老版本升级"

@@ -9,7 +9,7 @@
 
 ### POM修改
 
-1. grus版本必须使用`2021.2.0-SNAPTSHOT`
+1. grus版本必须使用`2022.0.0-SNAPSHOT`
 2. `pom.xml`里增加以下配置：
 
     ```xml
@@ -126,7 +126,7 @@ info.build.java-version=@java.version@
 ```json title="GET http://127.0.0.1:8181/actuator/info"
 {
     "build":{
-        "grus-version":"2021.2.0-SNAPSHOT",
+        "grus-version":"2022.0.0-SNAPSHOT",
         "java-version":"17"
     }
 }
