@@ -44,7 +44,7 @@ public class TestTraceThreadPoolExecutor {
 
         Runtime.getRuntime().addShutdownHook(new Thread(sdkTracerProvider::close));
         GlobalOpenTelemetry.resetForTest();
-        GlobalOpenTelemetry.set(sdk);
+        OpenTelemetrys.set(sdk);
     }
 
 
