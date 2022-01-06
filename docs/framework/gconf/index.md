@@ -32,9 +32,9 @@ title: 模块说明
 
 ```xml
 <dependency>
-  <artifactId>grus-gconf</artifactId>
-  <groupId>com.ciicgat.grus</groupId>
-  <version>${revision}</version>
+  <groupId>com.ciicgat.sdk.gconf</groupId>
+  <artifactId>gconf-java-client</artifactId>
+  <version>1.0.0</version>
 </dependency>
 ```
 
@@ -124,12 +124,6 @@ Set<String> result = configCollection.getBean("ips", new BeanLoader<Set<String>>
 import com.ciicgat.sdk.gconf.annotation.BeanFieldKey;
 import com.ciicgat.sdk.gconf.annotation.GConfBean;
 
-
-/**
- * @Author: Jiaju.Wei
- * @Date: Created in 2018/6/21
- * @Description:
- */
 @GConfBean(appId = "session", key = "redis.properties")
 public class RedisPropClazz  {
 
