@@ -5,6 +5,7 @@
 
 package com.ciicgat.sdk.mq;
 
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.rabbitmq.client.BuiltinExchangeType;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
@@ -41,7 +42,7 @@ public class TestMq {
 
         Runtime.getRuntime().addShutdownHook(new Thread(sdkTracerProvider::close));
         GlobalOpenTelemetry.resetForTest();
-        GlobalOpenTelemetry.set(sdk);
+        OpenTelemetrys.set(sdk);
     }
     @Test
     public void test() throws Exception {

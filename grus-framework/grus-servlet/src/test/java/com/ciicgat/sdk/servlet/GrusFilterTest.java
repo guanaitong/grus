@@ -6,6 +6,7 @@
 package com.ciicgat.sdk.servlet;
 
 import com.ciicgat.grus.json.JSON;
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
@@ -44,7 +45,7 @@ public class GrusFilterTest {
 
         Runtime.getRuntime().addShutdownHook(new Thread(sdkTracerProvider::close));
         GlobalOpenTelemetry.resetForTest();
-        GlobalOpenTelemetry.set(sdk);
+        OpenTelemetrys.set(sdk);
     }
 
     @BeforeEach
