@@ -32,9 +32,11 @@ public class OpenTelemetrys {
     }
 
     private static final AtomicBoolean SET_STATE = new AtomicBoolean(false);
+    
 
-    public static void setSetState() {
+    public static void set(OpenTelemetry openTelemetry) {
         SET_STATE.set(true);
+        GlobalOpenTelemetry.set(openTelemetry);
     }
 
     public static Tracer getTracer() {

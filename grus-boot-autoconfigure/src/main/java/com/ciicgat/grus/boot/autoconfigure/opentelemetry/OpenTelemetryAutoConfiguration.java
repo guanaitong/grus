@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Configuration;
  * Created by August.Zhou on 2019-03-25 14:55.
  */
 @Configuration(proxyBeanMethods = false)
-
 public class OpenTelemetryAutoConfiguration {
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenTelemetryAutoConfiguration.class);
 
@@ -33,8 +32,7 @@ public class OpenTelemetryAutoConfiguration {
     public static class NoopConfiguration {
         @Bean
         public OpenTelemetry openTelemetry() {
-            GlobalOpenTelemetry.set(OpenTelemetry.noop());
-            OpenTelemetrys.setSetState();
+            OpenTelemetrys.set(OpenTelemetry.noop());
             return GlobalOpenTelemetry.get();
         }
     }
@@ -52,8 +50,7 @@ public class OpenTelemetryAutoConfiguration {
         public OpenTelemetry openTelemetry(SdkTracerProvider sdkTracerProvider) {
             TextMapPropagator textMapPropagator = TextMapPropagator.composite(W3CTraceContextPropagator.getInstance(), JaegerPropagator.getInstance());
             OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
-            GlobalOpenTelemetry.set(sdk);
-            OpenTelemetrys.setSetState();
+            OpenTelemetrys.set(sdk);
             return sdk;
         }
     }
