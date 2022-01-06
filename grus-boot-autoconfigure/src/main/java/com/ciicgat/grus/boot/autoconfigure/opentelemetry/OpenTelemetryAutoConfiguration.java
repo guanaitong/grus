@@ -5,6 +5,7 @@
 
 package com.ciicgat.grus.boot.autoconfigure.opentelemetry;
 
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
@@ -33,6 +34,7 @@ public class OpenTelemetryAutoConfiguration {
         @Bean
         public OpenTelemetry openTelemetry() {
             GlobalOpenTelemetry.set(OpenTelemetry.noop());
+            OpenTelemetrys.setSetState();
             return GlobalOpenTelemetry.get();
         }
     }
@@ -51,6 +53,7 @@ public class OpenTelemetryAutoConfiguration {
             TextMapPropagator textMapPropagator = TextMapPropagator.composite(W3CTraceContextPropagator.getInstance(), JaegerPropagator.getInstance());
             OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
             GlobalOpenTelemetry.set(sdk);
+            OpenTelemetrys.setSetState();
             return sdk;
         }
     }
