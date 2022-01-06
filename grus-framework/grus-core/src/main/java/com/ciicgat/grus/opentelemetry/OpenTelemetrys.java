@@ -13,6 +13,8 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.context.propagation.TextMapPropagator;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Created by August.Zhou on 2021/12/17 17:53.
  */
@@ -29,9 +31,17 @@ public class OpenTelemetrys {
         return GlobalOpenTelemetry.get().getPropagators().getTextMapPropagator();
     }
 
+    private static final AtomicBoolean SET_STATE = new AtomicBoolean(false);
+
+    public static void setSetState() {
+        SET_STATE.set(true);
+    }
 
     public static Tracer getTracer() {
-        return GlobalOpenTelemetry.get().getTracer("grus-instrumentation", "1.0.0");
+        if (SET_STATE.get()) {
+            return GlobalOpenTelemetry.get().getTracer("grus-instrumentation", "1.0.0");
+        }
+        return OpenTelemetry.noop().getTracer("grus-instrumentation", "1.0.0");
     }
 
 
