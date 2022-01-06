@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
@@ -29,9 +29,19 @@ public class SqlProvider implements ProviderMethodResolver {
         return SqlProviderSupport.getSqlScript("insertAll", providerContext);
     }
 
+    public <T> String insertIgnore(ProviderContext providerContext, T entity) {
+        SqlProviderSupport.checkEntity(entity);
+        return SqlProviderSupport.getSqlScript("insertIgnore", providerContext);
+    }
+
     public String batchInsert(ProviderContext providerContext, Map<String, Object> paramMap) {
         SqlProviderSupport.checkEntityList(paramMap);
         return SqlProviderSupport.getSqlScript("batchInsert", providerContext);
+    }
+
+    public <T> String batchInsertIgnore(ProviderContext providerContext, T entity) {
+        SqlProviderSupport.checkEntity(entity);
+        return SqlProviderSupport.getSqlScript("batchInsertIgnore", providerContext);
     }
 
     public String delete(ProviderContext providerContext, Map<String, Object> paramMap) {
@@ -83,11 +93,13 @@ public class SqlProvider implements ProviderMethodResolver {
         return SqlProviderSupport.getSqlScript("getByExample", providerContext);
     }
 
-    public String list(ProviderContext providerContext) {
+    public String list(ProviderContext providerContext, Map<String, Object> paramMap) {
+        SqlProviderSupport.filterCondition(paramMap);
         return SqlProviderSupport.getSqlScript("list", providerContext);
     }
 
-    public String count(ProviderContext providerContext) {
+    public String count(ProviderContext providerContext, Map<String, Object> paramMap) {
+        SqlProviderSupport.filterCondition(paramMap);
         return SqlProviderSupport.getSqlScript("count", providerContext);
     }
 

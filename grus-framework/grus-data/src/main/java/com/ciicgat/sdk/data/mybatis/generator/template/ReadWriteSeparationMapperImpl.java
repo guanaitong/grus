@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
@@ -39,8 +39,18 @@ public class ReadWriteSeparationMapperImpl<T> implements BaseMapper<T> {
     }
 
     @Override
+    public int insertIgnore(T entity) {
+        return writeSqlSessionTemplate.insert(this.getStatement("insertIgnore"), entity);
+    }
+
+    @Override
     public int batchInsert(List<T> list) {
         return writeSqlSessionTemplate.insert(this.getStatement("batchInsert"), list);
+    }
+
+    @Override
+    public int batchInsertIgnore(List<T> list) {
+        return writeSqlSessionTemplate.insert(this.getStatement("batchInsertIgnore"), list);
     }
 
     @Override

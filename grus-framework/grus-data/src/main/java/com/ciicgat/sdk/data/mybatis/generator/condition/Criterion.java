@@ -1,12 +1,16 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
 package com.ciicgat.sdk.data.mybatis.generator.condition;
 
+import com.ciicgat.sdk.data.mybatis.generator.util.SqlUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.springframework.util.Assert;
+
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 条件明细
@@ -16,28 +20,79 @@ import java.util.Objects;
  */
 public class Criterion {
 
-    private String condition;
-
-    private Object value;
-
+    private final String property;
+    private final String condition;
+    private final SqlKeyword sqlKeyword;
+    private final Object value;
     private Object secondValue;
-
     private boolean noValue;
-
     private boolean singleValue;
-
     private boolean likeValue;
-
     private boolean betweenValue;
-
     private boolean listValue;
-
-    private String typeHandler;
-
     private SqlLike sqlLike;
 
-    public String getCondition() {
-        return condition;
+    private Criterion(String property, Object value, SqlKeyword sqlKeyword) {
+        Assert.notNull(property, "property is required");
+        Assert.notNull(sqlKeyword, "sqlKeyword is required");
+        this.property = property;
+        this.value = value;
+        this.sqlKeyword = sqlKeyword;
+        this.condition = parseCondition();
+    }
+
+    private String parseCondition() {
+        return SqlUtils.contactCondition(property, sqlKeyword);
+    }
+
+    protected static Criterion build(String property, Object value, SqlKeyword sqlKeyword) {
+        Criterion criterion = new Criterion(property, value, sqlKeyword);
+        if (value instanceof List<?>) {
+            criterion.listValue = true;
+        } else {
+            criterion.singleValue = true;
+        }
+        return criterion;
+    }
+
+    protected static Criterion buildNoValue(String property, SqlKeyword sqlKeyword) {
+        Criterion criterion = build(property, null, sqlKeyword);
+        criterion.noValue = true;
+        return criterion;
+    }
+
+    protected static Criterion buildLike(String property, Object value, SqlLike sqlLike, SqlKeyword sqlKeyword) {
+        Criterion criterion = build(property, value, sqlKeyword);
+        criterion.sqlLike = sqlLike;
+        criterion.likeValue = true;
+        return criterion;
+    }
+
+    protected static Criterion buildBetween(String property, Object value, Object secondValue, SqlKeyword sqlKeyword) {
+        Criterion criterion = build(property, value, sqlKeyword);
+        criterion.secondValue = secondValue;
+        criterion.betweenValue = true;
+        return criterion;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Criterion criterion = (Criterion) o;
+
+        return new EqualsBuilder().append(noValue, criterion.noValue).append(singleValue, criterion.singleValue).append(likeValue, criterion.likeValue).append(betweenValue, criterion.betweenValue).append(listValue, criterion.listValue).append(property, criterion.property).append(value, criterion.value).append(secondValue, criterion.secondValue).append(sqlLike, criterion.sqlLike).append(sqlKeyword, criterion.sqlKeyword).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37).append(property).append(value).append(secondValue).append(noValue).append(singleValue).append(likeValue).append(betweenValue).append(listValue).append(sqlLike).append(sqlKeyword).toHashCode();
+    }
+
+    public String getProperty() {
+        return property;
     }
 
     public Object getValue() {
@@ -64,10 +119,6 @@ public class Criterion {
         return listValue;
     }
 
-    public String getTypeHandler() {
-        return typeHandler;
-    }
-
     public boolean isLikeValue() {
         return likeValue;
     }
@@ -76,74 +127,11 @@ public class Criterion {
         return sqlLike;
     }
 
-    protected Criterion(String condition) {
-        super();
-        this.condition = condition;
-        this.typeHandler = null;
-        this.noValue = true;
+    public SqlKeyword getSqlKeyword() {
+        return sqlKeyword;
     }
 
-    protected Criterion(String condition, Object value, String typeHandler) {
-        this(condition, value, typeHandler, (SqlLike) null);
-    }
-
-    protected Criterion(String condition, Object value, String typeHandler, SqlLike sqlLike) {
-        super();
-        this.condition = condition;
-        this.value = value;
-        this.typeHandler = typeHandler;
-        if (Objects.nonNull(sqlLike)) {
-            this.likeValue = true;
-            this.sqlLike = sqlLike;
-        } else {
-            if (value instanceof List<?>) {
-                this.listValue = true;
-            } else {
-                this.singleValue = true;
-            }
-        }
-    }
-
-    protected Criterion(String condition, Object value) {
-        this(condition, value, (String) null);
-    }
-
-    protected Criterion(String condition, Object value, SqlLike sqlLike) {
-        this(condition, value, null, sqlLike);
-    }
-
-    protected Criterion(String condition, Object value, Object secondValue, String typeHandler) {
-        super();
-        this.condition = condition;
-        this.value = value;
-        this.secondValue = secondValue;
-        this.typeHandler = typeHandler;
-        this.betweenValue = true;
-    }
-
-    protected Criterion(String condition, Object value, Object secondValue) {
-        this(condition, value, secondValue, null);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Criterion criterion = (Criterion) o;
-        return noValue == criterion.noValue &&
-                singleValue == criterion.singleValue &&
-                likeValue == criterion.likeValue &&
-                betweenValue == criterion.betweenValue &&
-                listValue == criterion.listValue &&
-                Objects.equals(condition, criterion.condition) &&
-                Objects.equals(value, criterion.value) &&
-                Objects.equals(secondValue, criterion.secondValue) &&
-                Objects.equals(typeHandler, criterion.typeHandler) &&
-                sqlLike == criterion.sqlLike;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(condition, value, secondValue, noValue, singleValue, likeValue, betweenValue, listValue, typeHandler, sqlLike);
+    public String getCondition() {
+        return condition;
     }
 }

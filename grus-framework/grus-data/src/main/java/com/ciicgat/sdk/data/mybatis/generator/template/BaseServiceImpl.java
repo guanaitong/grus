@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
@@ -46,6 +46,12 @@ public class BaseServiceImpl<T> implements BaseService<T> {
     }
 
     @Override
+    public int insertIgnore(T entity) {
+        this.checkEntity(entity);
+        return baseMapper.insertIgnore(entity);
+    }
+
+    @Override
     public int save(T entity) {
         this.checkEntity(entity);
         return ReflectUtils.isIdNull(entity) ? this.insert(entity) : this.update(entity);
@@ -61,6 +67,12 @@ public class BaseServiceImpl<T> implements BaseService<T> {
     public int batchInsert(List<T> list) {
         this.checkEntityList(list);
         return baseMapper.batchInsert(list);
+    }
+
+    @Override
+    public int batchInsertIgnore(List<T> list) {
+        this.checkEntityList(list);
+        return baseMapper.batchInsertIgnore(list);
     }
 
     @Override

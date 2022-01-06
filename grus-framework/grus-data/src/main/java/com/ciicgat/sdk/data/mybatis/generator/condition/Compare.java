@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
@@ -32,26 +32,6 @@ public interface Compare<Children, R> extends Serializable {
      * @return children
      */
     Children ne(R column, Object val);
-
-    /**
-     * 等于 =
-     * (支持空字符串)
-     *
-     * @param column 字段
-     * @param val    值
-     * @return children
-     */
-    Children eqBlankable(R column, Object val);
-
-    /**
-     * 不等于 &lt;&gt;
-     * (支持空字符串)
-     *
-     * @param column 字段
-     * @param val    值
-     * @return children
-     */
-    Children neBlankable(R column, Object val);
 
     /**
      * 大于 &gt;

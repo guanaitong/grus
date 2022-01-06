@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
@@ -21,7 +21,7 @@ public class LambdaCriteria<T> extends GeneratedCriteria<T, SFunction<T, ?>, Lam
     }
 
     public LambdaCriteria eq(String column, Object val) {
-        this.addCriterion(this.contactCondition(column, SqlKeyword.EQ), val, column);
+        this.addCriterion(column, val, SqlKeyword.EQ);
         return this;
     }
 }
