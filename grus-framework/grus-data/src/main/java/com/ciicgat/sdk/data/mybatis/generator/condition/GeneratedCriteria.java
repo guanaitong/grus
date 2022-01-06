@@ -1,14 +1,12 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
 package com.ciicgat.sdk.data.mybatis.generator.condition;
 
 import com.ciicgat.sdk.data.mybatis.generator.util.SqlUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,7 +21,6 @@ import java.util.Objects;
  */
 @SuppressWarnings({"serial", "unchecked"})
 public abstract class GeneratedCriteria<T, R, Children> implements Compare<Children, R>, Func<Children, R> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GeneratedCriteria.class);
     /**
      * 占位符
      */
@@ -47,68 +44,39 @@ public abstract class GeneratedCriteria<T, R, Children> implements Compare<Child
         this.criteria = criteria;
     }
 
-    public void addCriterion(String condition) {
-        if (condition == null) {
-            throw new RuntimeException("Value for condition cannot be null");
-        }
-        criteria.add(new Criterion(condition));
-    }
-
-    protected void addCriterion(R column, SqlKeyword sqlKeyword) {
-        this.addCriterion(this.contactCondition(this.columnToString(column), sqlKeyword));
-    }
-
     protected void addCriterion(R column, SqlKeyword sqlKeyword, Object value) {
-        String columnName = this.columnToString(column);
-        this.addCriterion(this.contactCondition(columnName, sqlKeyword), value, columnName);
+        this.addCriterion(this.columnToString(column), value, sqlKeyword);
     }
 
-    protected void addCriterion(R column, SqlKeyword sqlKeyword, Object value, boolean ignoreBlankValue) {
-        String columnName = this.columnToString(column);
-        this.addCriterion(this.contactCondition(columnName, sqlKeyword), value, columnName, ignoreBlankValue);
+    protected void addCriterion(String property, Object value, SqlKeyword sqlKeyword) {
+        addCriterion(property, value, sqlKeyword, null, false);
     }
 
-    protected void addCriterion(R column, SqlKeyword sqlKeyword, Object value1, Object value2) {
-        String columnName = this.columnToString(column);
-        this.addCriterion(this.contactCondition(columnName, sqlKeyword), value1, value2, columnName);
+    protected void addNoValueCriterion(R column, SqlKeyword sqlKeyword) {
+        addCriterion(this.columnToString(column), null, sqlKeyword, null, true);
     }
 
-    protected void addCriterion(String condition, Object value, String property) {
-        addCriterion(condition, value, property, true);
+    protected void addBetweenCriterion(R column, SqlKeyword sqlKeyword, Object value, Object secondValue) {
+        Assert.notNull(value, "Between firstValue is required");
+        Assert.notNull(secondValue, "Between secondValue is required");
+        addCriterion(this.columnToString(column), value, sqlKeyword, secondValue, false);
     }
 
-    protected void addCriterion(String condition, Object value, String property, boolean ignoreBlankValue) {
-        if (value == null) {
-            LOGGER.debug("Value for '{}' is null, just skip this condition", property);
-            return;
+    protected void addCriterion(String property, Object value, SqlKeyword sqlKeyword, Object secondValue, boolean noValue) {
+        criteria.removeIf(x -> Objects.equals(x.getCondition(), SqlUtils.contactCondition(property, sqlKeyword)));
+        Criterion criterion;
+        if (Objects.nonNull(secondValue)) {
+            criterion = Criterion.buildBetween(property, value, secondValue, sqlKeyword);
+        } else if (noValue) {
+            criterion = Criterion.buildNoValue(property, sqlKeyword);
+        } else {
+            criterion = Criterion.build(property, value, sqlKeyword);
         }
-        if (ignoreBlankValue && (value instanceof String) && StringUtils.isBlank((String) value)) {
-            LOGGER.debug("Value for '{}' is blank, just skip this condition", property);
-            return;
-        }
-        criteria.removeIf(x -> Objects.equals(x.getCondition(), condition));
-        criteria.add(new Criterion(condition, value));
+        criteria.add(criterion);
     }
 
     protected void addLikeCriterion(SqlKeyword sqlKeyword, SqlLike sqlLike, Object value, R column) {
-        String columnName = this.columnToString(column);
-        if (value == null) {
-            LOGGER.debug("Value for '{}' is null, just skip this condition", columnName);
-            return;
-        }
-        criteria.add(new Criterion(this.contactCondition(columnName, sqlKeyword), value, sqlLike));
-    }
-
-    protected void addCriterion(String condition, Object value1, Object value2, String property) {
-        if (value1 == null || value2 == null) {
-            throw new RuntimeException("Between values for `" + property + "` cannot be null");
-        }
-        criteria.add(new Criterion(condition, value1, value2));
-    }
-
-    public String contactCondition(String columnName, SqlKeyword sqlKeyword) {
-        SqlUtils.checkColumnName(columnName);
-        return String.format("`%s` %s", columnName, sqlKeyword.getKeyword());
+        criteria.add(Criterion.buildLike(this.columnToString(column), value, sqlLike, sqlKeyword));
     }
 
     protected abstract String columnToString(R column);
@@ -122,18 +90,6 @@ public abstract class GeneratedCriteria<T, R, Children> implements Compare<Child
     @Override
     public Children ne(R column, Object val) {
         addCriterion(column, SqlKeyword.NE, val);
-        return typedThis;
-    }
-
-    @Override
-    public Children eqBlankable(R column, Object val) {
-        addCriterion(column, SqlKeyword.EQ, val, false);
-        return typedThis;
-    }
-
-    @Override
-    public Children neBlankable(R column, Object val) {
-        addCriterion(column, SqlKeyword.NE, val, false);
         return typedThis;
     }
 
@@ -163,13 +119,13 @@ public abstract class GeneratedCriteria<T, R, Children> implements Compare<Child
 
     @Override
     public Children between(R column, Object val1, Object val2) {
-        addCriterion(column, SqlKeyword.BETWEEN, val1, val2);
+        addBetweenCriterion(column, SqlKeyword.BETWEEN, val1, val2);
         return typedThis;
     }
 
     @Override
     public Children notBetween(R column, Object val1, Object val2) {
-        addCriterion(column, SqlKeyword.NOT_BETWEEN, val1, val2);
+        addBetweenCriterion(column, SqlKeyword.NOT_BETWEEN, val1, val2);
         return typedThis;
     }
 
@@ -199,25 +155,25 @@ public abstract class GeneratedCriteria<T, R, Children> implements Compare<Child
 
     @Override
     public Children isNull(R column) {
-        addCriterion(column, SqlKeyword.IS_NULL);
+        addNoValueCriterion(column, SqlKeyword.IS_NULL);
         return typedThis;
     }
 
     @Override
     public Children isNotNull(R column) {
-        addCriterion(column, SqlKeyword.IS_NOT_NULL);
+        addNoValueCriterion(column, SqlKeyword.IS_NOT_NULL);
         return typedThis;
     }
 
     @Override
     public Children isBlank(R column) {
-        addCriterion(column, SqlKeyword.EQ, "", false);
+        addCriterion(column, SqlKeyword.EQ, "");
         return typedThis;
     }
 
     @Override
     public Children isNotBlank(R column) {
-        addCriterion(column, SqlKeyword.NE, "", false);
+        addCriterion(column, SqlKeyword.NE, "");
         return typedThis;
     }
 

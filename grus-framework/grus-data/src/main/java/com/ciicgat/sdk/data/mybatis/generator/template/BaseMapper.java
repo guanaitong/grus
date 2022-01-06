@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
@@ -52,6 +52,18 @@ public interface BaseMapper<T> {
     int insertAll(T entity);
 
     /**
+     * 选择性插入且忽略错误
+     * <p>
+     * 仅插入非null字段
+     *
+     * @param entity 实体
+     * @return
+     */
+    @InsertProvider(SqlProvider.class)
+    @Options(useGeneratedKeys = USE_GENERATED_KEYS, keyProperty = KEY_PROPERTY)
+    int insertIgnore(T entity);
+
+    /**
      * 批量选择性插入
      *
      * @param list 实体列表
@@ -60,6 +72,16 @@ public interface BaseMapper<T> {
     @InsertProvider(SqlProvider.class)
     @Options(useGeneratedKeys = USE_GENERATED_KEYS, keyProperty = KEY_PROPERTY)
     int batchInsert(@Param("list") List<T> list);
+
+    /**
+     * 批量选择性插入且忽略错误
+     *
+     * @param list 实体列表
+     * @return
+     */
+    @InsertProvider(SqlProvider.class)
+    @Options(useGeneratedKeys = USE_GENERATED_KEYS, keyProperty = KEY_PROPERTY)
+    int batchInsertIgnore(@Param("list") List<T> list);
 
     /**
      * 根据ID删除

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<sqls>
+<!--
+  ~ Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
+  ~ All rights reserved.
+  -->
 
-    <sql id="insertAll">
-        INSERT INTO `@{tableName}` (@{fieldsString})
-        VALUES
-        (@{fieldsParamString})
-    </sql>
+<sqls>
 
     <sql id="insert">
         <![CDATA[
@@ -20,9 +19,37 @@
         ]]>
     </sql>
 
+    <sql id="insertAll">
+        INSERT INTO `@{tableName}` (@{fieldsString})
+        VALUES
+        (@{fieldsParamString})
+    </sql>
+
+    <sql id="insertIgnore">
+        <![CDATA[
+        INSERT IGNORE INTO `@{tableName}`
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            @{conditionalFieldsString}
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            @{conditionalFieldsParamString}
+        </trim>
+        ]]>
+    </sql>
+
     <sql id="batchInsert">
         <![CDATA[
         INSERT INTO `@{tableName}` (@{fieldsString})
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (@{itemFieldsParamString})
+        </foreach>
+        ]]>
+    </sql>
+
+    <sql id="batchInsertIgnore">
+        <![CDATA[
+        INSERT IGNORE INTO `@{tableName}` (@{fieldsString})
         VALUES
         <foreach collection="list" item="item" separator=",">
             (@{itemFieldsParamString})

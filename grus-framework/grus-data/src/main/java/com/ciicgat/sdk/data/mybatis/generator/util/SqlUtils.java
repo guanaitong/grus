@@ -1,10 +1,11 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
 package com.ciicgat.sdk.data.mybatis.generator.util;
 
+import com.ciicgat.sdk.data.mybatis.generator.condition.SqlKeyword;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,10 +127,10 @@ public class SqlUtils {
         Objects.requireNonNull(template);
         Objects.requireNonNull(paramMap);
         Matcher m = pattern.matcher(template);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (m.find()) {
             String group = m.group(2);
-            String value = paramMap.get(group);
+            String value = paramMap.getOrDefault(group, "");
             m.appendReplacement(sb, value);
         }
         m.appendTail(sb);
@@ -165,5 +166,12 @@ public class SqlUtils {
             return StringUtils.EMPTY;
         }
         return param.substring(0, 1).toUpperCase() + param.substring(1);
+    }
+
+    public static String contactCondition(String columnName, SqlKeyword sqlKeyword) {
+        Assert.notNull(columnName, "columnName is required");
+        Assert.notNull(sqlKeyword, "sqlKeyword is required");
+        SqlUtils.checkColumnName(columnName);
+        return String.format("`%s` %s", columnName, sqlKeyword.getKeyword());
     }
 }

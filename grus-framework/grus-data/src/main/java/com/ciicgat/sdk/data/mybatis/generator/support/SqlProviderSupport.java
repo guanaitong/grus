@@ -1,11 +1,13 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
 package com.ciicgat.sdk.data.mybatis.generator.support;
 
 import com.ciicgat.sdk.data.mybatis.generator.condition.ConditionExample;
+import com.ciicgat.sdk.data.mybatis.generator.condition.Criterion;
+import com.ciicgat.sdk.data.mybatis.generator.condition.GeneratedCriteria;
 import com.ciicgat.sdk.data.mybatis.generator.util.ReflectUtils;
 import com.ciicgat.sdk.data.mybatis.generator.util.SqlUtils;
 import org.apache.ibatis.builder.annotation.ProviderContext;
@@ -29,18 +31,29 @@ public class SqlProviderSupport {
     private static final Map<String, String> SQL_CACHE = new ConcurrentHashMap<>();
 
     public static String getSqlScript(String method, ProviderContext providerContext) {
-        return getSqlScript(method, getEntityClassFromProviderContext(providerContext));
+        return doGetSqlScript(method, getEntityClassFromProviderContext(providerContext), null);
     }
 
-    public static String getSqlScript(String method, Class<?> entityClass) {
+    public static String getSqlScript(String method, ProviderContext providerContext, Map<String, String> extendParam) {
+        return doGetSqlScript(method, getEntityClassFromProviderContext(providerContext), extendParam);
+    }
+
+    public static String doGetSqlScript(String method, Class<?> entityClass, Map<String, String> extendParam) {
         return SqlProviderSupport.getSqlScript(method, entityClass, () -> {
             ReflectEntity reflectEntity = ReflectUtils.resolveEntity(entityClass);
             ReflectEntityHelper reflectEntityHelper = reflectEntity.getReflectEntityHelper();
             Map<String, String> paramMap = reflectEntityHelper.getVariableMap();
+            injectExtendParam(paramMap, extendParam);
             String sqlSegment = SqlUtils.getSqlSegmentMap().get(method);
             Objects.requireNonNull(sqlSegment, String.format("sqlSegment named '%s' is not exist", method));
             return SqlUtils.resolveMapperScript(sqlSegment, paramMap);
         });
+    }
+
+    private static void injectExtendParam(Map<String, String> paramMap, Map<String, String> extendParam) {
+        if (Objects.nonNull(extendParam) && !extendParam.isEmpty()) {
+            paramMap.putAll(extendParam);
+        }
     }
 
     public static String getSqlScript(String method, Class<?> clazz, Supplier<String> supplier) {
@@ -86,7 +99,36 @@ public class SqlProviderSupport {
     public static void checkCondition(Map<String, Object> paramMap) {
         ConditionExample example = (ConditionExample) paramMap.get("example");
         Assert.notNull(example, "example cant be null");
-        Assert.isTrue(example.getOredCriteria().size() > 0, "Condition can't be empty");
+        List<GeneratedCriteria> oredCriteria = example.getOredCriteria();
+        Assert.isTrue(oredCriteria.size() > 0, "Condition can't be empty");
+        for (GeneratedCriteria oredCriterion : oredCriteria) {
+            oredCriterion.getCriteria().forEach(x -> {
+                Criterion criterion = (Criterion) x;
+                if (!criterion.isNoValue()) {
+                    Assert.notNull(criterion.getValue(), String.format("Value for '%s' can't be null", criterion.getProperty()));
+                }
+            });
+        }
+    }
+
+    /**
+     * 过滤条件, 过滤值为空的条件
+     *
+     * @param paramMap 参数map
+     */
+    public static void filterCondition(Map<String, Object> paramMap) {
+        ConditionExample example = (ConditionExample) paramMap.get("example");
+        Assert.notNull(example, "example cant be null");
+        List<GeneratedCriteria> oredCriteria = example.getOredCriteria();
+        if (oredCriteria.size() == 0) {
+            return;
+        }
+        for (GeneratedCriteria oredCriterion : oredCriteria) {
+            oredCriterion.getCriteria().removeIf(x -> {
+                Criterion criterion = (Criterion) x;
+                return !criterion.isNoValue() && Objects.isNull(criterion.getValue());
+            });
+        }
     }
 
     /**

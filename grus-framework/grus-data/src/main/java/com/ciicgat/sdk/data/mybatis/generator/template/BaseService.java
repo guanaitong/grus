@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
@@ -40,6 +40,16 @@ public interface BaseService<T> {
     int insertAll(T entity);
 
     /**
+     * 选择性插入且忽略错误
+     * <p>
+     * 仅插入非null字段
+     *
+     * @param entity 实体
+     * @return
+     */
+    int insertIgnore(T entity);
+
+    /**
      * 选择性保存
      * <p>entity.id = null  -> 插入</p>
      * <p>entity.id != null -> 更新</p>
@@ -66,6 +76,14 @@ public interface BaseService<T> {
      * @return
      */
     int batchInsert(List<T> list);
+
+    /**
+     * 批量选择性插入且忽略错误
+     *
+     * @param list 实体列表
+     * @return
+     */
+    int batchInsertIgnore(List<T> list);
 
     /**
      * 根据ID删除
