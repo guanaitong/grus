@@ -157,7 +157,6 @@ nav:
           - Velocity使用说明: framework/web/grus-velocity.md
       - job:
           - framework/job/index.md
-          - ElasticJob介绍: framework/job/elasticjob.md
       - 单元测试:
           - framework/test/index.md
       - 微服务流量控制:
