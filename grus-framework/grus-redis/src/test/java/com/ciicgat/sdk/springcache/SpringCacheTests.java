@@ -26,6 +26,7 @@ import javax.annotation.Resource;
 import java.net.URL;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 /**
  * Created by August.Zhou on 2018-11-15 13:19.
@@ -284,5 +285,37 @@ public class SpringCacheTests {
         String four = cacheService.getRandomCacheRefresher(uid, 4);
 //        Assertions.assertEquals(four, third);
         Assertions.assertTrue(four.startsWith("3"));
+    }
+
+    @Test
+    public void test_getWithCacheFallBack() {
+        AbstractCache<?> abstractCache = (AbstractCache) frequencyAsyncCache;
+
+        String uid = UUID.randomUUID().toString();
+        String value = abstractCache.getWithCacheFallBack(uid, () -> uid);
+        Assert.assertEquals(uid, value);
+        String value2 = abstractCache.getWithCacheFallBack(uid, new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                throw new RuntimeException("x");
+            }
+        });
+        Assert.assertEquals(uid, value2);
+
+        Integer value3 = abstractCache.getWithCacheFallBack(UUID.randomUUID().toString(), new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                throw new RuntimeException("x");
+            }
+        });
+        Assert.assertNull(value3);
+
+        Integer value4 = abstractCache.getWithCacheFallBack((CacheKey) () -> UUID.randomUUID().toString(), new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                throw new RuntimeException("x");
+            }
+        });
+        Assert.assertNull(value4);
     }
 }

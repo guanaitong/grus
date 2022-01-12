@@ -199,6 +199,15 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         return this.redisConnectionFactory;
     }
 
+    /**
+     * 先从缓存取数据，如果为空则从valueLoader取
+     * 该方法有命中缓存后触发刷新机制。看RefreshPolicy
+     *
+     * @param key
+     * @param valueLoader
+     * @param <T>
+     * @return
+     */
     @Override
     public final <T> T get(final Object key, final Callable<T> valueLoader) {
         String actualKey;
@@ -228,6 +237,44 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
                 return applyCall(valueLoader);
             }
         }
+    }
+
+    /**
+     * 行为和上面的get方法相反。先走valueLoader，然后put进缓存。如果失败会走缓存。
+     *
+     * @param key
+     * @param valueLoader
+     * @param <T>
+     * @return
+     */
+    public final <T> T getWithCacheFallBack(final Object key, final Callable<T> valueLoader) {
+        String actualKey;
+        if (key instanceof CacheKey) {
+            actualKey = ((CacheKey) key).cacheKey();
+        } else {
+            actualKey = key.toString();
+        }
+        try {
+            T value = valueLoader.call();
+            put(actualKey, value);
+            return value;
+        } catch (Exception e) {
+            LOGGER.warn("call failed {}", key, e);
+            final Cache.ValueWrapper valueWrapper = get(actualKey);
+            if (valueWrapper == null) {
+                return null;
+            } else {
+                Object cacheValue = valueWrapper.get();
+                try {
+                    return (T) cacheValue;
+                } catch (ClassCastException ex) {
+                    if (cacheValue != null) {
+                        LOGGER.error("NOTICE:class has changed,original class from cache is {}, you can update cache name to avoid this exception", cacheValue.getClass());
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private <T> T applyCall(final Callable<T> valueLoader) {
