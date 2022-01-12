@@ -11,4 +11,8 @@ package com.ciicgat.sdk.springcache;
  */
 public interface CacheKey {
     String cacheKey();
+
+    static String key(Object key) {
+        return key instanceof CacheKey ? ((CacheKey) key).cacheKey() : key.toString();
+    }
 }

@@ -210,32 +210,19 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
      */
     @Override
     public final <T> T get(final Object key, final Callable<T> valueLoader) {
-        String actualKey;
-        if (key instanceof CacheKey) {
-            actualKey = ((CacheKey) key).cacheKey();
-        } else {
-            actualKey = key.toString();
-        }
-        final Cache.ValueWrapper valueWrapper = get(actualKey);
+        String stringKey = CacheKey.key(key);
+        final Cache.ValueWrapper valueWrapper = get(stringKey);
         if (valueWrapper == null) {
             Object o = applyCall(valueLoader);
-            put(actualKey, o);
-            this.refreshPolicy.recordCacheInit(isGlobalRefreshPolicy, this, actualKey);
+            put(stringKey, o);
+            this.refreshPolicy.recordCacheInit(isGlobalRefreshPolicy, this, stringKey);
             return (T) o;
         } else {
-            boolean mayRefresh = refreshPolicy.mayRefresh(isGlobalRefreshPolicy, this, actualKey);
+            boolean mayRefresh = refreshPolicy.mayRefresh(isGlobalRefreshPolicy, this, stringKey);
             if (mayRefresh) {
-                compareThenRefresh(actualKey, valueWrapper, (Callable<Object>) valueLoader);
+                compareThenRefresh(stringKey, valueWrapper, (Callable<Object>) valueLoader);
             }
-            Object cacheValue = valueWrapper.get();
-            try {
-                return (T) cacheValue;
-            } catch (ClassCastException ex) {
-                if (cacheValue != null) {
-                    LOGGER.error("NOTICE:class has changed,original class from cache is {}, you can update cache name to avoid this exception", cacheValue.getClass());
-                }
-                return applyCall(valueLoader);
-            }
+            return (T) valueWrapper.get();
         }
     }
 
@@ -248,33 +235,16 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
      * @return
      */
     public final <T> T getWithCacheFallBack(final Object key, final Callable<T> valueLoader) {
-        String actualKey;
-        if (key instanceof CacheKey) {
-            actualKey = ((CacheKey) key).cacheKey();
-        } else {
-            actualKey = key.toString();
-        }
+        String stringKey = CacheKey.key(key);
         try {
             T value = valueLoader.call();
-            put(actualKey, value);
+            put(stringKey, value);
             return value;
         } catch (Exception e) {
-            LOGGER.warn("call failed {}", key, e);
-            final Cache.ValueWrapper valueWrapper = get(actualKey);
-            if (valueWrapper == null) {
-                return null;
-            } else {
-                Object cacheValue = valueWrapper.get();
-                try {
-                    return (T) cacheValue;
-                } catch (ClassCastException ex) {
-                    if (cacheValue != null) {
-                        LOGGER.error("NOTICE:class has changed,original class from cache is {}, you can update cache name to avoid this exception", cacheValue.getClass());
-                    }
-                }
-            }
+            LOGGER.warn("call failed,cache {},key {}", this.name, key, e);
+            final Cache.ValueWrapper valueWrapper = get(stringKey);
+            return valueWrapper == null ? null : (T) valueWrapper.get();
         }
-        return null;
     }
 
     private <T> T applyCall(final Callable<T> valueLoader) {
