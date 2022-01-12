@@ -293,14 +293,14 @@ public class SpringCacheTests {
 
         String uid = UUID.randomUUID().toString();
         String value = abstractCache.getWithCacheFallBack(uid, () -> uid);
-        Assert.assertEquals(uid, value);
+        Assertions.assertEquals(uid, value);
         String value2 = abstractCache.getWithCacheFallBack(uid, new Callable<String>() {
             @Override
             public String call() throws Exception {
                 throw new RuntimeException("x");
             }
         });
-        Assert.assertEquals(uid, value2);
+        Assertions.assertEquals(uid, value2);
 
         Integer value3 = abstractCache.getWithCacheFallBack(UUID.randomUUID().toString(), new Callable<Integer>() {
             @Override
@@ -308,7 +308,7 @@ public class SpringCacheTests {
                 throw new RuntimeException("x");
             }
         });
-        Assert.assertNull(value3);
+        Assertions.assertNull(value3);
 
         Integer value4 = abstractCache.getWithCacheFallBack((CacheKey) () -> UUID.randomUUID().toString(), new Callable<Integer>() {
             @Override
@@ -316,6 +316,6 @@ public class SpringCacheTests {
                 throw new RuntimeException("x");
             }
         });
-        Assert.assertNull(value4);
+        Assertions.assertNull(value4);
     }
 }
