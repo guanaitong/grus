@@ -82,16 +82,28 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
     private static final int DEFAULT_LOCAL_EXPIRE_SECONDS = 3600;
     private static final long DEFAULT_LOCAL_MAX_SIZE = 40960L;
 
+    /**
+     * 本地缓存
+     * @return
+     */
     public static Local local() {
         return new Local();
     }
 
+    /**
+     * redis缓存
+     * @return
+     */
     public static Redis<? extends Redis> redis() {
         return new Redis<>();
     }
 
-    public static LocalRedis localRedis() {
-        return new LocalRedis();
+    /**
+     * 二级缓存（本地+redis）
+     * @return
+     */
+    public static L2 l2() {
+        return new L2();
     }
 
     public abstract AbstractCache newCache(String name, RedisCacheManager redisCacheManager);
@@ -197,7 +209,7 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
     /**
      * LocalRedis-specific cache properties.
      */
-    public static class LocalRedis extends Redis<LocalRedis> {
+    public static class L2 extends Redis<L2> {
         /**
          * 是否序列化value，如果为否，那么缓存的value为对象，如果是，那么缓存的value为对象序列化后的字节数组
          * 不使用序列化性能更加高。但是需要保证返回的值，不能做修改。
@@ -219,14 +231,14 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
          */
         private int initialCapacity = DEFAULT_LOCAL_INIT_SIZE;
 
-        LocalRedis() {
+        L2() {
         }
 
         public boolean isSerialize() {
             return serialize;
         }
 
-        public LocalRedis setSerialize(boolean serialize) {
+        public L2 setSerialize(boolean serialize) {
             this.serialize = serialize;
             return this;
         }
@@ -235,7 +247,7 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
             return maximumSize;
         }
 
-        public LocalRedis setMaximumSize(long maximumSize) {
+        public L2 setMaximumSize(long maximumSize) {
             this.maximumSize = maximumSize;
             return this;
         }
@@ -244,7 +256,7 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
             return localExpireSeconds;
         }
 
-        public LocalRedis setLocalExpireSeconds(int localExpireSeconds) {
+        public L2 setLocalExpireSeconds(int localExpireSeconds) {
             this.localExpireSeconds = localExpireSeconds;
             return this;
         }
@@ -254,7 +266,7 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
             return initialCapacity;
         }
 
-        public LocalRedis setInitialCapacity(int initialCapacity) {
+        public L2 setInitialCapacity(int initialCapacity) {
             this.initialCapacity = initialCapacity;
             return this;
         }

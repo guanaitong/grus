@@ -19,11 +19,11 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * Created by August.Zhou on 2020/12/15 15:46.
  */
-public class L2Cache extends RedisCache<CacheConfig.LocalRedis> implements ILocalCache {
+public class L2Cache extends RedisCache<CacheConfig.L2> implements ILocalCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(L2Cache.class);
     private final com.github.benmanes.caffeine.cache.Cache<Object, Object> localCache;
 
-    public L2Cache(String name, RedisCacheManager redisCacheManager, CacheConfig.LocalRedis localRedis) {
+    public L2Cache(String name, RedisCacheManager redisCacheManager, CacheConfig.L2 localRedis) {
         super(name, redisCacheManager, localRedis);
 
         Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
