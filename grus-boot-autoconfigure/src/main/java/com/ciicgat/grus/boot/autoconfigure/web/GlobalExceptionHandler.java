@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -77,9 +79,9 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(FeignException.class)
-    public ApiResponse<Object> handleFeignException(FeignException e) {
+    public ResponseEntity<ApiResponse<Object>> handleFeignException(FeignException e) {
         LOGGER.error("error", e);
-        return ApiResponse.fail(new StandardErrorCode(webProperties.getErrorCodePrefix(), 4, 0, "依赖服务异常"));
+        return fail(HttpStatus.INTERNAL_SERVER_ERROR, new StandardErrorCode(webProperties.getErrorCodePrefix(), 4, 0, "依赖服务异常"));
     }
 
 
@@ -106,11 +108,7 @@ public class GlobalExceptionHandler {
      * @param e
      * @return
      */
-    @ExceptionHandler({
-            ServletException.class,
-            MissingServletRequestParameterException.class,
-            HttpRequestMethodNotSupportedException.class,
-            NoHandlerFoundException.class})
+    @ExceptionHandler({ServletException.class, MissingServletRequestParameterException.class, HttpRequestMethodNotSupportedException.class, NoHandlerFoundException.class})
     public ApiResponse<Object> handleServletException(ServletException e) {
         LOGGER.warn("error", e);
         String errorMsg = "请求格式不正确";
@@ -128,10 +126,7 @@ public class GlobalExceptionHandler {
      * @param e
      * @return
      */
-    @ExceptionHandler({
-            TypeMismatchException.class,
-            MethodArgumentTypeMismatchException.class,
-            MethodArgumentConversionNotSupportedException.class})
+    @ExceptionHandler({TypeMismatchException.class, MethodArgumentTypeMismatchException.class, MethodArgumentConversionNotSupportedException.class})
     public ApiResponse<Object> handleTypeMismatchException(TypeMismatchException e) {
         LOGGER.warn("TypeMismatchException, error: " + e.getMessage());
         return ApiResponse.fail(new StandardErrorCode(webProperties.getErrorCodePrefix(), 2, 0, "前端参数错误"));
@@ -191,11 +186,11 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler
-    public ApiResponse<Object> handleThrowable(HttpServletRequest request, Throwable throwable) {
+    public ResponseEntity<ApiResponse<Object>> handleThrowable(HttpServletRequest request, Throwable throwable) {
         //为了应用迁移方便
         if (throwable instanceof ErrorCode errorCode) {
             LOGGER.warn("{}, errorCode {} errorMsg {}", throwable.getClass().getSimpleName(), ((ErrorCode) throwable).getErrorCode(), ((ErrorCode) throwable).getErrorMsg());
-            return ApiResponse.fail(errorCode);
+            return fail(HttpStatus.OK, errorCode);
         }
 
         StringBuffer requestInfo = request.getRequestURL();
@@ -208,7 +203,11 @@ public class GlobalExceptionHandler {
         if (throwable instanceof SQLException) {
             errorMsg = "数据库异常";
         }
-        return ApiResponse.fail(new StandardErrorCode(webProperties.getErrorCodePrefix(), 1, 0, errorMsg));
+        return fail(HttpStatus.SERVICE_UNAVAILABLE, new StandardErrorCode(webProperties.getErrorCodePrefix(), 1, 0, errorMsg));
+    }
+
+    private ResponseEntity<ApiResponse<Object>> fail(HttpStatus status, ErrorCode errorCode) {
+        return ResponseEntity.status(status).body(ApiResponse.fail(errorCode));
     }
 
 
