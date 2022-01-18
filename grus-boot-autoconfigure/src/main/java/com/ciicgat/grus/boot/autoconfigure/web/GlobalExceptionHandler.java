@@ -57,6 +57,22 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 一般是当前系统业务异常
+     *
+     * @param e
+     * @return
+     */
+    @ExceptionHandler(BusinessRuntimeException.class)
+    public ApiResponse<Object> handleBusinessRuntimeException(BusinessRuntimeException e) {
+        if (webProperties.isPrintBusinessErrorStack()) {
+            LOGGER.warn(e.toString(), e);
+        } else {
+            LOGGER.warn("BusinessRuntimeException, errorCode {} errorMsg {}", e.getErrorCode(), e.getErrorMsg());
+        }
+        return ApiResponse.fail(e);
+    }
+
+    /**
      * 一般是依赖服务业务异常
      *
      * @param e
@@ -84,24 +100,6 @@ public class GlobalExceptionHandler {
         return fail(HttpStatus.INTERNAL_SERVER_ERROR, new StandardErrorCode(webProperties.getErrorCodePrefix(), 4, 0, "依赖服务异常"));
     }
 
-
-    /**
-     * 一般是当前系统业务异常
-     *
-     * @param e
-     * @return
-     */
-    @ExceptionHandler(BusinessRuntimeException.class)
-    public ApiResponse<Object> handleBusinessRuntimeException(BusinessRuntimeException e) {
-        if (webProperties.isPrintBusinessErrorStack()) {
-            LOGGER.warn(e.toString(), e);
-        } else {
-            LOGGER.warn("BusinessRuntimeException, errorCode {} errorMsg {}", e.getErrorCode(), e.getErrorMsg());
-        }
-        return ApiResponse.fail(e);
-    }
-
-
     /**
      * 一般ServletException都是http请求方式不对引起的异常，可以认为是参数错误
      *
@@ -109,14 +107,14 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler({ServletException.class, MissingServletRequestParameterException.class, HttpRequestMethodNotSupportedException.class, NoHandlerFoundException.class})
-    public ApiResponse<Object> handleServletException(ServletException e) {
+    public ResponseEntity<ApiResponse<Object>> handleServletException(ServletException e) {
         LOGGER.warn("error", e);
         String errorMsg = "请求格式不正确";
         if (e.getClass() == MissingServletRequestParameterException.class) {
             errorMsg = "请求参数缺失";
         }
-
-        return ApiResponse.fail(new StandardErrorCode(webProperties.getErrorCodePrefix(), 2, 0, errorMsg));
+        HttpStatus status = e instanceof HttpRequestMethodNotSupportedException ? HttpStatus.METHOD_NOT_ALLOWED : HttpStatus.BAD_REQUEST;
+        return fail(status, new StandardErrorCode(webProperties.getErrorCodePrefix(), 2, 0, errorMsg));
     }
 
 
@@ -127,9 +125,9 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler({TypeMismatchException.class, MethodArgumentTypeMismatchException.class, MethodArgumentConversionNotSupportedException.class})
-    public ApiResponse<Object> handleTypeMismatchException(TypeMismatchException e) {
+    public ResponseEntity<ApiResponse<Object>> handleTypeMismatchException(TypeMismatchException e) {
         LOGGER.warn("TypeMismatchException, error: " + e.getMessage());
-        return ApiResponse.fail(new StandardErrorCode(webProperties.getErrorCodePrefix(), 2, 0, "前端参数错误"));
+        return fail(HttpStatus.BAD_REQUEST, new StandardErrorCode(webProperties.getErrorCodePrefix(), 2, 0, "前端参数错误"));
     }
 
     @ExceptionHandler(BindException.class)
