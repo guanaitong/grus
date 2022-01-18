@@ -121,9 +121,9 @@ public class CacheApplication {
         redisCacheConfig.setCacheConfigFunc(name -> {
             switch (name) {
                 case "uidCache":
-                    return CacheConfig.localRedis().setExpireSeconds(600);
+                    return CacheConfig.l2().setExpireSeconds(600);
             }
-            return CacheConfig.localRedis();
+            return CacheConfig.l2();
         });
         return new RedisCacheManager(redisCacheConfig);
     }
@@ -147,14 +147,14 @@ public class CacheApplication {
                 case "useRedisCache":
                     return CacheConfig.redis().setExpireSeconds(600);
                 case "useLocalCacheSerialize":
-                    return CacheConfig.localRedis().setExpireSeconds(600).setLocalExpireSeconds(120).setSerialize(true);
+                    return CacheConfig.l2().setExpireSeconds(600).setLocalExpireSeconds(120).setSerialize(true);
                 case "useLocalCache":
                     return CacheConfig.local().setCacheNull(true).setExpireSeconds(60);
                 case "useLocalCacheNoExpire":
                     return CacheConfig.local().setExpireSeconds(0);
             }
 
-            return CacheConfig.localRedis().setSerialize(false);
+            return CacheConfig.l2().setSerialize(false);
         });
         redisCacheConfig.setRefreshExecutor(() -> Runnable::run);
         redisCacheConfig.setRefreshPolicy(RefreshPolicy.frequency(2));
