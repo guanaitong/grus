@@ -65,6 +65,7 @@ public class Criterion {
         Criterion criterion = build(property, value, sqlKeyword);
         criterion.sqlLike = sqlLike;
         criterion.likeValue = true;
+        criterion.singleValue = false;
         return criterion;
     }
 
@@ -72,6 +73,7 @@ public class Criterion {
         Criterion criterion = build(property, value, sqlKeyword);
         criterion.secondValue = secondValue;
         criterion.betweenValue = true;
+        criterion.singleValue = false;
         return criterion;
     }
 
