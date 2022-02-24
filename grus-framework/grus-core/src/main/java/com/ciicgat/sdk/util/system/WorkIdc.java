@@ -9,7 +9,7 @@ package com.ciicgat.sdk.util.system;
  * Created by August.Zhou on 2017/12/14 9:49.
  */
 public enum WorkIdc {
-    OFC, JX, SH, ALI;
+    OFC, SH, ALI;
 
     private final String innerDomainSuffix;
 

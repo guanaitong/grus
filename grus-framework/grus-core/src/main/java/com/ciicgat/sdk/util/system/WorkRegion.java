@@ -39,8 +39,6 @@ public class WorkRegion {
             publicDomainSuffix = "dev";
         } else if (workEnv == WorkEnv.PRODUCT || workEnv == WorkEnv.PREPARE) {
             publicDomainSuffix = "com";
-        } else if (workEnv == WorkEnv.TEST && workIdc == WorkIdc.JX) {
-            publicDomainSuffix = "cc";
         } else if (workEnv == WorkEnv.TEST && workIdc == WorkIdc.ALI) {
             publicDomainSuffix = "tech";
         }
