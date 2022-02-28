@@ -19,7 +19,11 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
 
 在`grus`版本`2021.1.x`及以前，使用`jdk-11`，自`2022.0.0`（最新版本）开始使用`jdk-17`，详见 [Java17升级指南](framework/others/grus-17.md)
 
-目前推荐的版本为 **`2021.1.17`**，基于`spring-boot-version`为`2.3.12.RELEASE`。
+目前稳定版本为 **`2021.1.17`**，基于`spring-boot-version`为`2.3.12.RELEASE`。
+
+!!! success
+
+    **`2022.0.0`** 正式版本现已发布，多种新特性请尝试使用
 
 推荐使用的IDEA版本为`2021.2`及以上（后续会逐步转成`jdk-17`开发，建议使用支持`jdk-17`的IDEA版本）。
 
@@ -53,7 +57,7 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
 
 ## 发布版本
 
-- 2022.0 - 在开发中 `2022.0.0-SNAPSHOT`，基于`spring-boot-version`为`2.5.8`
+- 2022.0 - 现已发布 `2022.0.0`，基于`spring-boot-version`为`2.5.10`
 - 2021.1 - 推荐使用 `2021.1.17`，基于`spring-boot-version`为`2.3.12.RELEASE`
 
 ??? abstract "Old versions(不推荐使用)"
@@ -66,7 +70,7 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
 
 升级时，grus 一般都会有较大的变动，并提供一些有用的新特性。升级前建议仔细阅读 Release Notes，如下是相关的跳转链接。
 
-- [2021.1 to 2022.0](https://gitlab.wuxingdev.cn/java/framework/grus/wikis/grus-2022.0-release-notes) - `TODO`
+- [2021.1 to 2022.0](https://gitlab.wuxingdev.cn/java/framework/grus/wikis/grus-2022.0-release-notes) 
 - [old to 2021.1](https://gitlab.wuxingdev.cn/java/framework/grus/wikis/grus-2021.1-release-notes), 这是一个从历史老版本升级的简单汇总
 
 ??? example "老版本升级"
