@@ -37,6 +37,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.ciicgat.sdk.servlet.TrafficCounter.TrafficIncrement;
+
 /**
  * Created by August.Zhou on 2019-06-19 13:51.
  */
@@ -76,6 +78,7 @@ public class GrusFilter implements Filter {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
+
         //这边过滤掉forward和避免上游重复配置了Filter
         if (servletRequest.getAttribute(SERVER_SPAN_CONTEXT) != null) {
             filterChain.doFilter(servletRequest, servletResponse);
@@ -88,11 +91,16 @@ public class GrusFilter implements Filter {
         response.addHeader("x-app-instance", Systems.APP_INSTANCE);
 
         String uri = request.getRequestURI();
+
         //是否满足排除条件
         if (isExclude(uri)) {
             filterChain.doFilter(request, response);
             return;
         }
+
+        //流量计数
+        TrafficIncrement();
+
         int con = current.incrementAndGet(); //并发数
         if (con > 64) {
             String logMsg = "服务并发有点高,并发数:" + con;

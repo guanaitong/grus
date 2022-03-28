@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Import;
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({ServletContextInitializer.class})
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@Import({ApiResponseHeaderAdvice.class, GlobalExceptionHandler.class, GrusSystemController.class, GrusHealthCheckController.class})
+@Import({ApiResponseHeaderAdvice.class, GlobalExceptionHandler.class, GrusHealthCheckController.class})
 @EnableConfigurationProperties(WebProperties.class)
 public class GrusWebAutoConfiguration {
 
