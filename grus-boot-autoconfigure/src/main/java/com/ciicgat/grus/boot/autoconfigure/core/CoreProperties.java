@@ -5,8 +5,10 @@
 
 package com.ciicgat.grus.boot.autoconfigure.core;
 
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.sdk.util.frigate.GroupBot;
+import com.ciicgat.sdk.util.system.Systems;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -50,6 +52,7 @@ public class CoreProperties {
         if (Objects.nonNull(groupBotKey)) {
             GroupBot.GLOBAL_GROUP_KEY = groupBotKey;
         }
+        Alert.send(String.format("应用（%s）-（%s）正在启动", Systems.APP_NAME, Systems.APP_INSTANCE));
     }
 
     public String getGroupBotKey() {

@@ -5,16 +5,14 @@
 
 package com.ciicgat.grus.boot.autoconfigure.core;
 
-import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.boot.autoconfigure.constants.GrusConstants;
-import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.impl.StandardGrusRuntimeContext;
 import com.ciicgat.grus.service.impl.StandardGrusRuntimeManager;
 import com.ciicgat.sdk.gconf.GconfConfig;
+import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.util.system.EnvHook;
-import com.ciicgat.sdk.util.system.WorkRegion;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -72,9 +70,6 @@ public class GrusCoreContextInitializer implements ApplicationContextInitializer
         beanFactory.registerSingleton(GrusConstants.GRUS_RUNTIME_CONTEXT_BEAN_ID, grusRuntimeManager.getGrusRuntimeContext());
 
         initGlobalGconfConfig(appName);
-        if (!WorkRegion.getCurrentWorkRegion().isDevelopOrTest()) {
-            Alert.send(String.format("应用（%s）正在启动", appName));
-        }
     }
 
     /**
