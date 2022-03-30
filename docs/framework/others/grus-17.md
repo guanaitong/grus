@@ -144,4 +144,6 @@ info.build.java-version=@java.version@
 
 ## 兼容问题
 
+- jackson升级后，蛇形转换的策略命名变更，即`spring.jackson.property-naming-strategy=CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES`废弃，使用`spring.jackson.property-naming-strategy=SNAKE_CASE`
+
 TODO:其他兼容性问题带补充
