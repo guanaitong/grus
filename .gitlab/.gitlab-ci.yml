@@ -1,5 +1,4 @@
 variables:
-  TZ: "Asia/Shanghai"
   MAVEN_CLI_OPTS: " --batch-mode -Dorg.slf4j.simpleLogger.defaultLogLevel=warn"
 
 
@@ -13,14 +12,12 @@ testOnJava17:
   image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
   stage: testOnJava17
   script:
-    - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
     - mvn $MAVEN_CLI_OPTS test -Djava.version=17 -Djacoco.skip=true
 
 sonarOnJava17:
   image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
   stage: sonarOnJava17
   script:
-    - keytool -keystore $JAVA_HOME/lib/security/cacerts -storepass changeit -noprompt -trustcacerts -importcert -alias guanaitongca -file .gitlab/GuanaitongCA.crt
     - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dsonar.projectKey=grus-2 -Dsonar.projectName=grus-2 -Djacoco.skip=false
 
 
