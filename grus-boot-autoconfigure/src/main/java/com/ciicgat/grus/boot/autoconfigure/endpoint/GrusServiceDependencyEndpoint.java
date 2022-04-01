@@ -15,6 +15,9 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * @author andy
+ */
 @Endpoint(id = "dep")
 public class GrusServiceDependencyEndpoint {
     @ReadOperation

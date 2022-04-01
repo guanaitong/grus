@@ -20,5 +20,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.ciicgat.grus.boot.autoconfigure.elasticsearch.ElasticsearchAutoConfiguration,\
   com.ciicgat.grus.boot.autoconfigure.zk.ZKAutoConfiguration,\
   com.ciicgat.grus.boot.autoconfigure.redis.GrusRedisAutoConfiguration,\
-  com.ciicgat.grus.boot.autoconfigure.cache.GrusRedisSpringCacheAutoConfiguration
+  com.ciicgat.grus.boot.autoconfigure.cache.GrusRedisSpringCacheAutoConfiguration,\
+  com.ciicgat.grus.boot.autoconfigure.endpoint.GrusEndpointConfiguration
 

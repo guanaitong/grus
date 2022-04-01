@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.ciicgat.sdk.servlet.TrafficCounter.TrafficIncrement;
 
 /**
  * Created by August.Zhou on 2019-06-19 13:51.
@@ -99,7 +98,7 @@ public class GrusFilter implements Filter {
         }
 
         //流量计数
-        TrafficIncrement();
+        TrafficCounter.trafficIncrement();
 
         int con = current.incrementAndGet(); //并发数
         if (con > 64) {
