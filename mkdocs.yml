@@ -178,3 +178,4 @@ nav:
       - 应用开发指南: others/develop-guide.md
       - 安全基础: others/security-base.md
       - 短链接: others/short-url.md
+      - CVE-2022-22965: others/CVE-2022-22965.md
