@@ -32,9 +32,9 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
 !!! warning
 
     1.0.0-SNAPSHOT 和早期版本已不再维护，请及时升级到推荐版本，保持技术栈的统一和程序的安全.
-
+    
     自`2022.0`开始，框架和巨灵神的引用不再放在一起，并只支持了`jdk-17`：
-
+    
     ```xml title="pom.xml"
     <project>
         <dependencyManagement>
@@ -59,8 +59,8 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
 
 ## 发布版本
 
-- 2022.0 - 现已发布 `2022.0.0`，基于`spring-boot-version`为`2.5.12`
-- 2021.1 - 推荐使用 `2021.1.22`，基于`spring-boot-version`为`2.3.12.RELEASE`
+- 2022.0 - 现已发布 `2022.0.1`，基于`spring-boot-version`为`2.5.12`
+- 2021.1 - 推荐使用 `2021.1.20`，基于`spring-boot-version`为`2.3.12.RELEASE`
 
 ??? abstract "Old versions(不推荐使用)"
 
