@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+  ~ Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
   ~ All rights reserved.
   -->
 
@@ -22,7 +22,8 @@
     <name>Grus Starter Parent</name>
     <url>https://github.com/guanaitong/grus</url>
     <description>Parent pom providing dependency and plugin management for applications
-        built with Maven</description>
+        built with Maven
+    </description>
     <scm>
         <connection>scm:git:git://github.com/java/grus.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/java/grus.git</developerConnection>

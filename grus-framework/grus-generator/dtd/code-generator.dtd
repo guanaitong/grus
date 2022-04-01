@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-        <!ELEMENT code-generator (baseConfig | jdbcConnection| javaModelGenerator | sqlMapGenerator | javaClientGenerator | serviceGenerator | controllerGenerator| dtoGenerator | tables)+>
+        <!--
+  - Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
+  - All rights reserved.
+  -->
+
+<!ELEMENT code-generator (baseConfig | jdbcConnection| javaModelGenerator | sqlMapGenerator | javaClientGenerator | serviceGenerator | controllerGenerator| dtoGenerator | tables)+>
 
 
         <!ELEMENT baseConfig (#PCDATA | property)*>

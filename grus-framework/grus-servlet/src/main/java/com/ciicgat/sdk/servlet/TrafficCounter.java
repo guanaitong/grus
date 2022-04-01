@@ -13,6 +13,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+
+/**
+ * @author andy
+ */
 public class TrafficCounter {
 
     private TrafficCounter() {

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
+ * All rights reserved.
+ */
+
 import com.intellij.database.model.DasTable
 import com.intellij.database.model.ObjectKind
 import com.intellij.database.util.Case

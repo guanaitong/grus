@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2021, CIIC Guanaitong, Co., Ltd.
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
  * All rights reserved.
  */
 
@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class GrusWebLogAutoConfigurationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withUserConfiguration(GrusWebLogAutoConfiguration.class);
+
     @Test
     void grusWebLogPrinter() {
         this.contextRunner
