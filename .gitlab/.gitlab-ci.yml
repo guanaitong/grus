@@ -18,7 +18,7 @@ test:
 sonar:
   stage: sonar
   script:
-    - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dsonar.projectKey=grus2022 -Dsonar.projectName=grus2022 -Djacoco.skip=false
+    - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dsonar.projectKey=grus-2 -Dsonar.projectName=grus-2 -Djacoco.skip=false
 
 
 deploy:
