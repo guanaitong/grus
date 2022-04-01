@@ -1,33 +1,31 @@
+image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
+
 variables:
   MAVEN_CLI_OPTS: " --batch-mode -Dorg.slf4j.simpleLogger.defaultLogLevel=warn"
 
 
 stages:
-  - testOnJava17
-  - sonarOnJava17
+  - test
+  - sonar
   - deploy
 
 
-testOnJava17:
-  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
-  stage: testOnJava17
+test:
+  stage: test
   script:
     - mvn $MAVEN_CLI_OPTS test -Djava.version=17 -Djacoco.skip=true
 
-sonarOnJava17:
-  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
-  stage: sonarOnJava17
+sonar:
+  stage: sonar
   script:
     - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dsonar.projectKey=grus-2 -Dsonar.projectName=grus-2 -Djacoco.skip=false
 
 
 deploy:
-  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
   stage: deploy
   script:
-    - mvn $MAVEN_CLI_OPTS deploy -DskipTests -Pgitlab
+    - mvn $MAVEN_CLI_OPTS deploy -DskipTests
     - sh generate_parent_pom.sh
-    - mvn $MAVEN_CLI_OPTS -f tmp/.flattened-pom.xml  deploy -DskipTests -Pgitlab
+    - mvn $MAVEN_CLI_OPTS -f tmp/.flattened-pom.xml  deploy -DskipTests
   only:
     - master
-    - 2021.1.x
