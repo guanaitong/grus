@@ -181,8 +181,9 @@ nav:
       - 2020.9: upgrade/2020-9.md
       - 2021.1: upgrade/2021-1.md
       - 2022.0: upgrade/2022-0.md
+  - 安全:
+      - 安全基础: security/security-base.md
+      - CVE-2022-22965: security/CVE-2022-22965.md
   - 其他:
       - 应用开发指南: others/develop-guide.md
-      - 安全基础: others/security-base.md
       - 短链接: others/short-url.md
-      - CVE-2022-22965: others/CVE-2022-22965.md
