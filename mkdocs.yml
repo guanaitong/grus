@@ -142,7 +142,7 @@ nav:
       - data:
           - framework/data/index.md
           - Mybatis分页插件: framework/data/mybatis-pagehelper.md
-          - Mybatis增加: framework/data/mybatis-enhance.md
+          - Mybatis增强: framework/data/mybatis-enhance.md
       - redis:
           - framework/redis/index.md
       - zookeeper:
@@ -173,7 +173,12 @@ nav:
           - framework/others/index.md
           - bean复制工具: framework/others/grus-core.md
           - JSON使用说明: framework/others/grus-json.md
-          - Java17升级指南: framework/others/grus-17.md
+  - 升级:
+      - 2020.6: upgrade/2020-6.md
+      - 2020.7: upgrade/2020-7.md
+      - 2020.9: upgrade/2020-9.md
+      - 2021.1: upgrade/2021-1.md
+      - 2022.0: upgrade/2022-0.md
   - 其他:
       - 应用开发指南: others/develop-guide.md
       - 安全基础: others/security-base.md
