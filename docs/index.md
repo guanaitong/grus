@@ -19,7 +19,7 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
 
 此 parent 类似 SpringBoot 的 parent，包含了日常开发中需要用到的 SpringBoot、Grus、Grus Boot、常用第三方等所有依赖。
 
-在`grus`版本`2021.1.x`及以前，使用`jdk-11`，自`2022.0.0`（最新版本）开始使用`jdk-17`，详见 [Java17升级指南](framework/others/grus-17.md)
+在`grus`版本`2021.1.x`及以前，使用`jdk-11`，自`2022.0.0`（最新版本）开始使用`jdk-17`，详见 [2022.0升级指南](upgrade/2022-0.md)
 
 目前稳定版本为 **`2021.1.20`**，基于`spring-boot-version`为`2.3.12.RELEASE`。
 
