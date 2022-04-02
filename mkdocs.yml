@@ -145,6 +145,8 @@ nav:
           - Mybatis增强: framework/data/mybatis-enhance.md
       - redis:
           - framework/redis/index.md
+      - cache:
+          - framework/cache/cache.md
       - zookeeper:
           - framework/zk/index.md
       - kafka:
