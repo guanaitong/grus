@@ -4,12 +4,16 @@ title: Java 安装
 
 # Java 环境安装
 
-公司目前使用 openjdk-11 进行开发，下载与配置流程如下：
+公司目前使用 eclipse-temurin，下载与配置流程如下：
 
 ## 下载地址
 
-- 访问 [openjdk 下载地址](https://jdk.java.net/archive/) - 选择合适版本`openjdk`进行下载
-- 访问 [oracle 下载地址](https://www.oracle.com/java/technologies/javase-downloads.html) - 选择合适的`jdk`进行下载
+- 我们私服下载地址：[filestorage.wuxingdev.cn/openjdk/](http://filestorage.wuxingdev.cn/openjdk/)
+- 访问 [eclipse-temurin](https://adoptium.net/temurin/releases/) 官网
+
+注意：**严禁在公司电脑上使用OracleJDK**
+
+请选择合适版本进行下载
 
 ## 安装
 
@@ -69,10 +73,6 @@ source ~/.zshrc
 </Alert>
 
 **方案二**
-
-直接去oracle官网下载dmg安装包安装，下载地址为：[oracle 官网下载](https://www.oracle.com/java/technologies/javase-downloads.html)
-
-**方案三**
 
 使用 Homebrew 进行安装
 
