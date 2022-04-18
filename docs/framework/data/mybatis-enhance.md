@@ -28,7 +28,7 @@
     <parent>
         <groupId>com.ciicgat.grus.boot</groupId>
         <artifactId>grus-boot-starter-parent</artifactId>
-        <version>2021.1.0</version>
+        <version>2021.1.20</version>
     </parent>
 ```
 
@@ -579,12 +579,11 @@ List<ShopTip> list = shopTipMapper.list(example);
 引入代码生成器，`scope`设置为`test`
 
 ```xml
-    <dependency>
-        <groupId>com.ciicgat.grusgenerator</groupId>
-        <artifactId>grus-generator</artifactId>
-        <version>${latest.version}</version>
-        <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>com.ciicgat.grus</groupId>
+            <artifactId>grus-generator</artifactId>
+            <scope>test</scope>
+        </dependency>
 ```
 
 **配置**
@@ -651,7 +650,7 @@ List<ShopTip> list = shopTipMapper.list(example);
 public class CodeGeneratorTest {
     @Test
     public void generate() {
-        CodeGenerator.builder().build().generate();
+       new CodeGenerator().generate();
     }
 }
 ```
