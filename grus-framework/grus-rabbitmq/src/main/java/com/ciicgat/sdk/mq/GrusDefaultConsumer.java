@@ -9,6 +9,9 @@ import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
@@ -26,9 +29,11 @@ import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by August.Zhou on 2019-04-25 19:12.
@@ -61,6 +66,9 @@ public class GrusDefaultConsumer extends DefaultConsumer {
 
     private final String host;
 
+    private final Cache<String, AtomicInteger> failedCounts = Caffeine.
+            newBuilder().initialCapacity(16).scheduler(Scheduler.systemScheduler()).expireAfterAccess(Duration.ofMinutes(15)).expireAfterAccess(Duration.ofMinutes(15)).maximumSize(4096).build();
+
     GrusDefaultConsumer(Channel channel, String host, MsgProcessor msgProcessor, AtomicBoolean isRunning) {
         super(channel);
         this.host = host;
@@ -80,9 +88,9 @@ public class GrusDefaultConsumer extends DefaultConsumer {
     }
 
     protected void handleDelivery0(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-        String text;
+        String msg;
         try {
-            text = new String(body, StandardCharsets.UTF_8);
+            msg = new String(body, StandardCharsets.UTF_8);
         } catch (Exception e) {
             LOGGER.error("UnsupportedEncodingException", e);
             getChannel().basicAck(envelope.getDeliveryTag(), false);
@@ -92,8 +100,9 @@ public class GrusDefaultConsumer extends DefaultConsumer {
         Context context = OpenTelemetrys.getTextMapPropagator().extract(Context.current(), properties.getHeaders(), getter);
 
         Span span = tracer.spanBuilder("handleMsg").setSpanKind(SpanKind.CONSUMER).setParent(context).startSpan();
+        String traceId = "";
         if (span != Span.getInvalid()) {
-            String traceId = span.getSpanContext().getTraceId();
+            traceId = span.getSpanContext().getTraceId();
             String spanId = span.getSpanContext().getSpanId();
             String parentId = "";
             if (span instanceof ReadWriteSpan readWriteSpan) {
@@ -106,19 +115,31 @@ public class GrusDefaultConsumer extends DefaultConsumer {
 
         try (Scope scope = span.makeCurrent()) {
             OpenTelemetrys.configSystemTags(span);
-            boolean b = msgProcessor.apply(envelope.getRoutingKey(), text);
-            if (b) {
+            boolean result = false;
+            try {
+                result = msgProcessor.apply(envelope.getRoutingKey(), msg);
+            } catch (Exception e) {
+                LOGGER.error("handle msg error,msg:" + msg, e);
+            }
+            if (result) {
                 getChannel().basicAck(envelope.getDeliveryTag(), false);
             } else {
-                // 消息处理失败，重新入队
-                getChannel().basicReject(envelope.getDeliveryTag(), true);
-                String msg = msgProcessor.getClass().getName() + "处理失败(将重新入队)[需开发紧急处理]:" + text;
-                Alert.send(msg);
-                LOGGER.warn(msg);
+                var key = envelope.getRoutingKey() + ":::" + msg;
+                var failedCount = failedCounts.get(key, s -> new AtomicInteger()).incrementAndGet();
+                if (failedCount <= 3) {
+                    // 消息处理失败，重新入队
+                    getChannel().basicReject(envelope.getDeliveryTag(), true);
+                    LOGGER.warn("重新入队,msg:" + msg);
+                } else {
+                    getChannel().basicReject(envelope.getDeliveryTag(), false);
+                    failedCounts.invalidate(key);
+                    Alert.send(String.format("消息处理失败超过最大重试次数，丢弃。trace[%s],msg: %s", traceId, msg));
+                    LOGGER.warn("消息处理失败超过最大重试次数，丢弃。msg:" + msg);
+                }
             }
         } catch (Exception e) {
-            Alert.send("handle msg error,msg:" + text, e);
-            LOGGER.error("handle msg error,msg:" + text, e);
+            Alert.send("handle msg error,msg:" + msg, e);
+            LOGGER.error("handle msg error,msg:" + msg, e);
             throw e;
         } finally {
             span.end();

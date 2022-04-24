@@ -133,6 +133,8 @@ public class MsgReceiver {
 
         private List<RQ> rqList = new ArrayList<>();
 
+        private boolean enableDeadLetter;
+
 
         /**
          * 在精细化定制前,必须填充全部默认值
@@ -165,6 +167,11 @@ public class MsgReceiver {
          */
         public ReceiverBuilder setPrefetchCount(int prefetchCount) {
             this.prefetchCount = prefetchCount;
+            return this;
+        }
+
+        public ReceiverBuilder enableDeadLetter(boolean enableDeadLetter) {
+            this.enableDeadLetter = enableDeadLetter;
             return this;
         }
 
