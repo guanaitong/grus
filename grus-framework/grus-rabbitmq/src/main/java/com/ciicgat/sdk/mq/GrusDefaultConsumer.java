@@ -67,7 +67,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
     private final String host;
 
     private final Cache<String, AtomicInteger> failedCounts = Caffeine.
-            newBuilder().initialCapacity(16).scheduler(Scheduler.systemScheduler()).expireAfterAccess(Duration.ofMinutes(15)).expireAfterAccess(Duration.ofMinutes(15)).maximumSize(4096).build();
+            newBuilder().initialCapacity(16).scheduler(Scheduler.systemScheduler()).expireAfterWrite(Duration.ofMinutes(5)).expireAfterAccess(Duration.ofMinutes(5)).maximumSize(4096).build();
 
     GrusDefaultConsumer(Channel channel, String host, MsgProcessor msgProcessor, AtomicBoolean isRunning) {
         super(channel);
