@@ -1,27 +1,39 @@
-image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
-
 variables:
   MAVEN_CLI_OPTS: " --batch-mode -Dorg.slf4j.simpleLogger.defaultLogLevel=warn"
 
 
 stages:
-  - test
-  - sonar
+  - build
   - deploy
 
-
 test:
-  stage: test
+  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
+  stage: build
   script:
-    - mvn $MAVEN_CLI_OPTS test -Djava.version=17 -Djacoco.skip=true
+    - mvn $MAVEN_CLI_OPTS verify -Djava.version=17  sonar:sonar -Dsonar.projectKey=grus-2 -Dsonar.projectName=grus-2
 
-sonar:
-  stage: sonar
+mkdocs:
+  image: registry.wuxingdev.cn/third/python:3.10.0
+  stage: build
   script:
-    - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dsonar.projectKey=grus-2 -Dsonar.projectName=grus-2 -Djacoco.skip=false
+    - pip install mkdocs-material -i https://mirrors.aliyun.com/pypi/simple/
+    - mkdocs build --site-dir public
+    - curl -O http://filestorage.wuxingdev.cn/build-cli/build-cli && chmod +x build-cli && ./build-cli
+  only:
+    - master
+#test:
+#  stage: test
+#  script:
+#    - mvn $MAVEN_CLI_OPTS test -Djava.version=17 -Djacoco.skip=true
+#
+#sonar:
+#  stage: test
+#  script:
+#    - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dsonar.projectKey=grus-2 -Dsonar.projectName=grus-2 -Djacoco.skip=false
 
 
 deploy:
+  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
   stage: deploy
   script:
     - mvn $MAVEN_CLI_OPTS deploy -DskipTests
