@@ -16,7 +16,7 @@ mkdocs:
   image: registry.wuxingdev.cn/third/python:3.10.0
   stage: build
   script:
-    - pip install mkdocs-material -i https://mirrors.aliyun.com/pypi/simple/
+    - pip3 install mkdocs-material -i https://mirrors.aliyun.com/pypi/simple/
     - mkdocs build
     - curl -O http://filestorage.wuxingdev.cn/build-cli/build-cli && chmod +x build-cli && ./build-cli -jobName guide-java
   only:
