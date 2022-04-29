@@ -17,6 +17,7 @@ mkdocs:
   stage: build
   script:
     - pip3 install mkdocs-material -i https://mirrors.aliyun.com/pypi/simple/
+    - mkdocs --version
     - mkdocs build
     - curl -O http://filestorage.wuxingdev.cn/build-cli/build-cli && chmod +x build-cli && ./build-cli -jobName guide-java
   only:
