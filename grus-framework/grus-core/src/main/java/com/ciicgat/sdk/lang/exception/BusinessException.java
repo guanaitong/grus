@@ -20,6 +20,7 @@ public class BusinessException extends Exception {
     private String errorMsg;
 
     public BusinessException(int errorCode, String errorMsg) {
+        super("errorCode=" + errorCode + ", errorMsg=" + errorMsg);
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
     }
@@ -37,9 +38,7 @@ public class BusinessException extends Exception {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("BussinessException occurred, errorCode=" + errorCode + ",errorMsg=" + errorMsg);
-        return sb.toString();
+        return "BusinessException occurred, errorCode=" + errorCode + ",errorMsg=" + errorMsg;
     }
 
 }

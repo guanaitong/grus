@@ -20,7 +20,7 @@ public class BusinessRuntimeException extends RuntimeException implements ErrorC
     private String errorMsg;
 
     public BusinessRuntimeException(int errorCode, String errorMsg) {
-        super(errorCode + "");
+        super("errorCode=" + errorCode + ", errorMsg=" + errorMsg);
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
     }
@@ -38,9 +38,7 @@ public class BusinessRuntimeException extends RuntimeException implements ErrorC
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("BusinessRuntimeException occurred, errorCode=" + errorCode + ",errorMsg=" + errorMsg);
-        return sb.toString();
+        return "BusinessRuntimeException occurred, errorCode=" + errorCode + ",errorMsg=" + errorMsg;
     }
 
 }
