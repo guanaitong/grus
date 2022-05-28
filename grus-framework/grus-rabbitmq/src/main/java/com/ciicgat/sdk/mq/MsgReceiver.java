@@ -59,17 +59,20 @@ public class MsgReceiver {
         this.parallelNum = builder.parallelNum;
         this.host = builder.host;
         this.connection = CacheConnectionFactory.getConnection(builder, true);
-        queueDeclareAndBind();
+        queueDeclareAndBind(builder);
     }
 
     public static ReceiverBuilder newBuilder() {
         return new ReceiverBuilder();
     }
 
-    private void queueDeclareAndBind() throws IOException, TimeoutException {
+    private void queueDeclareAndBind(ReceiverBuilder builder) throws IOException, TimeoutException {
         Map<String, Object> args = new HashMap<>();
         args.put("x-expires", DEFAULT_QUEUE_TTL);
         args.put("x-message-ttl", DEFAULT_MESSAGE_TTL);
+        if (builder.queueParams != null) {
+            args.putAll(builder.queueParams);
+        }
 
         for (RQ rq : rqList) {
             Channel channel = null;
@@ -133,7 +136,7 @@ public class MsgReceiver {
 
         private List<RQ> rqList = new ArrayList<>();
 
-        private boolean enableDeadLetter;
+        private Map<String, Object> queueParams;
 
 
         /**
@@ -170,8 +173,14 @@ public class MsgReceiver {
             return this;
         }
 
-        public ReceiverBuilder enableDeadLetter(boolean enableDeadLetter) {
-            this.enableDeadLetter = enableDeadLetter;
+        /**
+         * 支持设置队列参数
+         *
+         * @param queueParams
+         * @return
+         */
+        public ReceiverBuilder setQueueParams(Map<String, Object> queueParams) {
+            this.queueParams = queueParams;
             return this;
         }
 
