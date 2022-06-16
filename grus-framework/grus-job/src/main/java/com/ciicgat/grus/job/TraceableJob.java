@@ -5,6 +5,7 @@
 
 package com.ciicgat.grus.job;
 
+import com.ciicgat.grus.logger.LogUtil;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
@@ -15,7 +16,6 @@ import org.apache.shardingsphere.elasticjob.api.ShardingContext;
 import org.apache.shardingsphere.elasticjob.simple.job.SimpleJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import java.util.Objects;
 
@@ -40,9 +40,7 @@ public class TraceableJob implements SimpleJob {
             if (span instanceof ReadWriteSpan readWriteSpan) {
                 parentId = readWriteSpan.getParentSpanContext().getSpanId();
             }
-            MDC.put("traceId", traceId);
-            MDC.put("spanId", spanId);
-            MDC.put("parentId", parentId);
+            LogUtil.putMdcForTrace(traceId, spanId, parentId, false);
         }
 
         try (Scope scope = span.makeCurrent()) {

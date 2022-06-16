@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.mq;
+package com.ciicgat.sdk.mq.main;
 
 import com.ciicgat.grus.json.JSON;
 import com.rabbitmq.client.Channel;
@@ -18,9 +18,11 @@ import java.util.Map;
 /**
  * Created by August.Zhou on 2018/5/23 15:00.
  */
-public class TestProducer1 {
+public class TestNotify {
 
     public static void main(String[] args) {
+
+
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("mq.servers.dev.ofc");
 //        factory.setPort(port);

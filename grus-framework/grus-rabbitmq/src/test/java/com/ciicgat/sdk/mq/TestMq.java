@@ -5,7 +5,11 @@
 
 package com.ciicgat.sdk.mq;
 
+import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import com.ciicgat.sdk.lang.threads.Threads;
+import com.ciicgat.sdk.mq.processor.MultiRouteProcessor;
+import com.ciicgat.sdk.mq.processor.SingleRouteProcessor;
 import com.rabbitmq.client.BuiltinExchangeType;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
@@ -17,10 +21,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-import java.util.Vector;
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -28,11 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class TestMq {
 
-    private static String forTestExchangeName = "for-test-exchange";
 
-    private static String forTestRoutingKeyA = "for-test-routingKey-A";
-
-    private static String forTestRoutingKeyB = "for-test-routingKey-B";
     @BeforeAll
     public static void registerTracer() {
         SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder().build();
@@ -44,41 +46,10 @@ public class TestMq {
         GlobalOpenTelemetry.resetForTest();
         OpenTelemetrys.set(sdk);
     }
+
     @Test
-    public void test() throws Exception {
-        List<String> msgList = new ArrayList<>();
-
-        int num = 100;
-        for (int i = 0; i < num; i++) {
-            msgList.add("测试消息:" + Math.random());
-        }
-
-        AtomicInteger atomicInteger = new AtomicInteger(num * 2);
-
-        MsgReceiver receiver = MsgReceiver
-                .newBuilder()
-                .setExchangeName(forTestExchangeName)
-                .addBindQueue(forTestRoutingKeyA, "a")
-                .addBindQueue(forTestRoutingKeyB, "b")
-                .setPrefetchCount(1)
-                .setParallelNum(4)
-                .build();
-
-        List<String> aReceives = new Vector<>();
-
-        List<String> bReceives = new Vector<>();
-
-        receiver.register((r, msg) -> {
-            if (forTestRoutingKeyA.equals(r)) {
-                aReceives.add(msg);
-                atomicInteger.decrementAndGet();
-            } else if (forTestRoutingKeyB.equals(r)) {
-                bReceives.add(msg);
-                atomicInteger.decrementAndGet();
-            }
-            return true;
-        });
-
+    public void testNormal() {
+        String forTestExchangeName = "for-test-exchange-testNormal";
 
         MsgDispatcher dispatcher = MsgDispatcher
                 .newBuilder()
@@ -87,10 +58,68 @@ public class TestMq {
                 .setParallelNum(2)
                 .build();
 
+        String forTestRoutingKeyA = "for-test-A" + Math.random();
+        String forTestRoutingKeyB = "for-test-B" + Math.random();
 
-        for (String s : msgList) {
-            dispatcher.sendMsg(s, forTestRoutingKeyA);
-            dispatcher.sendMsg(s, forTestRoutingKeyB);
+        //c abort
+        String forTestRoutingKeyC = "for-test-C" + Math.random();
+
+
+        Set<TestData> msgList = Collections.synchronizedSet(new TreeSet<>());
+        int num = 100;
+        for (int i = 0; i < num; i++) {
+            TestData testData = new TestData();
+            testData.setDate(new Date());
+            testData.setText("测试消息:" + Math.random());
+            testData.setI(i);
+            msgList.add(testData);
+        }
+
+        AtomicInteger atomicInteger = new AtomicInteger(num * 3);
+
+        MsgReceiver receiver = MsgReceiver
+                .newBuilder()
+                .setExchangeName(forTestExchangeName)
+                .addBindQueue(new Queue(forTestRoutingKeyA, forTestRoutingKeyA).setAutoDelete(true).setExclusive(true))
+                .addBindQueue(new Queue(forTestRoutingKeyB, forTestRoutingKeyB).setAutoDelete(true).setExclusive(true))
+                .addBindQueue(new Queue(forTestRoutingKeyC, forTestRoutingKeyC).setAutoDelete(true).setExclusive(true))
+                .setPrefetchCount(1)
+                .setParallelNum(4)
+                .build();
+
+        Set<TestData> aReceives = Collections.synchronizedSet(new TreeSet<>());
+        Set<TestData> bReceives = Collections.synchronizedSet(new TreeSet<>());
+        Set<TestData> cReceives = Collections.synchronizedSet(new TreeSet<>());
+
+        Map<String, SingleRouteProcessor<?>> processors = Map.of(forTestRoutingKeyA, new SingleRouteProcessor<TestData>() {
+            @Override
+            protected State handle(String routingKey, TestData object) {
+                atomicInteger.decrementAndGet();
+                aReceives.add(object);
+                return State.OK;
+            }
+        }, forTestRoutingKeyB, new SingleRouteProcessor<TestData>() {
+            @Override
+            protected State handle(String routingKey, TestData object) {
+                atomicInteger.decrementAndGet();
+                bReceives.add(object);
+                return State.OK;
+            }
+        }, forTestRoutingKeyC, new SingleRouteProcessor<TestData>() {
+            @Override
+            protected State handle(String routingKey, TestData object) {
+                atomicInteger.decrementAndGet();
+                cReceives.add(object);
+                return State.Abort;
+            }
+        });
+        receiver.register(new MultiRouteProcessor(processors));
+
+
+        for (TestData s : msgList) {
+            dispatcher.sendMsg(JSON.toJSONString(s), forTestRoutingKeyA);
+            dispatcher.sendMsg(JSON.toJSONString(s), forTestRoutingKeyB);
+            dispatcher.sendMsg(JSON.toJSONString(s), forTestRoutingKeyC);
         }
 
         long start = System.currentTimeMillis();
@@ -101,19 +130,223 @@ public class TestMq {
                 return;
             }
         }
-        compare(msgList, aReceives);
-        compare(msgList, bReceives);
+
+        Assertions.assertEquals(msgList.size(), aReceives.size());
+        Assertions.assertEquals(msgList.size(), bReceives.size());
+        Assertions.assertEquals(msgList.size(), cReceives.size());
     }
 
-    private void compare(List<String> a, List<String> b) {
-        Assertions.assertEquals(a.size(), b.size());
-        List<String> aa = new ArrayList<>(a);
-        Collections.sort(aa);
+    @Test
+    public void testRetry() {
+        String forTestExchangeName = "for-test-exchange-testRetry";
+        MsgDispatcher dispatcher = MsgDispatcher
+                .newBuilder()
+                .setExchangeName(forTestExchangeName)
+                .setExchangeType(BuiltinExchangeType.DIRECT)
+                .setParallelNum(2)
+                .build();
 
-        List<String> bb = new ArrayList<>(b);
-        Collections.sort(bb);
-        for (int i = 0; i < a.size(); i++) {
-            Assertions.assertEquals(aa.get(i), bb.get(i));
+        String forTestRoutingKeyA = "for-test-A" + Math.random();
+
+        Set<TestData> msgList = Collections.synchronizedSet(new TreeSet<>());
+        int num = 100;
+        for (int i = 0; i < num; i++) {
+            TestData testData = new TestData();
+            testData.setDate(new Date());
+            testData.setText("测试消息:" + Math.random());
+            testData.setI(i);
+            msgList.add(testData);
         }
+
+        AtomicInteger atomicInteger = new AtomicInteger(num * 1);
+
+        MsgReceiver receiver = MsgReceiver
+                .newBuilder()
+                .setExchangeName(forTestExchangeName)
+                .addBindQueue(new Queue(forTestRoutingKeyA, forTestRoutingKeyA).setAutoDelete(true).setExclusive(true))
+                .setPrefetchCount(1)
+                .setParallelNum(4)
+                .build();
+
+        Set<TestData> aReceives = Collections.synchronizedSet(new TreeSet<>());
+
+        Map<String, SingleRouteProcessor<?>> processors = Map.of(forTestRoutingKeyA, new SingleRouteProcessor<TestData>() {
+            @Override
+            protected State handle(String routingKey, TestData object) {
+                aReceives.add(object);
+                atomicInteger.decrementAndGet();
+                if (object.getI() < 50) {
+                    throw new RuntimeException();
+                }
+                return State.Retry;
+            }
+        });
+        receiver.register(new MultiRouteProcessor(processors));
+
+
+        for (TestData s : msgList) {
+            dispatcher.sendMsg(JSON.toJSONString(s), forTestRoutingKeyA);
+        }
+
+        long start = System.currentTimeMillis();
+
+        while (atomicInteger.get() >= 0) {
+            if ((System.currentTimeMillis() - start) > 30 * 1000) {
+                Assertions.fail("timeout");
+                return;
+            }
+        }
+    }
+
+    @Test
+    public void testDelayDeadLetterTTL() {
+        String forTestExchangeName = "for-test-exchange-testDelayDeadLetterTTL";
+        MsgDispatcher dispatcher = MsgDispatcher
+                .newBuilder()
+                .setExchangeName(forTestExchangeName)
+                .setExchangeType(BuiltinExchangeType.DIRECT)
+                .setParallelNum(2)
+                .build();
+
+        String forTestRoutingKeyA = "for-test-A" + Math.random();
+
+        Set<TestData> msgList = Collections.synchronizedSet(new TreeSet<>());
+        int num = 100;
+        for (int i = 0; i < num; i++) {
+            TestData testData = new TestData();
+            testData.setDate(new Date());
+            testData.setText("测试消息:" + Math.random());
+            testData.setI(i);
+            msgList.add(testData);
+        }
+
+        AtomicInteger atomicInteger = new AtomicInteger(num * 1);
+
+        // mainReceiver用于创建一个主交换机，绑定延迟交换机。不需要注册消息处理器，否则消息立即、直接被它给消费了。
+        MsgReceiver mainReceiver = MsgReceiver
+                .newBuilder()
+                .setExchangeName(forTestExchangeName)
+                .addBindQueue(new Queue(forTestRoutingKeyA, forTestRoutingKeyA).setAutoDelete(true).setExclusive(true).addDelayDeadLetterConfig("dead.ttl.exchange", 3, TimeUnit.SECONDS))
+                .setPrefetchCount(1)
+                .setParallelNum(1)
+                .build();
+
+
+        // 此receiver才是真正的消费者
+        String deadQueue = "dead.ttl.queue." + Math.random();
+        MsgReceiver receiver = MsgReceiver
+                .newBuilder()
+                .setExchangeName("dead.ttl.exchange")
+                .addBindQueue(new Queue("", deadQueue).setAutoDelete(true).setExclusive(true))
+                .setPrefetchCount(1)
+                .setParallelNum(4)
+                .build();
+
+        Set<TestData> aReceives = Collections.synchronizedSet(new TreeSet<>());
+
+        Map<String, SingleRouteProcessor<?>> processors = Map.of("", new SingleRouteProcessor<TestData>() {
+            @Override
+            protected State handle(String routingKey, TestData object) {
+                aReceives.add(object);
+                atomicInteger.decrementAndGet();
+                return State.OK;
+            }
+        });
+        receiver.register(new MultiRouteProcessor(processors));
+
+
+        for (TestData s : msgList) {
+            dispatcher.sendMsg(JSON.toJSONString(s), forTestRoutingKeyA);
+        }
+
+        Threads.sleepSeconds(4);
+
+        long start = System.currentTimeMillis();
+
+        while (atomicInteger.get() > 0) {
+            if ((System.currentTimeMillis() - start) > 30 * 1000) {
+                Assertions.fail("timeout");
+                return;
+            }
+        }
+
+        Assertions.assertEquals(msgList.size(), aReceives.size());
+    }
+
+    @Test
+    public void testGlobalDeadLetterTTL() {
+        String forTestExchangeName = "for-test-exchange-testGlobalDeadLetterTTL";
+        MsgDispatcher dispatcher = MsgDispatcher
+                .newBuilder()
+                .setExchangeName(forTestExchangeName)
+                .setExchangeType(BuiltinExchangeType.DIRECT)
+                .setParallelNum(2)
+                .build();
+
+        String forTestRoutingKeyA = "for-test-A" + Math.random();
+
+        Set<TestData> msgList = Collections.synchronizedSet(new TreeSet<>());
+        int num = 100;
+        for (int i = 0; i < num; i++) {
+            TestData testData = new TestData();
+            testData.setDate(new Date());
+            testData.setText("测试消息:" + Math.random());
+            testData.setI(i);
+            msgList.add(testData);
+        }
+
+        AtomicInteger atomicInteger = new AtomicInteger(num * 1);
+
+        MsgReceiver mainReceiver = MsgReceiver
+                .newBuilder()
+                .setExchangeName(forTestExchangeName)
+                .addBindQueue(new Queue(forTestRoutingKeyA, forTestRoutingKeyA).setAutoDelete(true).setExclusive(true).addGlobalDeadLetterConfig())
+                .setPrefetchCount(1)
+                .setParallelNum(1)
+                .build();
+        mainReceiver.register(new MsgProcessor() {
+            @Override
+            public State apply(String m, String routingKey, String msg) {
+                return State.Abort;
+            }
+        });
+
+        MsgReceiver receiver = MsgReceiver
+                .newBuilder()
+                .setExchangeName(MqConstants.GLOBAL_DEAD_LETTER_EXCHANGE_NAME)
+                .addBindQueue(new Queue("", "global.dead.queue" + Math.random()).setAutoDelete(true).setExclusive(true))
+                .setPrefetchCount(1)
+                .setParallelNum(4)
+                .build();
+
+        Set<TestData> aReceives = Collections.synchronizedSet(new TreeSet<>());
+
+        Map<String, SingleRouteProcessor<?>> processors = Map.of("", new SingleRouteProcessor<TestData>() {
+            @Override
+            protected State handle(String routingKey, TestData object) {
+                aReceives.add(object);
+                atomicInteger.decrementAndGet();
+                return State.OK;
+            }
+        });
+        receiver.register(new MultiRouteProcessor(processors));
+
+
+        for (TestData s : msgList) {
+            dispatcher.sendMsg(JSON.toJSONString(s), forTestRoutingKeyA);
+        }
+
+        Threads.sleepSeconds(4);
+
+        long start = System.currentTimeMillis();
+
+        while (atomicInteger.get() > 0) {
+            if ((System.currentTimeMillis() - start) > 30 * 1000) {
+                Assertions.fail("timeout");
+                return;
+            }
+        }
+
+        Assertions.assertTrue(aReceives.size() - msgList.size() >= 0);
     }
 }

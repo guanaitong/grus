@@ -8,6 +8,7 @@ package com.ciicgat.sdk.mq;
 import com.ciicgat.sdk.lang.threads.ShutdownHook;
 import com.ciicgat.sdk.lang.tool.CloseUtils;
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.slf4j.Logger;
@@ -15,20 +16,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 消息接受者
+ * 消息接受者。一个exchange只有一个MsgReceiver
  * Created by cpx on 2017-08-07.
  */
 public class MsgReceiver {
-    static final int DEFAULT_MESSAGE_TTL = 7 * 24 * 60 * 60 * 1000;
-    static final int DEFAULT_QUEUE_TTL = 7 * 24 * 60 * 60 * 1000;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MsgReceiver.class);
     /**
      * 连接
@@ -41,9 +38,11 @@ public class MsgReceiver {
     private final String exchangeName;
 
     private final int prefetchCount;
-    private final List<RQ> rqList;
+    private final List<Queue> queueList;
     private final int parallelNum;
     private final String host;
+
+    private final int maxRetryCount;
     private MsgProcessor msgProcessor;
 
 
@@ -52,48 +51,51 @@ public class MsgReceiver {
      *
      * @param builder
      */
-    private MsgReceiver(ReceiverBuilder builder) throws Exception {
-        this.exchangeName = Objects.requireNonNull(builder.exchangeName, "exchangeName为空");
-        this.rqList = builder.rqList;
+    private MsgReceiver(ReceiverBuilder builder) {
+        this.exchangeName = CacheFactory.checkExchangeExisted(builder.exchangeName, true);
+        this.queueList = builder.queues;
         this.prefetchCount = builder.prefetchCount;
         this.parallelNum = builder.parallelNum;
         this.host = builder.host;
-        this.connection = CacheConnectionFactory.getConnection(builder, true);
-        queueDeclareAndBind(builder);
+        this.maxRetryCount = builder.maxRetryCount;
+        this.connection = CacheFactory.getConnection(builder, true);
+        queueDeclareAndBind();
     }
 
     public static ReceiverBuilder newBuilder() {
         return new ReceiverBuilder();
     }
 
-    private void queueDeclareAndBind(ReceiverBuilder builder) throws IOException, TimeoutException {
-        Map<String, Object> args = new HashMap<>();
-        args.put("x-expires", DEFAULT_QUEUE_TTL);
-        args.put("x-message-ttl", DEFAULT_MESSAGE_TTL);
-        if (builder.queueParams != null) {
-            args.putAll(builder.queueParams);
-        }
-
-        for (RQ rq : rqList) {
+    private void queueDeclareAndBind() {
+        for (Queue queue : queueList) {
             Channel channel = null;
             try {
                 channel = connection.createChannel(); //NOSONAR
                 try {
-                    AMQP.Queue.DeclareOk result = channel.queueDeclarePassive(rq.queueName);
-                    LOGGER.warn("queue {} founded,MessageCount {},ConsumerCount {}", rq.queueName, result.getMessageCount(), result.getConsumerCount());
+                    AMQP.Queue.DeclareOk result = channel.queueDeclarePassive(queue.getQueueName());
+                    LOGGER.warn("queue {} founded,MessageCount {},ConsumerCount {}", queue.getQueueName(), result.getMessageCount(), result.getConsumerCount());
                 } catch (IOException e) {
-                    LOGGER.warn("queue {} not found", rq.queueName);
+                    LOGGER.warn("queue {} not found", queue.getQueueName());
                     channel = connection.createChannel(); //NOSONAR
-                    channel.queueDeclare(rq.queueName, true, false, false, args);
+                    channel.queueDeclare(queue.getQueueName(), queue.isDurable(), queue.isExclusive(), queue.isAutoDelete(), queue.getArgs());
                 }
                 //
-                channel.queueBind(rq.queueName, exchangeName, rq.routingKey);
+                channel.queueBind(queue.getQueueName(), exchangeName, queue.getRoutingKey());
+                if (!queue.isRegisterConsumer()) {
+                    // 自动创建死信队列交换机
+                    String deadLetterExchange = (String) queue.getArgs().get(MqConstants.DEAD_LETTER_EXCHANGE_KEY);
+                    if (deadLetterExchange != null) {
+                        channel.exchangeDeclare(deadLetterExchange, BuiltinExchangeType.FANOUT, true); //NOSONAR
+                    }
+                }
+                ConfigData.add(this.exchangeName, queue.getRoutingKey(), queue.getQueueName(), true, channel);
+            } catch (IOException e) {
+                throw new RabbitMqException(e);
             } finally {
                 CloseUtils.close(channel);
             }
 
         }
-
     }
 
     /**
@@ -102,21 +104,34 @@ public class MsgReceiver {
      * @param msgProcessor
      * @param
      */
-    public void register(MsgProcessor msgProcessor) throws Exception {
+    public void register(MsgProcessor msgProcessor) {
+        if (this.msgProcessor != null) {
+            throw new UnsupportedOperationException("不支持绑定多个消息处理器");
+        }
         this.msgProcessor = Objects.requireNonNull(msgProcessor);
         List<Channel> channelList = new ArrayList<>(parallelNum);
         for (int i = 0; i < parallelNum; i++) {
-            Channel channel = connection.createChannel(); //NOSONAR
-            channel.basicQos(prefetchCount);
-            channelList.add(channel);
+            try {
+                Channel channel = connection.createChannel(); //NOSONAR
+                channel.basicQos(prefetchCount);
+                channelList.add(channel);
+            } catch (IOException e) {
+                throw new RabbitMqException(e);
+            }
         }
 
 
         AtomicBoolean isRunning = new AtomicBoolean(true);
 
         for (Channel channel : channelList) {
-            for (RQ rq : rqList) {
-                channel.basicConsume(rq.queueName, false, new GrusDefaultConsumer(channel, host, msgProcessor, isRunning));
+            for (Queue queue : queueList) {
+                if (queue.isRegisterConsumer()) {
+                    try {
+                        channel.basicConsume(queue.getQueueName(), false, new GrusDefaultConsumer(channel, host, msgProcessor, isRunning, maxRetryCount, queue.isEnableDeadLetter()));
+                    } catch (IOException e) {
+                        throw new RabbitMqException(e);
+                    }
+                }
             }
         }
         ShutdownHook.addShutdownHook(() -> {
@@ -133,10 +148,13 @@ public class MsgReceiver {
 
         int prefetchCount = 1;
 
+        /**
+         * 最大重试次数，默认3
+         */
+        int maxRetryCount = 5;
 
-        private List<RQ> rqList = new ArrayList<>();
 
-        private Map<String, Object> queueParams;
+        private List<Queue> queues = new ArrayList<>();
 
 
         /**
@@ -154,7 +172,16 @@ public class MsgReceiver {
          * @return
          */
         public ReceiverBuilder addBindQueue(String routingKey, String queueName) {
-            rqList.add(new RQ(routingKey, queueName));
+            return addBindQueue(new Queue(routingKey, queueName));
+        }
+
+        public synchronized ReceiverBuilder addBindQueue(Queue queue) {
+            for (Queue q : queues) {
+                if (q.getQueueName().equals(queue.getQueueName())) {
+                    throw new IllegalArgumentException("queue has added");
+                }
+            }
+            queues.add(queue);
             return this;
         }
 
@@ -174,16 +201,15 @@ public class MsgReceiver {
         }
 
         /**
-         * 支持设置队列参数
+         * 消费失败时的最大重试次数
          *
-         * @param queueParams
+         * @param maxRetryCount
          * @return
          */
-        public ReceiverBuilder setQueueParams(Map<String, Object> queueParams) {
-            this.queueParams = queueParams;
+        public ReceiverBuilder setMaxRetryCount(int maxRetryCount) {
+            this.maxRetryCount = maxRetryCount;
             return this;
         }
-
 
         /**
          * 创建定制化消息分发者
@@ -191,24 +217,8 @@ public class MsgReceiver {
          * @return
          */
         @Override
-        public MsgReceiver build() throws Exception {
+        public MsgReceiver build() {
             return new MsgReceiver(this);
-        }
-    }
-
-    private static class RQ {
-
-        /**
-         * 队列名称
-         */
-        String routingKey;
-
-        String queueName;
-
-
-        RQ(String routingKey, String queueName) {
-            this.routingKey = routingKey;
-            this.queueName = queueName;
         }
     }
 }

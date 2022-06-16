@@ -7,6 +7,7 @@ package com.ciicgat.sdk.servlet;
 
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.logger.LogUtil;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.service.GrusFramework;
@@ -132,10 +133,8 @@ public class GrusFilter implements Filter {
                     parentId = readWriteSpan.getParentSpanContext().getSpanId();
                 }
             }
-            MDC.put("traceId", traceId);
-            MDC.put("spanId", spanId);
-            MDC.put("parentId", parentId);
-            response.addHeader("x-trace-id", traceId);
+            String finalTraceId = LogUtil.putMdcForTrace(traceId, spanId, parentId, request.getHeader("uber-trace-id") != null);
+            response.addHeader("x-trace-id", finalTraceId);
             response.addHeader("x-span-id", spanId);
             response.addHeader("x-parent-id", parentId);
         }

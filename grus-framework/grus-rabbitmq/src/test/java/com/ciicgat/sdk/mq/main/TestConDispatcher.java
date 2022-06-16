@@ -3,12 +3,11 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.mq;
+package com.ciicgat.sdk.mq.main;
 
 import com.ciicgat.sdk.lang.threads.Threads;
+import com.ciicgat.sdk.mq.MsgDispatcher;
 import com.rabbitmq.client.BuiltinExchangeType;
-
-import java.io.IOException;
 
 /**
  * @Author: yuqi.chen
@@ -16,16 +15,14 @@ import java.io.IOException;
  */
 public class TestConDispatcher {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
 
-        MsgDispatcher dispatcher = MsgDispatcher
-                .newBuilder()
+        MsgDispatcher dispatcher = MsgDispatcher.newBuilder()
 //                .setExchangeNameInfo(exchangeNameInfo)
                 .setExchangeName("xxxxy")
 //                .setRoutingKey("testRouting.a")
-                .setExchangeType(BuiltinExchangeType.DIRECT)
-                .build();
+                .setExchangeType(BuiltinExchangeType.DIRECT).build();
 
 
         for (int i = 0; i < 20; i++) {
@@ -33,12 +30,8 @@ public class TestConDispatcher {
                 @Override
                 public void run() {
                     for (int i = 0; i < 100; i++) {
-                        try {
-                            dispatcher.sendMsg("测试消息a", "a");
+                        dispatcher.sendMsg("测试消息a", "a");
 //                             System.out.println("123");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
                         Threads.sleep(10 * 1000);
                     }
 

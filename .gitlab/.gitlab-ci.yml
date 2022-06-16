@@ -13,7 +13,7 @@ test:
     - mvn $MAVEN_CLI_OPTS verify -Djava.version=17  sonar:sonar -Dsonar.projectKey=grus-2 -Dsonar.projectName=grus-2
 
 mkdocs:
-  image: registry.wuxingdev.cn/third/python:3.10.0
+  image: registry.wuxingdev.cn/build/python:3-bullseye
   stage: build
   script:
     - pip3 install mkdocs-material mkdocs-minify-plugin mkdocs-redirects -i https://mirrors.aliyun.com/pypi/simple/

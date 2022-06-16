@@ -9,6 +9,7 @@ import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
+import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
@@ -27,7 +28,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+
+import static com.ciicgat.sdk.mq.RabbitMqException.handleException;
 
 
 /**
@@ -38,15 +41,12 @@ import java.util.Objects;
 public class MsgDispatcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MsgDispatcher.class);
     private static final TextMapSetter<Map<String, Object>> setter = (carrier, key, value) -> carrier.put(key, value);
+    private static final SessionIdGenerator SESSION_ID_GENERATOR = new SessionIdGenerator();
     protected final String host;
     /**
      * 交换机类型
      */
     private final BuiltinExchangeType exchangeType;
-    /**
-     * 默认路由名称
-     */
-    private final String defaultRoutingKey;
     private final boolean confirm;
     /**
      * 交换机名称
@@ -58,16 +58,19 @@ public class MsgDispatcher {
     private final Connection connection;
     private final ChannelPool channelPool;
 
-    protected MsgDispatcher(DispatcherBuilder builder) throws Exception {
-        this.exchangeName = Objects.requireNonNull(builder.exchangeName, "exchangeName为空");
-        this.defaultRoutingKey = builder.routingKey;
+    protected MsgDispatcher(DispatcherBuilder builder) {
+        this.exchangeName = CacheFactory.checkExchangeExisted(builder.exchangeName, false);
         this.confirm = builder.confirm;
         this.exchangeType = builder.exchangeType;
-        this.connection = CacheConnectionFactory.getConnection(builder, false);
+        this.connection = CacheFactory.getConnection(builder, false);
         this.host = builder.host;
 
         try (Channel channel = connection.createChannel()) {
             channel.exchangeDeclare(exchangeName, exchangeType, true); //NOSONAR
+        } catch (IOException e) {
+            throw new RabbitMqException(e);
+        } catch (TimeoutException e) {
+            throw new RabbitMqException(e);
         }
 
         channelPool = new ChannelPool(connection, builder.parallelNum, this.confirm);
@@ -81,25 +84,16 @@ public class MsgDispatcher {
     }
 
     /**
-     * 发送消息
-     *
-     * @param msg 消息体
-     */
-    public void sendMsg(String msg) throws IOException {
-        this.sendMsg(msg, this.defaultRoutingKey);
-    }
-
-    /**
      * 发送消息，指定路由名称
      *
      * @param msg        消息体
      * @param routingKey 路由
      */
-    public void sendMsg(String msg, String routingKey) throws IOException {
+    public void sendMsg(String msg, String routingKey) {
         this.sendMsg(msg, routingKey, MessageProperties.PERSISTENT_BASIC);
     }
 
-    public void sendMsg(String msg, String routingKey, final AMQP.BasicProperties properties) throws IOException {
+    public void sendMsg(String msg, String routingKey, AMQP.BasicProperties properties) {
         if (BuiltinExchangeType.FANOUT == exchangeType) {
             routingKey = "";
         }
@@ -112,31 +106,27 @@ public class MsgDispatcher {
             span.setAttribute("component", "rabbitmq");
             channel = channelPool.borrowObject();
             Map<String, Object> headers = new HashMap<>();
+            //生成消息id
+            headers.put(MqConstants.MSG_ID_KEY, SESSION_ID_GENERATOR.generateSessionId());
             OpenTelemetrys.getTextMapPropagator().inject(Context.current(), headers, setter);
-            AMQP.BasicProperties traceProperties = properties;
-            if (!headers.isEmpty()) {
-                if (properties == null) {
-                    traceProperties = new AMQP.BasicProperties("application/octet-stream", null, headers, 2, 0, null, null, null, null, null, null, null, null, null);
-                } else {
-                    if (properties.getHeaders() != null) headers.putAll(properties.getHeaders());
-                    traceProperties = properties.builder().headers(headers).build();
-                }
+            AMQP.BasicProperties traceProperties;
+            if (properties == null) {
+                traceProperties = new AMQP.BasicProperties("application/octet-stream", null, headers, 2, 0, null, null, null, null, null, null, null, null, null);
+            } else {
+                if (properties.getHeaders() != null) headers.putAll(properties.getHeaders());
+                traceProperties = properties.builder().headers(headers).build();
             }
             channel.basicPublish(exchangeName, routingKey, false, traceProperties, msg.getBytes(StandardCharsets.UTF_8));
+            ConfigData.add(this.exchangeName, routingKey, "", false, channel);
             if (this.confirm) {
                 channel.waitForConfirmsOrDie();
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
+            LOGGER.error("send msg error,msg {}", msg, e);
             Alert.send("send msg error,msg:" + msg, e);
-            throw new IOException(e);
+            handleException(e);
         } finally {
-            try {
-                if (null != channel) {
-                    channelPool.returnObject(channel);
-                }
-            } catch (Exception e) {
-                // ignored
-            }
+            channelPool.returnObject(channel);
             span.end();
             SlowLogger.logEvent(Module.RABBITMQ, span, "send msg slow");
         }
@@ -151,12 +141,6 @@ public class MsgDispatcher {
          * 交换机类型
          */
         BuiltinExchangeType exchangeType = BuiltinExchangeType.DIRECT;
-
-
-        /**
-         * 默认路由
-         */
-        String routingKey = "";
 
         /**
          * 是否启用confirm
@@ -193,11 +177,6 @@ public class MsgDispatcher {
             return this;
         }
 
-        public DispatcherBuilder setRoutingKey(String routingKey) {
-            this.routingKey = routingKey;
-            return this;
-        }
-
         public DispatcherBuilder setConfirm(boolean confirm) {
             this.confirm = confirm;
             return this;
@@ -209,7 +188,7 @@ public class MsgDispatcher {
          * @return
          */
         @Override
-        public MsgDispatcher build() throws Exception {
+        public MsgDispatcher build() {
             return new MsgDispatcher(this);
         }
     }

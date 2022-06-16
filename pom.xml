@@ -91,7 +91,7 @@
         <guava.version>29.0-jre</guava.version>
         <feign.version>11.6</feign.version>
         <okhttp.version>3.14.9</okhttp.version>
-        <opentelemetry.version>1.13.0</opentelemetry.version>
+        <opentelemetry.version>1.15.0</opentelemetry.version>
         <elastic-job.version>3.0.0</elastic-job.version>
         <curator.version>5.1.0</curator.version>
         <zookeeper.version>3.6.3</zookeeper.version>

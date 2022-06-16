@@ -5,6 +5,8 @@
 
 package com.ciicgat.grus.logger;
 
+import org.slf4j.MDC;
+
 /**
  * @author Wei Jiaju
  * @date 2020/4/26 17:49
@@ -36,4 +38,14 @@ public class LogUtil {
         return logExclude == null || !logExclude.excludeResp();
     }
 
+    public static String putMdcForTrace(String traceId, String spanId, String parentId, boolean fromJaeger) {
+        MDC.put("spanId", spanId);
+        MDC.put("parentId", parentId);
+        if (fromJaeger && traceId.startsWith("0000000000000000")) {
+            String jaegerTraceId = traceId.substring(16);
+            MDC.put("traceId", jaegerTraceId);
+            return jaegerTraceId;
+        }
+        return traceId;
+    }
 }

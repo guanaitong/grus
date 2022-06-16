@@ -109,6 +109,6 @@ public abstract class AbstractBuilder<T, SELF extends AbstractBuilder> {
     }
 
 
-    public abstract T build() throws Exception;
+    public abstract T build();
 
 }

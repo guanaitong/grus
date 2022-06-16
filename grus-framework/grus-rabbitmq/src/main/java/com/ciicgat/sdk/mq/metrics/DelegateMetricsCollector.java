@@ -14,9 +14,19 @@ import com.rabbitmq.client.NoOpMetricsCollector;
  * Created by August.Zhou on 2019-12-09 15:11.
  */
 public class DelegateMetricsCollector implements MetricsCollector {
+    static DelegateMetricsCollector CONSUMER = new DelegateMetricsCollector();
+    static DelegateMetricsCollector PRODUCER = new DelegateMetricsCollector();
     private MetricsCollector metricsCollector = new NoOpMetricsCollector();
 
     DelegateMetricsCollector() {
+    }
+
+    public static DelegateMetricsCollector getConsumerInstance() {
+        return CONSUMER;
+    }
+
+    public static DelegateMetricsCollector getProducerInstance() {
+        return PRODUCER;
     }
 
     public DelegateMetricsCollector setMetricsCollector(MetricsCollector metricsCollector) {
@@ -82,17 +92,5 @@ public class DelegateMetricsCollector implements MetricsCollector {
     @Override
     public void basicCancel(Channel channel, String consumerTag) {
         metricsCollector.basicCancel(channel, consumerTag);
-    }
-
-    static DelegateMetricsCollector CONSUMER = new DelegateMetricsCollector();
-
-    static DelegateMetricsCollector PRODUCER = new DelegateMetricsCollector();
-
-    public static DelegateMetricsCollector getConsumerInstance() {
-        return CONSUMER;
-    }
-
-    public static DelegateMetricsCollector getProducerInstance() {
-        return PRODUCER;
     }
 }

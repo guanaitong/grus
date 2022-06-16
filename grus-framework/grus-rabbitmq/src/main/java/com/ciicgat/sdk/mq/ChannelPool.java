@@ -43,7 +43,7 @@ public class ChannelPool implements AutoCloseable {
         while (true) {
             final int value = current.get();
             if (value >= maxParallelNum) {
-                Threads.sleep(5);
+                Threads.sleep(20);
                 continue;
             }
             if (current.compareAndSet(value, 1 + value)) {
