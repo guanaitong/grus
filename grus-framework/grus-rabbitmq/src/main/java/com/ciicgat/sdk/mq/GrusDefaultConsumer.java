@@ -64,14 +64,15 @@ public class GrusDefaultConsumer extends DefaultConsumer {
 
     private final int maxRetryCount;
     private final boolean enableDeadLetter;
-    private final String host;
     private final Cache<String, AtomicInteger> failedCounts = Caffeine.newBuilder().initialCapacity(16).scheduler(Scheduler.systemScheduler()).expireAfterWrite(Duration.ofMinutes(5)).expireAfterAccess(Duration.ofMinutes(5)).maximumSize(10240).build();
     private MsgProcessor msgProcessor;
 
+    private final String queue;
 
-    GrusDefaultConsumer(Channel channel, String host, MsgProcessor msgProcessor, AtomicBoolean isRunning, int maxRetryCount, boolean enableDeadLetter) {
+
+    GrusDefaultConsumer(Channel channel, String queue, MsgProcessor msgProcessor, AtomicBoolean isRunning, int maxRetryCount, boolean enableDeadLetter) {
         super(channel);
-        this.host = host;
+        this.queue = queue;
         this.msgProcessor = msgProcessor;
         this.isRunning = Objects.requireNonNull(isRunning);
         this.maxRetryCount = maxRetryCount;
@@ -159,6 +160,9 @@ public class GrusDefaultConsumer extends DefaultConsumer {
                 Map<String, Object> headers = new HashMap<>();
                 headers.put("x-app-name", Systems.APP_NAME);
                 headers.put(MqConstants.MSG_ID_KEY, msgId);
+                headers.put("routing-key", envelope.getRoutingKey());
+                headers.put("exchange", envelope.getExchange());
+                headers.put("queue", this.queue);
                 AMQP.BasicProperties properties = new AMQP.BasicProperties("application/octet-stream", null, headers, 2, 0, null, null, null, null, null, null, null, null, null);
                 getChannel().basicPublish(MqConstants.GLOBAL_DEAD_LETTER_EXCHANGE_NAME, "", false, properties, body);
             } catch (Exception e) {

@@ -127,7 +127,7 @@ public class MsgReceiver {
             for (Queue queue : queueList) {
                 if (queue.isRegisterConsumer()) {
                     try {
-                        channel.basicConsume(queue.getQueueName(), false, new GrusDefaultConsumer(channel, host, msgProcessor, isRunning, maxRetryCount, queue.isEnableDeadLetter()));
+                        channel.basicConsume(queue.getQueueName(), false, new GrusDefaultConsumer(channel, queue.getQueueName(), msgProcessor, isRunning, maxRetryCount, queue.isEnableDeadLetter()));
                     } catch (IOException e) {
                         throw new RabbitMqException(e);
                     }
