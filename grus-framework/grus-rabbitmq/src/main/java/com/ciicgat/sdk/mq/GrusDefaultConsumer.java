@@ -114,8 +114,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
             LogUtil.putMdcForTrace(traceId, spanId, parentId, properties.getHeaders().containsKey("uber-trace-id"));
         }
 
-        Object msgObjectId = properties.getHeaders().get(MqConstants.MSG_ID_KEY);
-        String msgId = msgObjectId == null ? null : String.valueOf(msgObjectId);
+        String msgId = properties.getMessageId();
         try (Scope scope = span.makeCurrent()) {
             OpenTelemetrys.configSystemTags(span);
             State result;
@@ -158,11 +157,12 @@ public class GrusDefaultConsumer extends DefaultConsumer {
             // 当没有启用死信队列时，手动的往全局死信队列里发
             try {
                 Map<String, Object> headers = new HashMap<>();
-                headers.put("x-app-name", Systems.APP_NAME);
-                headers.put(MqConstants.MSG_ID_KEY, msgId);
-                headers.put("routing-key", envelope.getRoutingKey());
-                headers.put("exchange", envelope.getExchange());
-                headers.put("queue", this.queue);
+                headers.put("manual", 0);
+                headers.put("m-app-name", Systems.APP_NAME);
+                headers.put("m-msg-id", msgId);
+                headers.put("m-routing-key", envelope.getRoutingKey());
+                headers.put("m-exchange", envelope.getExchange());
+                headers.put("m-queue", this.queue);
                 AMQP.BasicProperties properties = new AMQP.BasicProperties("application/octet-stream", null, headers, 2, 0, null, null, null, null, null, null, null, null, null);
                 getChannel().basicPublish(MqConstants.GLOBAL_DEAD_LETTER_EXCHANGE_NAME, "", false, properties, body);
             } catch (Exception e) {

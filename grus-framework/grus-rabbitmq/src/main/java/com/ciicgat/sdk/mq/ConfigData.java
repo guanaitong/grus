@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,13 +31,13 @@ public class ConfigData {
     private final boolean consumer;
     private final String exchange;
     private final String routingKey;
-    private final String queueName;
+    private final String queue;
 
     public ConfigData(String exchange, String routingKey, String queueName, boolean consumer) {
         this.appName = Systems.APP_NAME;
         this.exchange = exchange;
         this.routingKey = routingKey;
-        this.queueName = queueName;
+        this.queue = queueName;
         this.consumer = consumer;
     }
 
@@ -55,28 +56,8 @@ public class ConfigData {
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ConfigData that = (ConfigData) o;
-
-        if (consumer != that.consumer) return false;
-        if (appName != null ? !appName.equals(that.appName) : that.appName != null) return false;
-        if (exchange != null ? !exchange.equals(that.exchange) : that.exchange != null) return false;
-        if (routingKey != null ? !routingKey.equals(that.routingKey) : that.routingKey != null) return false;
-        return queueName != null ? queueName.equals(that.queueName) : that.queueName == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = appName != null ? appName.hashCode() : 0;
-        result = 31 * result + (consumer ? 1 : 0);
-        result = 31 * result + (exchange != null ? exchange.hashCode() : 0);
-        result = 31 * result + (routingKey != null ? routingKey.hashCode() : 0);
-        result = 31 * result + (queueName != null ? queueName.hashCode() : 0);
-        return result;
+    public String getQueue() {
+        return queue;
     }
 
     @Override
@@ -100,7 +81,16 @@ public class ConfigData {
         return routingKey;
     }
 
-    public String getQueueName() {
-        return queueName;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ConfigData that = (ConfigData) o;
+        return consumer == that.consumer && Objects.equals(appName, that.appName) && Objects.equals(exchange, that.exchange) && Objects.equals(routingKey, that.routingKey) && Objects.equals(queue, that.queue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(appName, consumer, exchange, routingKey, queue);
     }
 }

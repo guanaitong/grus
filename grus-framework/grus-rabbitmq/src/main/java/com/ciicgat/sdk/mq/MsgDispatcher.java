@@ -107,14 +107,14 @@ public class MsgDispatcher {
             channel = channelPool.borrowObject();
             Map<String, Object> headers = new HashMap<>();
             //生成消息id
-            headers.put(MqConstants.MSG_ID_KEY, SESSION_ID_GENERATOR.generateSessionId());
+            String msgId = SESSION_ID_GENERATOR.generateSessionId();
             OpenTelemetrys.getTextMapPropagator().inject(Context.current(), headers, setter);
             AMQP.BasicProperties traceProperties;
             if (properties == null) {
-                traceProperties = new AMQP.BasicProperties("application/octet-stream", null, headers, 2, 0, null, null, null, null, null, null, null, null, null);
+                traceProperties = new AMQP.BasicProperties("application/octet-stream", null, headers, 2, 0, null, null, null, msgId, null, null, null, null, null);
             } else {
                 if (properties.getHeaders() != null) headers.putAll(properties.getHeaders());
-                traceProperties = properties.builder().headers(headers).build();
+                traceProperties = properties.builder().headers(headers).messageId(msgId).build();
             }
             channel.basicPublish(exchangeName, routingKey, false, traceProperties, msg.getBytes(StandardCharsets.UTF_8));
             ConfigData.add(this.exchangeName, routingKey, "", false, channel);
