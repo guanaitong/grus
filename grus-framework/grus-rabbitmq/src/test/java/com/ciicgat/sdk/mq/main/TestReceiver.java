@@ -46,13 +46,13 @@ public class TestReceiver {
                 .setParallelNum(10).build();
 
 
-        receiver.register((msgId, r, msg) -> {
+        receiver.register((msg) -> {
             Span span = Span.current();
             String traceId = span.getSpanContext().getTraceId();
             System.out.println(traceId);
 //            throw new RuntimeException();
-            LOGGER.info(Thread.currentThread().getName() + " r:" + r + "   _____" + msg + " " + msg.contains(r));
-            System.out.println(Thread.currentThread().getName() + " r:" + r + "   _____" + msg + " " + msg.contains(r));
+            LOGGER.info(Thread.currentThread().getName() + " m:" + msg);
+            System.out.println(Thread.currentThread().getName() + " m:" + msg);
             return State.OK;
         });
 

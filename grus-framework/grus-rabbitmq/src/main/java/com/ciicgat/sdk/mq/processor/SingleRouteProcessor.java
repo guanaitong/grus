@@ -7,6 +7,7 @@ package com.ciicgat.sdk.mq.processor;
 
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.json.JSONException;
+import com.ciicgat.sdk.mq.Msg;
 import com.ciicgat.sdk.mq.MsgProcessor;
 import com.ciicgat.sdk.mq.State;
 import com.fasterxml.jackson.databind.JavaType;
@@ -31,16 +32,16 @@ public abstract class SingleRouteProcessor<T> implements MsgProcessor {
     }
 
     @Override
-    public final State apply(String msgId, String routingKey, String msg) {
+    public final State apply(Msg msg) {
         Object value;
         try {
-            value = JSON.parse(msg, _type);
+            value = JSON.parse(msg.body(), _type);
         } catch (JSONException jsonException) {
             LOGGER.error("json parse error", jsonException);
             return State.Abort;
         }
-        return handle(routingKey, (T) value);
+        return handle(msg, (T) value);
     }
 
-    protected abstract State handle(String routingKey, T object);
+    protected abstract State handle(Msg msg, T object);
 }

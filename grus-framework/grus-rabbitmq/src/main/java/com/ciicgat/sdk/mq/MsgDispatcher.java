@@ -148,6 +148,7 @@ public class MsgDispatcher {
         boolean confirm = false;
 
 
+
         /**
          * 在精细化定制前,必须填充全部默认值
          */

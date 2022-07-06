@@ -91,23 +91,23 @@ public class TestMq {
         Set<TestData> bReceives = Collections.synchronizedSet(new TreeSet<>());
         Set<TestData> cReceives = Collections.synchronizedSet(new TreeSet<>());
 
-        Map<String, SingleRouteProcessor<?>> processors = Map.of(forTestRoutingKeyA, new SingleRouteProcessor<TestData>() {
+        Map<QueueKey, SingleRouteProcessor<?>> processors = Map.of(new QueueKey(forTestRoutingKeyA, forTestRoutingKeyA), new SingleRouteProcessor<TestData>() {
             @Override
-            protected State handle(String routingKey, TestData object) {
+            protected State handle(Msg msg, TestData object) {
                 atomicInteger.decrementAndGet();
                 aReceives.add(object);
                 return State.OK;
             }
-        }, forTestRoutingKeyB, new SingleRouteProcessor<TestData>() {
+        }, new QueueKey(forTestRoutingKeyB, forTestRoutingKeyB), new SingleRouteProcessor<TestData>() {
             @Override
-            protected State handle(String routingKey, TestData object) {
+            protected State handle(Msg msg, TestData object) {
                 atomicInteger.decrementAndGet();
                 bReceives.add(object);
                 return State.OK;
             }
-        }, forTestRoutingKeyC, new SingleRouteProcessor<TestData>() {
+        }, new QueueKey(forTestRoutingKeyC, forTestRoutingKeyC), new SingleRouteProcessor<TestData>() {
             @Override
-            protected State handle(String routingKey, TestData object) {
+            protected State handle(Msg msg, TestData object) {
                 atomicInteger.decrementAndGet();
                 cReceives.add(object);
                 return State.Abort;
@@ -170,9 +170,9 @@ public class TestMq {
 
         Set<TestData> aReceives = Collections.synchronizedSet(new TreeSet<>());
 
-        Map<String, SingleRouteProcessor<?>> processors = Map.of(forTestRoutingKeyA, new SingleRouteProcessor<TestData>() {
+        Map<QueueKey, SingleRouteProcessor<?>> processors = Map.of(new QueueKey(forTestRoutingKeyA, forTestRoutingKeyA), new SingleRouteProcessor<TestData>() {
             @Override
-            protected State handle(String routingKey, TestData object) {
+            protected State handle(Msg msg, TestData object) {
                 aReceives.add(object);
                 atomicInteger.decrementAndGet();
                 if (object.getI() < 50) {
@@ -244,9 +244,9 @@ public class TestMq {
 
         Set<TestData> aReceives = Collections.synchronizedSet(new TreeSet<>());
 
-        Map<String, SingleRouteProcessor<?>> processors = Map.of("", new SingleRouteProcessor<TestData>() {
+        Map<QueueKey, SingleRouteProcessor<?>> processors = Map.of(new QueueKey("", deadQueue), new SingleRouteProcessor<TestData>() {
             @Override
-            protected State handle(String routingKey, TestData object) {
+            protected State handle(Msg msg, TestData object) {
                 aReceives.add(object);
                 atomicInteger.decrementAndGet();
                 return State.OK;
@@ -304,26 +304,22 @@ public class TestMq {
                 .setPrefetchCount(1)
                 .setParallelNum(1)
                 .build();
-        mainReceiver.register(new MsgProcessor() {
-            @Override
-            public State apply(String m, String routingKey, String msg) {
-                return State.Abort;
-            }
-        });
+        mainReceiver.register(msg -> State.Abort);
 
+        var deadQueue = "global.dead.queue" + Math.random();
         MsgReceiver receiver = MsgReceiver
                 .newBuilder()
                 .setExchangeName(MqConstants.GLOBAL_DEAD_LETTER_EXCHANGE_NAME)
-                .addBindQueue(new Queue("", "global.dead.queue" + Math.random()).setAutoDelete(true).setExclusive(true))
+                .addBindQueue(new Queue("", deadQueue).setAutoDelete(true).setExclusive(true))
                 .setPrefetchCount(1)
                 .setParallelNum(4)
                 .build();
 
         Set<TestData> aReceives = Collections.synchronizedSet(new TreeSet<>());
 
-        Map<String, SingleRouteProcessor<?>> processors = Map.of("", new SingleRouteProcessor<TestData>() {
+        Map<QueueKey, SingleRouteProcessor<?>> processors = Map.of(new QueueKey("", deadQueue), new SingleRouteProcessor<TestData>() {
             @Override
-            protected State handle(String routingKey, TestData object) {
+            protected State handle(Msg msg, TestData object) {
                 aReceives.add(object);
                 atomicInteger.decrementAndGet();
                 return State.OK;

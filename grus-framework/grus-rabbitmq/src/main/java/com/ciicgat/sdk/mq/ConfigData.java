@@ -33,11 +33,11 @@ public class ConfigData {
     private final String routingKey;
     private final String queue;
 
-    public ConfigData(String exchange, String routingKey, String queueName, boolean consumer) {
+    public ConfigData(String exchange, String routingKey, String queue, boolean consumer) {
         this.appName = Systems.APP_NAME;
         this.exchange = exchange;
         this.routingKey = routingKey;
-        this.queue = queueName;
+        this.queue = queue;
         this.consumer = consumer;
     }
 

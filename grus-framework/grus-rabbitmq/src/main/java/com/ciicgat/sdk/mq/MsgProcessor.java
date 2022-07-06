@@ -21,11 +21,9 @@ public interface MsgProcessor {
      * 上层实现时，需要根据情况捕获异常、返回对应的状态。
      * 如果上层没有捕获异常，则默认采用重试机制。重试次数可以自定义，默认5次。
      *
-     * @param msgId      消息id，发送时产生的。可用于消费时的幂等逻辑。如果业务已经有用于幂等的字段，可以忽略。老版本msgId为null
-     * @param routingKey 路由
-     * @param msg        消息体
+     * @param msg        消息内容。为了扩展性，换成了对象
      * @return
      */
-    State apply(String msgId, String routingKey, String msg);
+    State apply(Msg msg);
 
 }

@@ -119,7 +119,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
             OpenTelemetrys.configSystemTags(span);
             State result;
             try {
-                result = msgProcessor.apply(msgId, envelope.getRoutingKey(), msg);
+                result = msgProcessor.apply(new Msg(msgId, envelope.getExchange(), envelope.getRoutingKey(), this.queue, msg));
             } catch (RuntimeException e) {
                 LOGGER.error("handle msg error,msg {}", msg, e);
                 result = State.Retry;
