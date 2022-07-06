@@ -10,6 +10,7 @@ import com.ciicgat.grus.boot.autoconfigure.feign.FeignAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.gconf.GconfAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.job.ElasticJobAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.opentelemetry.OpenTelemetryAutoConfiguration;
+import com.ciicgat.grus.boot.autoconfigure.rabbitmq.RabbitMQAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.swagger.SwaggerAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.web.GrusWebAutoConfiguration;
@@ -32,6 +33,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
         OpenTelemetryAutoConfiguration.class,
         ElasticJobAutoConfiguration.class,
         ValidationAutoConfiguration.class,
+        RabbitMQAutoConfiguration.class,
         ZKAutoConfiguration.class})
 @EnableAsync(proxyTargetClass = true)
 public class HibernateValidationApplication {

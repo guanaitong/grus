@@ -15,6 +15,7 @@ import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.GrusServiceHttpHeader;
 import com.ciicgat.grus.service.GrusServiceStatus;
 import com.ciicgat.sdk.util.system.Systems;
+import com.ciicgat.sdk.util.system.WorkRegion;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
@@ -87,6 +88,18 @@ public class GrusFilter implements Filter {
         // 服务端降级
         final HttpServletRequest request = (HttpServletRequest) servletRequest;
         final HttpServletResponse response = (HttpServletResponse) servletResponse;
+
+        if (Systems.IN_K8S && WorkRegion.getCurrentWorkRegion().isDevelopOrTest()) {
+            String sslProtocol = request.getHeader("x_ssl_protocol");
+            if (sslProtocol != null && !sslProtocol.isEmpty()) {
+                if ("TLSv1".equals(sslProtocol) || "TLSv1.1".equals(sslProtocol) || "SSLv3".equals(sslProtocol)) {
+                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    response.getWriter().write(String.format("ssl version %s not support", sslProtocol));
+                    return;
+                }
+            }
+        }
+
         response.addHeader("x-app-name", Systems.APP_NAME);
         response.addHeader("x-app-instance", Systems.APP_INSTANCE);
 

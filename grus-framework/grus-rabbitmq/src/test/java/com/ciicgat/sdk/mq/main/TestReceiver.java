@@ -6,8 +6,13 @@
 package com.ciicgat.sdk.mq.main;
 
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
-import com.ciicgat.sdk.mq.MsgReceiver;
+import com.ciicgat.sdk.mq.Message;
+import com.ciicgat.sdk.mq.MsgProcessor;
+import com.ciicgat.sdk.mq.RabbitMqConsumer;
+import com.ciicgat.sdk.mq.Queue;
+import com.ciicgat.sdk.mq.RabbitMqInitializer;
 import com.ciicgat.sdk.mq.State;
+import com.ciicgat.sdk.mq.TestConnection;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
@@ -36,25 +41,30 @@ public class TestReceiver {
 //        QueueNameInfo queueNameInfo = new QueueNameInfo();
 //        queueNameInfo.setAppId("9999");
 //        queueNameInfo.setExchangeName();
+        Queue queueA = new Queue();
+        queueA.setName("c");
+        queueA.setAutoDelete(true);
+        RabbitMqInitializer.queueDeclareAndBind(TestConnection.getConnection(), queueA, "xxxxy", "c");
+        Queue queueB = new Queue();
+        queueB.setName("b");
+        queueB.setAutoDelete(true);
+        RabbitMqInitializer.queueDeclareAndBind(TestConnection.getConnection(), queueB, "xxxxy", "b");
 
-        MsgReceiver receiver = MsgReceiver
-                .newBuilder()
-                .setExchangeName("xxxxy")
-                .addBindQueue("a", "a")
-                .addBindQueue("b", "b")
-                .setPrefetchCount(1)
-                .setParallelNum(10).build();
-
-
-        receiver.register((msg) -> {
-            Span span = Span.current();
-            String traceId = span.getSpanContext().getTraceId();
-            System.out.println(traceId);
+        RabbitMqConsumer receiver = new RabbitMqConsumer(TestConnection.getConnection(), 2, 1, 1, true);
+        MsgProcessor msgProcessor = new MsgProcessor() {
+            @Override
+            public State apply(Message msg) {
+                Span span = Span.current();
+                String traceId = span.getSpanContext().getTraceId();
+                System.out.println(traceId);
 //            throw new RuntimeException();
-            LOGGER.info(Thread.currentThread().getName() + " m:" + msg);
-            System.out.println(Thread.currentThread().getName() + " m:" + msg);
-            return State.OK;
-        });
+                LOGGER.info(Thread.currentThread().getName() + " m:" + msg);
+                System.out.println(Thread.currentThread().getName() + " m:" + msg);
+                return State.OK;
+            }
+        };
+        receiver.consume("c", msgProcessor);
+        receiver.consume("b", msgProcessor);
 
 //        Threads.sleepSeconds(1000);
 

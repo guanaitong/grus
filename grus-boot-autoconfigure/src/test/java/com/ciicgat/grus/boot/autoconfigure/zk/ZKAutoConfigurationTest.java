@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ZKAutoConfigurationTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withUserConfiguration(ZKAutoConfiguration.class);
+
     @Test
     void workIdHolder() {
         this.contextRunner

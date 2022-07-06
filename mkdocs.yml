@@ -149,6 +149,8 @@ nav:
           - framework/cache/cache.md
       - zookeeper:
           - framework/zk/index.md
+      - rabbitmq:
+          - framework/rabbitmq/index.md
       - kafka:
           - framework/kafka/index.md
       - web:

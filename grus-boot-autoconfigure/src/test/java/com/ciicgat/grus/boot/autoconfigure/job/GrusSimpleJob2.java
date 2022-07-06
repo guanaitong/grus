@@ -22,6 +22,7 @@ public class GrusSimpleJob2 implements SimpleJob {
 
     private AtomicInteger atomicInteger = new AtomicInteger();
     private CountDownLatch countDownLatch = new CountDownLatch(1);
+
     public GrusSimpleJob2() {
         System.out.println("init----------------------------");
     }

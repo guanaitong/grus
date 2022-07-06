@@ -6,8 +6,8 @@
 package com.ciicgat.sdk.mq.main;
 
 import com.ciicgat.sdk.lang.threads.Threads;
-import com.ciicgat.sdk.mq.MsgDispatcher;
-import com.rabbitmq.client.BuiltinExchangeType;
+import com.ciicgat.sdk.mq.RabbitMqProducer;
+import com.ciicgat.sdk.mq.TestConnection;
 
 /**
  * @Author: yuqi.chen
@@ -17,12 +17,7 @@ public class TestConDispatcher {
 
     public static void main(String[] args) {
 
-
-        MsgDispatcher dispatcher = MsgDispatcher.newBuilder()
-//                .setExchangeNameInfo(exchangeNameInfo)
-                .setExchangeName("xxxxy")
-//                .setRoutingKey("testRouting.a")
-                .setExchangeType(BuiltinExchangeType.DIRECT).build();
+        RabbitMqProducer dispatcher = new RabbitMqProducer(TestConnection.getConnection(), 3, false, true, true);
 
 
         for (int i = 0; i < 20; i++) {
@@ -30,8 +25,7 @@ public class TestConDispatcher {
                 @Override
                 public void run() {
                     for (int i = 0; i < 100; i++) {
-                        dispatcher.sendMsg("测试消息a", "a");
-//                             System.out.println("123");
+                        dispatcher.publish("xxxxy", "a", "测试消息a");
                         Threads.sleep(10 * 1000);
                     }
 

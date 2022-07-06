@@ -32,7 +32,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -60,23 +59,22 @@ public class GrusDefaultConsumer extends DefaultConsumer {
         }
     };
     private static final Logger LOGGER = LoggerFactory.getLogger(GrusDefaultConsumer.class);
-    private final AtomicBoolean isRunning;
 
+    private final String queue;
+    private final AtomicBoolean isRunning;
     private final int maxRetryCount;
-    private final boolean enableDeadLetter;
+    private final boolean fallBack;
     private final Cache<String, AtomicInteger> failedCounts = Caffeine.newBuilder().initialCapacity(16).scheduler(Scheduler.systemScheduler()).expireAfterWrite(Duration.ofMinutes(5)).expireAfterAccess(Duration.ofMinutes(5)).maximumSize(10240).build();
     private MsgProcessor msgProcessor;
 
-    private final String queue;
 
-
-    GrusDefaultConsumer(Channel channel, String queue, MsgProcessor msgProcessor, AtomicBoolean isRunning, int maxRetryCount, boolean enableDeadLetter) {
+    GrusDefaultConsumer(Channel channel, String queue, MsgProcessor msgProcessor, AtomicBoolean isRunning, int maxRetryCount, boolean fallBack) {
         super(channel);
         this.queue = queue;
         this.msgProcessor = msgProcessor;
-        this.isRunning = Objects.requireNonNull(isRunning);
+        this.isRunning = isRunning;
         this.maxRetryCount = maxRetryCount;
-        this.enableDeadLetter = enableDeadLetter;
+        this.fallBack = fallBack;
     }
 
     @Override
@@ -119,7 +117,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
             OpenTelemetrys.configSystemTags(span);
             State result;
             try {
-                result = msgProcessor.apply(new Msg(msgId, envelope.getExchange(), envelope.getRoutingKey(), this.queue, msg));
+                result = msgProcessor.apply(new Message(msgId, envelope.getExchange(), envelope.getRoutingKey(), this.queue, msg));
             } catch (RuntimeException e) {
                 LOGGER.error("handle msg error,msg {}", msg, e);
                 result = State.Retry;
@@ -153,8 +151,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
     private void abort(Envelope envelope, String msgId, String msg, byte[] body) throws IOException {
         LOGGER.warn("abort msg: {}", msg);
         getChannel().basicReject(envelope.getDeliveryTag(), false);
-        if (!enableDeadLetter) {
-            // 当没有启用死信队列时，手动的往全局死信队列里发
+        if (fallBack) {
             try {
                 Map<String, Object> headers = new HashMap<>();
                 headers.put("manual", 0);

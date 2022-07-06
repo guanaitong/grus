@@ -6,8 +6,8 @@
 package com.ciicgat.sdk.mq.main;
 
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
-import com.ciicgat.sdk.mq.MsgDispatcher;
-import com.rabbitmq.client.BuiltinExchangeType;
+import com.ciicgat.sdk.mq.RabbitMqProducer;
+import com.ciicgat.sdk.mq.TestConnection;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.context.propagation.TextMapPropagator;
@@ -27,15 +27,16 @@ public class TestDispatcher {
         OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
         OpenTelemetrys.set(sdk);
 
-        MsgDispatcher dispatcher = MsgDispatcher
-                .newBuilder()
-//                .setExchangeNameInfo(exchangeNameInfo)
-                .setExchangeName("xxxxy")
-//                .setRoutingKey("testRouting.a")
-                .setExchangeType(BuiltinExchangeType.DIRECT)
-                .build();
+        RabbitMqProducer dispatcher = new RabbitMqProducer(TestConnection.getConnection(), 3, false, true, true);
+//        MsgDispatcher dispatcher = MsgDispatcher
+//                .newBuilder()
+////                .setExchangeNameInfo(exchangeNameInfo)
+//                .setExchangeName("xxxxy")
+////                .setRoutingKey("testRouting.a")
+//                .setExchangeType(BuiltinExchangeType.DIRECT)
+//                .build();
 
-        dispatcher.sendMsg("测试消息a", "a");
+        dispatcher.exchangeMsgDispatcher("xxxxy").publish("a", "测试消息a");
 //        for (int i = 0; i < 100; i++) {
 //            dispatcher.sendMsg("测试消息a" + i, "a");
 //            dispatcher.sendMsg("测试消息b" + i, "b");

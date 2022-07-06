@@ -7,7 +7,7 @@ package com.ciicgat.sdk.mq.processor;
 
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.json.JSONException;
-import com.ciicgat.sdk.mq.Msg;
+import com.ciicgat.sdk.mq.Message;
 import com.ciicgat.sdk.mq.MsgProcessor;
 import com.ciicgat.sdk.mq.State;
 import com.fasterxml.jackson.databind.JavaType;
@@ -22,26 +22,26 @@ import java.lang.reflect.Type;
  * <p>
  * Created by August.Zhou on 2022/7/3 09:40
  */
-public abstract class SingleRouteProcessor<T> implements MsgProcessor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SingleRouteProcessor.class);
+public abstract class JSONObjectProcessor<T> implements MsgProcessor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSONObjectProcessor.class);
     private final JavaType _type;
 
-    public SingleRouteProcessor() {
+    public JSONObjectProcessor() {
         Type type = ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         this._type = JSON.getTypeFactory().constructType(type);
     }
 
     @Override
-    public final State apply(Msg msg) {
+    public final State apply(Message message) {
         Object value;
         try {
-            value = JSON.parse(msg.body(), _type);
+            value = JSON.parse(message.body(), _type);
         } catch (JSONException jsonException) {
             LOGGER.error("json parse error", jsonException);
             return State.Abort;
         }
-        return handle(msg, (T) value);
+        return handle(message, (T) value);
     }
 
-    protected abstract State handle(Msg msg, T object);
+    protected abstract State handle(Message message, T object);
 }
