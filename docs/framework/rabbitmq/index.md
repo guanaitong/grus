@@ -229,8 +229,43 @@ public class XXXConfiguration {
 
 在不确定时，可以返回`Retry`。
 
-其他注意点：
+下面给出一个异常处理比较完善的demo：
+
+```java
+
+@MessageQueueListener("grus-demo-test-queue") //MessageQueueListener定义消费哪个队列
+public class DemoMsgProcessor implements MsgProcessor {
+    @Override
+    public State apply(Message message) {
+        try {
+            // do something
+            return State.OK;
+        } catch (JSONException e) {
+            // json解析异常，消息肯定无法处理了，直接放弃。
+            return State.Abort;
+        } catch (FeignException e) {
+            // 微服务网络错误时，重试。正常情况下不会出现此异常。
+            return State.Retry;
+        } catch (DataAccessException e) {
+            // 数据库异常时，重试。正常情况下不会出现此异常。
+            return State.Retry;
+        } catch (DataAccessException e) {
+            // 数据库异常时，重试。正常情况下不会出现此异常。
+            return State.Retry;
+        } catch (BusinessFeignException e) {
+            // 依赖服务返回的code非0。要根据实际的情况判断
+            return 根据实际情况判断返回;
+        } catch (BusinessRuntimeException e) {
+            // 处理逻辑内部抛出来的
+            return 根据实际情况判断返回;
+        }
+    }
+}
+```
+
+注意点：
 
 1. 同一个队列，只能注册一个处理器。当试图注册第二个时，会报错。
-2. 生产上，可以查看risk数据库实例的`notifyagent`库的`MqMsg`表
+2. 虽然框架做了异常捕获。但是依然建议大家捕获异常，根据实际情况，对异常做出判断，返回对应的状态。
+3. 生产上，可以查看risk数据库实例的`notifyagent`库的`MqMsg`表
 
