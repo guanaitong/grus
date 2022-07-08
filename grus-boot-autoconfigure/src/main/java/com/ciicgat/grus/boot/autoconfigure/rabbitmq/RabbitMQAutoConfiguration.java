@@ -5,12 +5,12 @@
 
 package com.ciicgat.grus.boot.autoconfigure.rabbitmq;
 
-import com.ciicgat.sdk.mq.ConnnectionFactory;
-import com.ciicgat.sdk.mq.RabbitMqProducer;
-import com.ciicgat.sdk.mq.RabbitMqConsumer;
-import com.ciicgat.sdk.mq.Queue;
-import com.ciicgat.sdk.mq.QueueBind;
-import com.ciicgat.sdk.mq.RabbitMqInitializer;
+import com.ciicgat.grus.rabbitmq.ConnnectionFactory;
+import com.ciicgat.grus.rabbitmq.Queue;
+import com.ciicgat.grus.rabbitmq.QueueBind;
+import com.ciicgat.grus.rabbitmq.RabbitMqConsumer;
+import com.ciicgat.grus.rabbitmq.RabbitMqInitializer;
+import com.ciicgat.grus.rabbitmq.RabbitMqProducer;
 import com.rabbitmq.client.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

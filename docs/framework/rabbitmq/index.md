@@ -12,20 +12,20 @@
 
 ![rabbitmq概念图](rabbitmq.jpeg)
 
-
-
 说下架构层面的一些考虑：
 
 1. 所有应用程序使用同一个rabbitmq服务器。
 2. virtual host我们所有应用都固定使用根**/**。前两点的主要原因是：把**rabbitmq**定位于无障碍消息总线。
 3. 考虑rabbitmq服务器连接上限，每个应用程序对服务端最多只有两个连接，producer和consumer各一个。大流量大并发场景，这可能会是一个性能限制，但目前足以覆盖关爱通所有场景。
-4. 考虑到实际业务没那么复杂，所以我们做出限制：**一个jvm进程内，创建一个消费者或者一个生产者**。也就是Grus把channel限制到exchange上了。（实际上，channel在生产者情况可用于多个exchange、在消费者情况下可用于多个queue，不过这样子对于框架封装过于复杂）
+4. 考虑到实际业务没那么复杂，所以我们做出限制：**一个jvm进程内，创建一个消费者或者一个生产者**
+   。也就是Grus把channel限制到exchange上了。（实际上，channel在生产者情况可用于多个exchange、在消费者情况下可用于多个queue，不过这样子对于框架封装过于复杂）
 
 ## SDK
 
 直接使用`grus-boot-starter-rabbitmq`。
 
 ```xml
+
 <dependency>
     <groupId>com.ciicgat.grus.boot</groupId>
     <artifactId>grus-boot-starter-rabbitmq</artifactId>
@@ -94,38 +94,40 @@ grus.rabbitmq.producer.createTimestamp=true
     @Autowired
     private RabbitMqProducer rabbitMqProducer;
 
-    public void doSth(){
+    public void doSth() {
         var exchange = "grus-demo-test-exchange";
         var routingKey = "grus-demo-test";
-        rabbitMqProducer.publish(exchange,routingKey,"i am a message");
+        rabbitMqProducer.publish(exchange, routingKey, "i am a message");
     }
- }
+}
 ```
 
-提供了便捷的类`ExchangeProducer`，可以少传了exchange参数。
+提供了便捷的类`ExchangeObjectPublisher`，可以少传了exchange参数，而且msg为对象是自动转化为json字符串
 
 ```java
+
 @Configuration(proxyBeanMethods = false)
 public class XXXConfiguration {
     @Bean
-    public ExchangeProducer exchangeProducer(RabbitMqProducer rabbitMqProducer){
-        return rabbitMqProducer.exchangeMsgDispatcher("grus-demo-test-exchange");
+    public ExchangeObjectPublisher exchangeObjectPublisher(RabbitMqProducer rabbitMqProducer) {
+        return rabbitMqProducer.exchangeObjectPublisher("grus-demo-test-exchange");
     }
 }
+
 public class RabbitMQTest {
     @Autowired
-    private ExchangeProducer exchangeProducer;
+    private ExchangeObjectPublisher exchangeObjectPublisher;
 
-    public void doSth(){
+    public void doSth() {
         var routingKey1 = "grus-demo-test-1";
-        exchangeProducer.publish(routingKey1,"i am a message");
+        exchangeProducer.publish(routingKey1, "i am a message");
         var routingKey2 = "grus-demo-test-2";
-        exchangeProducer.publish(routingKey2,"i am a message2");
+        User user = new User(1, "albert");
+        //传对象
+        exchangeProducer.publish(routingKey2, user);
     }
 }
 ```
-
-
 
 ## 消费者
 
@@ -135,13 +137,12 @@ public class RabbitMQTest {
 2. 保证消息可以重复消费
 
 以上的两点，对于开发来说要求有点高，其需要正确处理各种场景、异常。比如以下常见的情况就会发生问题：
+
 - 捕获了异常，但是对异常不做处理，最终无脑确认消息已消费。假如此时发生短暂的依赖服务异常，消息得不到重试的机会，进而导致数据丢失
 - 捕获了异常，在异常发生时让消息重新入列。此种处理方式，虽然能保证消息不丢弃，但是对于那些无法处理异常的数据（比如json格式错误），会让导致其消息在程序和服务器之间来回踢皮球，而且此条消息永远结束不了。
 - 不捕获异常，导致mq的消费线程直接crash，导致连接断开。
 
 我们在新的框架下，努力解决上述问题。
-
-
 
 启用消费者：
 
@@ -153,9 +154,10 @@ grus.rabbitmq.consumer.maxRetry=5 //最大的重试次数
 grus.rabbitmq.consumer.fallBack=true //遇到消息丢弃时，是否将消息发送到全局错误信息收集交换机
 ```
 
-编辑队列的消息处理器：
+编写队列的消息处理器：
 
 ```java
+
 @MessageQueueListener("grus-demo-test-queue") //MessageQueueListener定义消费哪个队列
 public class TestMsgProcessor implements MsgProcessor {
     @Override
@@ -177,21 +179,20 @@ public class TestMsgProcessor extends JSONObjectProcessor<TestData> {
 //如果消息处理器是
 ```
 
-
-
 高级用法，如果程序想要多个队列共享一个消息处理器，程序根据队列名字自己做路由，可以这么写：
 
 ```java
+
 @Configuration(proxyBeanMethods = false)
 public class XXXConfiguration {
     @Autowired
-    MsgProcessor msgProcessor(RabbitMqConsumer rabbitMqConsumer){
+    MsgProcessor msgProcessor(RabbitMqConsumer rabbitMqConsumer) {
         Map<String, ? extends MsgProcessor> msgProcessorMap = Map.of("q1", new MsgProcessor() {
             @Override
             public State apply(Message message) {
                 return State.OK;
             }
-        },"q2", new JSONObjectProcessor<TestData>() {
+        }, "q2", new JSONObjectProcessor<TestData>() {
             @Override
             public State handle(Message msg, TestData testData) {
                 return State.OK;
@@ -199,14 +200,12 @@ public class XXXConfiguration {
         });
         DispatcherMsgProcessor dispatcherMsgProcessor = new DispatcherMsgProcessor(msgProcessorMap);
         for (Map.Entry<String, ? extends MsgProcessor> entry : msgProcessorMap.entrySet()) {
-            rabbitMqConsumer.consume(entry.getKey(),entry.getValue());
+            rabbitMqConsumer.consume(entry.getKey(), entry.getValue());
         }
         return dispatcherMsgProcessor;
     }
 }
 ```
-
-
 
 关于消费者返回状态说明：
 
@@ -214,6 +213,9 @@ public class XXXConfiguration {
 2. 返回Retry时，消息会重试（重新入列），最大重试次数看配置。超过最大重试次数后，默认往全局错误信息收集交换机发送该消息（此行为是框架做的）
 3. 返回Abort时，消息会立即丢弃（拒绝，不入列），默认也会往全局错误信息收集交换机发送该消息。如果队列上设置了死信交换机，rabbitmq还会往死信交换机发。
 
-tips：
+所以，大家不用当心丢消息或者消息无法处理。在不确定时，可以返回Retry。
 
-1. 大家不用当心丢消息或者消息无法处理。在不确定时，可以返回Retry。
+其他注意点：
+
+1. 同一个队列，只能注册一个处理器。当试图注册第二个时，会报错。
+2. 生产上，可以查看risk数据库实例的`notifyagent`库的`MqMsg`表

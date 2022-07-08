@@ -5,9 +5,9 @@
 
 package com.ciicgat.grus.boot.autoconfigure.rabbitmq;
 
-import com.ciicgat.sdk.mq.Message;
-import com.ciicgat.sdk.mq.MsgProcessor;
-import com.ciicgat.sdk.mq.State;
+import com.ciicgat.grus.rabbitmq.Message;
+import com.ciicgat.grus.rabbitmq.MsgProcessor;
+import com.ciicgat.grus.rabbitmq.State;
 
 /**
  * Created by August.Zhou on 2022/7/8 16:17

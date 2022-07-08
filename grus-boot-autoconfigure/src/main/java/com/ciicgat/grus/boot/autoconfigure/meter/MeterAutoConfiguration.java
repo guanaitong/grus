@@ -5,7 +5,7 @@
 
 package com.ciicgat.grus.boot.autoconfigure.meter;
 
-import com.ciicgat.sdk.mq.metrics.DelegateMetricsCollector;
+import com.ciicgat.grus.rabbitmq.metrics.DelegateMetricsCollector;
 import com.rabbitmq.client.ConnectionFactory;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Value;

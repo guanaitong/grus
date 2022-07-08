@@ -7,8 +7,8 @@ package com.ciicgat.grus.boot.autoconfigure.rabbitmq;
 
 import com.ciicgat.grus.boot.autoconfigure.condition.ServerEnvCondition;
 import com.ciicgat.grus.boot.autoconfigure.core.GrusCoreContextInitializer;
-import com.ciicgat.sdk.mq.RabbitMqConsumer;
-import com.ciicgat.sdk.mq.RabbitMqProducer;
+import com.ciicgat.grus.rabbitmq.RabbitMqConsumer;
+import com.ciicgat.grus.rabbitmq.RabbitMqProducer;
 import com.rabbitmq.client.Connection;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import org.junit.jupiter.api.Test;

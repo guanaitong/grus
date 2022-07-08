@@ -5,9 +5,9 @@
 
 package com.ciicgat.grus.boot.autoconfigure.rabbitmq;
 
+import com.ciicgat.grus.rabbitmq.Queue;
+import com.ciicgat.grus.rabbitmq.QueueBind;
 import com.ciicgat.sdk.gconf.GlobalGconfConfig;
-import com.ciicgat.sdk.mq.Queue;
-import com.ciicgat.sdk.mq.QueueBind;
 import com.ciicgat.sdk.util.system.Systems;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import com.rabbitmq.client.BuiltinExchangeType;
