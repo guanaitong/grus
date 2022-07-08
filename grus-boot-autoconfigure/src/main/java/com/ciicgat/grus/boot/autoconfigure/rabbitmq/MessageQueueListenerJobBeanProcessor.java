@@ -5,8 +5,8 @@
 
 package com.ciicgat.grus.boot.autoconfigure.rabbitmq;
 
-import com.ciicgat.grus.rabbitmq.MsgProcessor;
 import com.ciicgat.grus.rabbitmq.RabbitMqConsumer;
+import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 

@@ -5,6 +5,7 @@
 
 package com.ciicgat.grus.rabbitmq;
 
+import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.slf4j.Logger;

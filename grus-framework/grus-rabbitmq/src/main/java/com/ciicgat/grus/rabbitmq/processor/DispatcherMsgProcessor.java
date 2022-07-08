@@ -6,7 +6,6 @@
 package com.ciicgat.grus.rabbitmq.processor;
 
 import com.ciicgat.grus.rabbitmq.Message;
-import com.ciicgat.grus.rabbitmq.MsgProcessor;
 import com.ciicgat.grus.rabbitmq.State;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

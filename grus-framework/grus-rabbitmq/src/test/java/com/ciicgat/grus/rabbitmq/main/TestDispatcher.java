@@ -36,7 +36,7 @@ public class TestDispatcher {
 //                .setExchangeType(BuiltinExchangeType.DIRECT)
 //                .build();
 
-        dispatcher.exchangeObjectPublisher("xxxxy").publish("a", "测试消息a");
+        dispatcher.exchangePublisher("xxxxy").publish("a", "测试消息a");
 //        for (int i = 0; i < 100; i++) {
 //            dispatcher.sendMsg("测试消息a" + i, "a");
 //            dispatcher.sendMsg("测试消息b" + i, "b");

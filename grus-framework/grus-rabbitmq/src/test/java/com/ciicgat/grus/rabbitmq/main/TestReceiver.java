@@ -7,12 +7,12 @@ package com.ciicgat.grus.rabbitmq.main;
 
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.rabbitmq.Message;
-import com.ciicgat.grus.rabbitmq.MsgProcessor;
 import com.ciicgat.grus.rabbitmq.Queue;
 import com.ciicgat.grus.rabbitmq.RabbitMqConsumer;
 import com.ciicgat.grus.rabbitmq.RabbitMqInitializer;
 import com.ciicgat.grus.rabbitmq.State;
 import com.ciicgat.grus.rabbitmq.TestConnection;
+import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;

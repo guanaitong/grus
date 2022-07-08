@@ -8,7 +8,6 @@ package com.ciicgat.grus.rabbitmq.processor;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.json.JSONException;
 import com.ciicgat.grus.rabbitmq.Message;
-import com.ciicgat.grus.rabbitmq.MsgProcessor;
 import com.ciicgat.grus.rabbitmq.State;
 import com.fasterxml.jackson.databind.JavaType;
 import org.slf4j.Logger;

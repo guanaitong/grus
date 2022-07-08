@@ -9,6 +9,7 @@ import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.logger.LogUtil;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
+import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
 import com.ciicgat.sdk.util.system.Systems;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -80,14 +81,14 @@ public class GrusDefaultConsumer extends DefaultConsumer {
     @Override
     public final void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
         if (isRunning.get()) {
-            handleDelivery0(consumerTag, envelope, properties, body);
+            _handleDelivery(consumerTag, envelope, properties, body);
         } else {
             // 关机后，消息不再消费，重新入队
             getChannel().basicReject(envelope.getDeliveryTag(), true);
         }
     }
 
-    protected void handleDelivery0(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+    protected void _handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
         String msg;
         try {
             msg = new String(body, StandardCharsets.UTF_8);

@@ -3,15 +3,18 @@
  * All rights reserved.
  */
 
-package com.ciicgat.grus.rabbitmq;
+package com.ciicgat.grus.rabbitmq.processor;
 
+
+import com.ciicgat.grus.rabbitmq.Message;
+import com.ciicgat.grus.rabbitmq.State;
 
 /**
  * 消息处理器。
  * 一般一个queue会有一个MsgProcessor
  * 为了便捷，可使用上层的JSONObjectProcessor
  * <p>
- * Created by cpx on 2017-08-07.
+ * Created by August.Zhou on 2022/7/8 21:22
  */
 @FunctionalInterface
 public interface MsgProcessor {

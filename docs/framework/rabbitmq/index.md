@@ -87,7 +87,7 @@ grus.rabbitmq.producer.createMessageId=true
 grus.rabbitmq.producer.createTimestamp=true
 ```
 
-当开启生产者后，框架会自动注入`RabbitMqProducer`单例，大家可以直接使用。
+当开启生产者后，框架会自动注入`RabbitMqProducer`单例，大家可以直接使用。`publish`方法支持将传入对象时自动转换为json字符串。
 
 ```java
  public class RabbitMQTest {
@@ -98,32 +98,37 @@ grus.rabbitmq.producer.createTimestamp=true
         var exchange = "grus-demo-test-exchange";
         var routingKey = "grus-demo-test";
         rabbitMqProducer.publish(exchange, routingKey, "i am a message");
+        var routingKey2 = "grus-demo-test-2";
+        //传对象
+        User user = new User(1, "albert");
+        rabbitMqProducer.publish(exchange, routingKey2, user);
     }
 }
 ```
 
-提供了便捷的类`ExchangeObjectPublisher`，可以少传了exchange参数，而且msg为对象是自动转化为json字符串
+提供了便捷的类`ExchangePublisher`，可以少传了exchange参数
 
 ```java
 
 @Configuration(proxyBeanMethods = false)
 public class XXXConfiguration {
     @Bean
-    public ExchangeObjectPublisher exchangeObjectPublisher(RabbitMqProducer rabbitMqProducer) {
-        return rabbitMqProducer.exchangeObjectPublisher("grus-demo-test-exchange");
+    public ExchangePublisher exchangePublisher(RabbitMqProducer rabbitMqProducer) {
+        return rabbitMqProducer.exchangePublisher("grus-demo-test-exchange");
     }
 }
 
-public class RabbitMQTest {
+@Service
+public class RabbitMQService {
     @Autowired
-    private ExchangeObjectPublisher exchangeObjectPublisher;
+    private ExchangePublisher exchangePublisher;
 
     public void doSth() {
         var routingKey1 = "grus-demo-test-1";
         exchangeProducer.publish(routingKey1, "i am a message");
         var routingKey2 = "grus-demo-test-2";
-        User user = new User(1, "albert");
         //传对象
+        User user = new User(1, "albert");
         exchangeProducer.publish(routingKey2, user);
     }
 }

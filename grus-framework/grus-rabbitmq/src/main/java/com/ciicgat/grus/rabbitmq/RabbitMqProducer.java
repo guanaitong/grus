@@ -7,6 +7,8 @@ package com.ciicgat.grus.rabbitmq;
 
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.core.Stringer;
+import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
@@ -59,8 +61,8 @@ public class RabbitMqProducer {
         this.createTimestamp = createTimestamp;
     }
 
-    public ExchangeObjectPublisher exchangeObjectPublisher(String exchange) {
-        return new ExchangeObjectPublisher(this, exchange);
+    public ExchangePublisher exchangePublisher(String exchange) {
+        return new ExchangePublisher(this, exchange);
     }
 
     /**
@@ -68,10 +70,10 @@ public class RabbitMqProducer {
      *
      * @param exchange   交换机
      * @param routingKey 路由
-     * @param msg        消息体
+     * @param value      消息体
      */
-    public void publish(String exchange, String routingKey, String msg) {
-        this.publish(exchange, routingKey, msg, null);
+    public void publish(String exchange, String routingKey, Object value) {
+        this.publish(exchange, routingKey, value, null);
     }
 
     /**
@@ -79,10 +81,14 @@ public class RabbitMqProducer {
      *
      * @param exchange   交换机
      * @param routingKey 路由
-     * @param msg        消息体
+     * @param value      消息体
      * @param properties
      */
-    public void publish(String exchange, String routingKey, String msg, AMQP.BasicProperties properties) {
+    public void publish(String exchange, String routingKey, Object value, AMQP.BasicProperties properties) {
+        // value是字符串时，直接使用
+        // value继承了Stringer接口时，使用Stringer的string方法。这个主要是方便上游自定义序列化规则
+        // 剩下的，value自动转化为json字符串
+        String msg = value instanceof String ? (String) value : (value instanceof Stringer ? ((Stringer) value).string() : JSON.toJSONString(value));
         Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder("sendMsg").setSpanKind(SpanKind.PRODUCER).setParent(Context.current()).startSpan();
         Channel channel = null;

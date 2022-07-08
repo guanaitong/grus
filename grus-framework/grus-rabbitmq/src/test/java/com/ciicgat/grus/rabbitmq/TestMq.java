@@ -123,11 +123,11 @@ public class TestMq {
         receiver.consume(forTestRoutingKeyC, multiRouteProcessor);
 
 
-        ExchangeObjectPublisher exchangeObjectPublisher = dispatcher.exchangeObjectPublisher(forTestExchangeName);
+        ExchangePublisher exchangePublisher = dispatcher.exchangePublisher(forTestExchangeName);
         for (TestData s : msgList) {
-            exchangeObjectPublisher.publish(forTestRoutingKeyA, s);
-            exchangeObjectPublisher.publish(forTestRoutingKeyB, s);
-            exchangeObjectPublisher.publish(forTestRoutingKeyC, s);
+            exchangePublisher.publish(forTestRoutingKeyA, s);
+            exchangePublisher.publish(forTestRoutingKeyB, s);
+            exchangePublisher.publish(forTestRoutingKeyC, s);
         }
 
         long start = System.currentTimeMillis();
