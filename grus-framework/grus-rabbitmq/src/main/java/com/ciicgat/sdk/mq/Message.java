@@ -5,6 +5,8 @@
 
 package com.ciicgat.sdk.mq;
 
+import java.util.Date;
+
 /**
  * Created by August.Zhou on 2022/7/6 09:40
  *
@@ -14,6 +16,6 @@ package com.ciicgat.sdk.mq;
  * @param queue      队列
  * @param body       消息内容
  */
-public record Message(String msgId, String exchange, String routingKey, String queue, String body) {
+public record Message(String exchange, String routingKey, String queue, String msgId, Date createdAt, String body) {
 
 }
