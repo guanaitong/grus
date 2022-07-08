@@ -13,10 +13,24 @@ import com.rabbitmq.client.AMQP;
 public class ExchangePublisher {
     private final RabbitMqProducer rabbitMqProducer;
     private final String exchange;
+    /**
+     * 默认的路由
+     */
+    private final String defaultRoutingKey;
 
-    public ExchangePublisher(RabbitMqProducer rabbitMqProducer, String exchange) {
+    public ExchangePublisher(RabbitMqProducer rabbitMqProducer, String exchange, String defaultRoutingKey) {
         this.rabbitMqProducer = rabbitMqProducer;
         this.exchange = exchange;
+        this.defaultRoutingKey = defaultRoutingKey;
+    }
+
+    /**
+     * 使用默认路由发布消息。调用此方法，defaultRoutingKey不能为空。
+     *
+     * @param value
+     */
+    public void publish(Object value) {
+        this.publish(this.defaultRoutingKey, value, null);
     }
 
     public void publish(String routingKey, Object value) {

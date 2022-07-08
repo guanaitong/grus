@@ -62,7 +62,11 @@ public class RabbitMqProducer {
     }
 
     public ExchangePublisher exchangePublisher(String exchange) {
-        return new ExchangePublisher(this, exchange);
+        return this.exchangePublisher(exchange, null);
+    }
+
+    public ExchangePublisher exchangePublisher(String exchange, String defaultRoutingKey) {
+        return new ExchangePublisher(this, exchange, defaultRoutingKey);
     }
 
     /**
@@ -90,7 +94,7 @@ public class RabbitMqProducer {
         // 剩下的，value自动转化为json字符串
         String msg = value instanceof String ? (String) value : (value instanceof Stringer ? ((Stringer) value).string() : JSON.toJSONString(value));
         Tracer tracer = OpenTelemetrys.getTracer();
-        Span span = tracer.spanBuilder("sendMsg").setSpanKind(SpanKind.PRODUCER).setParent(Context.current()).startSpan();
+        Span span = tracer.spanBuilder("producer").setSpanKind(SpanKind.PRODUCER).setParent(Context.current()).startSpan();
         Channel channel = null;
         try (Scope scope = span.makeCurrent()) {
             OpenTelemetrys.configSystemTags(span);

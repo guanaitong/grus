@@ -101,7 +101,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
 
         Context context = OpenTelemetrys.getTextMapPropagator().extract(Context.current(), properties.getHeaders(), getter);
 
-        Span span = tracer.spanBuilder("handleMsg").setSpanKind(SpanKind.CONSUMER).setParent(context).startSpan();
+        Span span = tracer.spanBuilder("consumer").setSpanKind(SpanKind.CONSUMER).setParent(context).startSpan();
         String traceId = "";
         if (span != Span.getInvalid()) {
             traceId = span.getSpanContext().getTraceId();
