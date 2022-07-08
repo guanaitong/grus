@@ -55,12 +55,12 @@ grus.rabbitmq.init.exchanges[1].type=fanout
 
 ```properties
 grus.rabbitmq.init.queues[0].name=grus-demo-test-queue
-// 死信队列，声明死信交换机
+# 死信队列，声明死信交换机
 grus.rabbitmq.init.queues[0].args.x-dead-letter-exchange=grus-demo-test.dead.exchange
 grus.rabbitmq.init.queues[0].args.x-dead-letter-routing-key=
-// 消息一个小时会过期
+# 消息一个小时会过期
 grus.rabbitmq.init.queues[0].args.x-message-ttl=3600000
-// 优先级队列，最大优先级为10
+# 优先级队列，最大优先级为10
 grus.rabbitmq.init.queues[0].args.x-max-priority=10
 ```
 
@@ -82,7 +82,8 @@ grus.rabbitmq.init.binds[0].routing_key=grus-demo-test //如果交换机是fanou
 
 ```properties
 grus.rabbitmq.producer.enable=true
-grus.rabbitmq.producer.parallel=4 //生产者的并发数
+#生产者的并发数
+grus.rabbitmq.producer.parallel=4 
 grus.rabbitmq.producer.createMessageId=true
 grus.rabbitmq.producer.createTimestamp=true
 ```
@@ -147,16 +148,20 @@ public class RabbitMQService {
 - 捕获了异常，在异常发生时让消息重新入列。此种处理方式，虽然能保证消息不丢弃，但是对于那些无法处理异常的数据（比如json格式错误），会让导致其消息在程序和服务器之间来回踢皮球，而且此条消息永远结束不了。
 - 不捕获异常，导致mq的消费线程直接crash，导致连接断开。
 
-我们在新的框架下，努力解决上述问题。
+我们在新的框架下，努力缓解上述问题。
 
 启用消费者：
 
 ```properties
 grus.rabbitmq.consumer.enable=true
-grus.rabbitmq.consumer.parallel=4 //生产者的并发数
-grus.rabbitmq.consumer.prefetch=3 //客户端预取的个数
-grus.rabbitmq.consumer.maxRetry=5 //最大的重试次数
-grus.rabbitmq.consumer.fallBack=true //遇到消息丢弃时，是否将消息发送到全局错误信息收集交换机
+#生产者的并发数
+grus.rabbitmq.consumer.parallel=4 
+#客户端预取的个数
+grus.rabbitmq.consumer.prefetch=3 
+#最大的重试次数
+grus.rabbitmq.consumer.maxRetry=5 
+#遇到消息丢弃时，是否将消息发送到全局错误信息收集交换机
+grus.rabbitmq.consumer.fallBack=true 
 ```
 
 编写队列的消息处理器：
@@ -212,15 +217,20 @@ public class XXXConfiguration {
 }
 ```
 
-关于消费者返回状态说明：
+消息处理器`MsgProcessor`的返回从原来的bool，变成了`State`。关于`State`的说明：
 
-1. 返回OK时，消息立即被确认消费，从queue中删除。
-2. 返回Retry时，消息会重试（重新入列），最大重试次数看配置。超过最大重试次数后，默认往全局错误信息收集交换机发送该消息（此行为是框架做的）
-3. 返回Abort时，消息会立即丢弃（拒绝，不入列），默认也会往全局错误信息收集交换机发送该消息。如果队列上设置了死信交换机，rabbitmq还会往死信交换机发。
+1. 返回`OK`时，消息立即被确认消费，从queue中删除。
+2. 返回`Retry`时，消息会重试（重新入列），最大重试次数看配置。超过最大重试次数后，默认往全局错误信息收集交换机发送该消息（此行为是框架做的）
+3. 返回`Abort`时，消息会立即丢弃（拒绝，不入列），默认也会往全局错误信息收集交换机发送该消息。如果队列上设置了死信交换机，rabbitmq还会往死信交换机发。
 
-所以，大家不用当心丢消息或者消息无法处理。在不确定时，可以返回Retry。
+另外，新框架会捕获`MsgProcessor`的`apply`方法异常，且默认返回`Retry`。
+
+所以，大家不用当心`丢消息`、`错误消息无法处理导致来回踢皮球`、`方法异常导致消费者crash`这几种情况了。
+
+在不确定时，可以返回`Retry`。
 
 其他注意点：
 
 1. 同一个队列，只能注册一个处理器。当试图注册第二个时，会报错。
 2. 生产上，可以查看risk数据库实例的`notifyagent`库的`MqMsg`表
+
