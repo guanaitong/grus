@@ -24,11 +24,13 @@ mkdocs:
     - master
 
 unit-test:
+  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
   stage: build
   script:
     - mvn $MAVEN_CLI_OPTS test -Djava.version=17 -Djacoco.skip=true
 
 sonar:
+  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
   stage: build
   script:
     - mvn $MAVEN_CLI_OPTS verify sonar:sonar -Djava.version=17 -Djacoco.skip=false
