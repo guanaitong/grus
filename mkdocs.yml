@@ -133,46 +133,48 @@ nav:
       - 配置文件: framework/introduction/config.md
       - gconf:
           - framework/gconf/index.md
-      - 微服务调用:
-          - framework/api/index.md
-          - feign: framework/api/grus-feign-use.md
-          - 使用指南: framework/api/grus-feign-guide.md
-          - 最佳实践: framework/api/grus-feign-best-practice.md
-          - Feign协议升级: framework/api/grus-feign-contract.md
-          - 微服务流量控制: framework/api/limit.md
+      - 微服务:
+          - api聚合: framework/microservice/agg.md
+          - feign: framework/microservice/grus-feign-use.md
+          - 使用指南: framework/microservice/grus-feign-guide.md
+          - Feign最佳实践: framework/microservice/grus-feign-best-practice.md
+          - Feign协议升级: framework/microservice/grus-feign-contract.md
+          - 微服务流量控制: framework/microservice/flow-control.md
+          - 微服务流量控制: framework/microservice/trace.md
       - 数据库:
-          - 配置管理: framework/data/index.md
+          - 配置管理: framework/data/config.md
           - Mybatis分页插件: framework/data/mybatis-pagehelper.md
           - Mybatis增强: framework/data/mybatis-enhance.md
       - 缓存:
           - redis: framework/cache/redis.md
-          - 缓存框架: framework/cache/cache.md
+          - 缓存框架: framework/cache/grus-cache.md
           - 分布式session: framework/cache/session.md
-      - zookeeper:
-          - framework/zk/index.md
       - 消息队列:
           - rabbitmq: framework/mq/rabbitmq.md
           - kafka: framework/mq/kafka.md
       - web:
-          - framework/web/index.md
+          - 增强特性: framework/web/index.md
           - Validator模块: framework/web/grus-validator.md
           - Swagger使用说明: framework/web/grus-swagger.md
           - Freemarker使用说明: framework/web/grus-freemarker.md
           - Velocity使用说明: framework/web/grus-velocity.md
       - job:
           - framework/job/index.md
+      - zookeeper:
+          - framework/zk/index.md
       - 单元测试:
           - framework/test/index.md
       - 分布式存储gfs:
-          - framework/gfs/index.md
-          - gfs-client使用说明: framework/gfs/gfs-sdk.md
+          - sdk使用说明: framework/gfs/gfs-sdk.md
+          - 架构设计: framework/gfs/design.md
       - frigate消息:
-          - framework/frigate/index.md
-          - gfs-client使用说明: framework/frigate/grus-frigate-message-handle.md
-      - others:
-          - framework/others/index.md
-          - bean复制工具: framework/others/grus-core.md
-          - JSON使用说明: framework/others/grus-json.md
+          - client使用说明: framework/frigate/frigate-client.md
+          - 处理frigate消息: framework/frigate/grus-frigate-message-handle.md
+      - 工具类:
+          - HttpClient: framework/utils/httpclient.md
+          - BeanCopy: framework/utils/beancopy.md
+          - JSON: framework/utils/json.md
+          - JSON: framework/utils/others.md
   - 升级:
       - 2020.6: upgrade/2020-6.md
       - 2020.7: upgrade/2020-7.md

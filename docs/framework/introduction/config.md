@@ -6,6 +6,8 @@
 
 ![自动提示](../../assets/images/java/grus-auto.png)
 
+**所有的配置，都支持放到gconf上**
+
 原理：
 
 大家可以查看 grus-boot 源代码，我们在`grus-boot-autoconfigure`模块的 pom 中，有以下依赖：

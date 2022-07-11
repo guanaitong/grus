@@ -1,6 +1,4 @@
-# 其他
-
-## httpclient
+# httpclient
 
 <Alert type="warning">
   强烈建议使用框架封装的httpclient。

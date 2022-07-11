@@ -1,10 +1,11 @@
-# 数据模块
+# 配置管理
 
-## mysql driver
+## mysql驱动
 
 - mysql 驱动升级为 8.x。时区需要手动配置，框架已经针对时区做了兼容性处理，会在 JDBC 连接中，自动添加`serverTimezone=GMT%2B8`
+- 禁止使用`select *`，在表结构字段发生变化时，会有异常错误
 
-## data
+## 数据源配置
 
 - 会根据配置，自动创建数据源。
 - 如果需要读写分离，可以通过`DbProperties`来配置，如：
@@ -55,7 +56,7 @@ leakDetectionThreshold
 - 如果你的项目中需要使用多数据源，那么需要调用`com.ciicgat.sdk.data.datasource.DataSourceFactory.createMasterDataSource(String dbName)`，传入自己的 dbName。配套的，SqlSessionFactory 和 SqlSessionTemplate 也需要创建。你也可以在 SQL 语句中，指定数据的 schema。
 - 读写分离下，SqlSessionTemplate 的两个自动注入的对象为 writeSqlSessionTemplate 和 readSqlSessionTemplate
 
-## mybatis
+## mybatis配置
 
 - mybatis 版本升级为 3.5.1
 - [mybatis-3.5.0-Release-Notes](https://github.com/mybatis/mybatis-3/releases/tag/mybatis-3.5.0)
