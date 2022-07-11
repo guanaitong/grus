@@ -6,11 +6,11 @@ stages:
   - build
   - deploy
 
-test:
-  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
-  stage: build
-  script:
-    - mvn $MAVEN_CLI_OPTS verify -Djava.version=17  sonar:sonar -Dsonar.projectKey=grus-2 -Dsonar.projectName=grus-2
+#test:
+#  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
+#  stage: build
+#  script:
+#    - mvn $MAVEN_CLI_OPTS verify -Djava.version=17  sonar:sonar
 
 mkdocs:
   image: registry.wuxingdev.cn/build/python:3-bullseye
@@ -22,22 +22,23 @@ mkdocs:
     - curl -O http://filestorage.wuxingdev.cn/build-cli/build-cli && chmod +x build-cli && ./build-cli -jobName guide-java
   only:
     - master
-#test:
-#  stage: test
-#  script:
-#    - mvn $MAVEN_CLI_OPTS test -Djava.version=17 -Djacoco.skip=true
-#
-#sonar:
-#  stage: test
-#  script:
-#    - mvn $MAVEN_CLI_OPTS package sonar:sonar -Dsonar.projectKey=grus-2 -Dsonar.projectName=grus-2 -Djacoco.skip=false
+
+unit-test:
+  stage: build
+  script:
+    - mvn $MAVEN_CLI_OPTS test -Djava.version=17 -Djacoco.skip=true
+
+sonar:
+  stage: build
+  script:
+    - mvn $MAVEN_CLI_OPTS verify sonar:sonar -Djava.version=17 -Djacoco.skip=false
 
 
 deploy:
   image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
   stage: deploy
   script:
-    - mvn $MAVEN_CLI_OPTS deploy -DskipTests
+    - mvn $MAVEN_CLI_OPTS deploy -DskipTests -Djacoco.skip=true
     - sh generate_parent_pom.sh
     - mvn $MAVEN_CLI_OPTS -f tmp/.flattened-pom.xml  deploy -DskipTests
   only:
