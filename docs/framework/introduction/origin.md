@@ -2,13 +2,6 @@
 
 Grus框架是关爱通Java团队继巨灵神框架之后，第二次重大的架构升级。虽然巨灵神框架的许多设计和理念很先进，但是技术在前进。在当前阶段下，其有一些缺陷不满足我们技术发展的需求。
 
-感谢`@孙长浩`贡献 Grus 这个名字。
-
-## 面向Java11
-
-* java11有许多新特性和jvm性能的提升，许多都是我们期望在实际工作中使用的，比如G1垃圾回收；
-* 整个架构团队希望Grus框架能够支持Java11，这需要grus本身和依赖框架同时都可以。
-
 ## 全面拥抱SpringBoot
 
 ![grus](../../assets/images/java/grus.svg)
@@ -22,17 +15,17 @@ Grus框架是关爱通Java团队继巨灵神框架之后，第二次重大的架
       [![SpringBoot Code]][SpringBoot Code]
 
 === "GrusBoot"
-   
+
       [![GrusBoot Code]][GrusBoot Code]
 
-   [SpringBoot Code]: ../../assets/images/java/spring-auto-config.png
-   [GrusBoot Code]: ../../assets/images/java/grus-auto-config.png
+[SpringBoot Code]: ../../assets/images/java/spring-auto-config.png
+[GrusBoot Code]: ../../assets/images/java/grus-auto-config.png
 
 ## 详细结构
 
 [![grus detail]][grus detail]
 
-   [grus detail]: ../../assets/images/java/grus-detail.svg
+[grus detail]: ../../assets/images/java/grus-detail.svg
 
 看图前说明：
 
