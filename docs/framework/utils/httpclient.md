@@ -1,8 +1,7 @@
 # httpclient
 
-<Alert type="warning">
+!!! important
   强烈建议使用框架封装的httpclient。
-</Alert>
 
 框架目前统一提供了`httpClient`的工具类 `com.ciicgat.sdk.util.http.HttpClientHelper`，供开发者使用，能满足绝大多数的使用场景。内置了如下功能：
 
