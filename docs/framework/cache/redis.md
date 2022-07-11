@@ -334,7 +334,7 @@ cache 模块依赖`starter-data-redis`模块。实现大家可以看类`org.spri
 - 如果数据反序列化或者获取数据失败，会抛出异常返回，不存在 fallback。
 - 没有接入我们的数据源
 
-生产还是需要使用[Grus封装的cache框架](../cache/cache.md)
+生产还是需要使用[Grus封装的cache框架](../cache/index.md)
 
 ## session
 

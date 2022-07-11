@@ -131,28 +131,28 @@ nav:
       - Autoconfigure模块: framework/introduction/autoconfigure.md
       - Condition条件注解: framework/introduction/condition.md
       - 配置文件: framework/introduction/config.md
-      - Gconf:
+      - gconf:
           - framework/gconf/index.md
-      - 巨灵神规范:
+      - 微服务调用:
           - framework/api/index.md
           - feign: framework/api/grus-feign-use.md
           - 使用指南: framework/api/grus-feign-guide.md
           - 最佳实践: framework/api/grus-feign-best-practice.md
           - Feign协议升级: framework/api/grus-feign-contract.md
-      - data:
-          - framework/data/index.md
+          - 微服务流量控制: framework/api/limit.md
+      - 数据库:
+          - 配置管理: framework/data/index.md
           - Mybatis分页插件: framework/data/mybatis-pagehelper.md
           - Mybatis增强: framework/data/mybatis-enhance.md
-      - redis:
-          - framework/redis/index.md
-      - cache:
-          - framework/cache/cache.md
+      - 缓存:
+          - redis: framework/cache/redis.md
+          - 缓存框架: framework/cache/cache.md
+          - 分布式session: framework/cache/session.md
       - zookeeper:
           - framework/zk/index.md
-      - rabbitmq:
-          - framework/rabbitmq/index.md
-      - kafka:
-          - framework/kafka/index.md
+      - 消息队列:
+          - rabbitmq: framework/mq/rabbitmq.md
+          - kafka: framework/mq/kafka.md
       - web:
           - framework/web/index.md
           - Validator模块: framework/web/grus-validator.md
@@ -163,10 +163,6 @@ nav:
           - framework/job/index.md
       - 单元测试:
           - framework/test/index.md
-      - 微服务流量控制:
-          - framework/limit/index.md
-      - 分布式session:
-          - framework/session/index.md
       - 分布式存储gfs:
           - framework/gfs/index.md
           - gfs-client使用说明: framework/gfs/gfs-sdk.md
