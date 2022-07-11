@@ -139,8 +139,8 @@ nav:
           - 使用指南: framework/microservice/grus-feign-guide.md
           - Feign最佳实践: framework/microservice/grus-feign-best-practice.md
           - Feign协议升级: framework/microservice/grus-feign-contract.md
-          - 微服务流量控制: framework/microservice/flow-control.md
-          - 微服务流量控制: framework/microservice/trace.md
+          - 流量控制: framework/microservice/flow-control.md
+          - 链路追踪: framework/microservice/trace.md
       - 数据库:
           - 配置管理: framework/data/config.md
           - Mybatis分页插件: framework/data/mybatis-pagehelper.md
