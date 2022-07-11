@@ -6,6 +6,24 @@
 
 trace信息，已经通过`access`日志和a`pplicaton`日志打印出来，所以不再使用`jaeger-agent`或者`opentelemetry-collect`之类的工具收集了。
 
+## 获取TraceId
+
+新版本：
+
+```java
+        Span span = Span.current();
+        if (span != Span.getInvalid()) {
+            String traceId = span.getSpanContext().getTraceId();
+            System.out.println(traceId);
+        }
+```
+
+老版本：
+
+```java
+        SpanUtil.getSpanId(Spans.getRootSpan())
+```
+
 ## 线程池的trace
 
 在线上排查日志时，traceId是非常好用的工具。但是traceId一般仅在当前线程存在，当项目中使用了线程池时，traceId就丢失了，不利于后期问题的排查。
@@ -92,22 +110,3 @@ public class AsyncExecutorConfiguration implements AsyncConfigurer {
 }
 ```
 
-## devtool
-
-spring 为开发者提供了一个名为 spring-boot-devtools 的模块来使 Spring Boot 应用支持热部署，提高开发者的开发效率，无需手动重启 Spring Boot 应用。
-
-```xml
-
-<dependency>
-  <groupId>org.springframework.boot</groupId>
-  <artifactId>spring-boot-devtools</artifactId>
-  <optional>true</optional>
-</dependency>
-```
-
-参考文档：<https://blog.csdn.net/jaydenwang5310/article/details/78738847>
-
-## 其他
-
-- `spring.main.allow-bean-definition-overriding`默认为 false，这个对大部分人没有影响。
-- **如果你的项目成功迁移到新框架，那么 maven 依赖中，应该是没有任何老框架的 jar。因为新框架完全包含老框架的功能。否则，说明你的迁移还不完整**
