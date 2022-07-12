@@ -168,7 +168,7 @@ grus.rabbitmq.consumer.fallBack=true
 
 ```java
 
-@MessageQueueListener("grus-demo-test-queue") //MessageQueueListener定义消费哪个队列
+@MessageListener("grus-demo-test-queue") //MessageQueueListener定义消费哪个队列
 public class TestMsgProcessor implements MsgProcessor {
     @Override
     public State apply(Message message) {
