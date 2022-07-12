@@ -42,7 +42,7 @@ public class TestReceiver {
 //        queueNameInfo.setExchangeName();
 
 
-        RabbitMqConsumer receiver = new RabbitMqConsumer(TestConnection.getConnection(), 3, 1, 1, true);
+        RabbitMqConsumer receiver = new RabbitMqConsumer(TestConnection.getConnection(), 6, 1, 1, true);
         MsgProcessor msgProcessor = new MsgProcessor() {
             @Override
             public State apply(Message msg) {

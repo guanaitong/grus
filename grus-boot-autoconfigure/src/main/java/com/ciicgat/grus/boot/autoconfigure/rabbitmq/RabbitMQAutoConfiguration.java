@@ -5,22 +5,25 @@
 
 package com.ciicgat.grus.boot.autoconfigure.rabbitmq;
 
-import com.ciicgat.grus.rabbitmq.QueueBind;
-import com.ciicgat.grus.rabbitmq.ConnnectionFactory;
+import com.ciicgat.grus.rabbitmq.ConnectionFactory;
 import com.ciicgat.grus.rabbitmq.Exchange;
 import com.ciicgat.grus.rabbitmq.Queue;
+import com.ciicgat.grus.rabbitmq.QueueBind;
 import com.ciicgat.grus.rabbitmq.RabbitMqConsumer;
+import com.ciicgat.grus.rabbitmq.RabbitMqException;
 import com.ciicgat.grus.rabbitmq.RabbitMqInitializer;
 import com.ciicgat.grus.rabbitmq.RabbitMqProducer;
 import com.rabbitmq.client.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.io.IOException;
 
 /**
  * Created by August.Zhou on 2022/7/7 12:17
@@ -31,8 +34,11 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQAutoConfiguration {
     private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQAutoConfiguration.class);
 
-    private static Connection newConnection(RabbitMQProperty rabbitMQProperty, boolean consumer) {
-        return ConnnectionFactory.newConnectionFromCache(rabbitMQProperty.getHost(), rabbitMQProperty.getPort(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), rabbitMQProperty.isUseSingleConnection() ? true : consumer);
+    private static Connection newConnection(RabbitMQProperty rabbitMQProperty) {
+        if (rabbitMQProperty.isUseSingleConnection()) {
+            return ConnectionFactory.newConnectionFromCache(rabbitMQProperty.getHost(), rabbitMQProperty.getPort(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), rabbitMQProperty.getConsumer().getParallel());
+        }
+        return ConnectionFactory.newConnection(rabbitMQProperty.getHost(), rabbitMQProperty.getPort(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), rabbitMQProperty.getConsumer().getParallel());
     }
 
     @Configuration(proxyBeanMethods = false)
@@ -44,44 +50,31 @@ public class RabbitMQAutoConfiguration {
         }
 
         private void init(RabbitMQProperty rabbitMQProperty) {
-            Connection connection = newConnection(rabbitMQProperty, true);
-            RabbitMQProperty.Init rabbitMQPropertyInit = rabbitMQProperty.getInit();
-            for (Exchange exchange : rabbitMQPropertyInit.getExchanges()) {
-                RabbitMqInitializer.exchangeDeclare(connection, exchange);
+            try (Connection connection = ConnectionFactory.newConnection(rabbitMQProperty.getHost(), rabbitMQProperty.getPort(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), 1)) {
+                RabbitMQProperty.Init rabbitMQPropertyInit = rabbitMQProperty.getInit();
+                for (Exchange exchange : rabbitMQPropertyInit.getExchanges()) {
+                    RabbitMqInitializer.exchangeDeclare(connection, exchange);
+                }
+                for (Queue queue : rabbitMQPropertyInit.getQueues()) {
+                    RabbitMqInitializer.queueDeclare(connection, queue);
+                }
+                for (QueueBind queueBind : rabbitMQPropertyInit.getBinds()) {
+                    RabbitMqInitializer.queueBind(connection, queueBind);
+                }
+            } catch (IOException e) {
+                throw new RabbitMqException(e);
             }
-            for (Queue queue : rabbitMQPropertyInit.getQueues()) {
-                RabbitMqInitializer.queueDeclare(connection, queue);
-            }
-            for (QueueBind queueBind : rabbitMQPropertyInit.getBinds()) {
-                RabbitMqInitializer.queueBind(connection, queueBind);
-            }
-        }
-    }
-
-    @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(name = "grus.rabbitmq.producer.enable", havingValue = "true")
-    @AutoConfigureBefore(InitConfiguration.class)
-    public static class ProducerConfiguration {
-
-        @Bean
-        public Connection producerConnection(RabbitMQProperty rabbitMQProperty) {
-            return newConnection(rabbitMQProperty, false);
-        }
-
-        @Bean
-        public RabbitMqProducer rabbitMqProducer(RabbitMQProperty rabbitMQProperty, Connection producerConnection) {
-            return new RabbitMqProducer(producerConnection, rabbitMQProperty.getProducer().getParallel(), rabbitMQProperty.getProducer().isConfirm(), rabbitMQProperty.getProducer().isCreateMessageId(), rabbitMQProperty.getProducer().isCreateTimestamp());
         }
     }
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(name = "grus.rabbitmq.consumer.enable", havingValue = "true")
-    @AutoConfigureBefore(InitConfiguration.class)
+    @AutoConfigureAfter(InitConfiguration.class)
     public static class ConsumerConfiguration {
 
         @Bean
         public Connection consumerConnection(RabbitMQProperty rabbitMQProperty) {
-            return newConnection(rabbitMQProperty, true);
+            return newConnection(rabbitMQProperty);
         }
 
         @Bean(initMethod = "init", destroyMethod = "close")
@@ -94,4 +87,22 @@ public class RabbitMQAutoConfiguration {
             return new MessageListenerBeanProcessor(rabbitMqConsumer);
         }
     }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(name = "grus.rabbitmq.producer.enable", havingValue = "true")
+    @AutoConfigureAfter({InitConfiguration.class, ConsumerConfiguration.class})
+    public static class ProducerConfiguration {
+
+        @Bean
+        public Connection producerConnection(RabbitMQProperty rabbitMQProperty) {
+            return newConnection(rabbitMQProperty);
+        }
+
+        @Bean
+        public RabbitMqProducer rabbitMqProducer(RabbitMQProperty rabbitMQProperty, Connection producerConnection) {
+            return new RabbitMqProducer(producerConnection, rabbitMQProperty.getProducer().getParallel(), rabbitMQProperty.getProducer().isConfirm(), rabbitMQProperty.getProducer().isCreateMessageId(), rabbitMQProperty.getProducer().isCreateTimestamp());
+        }
+    }
+
+
 }

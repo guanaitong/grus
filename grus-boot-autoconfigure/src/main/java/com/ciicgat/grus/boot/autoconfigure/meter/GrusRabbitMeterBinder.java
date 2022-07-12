@@ -8,7 +8,6 @@ package com.ciicgat.grus.boot.autoconfigure.meter;
 import com.ciicgat.grus.rabbitmq.metrics.DelegateMetricsCollector;
 import com.rabbitmq.client.impl.MicrometerMetricsCollector;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.MeterBinder;
 
 /**
@@ -17,7 +16,6 @@ import io.micrometer.core.instrument.binder.MeterBinder;
 public class GrusRabbitMeterBinder implements MeterBinder {
     @Override
     public void bindTo(MeterRegistry registry) {
-        DelegateMetricsCollector.getConsumerInstance().setMetricsCollector(new MicrometerMetricsCollector(registry, "rabbitmq", Tags.of("name", "consumer")));
-        DelegateMetricsCollector.getProducerInstance().setMetricsCollector(new MicrometerMetricsCollector(registry, "rabbitmq", Tags.of("name", "producer")));
+        DelegateMetricsCollector.getInstance().setMetricsCollector(new MicrometerMetricsCollector(registry, "rabbitmq"));
     }
 }

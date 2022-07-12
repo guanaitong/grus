@@ -20,7 +20,7 @@ public class TestConnection {
         Properties properties = GlobalGconfConfig.getConfig().getProperties("rabbitmq.properties");
         var user = properties.getProperty("mq.default.username");
         var pwd = properties.getProperty("mq.default.pwd");
-        Connection connection = ConnnectionFactory.newConnectionFromCache("mq.servers.dev.ofc", 5672, user, pwd, "/", true);
+        Connection connection = ConnectionFactory.newConnectionFromCache("mq.servers.dev.ofc", 5672, user, pwd, "/", 4);
         return connection;
     }
 }

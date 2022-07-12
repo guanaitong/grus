@@ -14,20 +14,16 @@ import com.rabbitmq.client.NoOpMetricsCollector;
  * Created by August.Zhou on 2019-12-09 15:11.
  */
 public class DelegateMetricsCollector implements MetricsCollector {
-    static DelegateMetricsCollector CONSUMER = new DelegateMetricsCollector();
-    static DelegateMetricsCollector PRODUCER = new DelegateMetricsCollector();
+    static DelegateMetricsCollector INSTANCE = new DelegateMetricsCollector();
     private MetricsCollector metricsCollector = new NoOpMetricsCollector();
 
     DelegateMetricsCollector() {
     }
 
-    public static DelegateMetricsCollector getConsumerInstance() {
-        return CONSUMER;
+    public static DelegateMetricsCollector getInstance() {
+        return INSTANCE;
     }
 
-    public static DelegateMetricsCollector getProducerInstance() {
-        return PRODUCER;
-    }
 
     public DelegateMetricsCollector setMetricsCollector(MetricsCollector metricsCollector) {
         this.metricsCollector = metricsCollector;
