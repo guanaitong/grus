@@ -62,11 +62,7 @@ public class RabbitMqProducer {
     }
 
     public ExchangePublisher exchangePublisher(String exchange) {
-        return this.exchangePublisher(exchange, null);
-    }
-
-    public ExchangePublisher exchangePublisher(String exchange, String defaultRoutingKey) {
-        return new ExchangePublisher(this, exchange, defaultRoutingKey);
+        return new ExchangePublisher(this, exchange);
     }
 
     /**

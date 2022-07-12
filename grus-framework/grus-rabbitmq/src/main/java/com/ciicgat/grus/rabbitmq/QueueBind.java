@@ -9,9 +9,27 @@ package com.ciicgat.grus.rabbitmq;
  * Created by August.Zhou on 2022/7/6 09:56
  */
 public class QueueBind {
+    /**
+     * 队列
+     */
     private String queue;
+    /**
+     * 交换机
+     */
     private String exchange;
-    private String routingKey;
+    /**
+     * 路由
+     */
+    private String routingKey = "";
+
+    public QueueBind() {
+    }
+
+    public QueueBind(String queue, String exchange, String routingKey) {
+        this.queue = queue;
+        this.exchange = exchange;
+        this.routingKey = routingKey;
+    }
 
     public String getQueue() {
         return queue;

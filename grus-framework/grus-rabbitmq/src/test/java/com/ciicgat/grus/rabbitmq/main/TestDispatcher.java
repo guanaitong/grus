@@ -6,6 +6,7 @@
 package com.ciicgat.grus.rabbitmq.main;
 
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import com.ciicgat.grus.rabbitmq.ExchangePublisher;
 import com.ciicgat.grus.rabbitmq.RabbitMqProducer;
 import com.ciicgat.grus.rabbitmq.TestConnection;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
@@ -28,21 +29,13 @@ public class TestDispatcher {
         OpenTelemetrys.set(sdk);
 
         RabbitMqProducer dispatcher = new RabbitMqProducer(TestConnection.getConnection(), 3, false, true, true);
-//        MsgDispatcher dispatcher = MsgDispatcher
-//                .newBuilder()
-////                .setExchangeNameInfo(exchangeNameInfo)
-//                .setExchangeName("xxxxy")
-////                .setRoutingKey("testRouting.a")
-//                .setExchangeType(BuiltinExchangeType.DIRECT)
-//                .build();
-
-        dispatcher.exchangePublisher("xxxxy").publish("a", "测试消息a");
-//        for (int i = 0; i < 100; i++) {
-//            dispatcher.sendMsg("测试消息a" + i, "a");
-//            dispatcher.sendMsg("测试消息b" + i, "b");
-//        }
+        ExchangePublisher exchangePublisher = dispatcher.exchangePublisher("grus-test");
+//        exchangePublisher.publish("a", "测试消息a");
+        for (int i = 0; i < 100; i++) {
+            exchangePublisher.publish("a", "测试消息a" + i);
+            exchangePublisher.publish("b", "测试消息b" + i);
+        }
 
         System.out.println("finish");
-//        System.exit(0);
     }
 }

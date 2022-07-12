@@ -66,7 +66,7 @@ public class TestMq {
     public void testNormal() {
         String forTestExchangeName = "for-test-exchange-testNormal";
 
-        RabbitMqInitializer.exchangeDeclare(connection, forTestExchangeName, BuiltinExchangeType.DIRECT);
+        RabbitMqInitializer.exchangeDeclare(connection, new Exchange(forTestExchangeName, BuiltinExchangeType.DIRECT));
 
         String forTestRoutingKeyA = "for-test-A" + Math.random();
         String forTestRoutingKeyB = "for-test-B" + Math.random();
@@ -87,9 +87,12 @@ public class TestMq {
 
         AtomicInteger atomicInteger = new AtomicInteger(num * 3);
 
-        RabbitMqInitializer.queueDeclareAndBind(connection, newTestQueue(forTestRoutingKeyA), forTestExchangeName, forTestRoutingKeyA);
-        RabbitMqInitializer.queueDeclareAndBind(connection, newTestQueue(forTestRoutingKeyB), forTestExchangeName, forTestRoutingKeyA);
-        RabbitMqInitializer.queueDeclareAndBind(connection, newTestQueue(forTestRoutingKeyC), forTestExchangeName, forTestRoutingKeyA);
+        RabbitMqInitializer.queueDeclare(connection, newTestQueue(forTestRoutingKeyA));
+        RabbitMqInitializer.queueBind(connection, new QueueBind(forTestRoutingKeyA, forTestExchangeName, forTestRoutingKeyA));
+        RabbitMqInitializer.queueDeclare(connection, newTestQueue(forTestRoutingKeyB));
+        RabbitMqInitializer.queueBind(connection, new QueueBind(forTestRoutingKeyB, forTestExchangeName, forTestRoutingKeyB));
+        RabbitMqInitializer.queueDeclare(connection, newTestQueue(forTestRoutingKeyC));
+        RabbitMqInitializer.queueBind(connection, new QueueBind(forTestRoutingKeyC, forTestExchangeName, forTestRoutingKeyC));
         Set<TestData> aReceives = Collections.synchronizedSet(new TreeSet<>());
         Set<TestData> bReceives = Collections.synchronizedSet(new TreeSet<>());
         Set<TestData> cReceives = Collections.synchronizedSet(new TreeSet<>());
@@ -147,7 +150,7 @@ public class TestMq {
     @Test
     public void testRetry() {
         String forTestExchangeName = "for-test-exchange-testRetry";
-        RabbitMqInitializer.exchangeDeclare(connection, forTestExchangeName, BuiltinExchangeType.DIRECT);
+        RabbitMqInitializer.exchangeDeclare(connection, new Exchange(forTestExchangeName, BuiltinExchangeType.DIRECT));
 
         String forTestRoutingKeyA = "for-test-A" + Math.random();
 
@@ -162,7 +165,8 @@ public class TestMq {
         }
 
         AtomicInteger atomicInteger = new AtomicInteger(num * 1);
-        RabbitMqInitializer.queueDeclareAndBind(connection, newTestQueue(forTestRoutingKeyA), forTestExchangeName, forTestRoutingKeyA);
+        RabbitMqInitializer.queueDeclare(connection, newTestQueue(forTestRoutingKeyA));
+        RabbitMqInitializer.queueBind(connection, new QueueBind(forTestRoutingKeyA, forTestExchangeName, forTestRoutingKeyA));
 
         Set<TestData> aReceives = Collections.synchronizedSet(new TreeSet<>());
 

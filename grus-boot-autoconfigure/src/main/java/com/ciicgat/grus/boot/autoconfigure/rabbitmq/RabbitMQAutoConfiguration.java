@@ -5,9 +5,10 @@
 
 package com.ciicgat.grus.boot.autoconfigure.rabbitmq;
 
-import com.ciicgat.grus.rabbitmq.ConnnectionFactory;
-import com.ciicgat.grus.rabbitmq.Queue;
 import com.ciicgat.grus.rabbitmq.QueueBind;
+import com.ciicgat.grus.rabbitmq.ConnnectionFactory;
+import com.ciicgat.grus.rabbitmq.Exchange;
+import com.ciicgat.grus.rabbitmq.Queue;
 import com.ciicgat.grus.rabbitmq.RabbitMqConsumer;
 import com.ciicgat.grus.rabbitmq.RabbitMqInitializer;
 import com.ciicgat.grus.rabbitmq.RabbitMqProducer;
@@ -45,14 +46,14 @@ public class RabbitMQAutoConfiguration {
         private void init(RabbitMQProperty rabbitMQProperty) {
             Connection connection = newConnection(rabbitMQProperty, true);
             RabbitMQProperty.Init rabbitMQPropertyInit = rabbitMQProperty.getInit();
-            for (RabbitMQProperty.Exchange exchange : rabbitMQPropertyInit.getExchanges()) {
-                RabbitMqInitializer.exchangeDeclare(connection, exchange.getName(), exchange.getType());
+            for (Exchange exchange : rabbitMQPropertyInit.getExchanges()) {
+                RabbitMqInitializer.exchangeDeclare(connection, exchange);
             }
             for (Queue queue : rabbitMQPropertyInit.getQueues()) {
                 RabbitMqInitializer.queueDeclare(connection, queue);
             }
-            for (QueueBind bind : rabbitMQPropertyInit.getBinds()) {
-                RabbitMqInitializer.queueBind(connection, bind.getQueue(), bind.getExchange(), bind.getRoutingKey());
+            for (QueueBind queueBind : rabbitMQPropertyInit.getBinds()) {
+                RabbitMqInitializer.queueBind(connection, queueBind);
             }
         }
     }

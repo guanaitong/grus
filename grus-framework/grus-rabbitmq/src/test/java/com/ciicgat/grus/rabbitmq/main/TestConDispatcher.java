@@ -25,17 +25,14 @@ public class TestConDispatcher {
                 @Override
                 public void run() {
                     for (int i = 0; i < 100; i++) {
-                        dispatcher.publish("xxxxy", "a", "测试消息a");
+                        dispatcher.publish("grus-test", "a", "测试消息a");
                         Threads.sleep(10 * 1000);
                     }
 
                 }
             }).start();
-            //            dispatcher.sendMsg("测试消息a" + i, "a");
-//            dispatcher.sendMsg("测试消息b" + i, "b");
         }
 
         System.out.println("finish");
-//        System.exit(0);
     }
 }

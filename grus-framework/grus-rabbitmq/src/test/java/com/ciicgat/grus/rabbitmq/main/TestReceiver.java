@@ -7,12 +7,11 @@ package com.ciicgat.grus.rabbitmq.main;
 
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.rabbitmq.Message;
-import com.ciicgat.grus.rabbitmq.Queue;
 import com.ciicgat.grus.rabbitmq.RabbitMqConsumer;
-import com.ciicgat.grus.rabbitmq.RabbitMqInitializer;
 import com.ciicgat.grus.rabbitmq.State;
 import com.ciicgat.grus.rabbitmq.TestConnection;
 import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
+import com.ciicgat.sdk.lang.threads.Threads;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
@@ -41,16 +40,9 @@ public class TestReceiver {
 //        QueueNameInfo queueNameInfo = new QueueNameInfo();
 //        queueNameInfo.setAppId("9999");
 //        queueNameInfo.setExchangeName();
-        Queue queueA = new Queue();
-        queueA.setName("c");
-        queueA.setAutoDelete(true);
-        RabbitMqInitializer.queueDeclareAndBind(TestConnection.getConnection(), queueA, "xxxxy", "c");
-        Queue queueB = new Queue();
-        queueB.setName("b");
-        queueB.setAutoDelete(true);
-        RabbitMqInitializer.queueDeclareAndBind(TestConnection.getConnection(), queueB, "xxxxy", "b");
 
-        RabbitMqConsumer receiver = new RabbitMqConsumer(TestConnection.getConnection(), 2, 1, 1, true);
+
+        RabbitMqConsumer receiver = new RabbitMqConsumer(TestConnection.getConnection(), 3, 1, 1, true);
         MsgProcessor msgProcessor = new MsgProcessor() {
             @Override
             public State apply(Message msg) {
@@ -59,12 +51,13 @@ public class TestReceiver {
                 System.out.println(traceId);
 //            throw new RuntimeException();
                 LOGGER.info(Thread.currentThread().getName() + " m:" + msg);
+                Threads.sleepSeconds(10);
                 System.out.println(Thread.currentThread().getName() + " m:" + msg);
                 return State.OK;
             }
         };
-        receiver.consume("c", msgProcessor);
-        receiver.consume("b", msgProcessor);
+        receiver.consume("grus-test-a", msgProcessor);
+        receiver.consume("grus-test-b", msgProcessor);
 
 //        Threads.sleepSeconds(1000);
 

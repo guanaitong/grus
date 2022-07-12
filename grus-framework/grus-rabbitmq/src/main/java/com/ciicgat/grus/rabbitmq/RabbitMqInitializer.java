@@ -6,7 +6,6 @@
 package com.ciicgat.grus.rabbitmq;
 
 import com.ciicgat.sdk.util.system.Systems;
-import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.MessageProperties;
@@ -28,17 +27,12 @@ import static com.ciicgat.grus.rabbitmq.MqConstants.GLOBAL_CONFIG_EXCHANGE_NAME;
 public class RabbitMqInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMqInitializer.class);
 
-    public static void exchangeDeclare(Connection connection, String exchange, BuiltinExchangeType exchangeType) {
+    public static void exchangeDeclare(Connection connection, Exchange exchange) {
         execute(connection, channel -> {
-            channel.exchangeDeclare(exchange, exchangeType, true);
-            addConfigData(exchange, null, "", false, channel);
+            channel.exchangeDeclare(exchange.getName(), exchange.getType(), true);
+            addConfigData(exchange.getName(), null, "", false, channel);
         });
-        LOGGER.info("exchange[{}] type[{}] declared", exchange, exchangeType);
-    }
-
-    public static void queueDeclareAndBind(Connection connection, Queue queue, String exchange, String routingKey) {
-        queueDeclare(connection, queue);
-        queueBind(connection, queue.getName(), exchange, routingKey);
+        LOGGER.info("exchange[{}] type[{}] declared", exchange.getName(), exchange.getType());
     }
 
     public static void queueDeclare(Connection connection, Queue queue) {
@@ -52,12 +46,12 @@ public class RabbitMqInitializer {
         LOGGER.info("queue[{}] declared", name);
     }
 
-    public static void queueBind(Connection connection, String queue, String exchange, String routingKey) {
+    public static void queueBind(Connection connection, QueueBind queueBind) {
         execute(connection, channel -> {
-            channel.queueBind(queue, exchange, routingKey);
-            addConfigData(exchange, routingKey, queue, true, channel);
+            channel.queueBind(queueBind.getQueue(), queueBind.getExchange(), queueBind.getRoutingKey());
+            addConfigData(queueBind.getExchange(), queueBind.getRoutingKey(), queueBind.getQueue(), true, channel);
         });
-        LOGGER.info("queue[{}] exchange[{}] routingKey[{}] bound", queue, exchange, routingKey);
+        LOGGER.info("queue[{}] exchange[{}] routingKey[{}] bound", queueBind.getQueue(), queueBind.getExchange(), queueBind.getRoutingKey());
     }
 
     public static void addConfigData(String exchange, String routingKey, String queue, boolean consumer, Channel channel) throws IOException {

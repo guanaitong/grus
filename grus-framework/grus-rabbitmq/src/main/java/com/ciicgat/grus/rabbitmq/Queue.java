@@ -13,6 +13,9 @@ import java.util.Map;
  */
 public class Queue {
 
+    /**
+     * 队列名
+     */
     private String name;
 
     /**

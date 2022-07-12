@@ -34,7 +34,7 @@ public abstract class JSONObjectProcessor<T> implements MsgProcessor {
     public final State apply(Message message) {
         Object value;
         try {
-            value = JSON.parse(message.body(), _type);
+            value = JSON.parse(message.getBody(), _type);
         } catch (JSONException jsonException) {
             LOGGER.error("json parse error", jsonException);
             return State.Abort;

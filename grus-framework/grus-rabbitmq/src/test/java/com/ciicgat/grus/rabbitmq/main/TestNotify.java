@@ -21,8 +21,6 @@ import java.util.Map;
 public class TestNotify {
 
     public static void main(String[] args) {
-
-
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost("mq.servers.dev.ofc");
 //        factory.setPort(port);

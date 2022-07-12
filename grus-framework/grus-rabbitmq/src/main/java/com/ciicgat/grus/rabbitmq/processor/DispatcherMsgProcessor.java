@@ -25,7 +25,7 @@ public class DispatcherMsgProcessor implements MsgProcessor {
 
     @Override
     public State apply(Message msg) {
-        MsgProcessor msgProcessor = processors.get(msg.queue());
+        MsgProcessor msgProcessor = processors.get(msg.getQueue());
         if (msgProcessor == null) {
             LOGGER.error("cannot find processor");
             return State.Abort;
