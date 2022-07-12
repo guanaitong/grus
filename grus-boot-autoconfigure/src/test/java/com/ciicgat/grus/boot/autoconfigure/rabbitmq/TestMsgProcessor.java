@@ -12,7 +12,7 @@ import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
 /**
  * Created by August.Zhou on 2022/7/8 16:17
  */
-@MessageQueueListener("grus-demo-test-queue")
+@MessageListener("grus-demo-test-queue")
 public class TestMsgProcessor implements MsgProcessor {
     @Override
     public State apply(Message message) {

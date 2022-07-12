@@ -13,23 +13,23 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 /**
  * Created by August.Zhou on 2022/7/7 16:17
  */
-public class MessageQueueListenerJobBeanProcessor implements BeanPostProcessor {
+public class MessageListenerBeanProcessor implements BeanPostProcessor {
     private final RabbitMqConsumer rabbitMqConsumer;
 
-    public MessageQueueListenerJobBeanProcessor(RabbitMqConsumer rabbitMqConsumer) {
+    public MessageListenerBeanProcessor(RabbitMqConsumer rabbitMqConsumer) {
         this.rabbitMqConsumer = rabbitMqConsumer;
     }
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        MessageQueueListener messageQueueListener = bean.getClass().getAnnotation(MessageQueueListener.class);
-        if (messageQueueListener == null) {
+        MessageListener messageListener = bean.getClass().getAnnotation(MessageListener.class);
+        if (messageListener == null) {
             return bean;
         }
         if (!(bean instanceof MsgProcessor)) {
             throw new RuntimeException("bean class " + bean.getClass().getName() + " should implements com.ciicgat.sdk.mq.MsgProcessor");
         }
-        rabbitMqConsumer.consume(messageQueueListener.value(), (MsgProcessor) bean);
+        rabbitMqConsumer.consume(messageListener.value(), (MsgProcessor) bean);
         return bean;
     }
 

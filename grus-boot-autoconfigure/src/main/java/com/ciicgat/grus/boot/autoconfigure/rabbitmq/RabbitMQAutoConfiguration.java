@@ -89,8 +89,8 @@ public class RabbitMQAutoConfiguration {
         }
 
         @Bean
-        public MessageQueueListenerJobBeanProcessor messageQueueListenerJobBeanProcessor(RabbitMqConsumer rabbitMqConsumer) {
-            return new MessageQueueListenerJobBeanProcessor(rabbitMqConsumer);
+        public MessageListenerBeanProcessor messageQueueListenerJobBeanProcessor(RabbitMqConsumer rabbitMqConsumer) {
+            return new MessageListenerBeanProcessor(rabbitMqConsumer);
         }
     }
 }

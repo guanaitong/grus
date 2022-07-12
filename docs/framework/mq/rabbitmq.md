@@ -177,7 +177,7 @@ public class TestMsgProcessor implements MsgProcessor {
 }
 
 // 如果消息是json，可以这么写
-@MessageQueueListener("grus-demo-test-queue-2") //MessageQueueListener定义消费哪个队列
+@MessageListener("grus-demo-test-queue-2") //MessageQueueListener定义消费哪个队列
 public class TestMsgProcessor extends JSONObjectProcessor<TestData> {
     @Override
     public State handle(Message msg, TestData testData) {
@@ -233,7 +233,7 @@ public class XXXConfiguration {
 
 ```java
 
-@MessageQueueListener("grus-demo-test-queue") //MessageQueueListener定义消费哪个队列
+@MessageListener("grus-demo-test-queue") //MessageQueueListener定义消费哪个队列
 public class DemoMsgProcessor implements MsgProcessor {
     @Override
     public State apply(Message message) {
