@@ -67,9 +67,12 @@ grus.rabbitmq.init.queues[0].args.x-max-priority=10
 队列和交换机绑定:
 
 ```properties
-grus.rabbitmq.init.binds[0].queue=grus-demo-test-queue
-grus.rabbitmq.init.binds[0].exchange=grus-demo-test-exchange
-grus.rabbitmq.init.binds[0].routing_key=grus-demo-test //如果交换机是fanout模式，就是空了
+# 队列
+grus.rabbitmq.init.binds[0].queue=grus-demo-test-queue 
+# 交换机
+grus.rabbitmq.init.binds[0].exchange=grus-demo-test-exchange 
+# 路由。如果交换机是fanout模式，就是空了
+grus.rabbitmq.init.binds[0].routing_key=grus-demo-test
 ```
 
 注意点：
@@ -154,7 +157,7 @@ public class RabbitMQService {
 
 ```properties
 grus.rabbitmq.consumer.enable=true
-#生产者的并发数
+#消费的并发数
 grus.rabbitmq.consumer.parallel=4 
 #客户端预取的个数
 grus.rabbitmq.consumer.prefetch=3 
