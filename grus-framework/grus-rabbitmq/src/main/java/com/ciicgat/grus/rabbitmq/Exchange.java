@@ -7,6 +7,9 @@ package com.ciicgat.grus.rabbitmq;
 
 import com.rabbitmq.client.BuiltinExchangeType;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by August.Zhou on 2022/7/12 14:11
  */
@@ -19,6 +22,18 @@ public class Exchange {
      * 类型
      */
     private BuiltinExchangeType type;
+    /**
+     * 是否持久化，默认是
+     */
+    private boolean durable = true;
+    /**
+     * 是否自动删除，默认否
+     */
+    private boolean autoDelete = false;
+    /**
+     * 队列的配置参数
+     */
+    private Map<String, Object> args = new HashMap<>();
 
     public Exchange() {
     }
@@ -42,5 +57,29 @@ public class Exchange {
 
     public void setType(BuiltinExchangeType type) {
         this.type = type;
+    }
+
+    public boolean isDurable() {
+        return durable;
+    }
+
+    public void setDurable(boolean durable) {
+        this.durable = durable;
+    }
+
+    public boolean isAutoDelete() {
+        return autoDelete;
+    }
+
+    public void setAutoDelete(boolean autoDelete) {
+        this.autoDelete = autoDelete;
+    }
+
+    public Map<String, Object> getArgs() {
+        return args;
+    }
+
+    public void setArgs(Map<String, Object> args) {
+        this.args = args;
     }
 }

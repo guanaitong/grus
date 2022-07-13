@@ -29,7 +29,7 @@ public class RabbitMqInitializer {
 
     public static void exchangeDeclare(Connection connection, Exchange exchange) {
         execute(connection, channel -> {
-            channel.exchangeDeclare(exchange.getName(), exchange.getType(), true);
+            channel.exchangeDeclare(exchange.getName(), exchange.getType(), exchange.isDurable(), exchange.isAutoDelete(), getFinalArgs(exchange.getArgs(), false));
             addConfigData(exchange.getName(), null, "", false, channel);
         });
         LOGGER.info("exchange[{}] type[{}] declared", exchange.getName(), exchange.getType());
@@ -41,7 +41,7 @@ public class RabbitMqInitializer {
             execute(connection, channel -> channel.queueDeclarePassive(name));
         } catch (RabbitMqException e) {
             LOGGER.warn("queue[{}] not found", name);
-            execute(connection, channel -> channel.queueDeclare(name, queue.isDurable(), queue.isExclusive(), queue.isAutoDelete(), getFinalArgs(queue)));
+            execute(connection, channel -> channel.queueDeclare(name, queue.isDurable(), queue.isExclusive(), queue.isAutoDelete(), getFinalArgs(queue.getArgs(), true)));
         }
         LOGGER.info("queue[{}] declared", name);
     }
@@ -69,15 +69,17 @@ public class RabbitMqInitializer {
         }
     }
 
-    private static Map<String, Object> getFinalArgs(Queue queue) {
-        Map<String, Object> args = new HashMap<>(queue.getArgs());
-        if (!args.containsKey(MqConstants.EXPIRE_KEY)) {
-            args.put(MqConstants.EXPIRE_KEY, MqConstants.DEFAULT_TTL);
+    private static Map<String, Object> getFinalArgs(Map<String, Object> params, boolean queue) {
+        Map<String, Object> args = new HashMap<>(params);
+        if (queue) {
+            if (!args.containsKey(MqConstants.EXPIRE_KEY)) {
+                args.put(MqConstants.EXPIRE_KEY, MqConstants.DEFAULT_TTL);
+            }
+            if (!args.containsKey(MqConstants.MESSAGE_TTL_KEY)) {
+                args.put(MqConstants.MESSAGE_TTL_KEY, MqConstants.DEFAULT_TTL);
+            }
         }
-        if (!args.containsKey(MqConstants.MESSAGE_TTL_KEY)) {
-            args.put(MqConstants.MESSAGE_TTL_KEY, MqConstants.DEFAULT_TTL);
-        }
-        // 队列上写上应用名字，方便排查
+        // 写上应用名字，方便排查
         args.put("x-app-name", Systems.APP_NAME);
         return Collections.unmodifiableMap(args);
     }
