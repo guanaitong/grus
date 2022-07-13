@@ -36,7 +36,12 @@
 
 ## 初始化
 
-启用初始化功能：
+!!! info
+
+    老的sdk在创建消费者和生成者时，增加了很多参数，主要目的是用于交换机、队列等的初始化。
+    新版本，将初始化独立出来。大家通过配置，即可创建交换机、队列等。
+
+首先，必须启用初始化功能：
 
 ```properties
 grus.rabbitmq.init.enable=true
@@ -45,8 +50,10 @@ grus.rabbitmq.init.enable=true
 交换机创建：
 
 ```properties
+# 创建名叫grus-demo-test-exchange-direct的direct交换机
 grus.rabbitmq.init.exchanges[0].name=grus-demo-test-exchange-direct
 grus.rabbitmq.init.exchanges[0].type=direct
+# 创建名叫grus-demo-test-exchange-fanout的fanout交换机
 grus.rabbitmq.init.exchanges[1].name=grus-demo-test-exchange-fanout
 grus.rabbitmq.init.exchanges[1].type=fanout
 ```
@@ -54,7 +61,11 @@ grus.rabbitmq.init.exchanges[1].type=fanout
 队列创建：
 
 ```properties
-grus.rabbitmq.init.queues[0].name=grus-demo-test-queue
+#队列名字，其他配置均使用默认值。大家默认使用这个即可
+grus.rabbitmq.init.queues[1].name=grus-demo-test-queue
+
+# 第二个队列。用了很多高级配置
+grus.rabbitmq.init.queues[0].name=grus-demo-test-queue-2
 # 死信队列，声明死信交换机
 grus.rabbitmq.init.queues[0].args.x-dead-letter-exchange=grus-demo-test.dead.exchange
 grus.rabbitmq.init.queues[0].args.x-dead-letter-routing-key=
@@ -62,6 +73,8 @@ grus.rabbitmq.init.queues[0].args.x-dead-letter-routing-key=
 grus.rabbitmq.init.queues[0].args.x-message-ttl=3600000
 # 优先级队列，最大优先级为10
 grus.rabbitmq.init.queues[0].args.x-max-priority=10
+
+
 ```
 
 队列和交换机绑定:
@@ -75,23 +88,24 @@ grus.rabbitmq.init.binds[0].exchange=grus-demo-test-exchange
 grus.rabbitmq.init.binds[0].routing_key=grus-demo-test
 ```
 
-注意点：
-
-1. 对于已经创建的队列，无法更改其属性。可以通过控制台删除原队列，再带上属性创建一个新的。
+!!! attention 对于已经创建的交换机、队列，无法动态更改其属性。可以通过控制台删除原交换机、队列，再创建一个新的。
 
 ## 生产者
 
-启用生产者：
+生产者配置：
 
 ```properties
+#启用生产者
 grus.rabbitmq.producer.enable=true
 #生产者的并发数
 grus.rabbitmq.producer.parallel=4 
+# 生成消息id，默认为true
 grus.rabbitmq.producer.createMessageId=true
+# 生成消息时间戳，默认为true
 grus.rabbitmq.producer.createTimestamp=true
 ```
 
-当开启生产者后，框架会自动注入`RabbitMqProducer`单例，大家可以直接使用。`publish`方法支持将传入对象时自动转换为json字符串。
+当开启生产者后，框架会自动注入`RabbitMqProducer`单例，大家可以直接使用。其`publish`方法支持将传入对象时自动转换为json字符串。
 
 ```java
  public class RabbitMQTest {
