@@ -302,7 +302,3 @@ public class DemoMsgProcessor implements MsgProcessor {
 
 如果消息体里没有唯一性的业务字段，我们可以使用message的消息`msgId`字段，该字段是这条消息产生时生成的（由生产者生成的）。
 
-### 其他点
-
-1. 
-
