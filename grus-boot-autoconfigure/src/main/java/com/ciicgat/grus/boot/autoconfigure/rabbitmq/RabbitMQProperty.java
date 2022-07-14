@@ -233,7 +233,7 @@ public class RabbitMQProperty {
          * 当发生消息堆积时，当前queue的unack的消息个数一般等于parallelNum*prefetchCount。
          * 如果过大，那么unack的消息数量也过大，此时会影响mq性能。另外，如果用到优先级队列，那么因为当前客户端预取的过多，优先级队列实际也不会生效。
          */
-        private int prefetch = 1;
+        private int prefetch = 3;
 
         /**
          * 最大重试次数，默认5
