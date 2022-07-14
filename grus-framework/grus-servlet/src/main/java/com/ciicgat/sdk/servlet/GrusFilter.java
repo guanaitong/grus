@@ -15,7 +15,6 @@ import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.GrusServiceHttpHeader;
 import com.ciicgat.grus.service.GrusServiceStatus;
 import com.ciicgat.sdk.util.system.Systems;
-import com.ciicgat.sdk.util.system.WorkRegion;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
@@ -95,7 +94,7 @@ public class GrusFilter implements Filter {
         final HttpServletRequest request = (HttpServletRequest) servletRequest;
         final HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        if (disableOldSslProtocol && Systems.IN_K8S && WorkRegion.getCurrentWorkRegion().isDevelopOrTest()) {
+        if (disableOldSslProtocol && Systems.IN_K8S) {
             String sslProtocol = request.getHeader("x_ssl_protocol");
             if (sslProtocol != null && !sslProtocol.isEmpty()) {
                 if (!"TLSv1.2".equals(sslProtocol) && !"TLSv1.3".equals(sslProtocol)) {

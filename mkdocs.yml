@@ -181,6 +181,8 @@ nav:
       - 2020.9: upgrade/2020-9.md
       - 2021.1: upgrade/2021-1.md
       - 2022.0: upgrade/2022-0.md
+      - 2022.11.0: upgrade/2022-11-0.md
+      - 2022.17.0: upgrade/2022-17-0.md
   - 安全:
       - 安全基础: security/security-base.md
       - CVE-2022-22965: security/CVE-2022-22965.md
