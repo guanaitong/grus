@@ -87,13 +87,13 @@ public class RabbitMqProducer {
     public void publish(String exchange, String routingKey, Object value, AMQP.BasicProperties properties) {
         Objects.requireNonNull(value);
         byte[] bytes;
-        if (value instanceof String) {  // value是字符串时，直接使用
+        if (value instanceof String) {  // value是字符串时，通过utf8转换为字节数组
             bytes = ((String) value).getBytes(StandardCharsets.UTF_8);
-        } else if (value instanceof byte[]) {
+        } else if (value instanceof byte[]) { // value是字节数组时，直接使用
             bytes = (byte[]) value;
-        } else if (value instanceof Serializable) {
+        } else if (value instanceof Serializable) { //value对象可以实现Serializable接口，自定义序列化方式
             bytes = ((Serializable) value).serialize();
-        } else {
+        } else { // 其他类型时，默认直接转化为json
             bytes = JSON.toBytes(value);
         }
         Tracer tracer = OpenTelemetrys.getTracer();
