@@ -6,14 +6,13 @@
 package com.ciicgat.grus.rabbitmq;
 
 import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.json.JSONException;
 import com.ciicgat.grus.logger.LogUtil;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
 import com.ciicgat.sdk.util.system.Systems;
 import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.Scheduler;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
@@ -29,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -64,14 +62,15 @@ public class GrusDefaultConsumer extends DefaultConsumer {
     private final AtomicBoolean isRunning;
     private final int maxRetryCount;
     private final boolean fallBack;
-    private final Cache<Object, AtomicInteger> failedCounts = Caffeine.newBuilder().initialCapacity(16).scheduler(Scheduler.systemScheduler()).expireAfterWrite(Duration.ofMinutes(5)).expireAfterAccess(Duration.ofMinutes(5)).maximumSize(10240).build();
-    private MsgProcessor msgProcessor;
 
+    private final MsgProcessor msgProcessor;
+    private final Cache<Object, AtomicInteger> failedCounts;
 
-    GrusDefaultConsumer(Channel channel, String queue, MsgProcessor msgProcessor, AtomicBoolean isRunning, int maxRetryCount, boolean fallBack) {
+    GrusDefaultConsumer(Channel channel, String queue, MsgProcessor msgProcessor, Cache<Object, AtomicInteger> failedCounts, AtomicBoolean isRunning, int maxRetryCount, boolean fallBack) {
         super(channel);
         this.queue = queue;
         this.msgProcessor = msgProcessor;
+        this.failedCounts = failedCounts;
         this.isRunning = isRunning;
         this.maxRetryCount = maxRetryCount;
         this.fallBack = fallBack;
@@ -110,17 +109,24 @@ public class GrusDefaultConsumer extends DefaultConsumer {
             State result;
             try {
                 result = msgProcessor.onMessage(message);
+            } catch (JSONException e) {
+                LOGGER.error("handle msg error,msg {}", message, e);
+                result = State.Abort;
             } catch (Exception e) {
                 LOGGER.error("handle msg error,msg {}", message, e);
                 result = State.Retry;
             }
             if (result == State.OK) {
                 getChannel().basicAck(envelope.getDeliveryTag(), false);
+                return;
             } else if (result == State.Abort) {
                 abort(envelope, message, body);
+                return;
             } else if (result == State.Retry) {
                 Object key = msgId == null ? message.hashCode() : msgId;
-                if (failedCounts.get(key, s -> new AtomicInteger()).incrementAndGet() >= maxRetryCount && envelope.isRedeliver()) {
+                int i = failedCounts.get(key, s -> new AtomicInteger()).incrementAndGet();
+                LOGGER.warn("key {} {}", key, i);
+                if (i >= maxRetryCount && envelope.isRedeliver()) {
                     // 超过最大重试次数后，丢弃消息
                     LOGGER.warn("exceed maxRetryCount");
                     abort(envelope, message, body);
@@ -128,6 +134,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
                 } else {
                     LOGGER.warn("retry msg: {}", message);
                     getChannel().basicReject(envelope.getDeliveryTag(), true);
+                    return;
                 }
 
             } else {

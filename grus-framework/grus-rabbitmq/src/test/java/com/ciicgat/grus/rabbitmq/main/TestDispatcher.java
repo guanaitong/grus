@@ -30,10 +30,12 @@ public class TestDispatcher {
 
         RabbitMqProducer dispatcher = new RabbitMqProducer(TestConnection.getConnection(), 3, false, true, true);
         ExchangePublisher exchangePublisher = dispatcher.exchangePublisher("grus-test");
-//        exchangePublisher.publish("a", "测试消息a");
+        exchangePublisher.publish("a", "测试消息a");
+        exchangePublisher.publish("a", "测试消息a");
+        exchangePublisher.publish("a", "测试消息a");
         for (int i = 0; i < 1000; i++) {
-            exchangePublisher.publish("a", "测试消息a" + i);
-            exchangePublisher.publish("b", "测试消息b" + i);
+//            exchangePublisher.publish("a", "测试消息a" + i);
+//            exchangePublisher.publish("b", "测试消息b" + i);
         }
 
         System.out.println("finish");

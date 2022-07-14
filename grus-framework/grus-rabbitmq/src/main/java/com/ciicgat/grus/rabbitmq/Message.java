@@ -23,7 +23,7 @@ public class Message {
     private final byte[] body;
 
     /**
-     * @param exchange 交换机
+     * @param exchange   交换机
      * @param routingKey 路由
      * @param queue      队列
      * @param msgId      消息id，发送时产生的。可用于消费时的幂等逻辑。如果业务已经有用于幂等的字段，可以忽略。老版本msgId为null

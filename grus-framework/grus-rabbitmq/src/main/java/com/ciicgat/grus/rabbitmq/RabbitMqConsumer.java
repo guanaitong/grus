@@ -7,12 +7,16 @@ package com.ciicgat.grus.rabbitmq;
 
 import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
 import com.ciicgat.sdk.lang.tool.CloseUtils;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +24,7 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 消费者。全局只有一个RabbitMqConsumer
@@ -55,6 +60,7 @@ public class RabbitMqConsumer implements AutoCloseable {
 
     private final ConcurrentMap<String, MsgProcessor> queues = new ConcurrentHashMap<>();
 
+    private final Cache<Object, AtomicInteger> failedCounts = Caffeine.newBuilder().initialCapacity(16).scheduler(Scheduler.systemScheduler()).expireAfterWrite(Duration.ofMinutes(5)).expireAfterAccess(Duration.ofMinutes(5)).maximumSize(10240).build();
 
     public RabbitMqConsumer(Connection connection, int parallel, int prefetch, int maxRetry, boolean fallBack) {
         this.connection = connection;
@@ -93,7 +99,7 @@ public class RabbitMqConsumer implements AutoCloseable {
         Objects.requireNonNull(msgProcessor);
         for (Channel channel : channelList) {
             try {
-                channel.basicConsume(queue, false, new GrusDefaultConsumer(channel, queue, msgProcessor, isRunning, maxRetry, fallBack));
+                channel.basicConsume(queue, false, new GrusDefaultConsumer(channel, queue, msgProcessor, failedCounts, isRunning, maxRetry, fallBack));
             } catch (IOException e) {
                 throw new RabbitMqException(String.format("queue[%s] consume failed", queue), e);
             }

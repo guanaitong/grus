@@ -11,7 +11,6 @@ import com.ciicgat.grus.rabbitmq.State;
 import com.ciicgat.grus.rabbitmq.TestConnection;
 import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
 import com.ciicgat.grus.rabbitmq.processor.StringMsgProcessor;
-import com.ciicgat.sdk.lang.threads.Threads;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
@@ -42,16 +41,15 @@ public class TestReceiver {
 //        queueNameInfo.setExchangeName();
 
 
-        RabbitMqConsumer receiver = new RabbitMqConsumer(TestConnection.getConnection(), 6, 1, 1, true);
+        RabbitMqConsumer receiver = new RabbitMqConsumer(TestConnection.getConnection(), 2, 1, 3, true);
         MsgProcessor msgProcessor = (StringMsgProcessor) (msg, value) -> {
             Span span = Span.current();
             String traceId = span.getSpanContext().getTraceId();
-            System.out.println(traceId);
+            String spanId = span.getSpanContext().getSpanId();
 //            throw new RuntimeException();
-            LOGGER.info(Thread.currentThread().getName() + " m:" + value);
-            Threads.sleepSeconds(10);
-            System.out.println(Thread.currentThread().getName() + " m:" + value);
-            return State.OK;
+            LOGGER.info(traceId + "  " + spanId + " m:" + value);
+//            Threads.sleepSeconds(10);
+            return State.Retry;
         };
         receiver.consume("grus-test-a", msgProcessor);
         receiver.consume("grus-test-b", msgProcessor);
