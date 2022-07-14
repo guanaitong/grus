@@ -48,8 +48,14 @@ public class GrusFilter implements Filter {
     private static final String SERVER_SPAN_CONTEXT = GrusFilter.class.getName() + ".activeSpanContext";
     private static final Object TAG_VALUE = new Object();
     private final AtomicInteger current = new AtomicInteger();
+    private final boolean disableOldSslProtocol;
 
     public GrusFilter() {
+        this(true);
+    }
+
+    public GrusFilter(boolean disableOldSslProtocol) {
+        this.disableOldSslProtocol = disableOldSslProtocol;
     }
 
     @Override
@@ -89,10 +95,10 @@ public class GrusFilter implements Filter {
         final HttpServletRequest request = (HttpServletRequest) servletRequest;
         final HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        if (Systems.IN_K8S && WorkRegion.getCurrentWorkRegion().isDevelopOrTest()) {
+        if (disableOldSslProtocol && Systems.IN_K8S && WorkRegion.getCurrentWorkRegion().isDevelopOrTest()) {
             String sslProtocol = request.getHeader("x_ssl_protocol");
             if (sslProtocol != null && !sslProtocol.isEmpty()) {
-                if ("TLSv1".equals(sslProtocol) || "TLSv1.1".equals(sslProtocol) || "SSLv3".equals(sslProtocol)) {
+                if (!"TLSv1.2".equals(sslProtocol) && !"TLSv1.3".equals(sslProtocol)) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.getWriter().write(String.format("ssl version %s not support", sslProtocol));
                     return;

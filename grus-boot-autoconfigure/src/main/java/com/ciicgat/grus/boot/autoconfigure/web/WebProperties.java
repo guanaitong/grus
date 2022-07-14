@@ -12,6 +12,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "grus.web")
 public class WebProperties {
+    /**
+     * 限制不支持TLSv1.2以下的安全协议
+     */
+    private boolean disableOldSslProtocol = true;
 
     /**
      * 错误码前缀，最大值不要超过2146
@@ -50,5 +54,13 @@ public class WebProperties {
 
     public void setPrintBusinessErrorStack(boolean printBusinessErrorStack) {
         this.printBusinessErrorStack = printBusinessErrorStack;
+    }
+
+    public boolean isDisableOldSslProtocol() {
+        return disableOldSslProtocol;
+    }
+
+    public void setDisableOldSslProtocol(boolean disableOldSslProtocol) {
+        this.disableOldSslProtocol = disableOldSslProtocol;
     }
 }

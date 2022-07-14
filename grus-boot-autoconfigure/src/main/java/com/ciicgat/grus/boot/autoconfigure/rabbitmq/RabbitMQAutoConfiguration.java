@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -73,16 +74,19 @@ public class RabbitMQAutoConfiguration {
     public static class ConsumerConfiguration {
 
         @Bean
+        @ConditionalOnMissingBean
         public Connection consumerConnection(RabbitMQProperty rabbitMQProperty) {
             return newConnection(rabbitMQProperty);
         }
 
         @Bean(initMethod = "init", destroyMethod = "close")
+        @ConditionalOnMissingBean
         public RabbitMqConsumer rabbitMqConsumer(RabbitMQProperty rabbitMQProperty, Connection consumerConnection) {
             return new RabbitMqConsumer(consumerConnection, rabbitMQProperty.getConsumer().getParallel(), rabbitMQProperty.getConsumer().getPrefetch(), rabbitMQProperty.getConsumer().getMaxRetry(), rabbitMQProperty.getConsumer().isFallBack());
         }
 
         @Bean
+        @ConditionalOnMissingBean
         public MessageListenerBeanProcessor messageQueueListenerJobBeanProcessor(RabbitMqConsumer rabbitMqConsumer) {
             return new MessageListenerBeanProcessor(rabbitMqConsumer);
         }
@@ -94,11 +98,13 @@ public class RabbitMQAutoConfiguration {
     public static class ProducerConfiguration {
 
         @Bean
+        @ConditionalOnMissingBean
         public Connection producerConnection(RabbitMQProperty rabbitMQProperty) {
             return newConnection(rabbitMQProperty);
         }
 
         @Bean
+        @ConditionalOnMissingBean
         public RabbitMqProducer rabbitMqProducer(RabbitMQProperty rabbitMQProperty, Connection producerConnection) {
             return new RabbitMqProducer(producerConnection, rabbitMQProperty.getProducer().getParallel(), rabbitMQProperty.getProducer().isConfirm(), rabbitMQProperty.getProducer().isCreateMessageId(), rabbitMQProperty.getProducer().isCreateTimestamp());
         }

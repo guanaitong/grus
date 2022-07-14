@@ -30,8 +30,8 @@ public class GrusWebAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public GrusFilter grusFilter() {
-        return new GrusFilter();
+    public GrusFilter grusFilter(WebProperties webProperties) {
+        return new GrusFilter(webProperties.isDisableOldSslProtocol());
     }
 
     @Bean
