@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
@@ -65,7 +64,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
     private final AtomicBoolean isRunning;
     private final int maxRetryCount;
     private final boolean fallBack;
-    private final Cache<String, AtomicInteger> failedCounts = Caffeine.newBuilder().initialCapacity(16).scheduler(Scheduler.systemScheduler()).expireAfterWrite(Duration.ofMinutes(5)).expireAfterAccess(Duration.ofMinutes(5)).maximumSize(10240).build();
+    private final Cache<Object, AtomicInteger> failedCounts = Caffeine.newBuilder().initialCapacity(16).scheduler(Scheduler.systemScheduler()).expireAfterWrite(Duration.ofMinutes(5)).expireAfterAccess(Duration.ofMinutes(5)).maximumSize(10240).build();
     private MsgProcessor msgProcessor;
 
 
@@ -89,16 +88,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
     }
 
     protected void _handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-        String msg;
-        try {
-            msg = new String(body, StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            LOGGER.error("UnsupportedEncodingException", e);
-            getChannel().basicAck(envelope.getDeliveryTag(), false);
-            return;
-        }
         Tracer tracer = OpenTelemetrys.getTracer();
-
         Context context = OpenTelemetrys.getTextMapPropagator().extract(Context.current(), properties.getHeaders(), getter);
 
         Span span = tracer.spanBuilder("consumer").setSpanKind(SpanKind.CONSUMER).setParent(context).startSpan();
@@ -116,26 +106,27 @@ public class GrusDefaultConsumer extends DefaultConsumer {
         String msgId = properties.getMessageId();
         try (Scope scope = span.makeCurrent()) {
             OpenTelemetrys.configSystemTags(span);
+            final Message message = new Message(envelope.getExchange(), envelope.getRoutingKey(), this.queue, msgId, properties.getTimestamp(), body);
             State result;
             try {
-                result = msgProcessor.apply(new Message(envelope.getExchange(), envelope.getRoutingKey(), this.queue, msgId, properties.getTimestamp(), msg));
-            } catch (RuntimeException e) {
-                LOGGER.error("handle msg error,msg {}", msg, e);
+                result = msgProcessor.onMessage(message);
+            } catch (Exception e) {
+                LOGGER.error("handle msg error,msg {}", message, e);
                 result = State.Retry;
             }
             if (result == State.OK) {
                 getChannel().basicAck(envelope.getDeliveryTag(), false);
             } else if (result == State.Abort) {
-                abort(envelope, msgId, msg, body);
+                abort(envelope, message, body);
             } else if (result == State.Retry) {
-                String key = msgId == null ? envelope.getRoutingKey() + ":::" + msg : msgId;
+                Object key = msgId == null ? message.hashCode() : msgId;
                 if (failedCounts.get(key, s -> new AtomicInteger()).incrementAndGet() >= maxRetryCount && envelope.isRedeliver()) {
                     // 超过最大重试次数后，丢弃消息
                     LOGGER.warn("exceed maxRetryCount");
-                    abort(envelope, msgId, msg, body);
+                    abort(envelope, message, body);
                     failedCounts.invalidate(key);
                 } else {
-                    LOGGER.warn("retry msg: {}", msg);
+                    LOGGER.warn("retry msg: {}", message);
                     getChannel().basicReject(envelope.getDeliveryTag(), true);
                 }
 
@@ -149,22 +140,22 @@ public class GrusDefaultConsumer extends DefaultConsumer {
         }
     }
 
-    private void abort(Envelope envelope, String msgId, String msg, byte[] body) throws IOException {
-        LOGGER.warn("abort msg: {}", msg);
+    private void abort(Envelope envelope, Message message, byte[] body) throws IOException {
+        LOGGER.warn("abort msg: {}", message);
         getChannel().basicReject(envelope.getDeliveryTag(), false);
         if (fallBack) {
             try {
                 Map<String, Object> headers = new HashMap<>();
                 headers.put("manual", 0);
                 headers.put("m-app-name", Systems.APP_NAME);
-                headers.put("m-msg-id", msgId);
+                headers.put("m-msg-id", message.getMsgId());
                 headers.put("m-routing-key", envelope.getRoutingKey());
                 headers.put("m-exchange", envelope.getExchange());
                 headers.put("m-queue", this.queue);
                 AMQP.BasicProperties properties = new AMQP.BasicProperties("application/octet-stream", null, headers, 2, 0, null, null, null, null, null, null, null, null, null);
                 getChannel().basicPublish(MqConstants.GLOBAL_DEAD_EXCHANGE_NAME, "", false, properties, body);
             } catch (Exception e) {
-                LOGGER.error("send msg to global error, {}", msg, e);
+                LOGGER.error("send msg to global error, {}", message, e);
             }
         }
     }

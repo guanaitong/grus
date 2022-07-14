@@ -99,21 +99,21 @@ public class TestMq {
 
         Map<String, JSONObjectProcessor<?>> processors = Map.of(forTestRoutingKeyA, new JSONObjectProcessor<TestData>() {
             @Override
-            protected State handle(Message msg, TestData object) {
+            public State onMessage(Message msg, TestData object) {
                 atomicInteger.decrementAndGet();
                 aReceives.add(object);
                 return State.OK;
             }
         }, forTestRoutingKeyB, new JSONObjectProcessor<TestData>() {
             @Override
-            protected State handle(Message msg, TestData object) {
+            public State onMessage(Message msg, TestData object) {
                 atomicInteger.decrementAndGet();
                 bReceives.add(object);
                 return State.OK;
             }
         }, forTestRoutingKeyC, new JSONObjectProcessor<TestData>() {
             @Override
-            protected State handle(Message msg, TestData object) {
+            public State onMessage(Message msg, TestData object) {
                 atomicInteger.decrementAndGet();
                 cReceives.add(object);
                 return State.Abort;
@@ -172,7 +172,7 @@ public class TestMq {
 
         Map<String, JSONObjectProcessor<?>> processors = Map.of(forTestRoutingKeyA, new JSONObjectProcessor<TestData>() {
             @Override
-            protected State handle(Message msg, TestData object) {
+            public State onMessage(Message msg, TestData object) {
                 aReceives.add(object);
                 atomicInteger.decrementAndGet();
                 if (object.getI() < 50) {

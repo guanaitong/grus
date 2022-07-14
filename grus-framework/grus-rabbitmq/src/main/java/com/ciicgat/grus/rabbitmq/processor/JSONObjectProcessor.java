@@ -6,9 +6,7 @@
 package com.ciicgat.grus.rabbitmq.processor;
 
 import com.ciicgat.grus.json.JSON;
-import com.ciicgat.grus.json.JSONException;
 import com.ciicgat.grus.rabbitmq.Message;
-import com.ciicgat.grus.rabbitmq.State;
 import com.fasterxml.jackson.databind.JavaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +19,7 @@ import java.lang.reflect.Type;
  * <p>
  * Created by August.Zhou on 2022/7/3 09:40
  */
-public abstract class JSONObjectProcessor<T> implements MsgProcessor {
+public abstract class JSONObjectProcessor<T> implements ObjectMsgProcessor<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(JSONObjectProcessor.class);
     private final JavaType _type;
 
@@ -31,16 +29,7 @@ public abstract class JSONObjectProcessor<T> implements MsgProcessor {
     }
 
     @Override
-    public final State apply(Message message) {
-        Object value;
-        try {
-            value = JSON.parse(message.getBody(), _type);
-        } catch (JSONException jsonException) {
-            LOGGER.error("json parse error", jsonException);
-            return State.Abort;
-        }
-        return handle(message, (T) value);
+    public final T convert(Message message) {
+        return JSON.parse(message.getBody(), _type);
     }
-
-    protected abstract State handle(Message message, T object);
 }

@@ -7,7 +7,6 @@ package com.ciicgat.grus.rabbitmq;
 
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
-import com.ciicgat.grus.core.Stringer;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
@@ -28,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -85,10 +85,17 @@ public class RabbitMqProducer {
      * @param properties
      */
     public void publish(String exchange, String routingKey, Object value, AMQP.BasicProperties properties) {
-        // value是字符串时，直接使用
-        // value继承了Stringer接口时，使用Stringer的string方法。这个主要是方便上游自定义序列化规则
-        // 剩下的，value自动转化为json字符串
-        String msg = value instanceof String ? (String) value : (value instanceof Stringer ? ((Stringer) value).string() : JSON.toJSONString(value));
+        Objects.requireNonNull(value);
+        byte[] bytes;
+        if (value instanceof String) {  // value是字符串时，直接使用
+            bytes = ((String) value).getBytes(StandardCharsets.UTF_8);
+        } else if (value instanceof byte[]) {
+            bytes = (byte[]) value;
+        } else if (value instanceof Serializable) {
+            bytes = ((Serializable) value).serialize();
+        } else {
+            bytes = JSON.toBytes(value);
+        }
         Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder("producer").setSpanKind(SpanKind.PRODUCER).setParent(Context.current()).startSpan();
         Channel channel = null;
@@ -108,13 +115,13 @@ public class RabbitMqProducer {
                 if (properties.getHeaders() != null) headers.putAll(properties.getHeaders());
                 traceProperties = properties.builder().headers(headers).messageId(messageId).timestamp(timestamp).build();
             }
-            channel.basicPublish(exchange, routingKey, false, traceProperties, msg.getBytes(StandardCharsets.UTF_8));
+            channel.basicPublish(exchange, routingKey, false, traceProperties, bytes);
             if (this.confirm) {
                 channel.waitForConfirmsOrDie();
             }
         } catch (Exception e) {
-            LOGGER.error("send msg error,msg {}", msg, e);
-            Alert.send("send msg error,msg:" + msg, e);
+            LOGGER.error("send msg error,msg {}", value, e);
+            Alert.send("send msg error,msg:" + value, e);
             RabbitMqException.handleException(e);
         } finally {
             channelPool.returnObject(channel);

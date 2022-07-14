@@ -60,6 +60,14 @@ public class JSON {
         }
     }
 
+    public static byte[] toBytes(Object object) {
+        try {
+            return OBJECT_MAPPER.writeValueAsBytes(object);
+        } catch (Throwable e) {
+            throw new JSONException(e);
+        }
+    }
+
     /**
      * 解析为指定类
      *
@@ -112,6 +120,17 @@ public class JSON {
         }
         try {
             return OBJECT_MAPPER.readValue(text, javaType);
+        } catch (Throwable e) {
+            throw new JSONException(e);
+        }
+    }
+
+    public static <T> T parse(byte[] bytes, JavaType javaType) {
+        if (bytes == null || bytes.length == 0) {
+            return null;
+        }
+        try {
+            return OBJECT_MAPPER.readValue(bytes, javaType);
         } catch (Throwable e) {
             throw new JSONException(e);
         }

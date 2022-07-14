@@ -6,6 +6,7 @@
 package com.ciicgat.grus.rabbitmq;
 
 import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
+import com.ciicgat.sdk.lang.tool.CloseUtils;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.slf4j.Logger;
@@ -13,10 +14,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -51,7 +53,7 @@ public class RabbitMqConsumer implements AutoCloseable {
 
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
 
-    private final Set<String> queues = new HashSet<>();
+    private final ConcurrentMap<String, MsgProcessor> queues = new ConcurrentHashMap<>();
 
 
     public RabbitMqConsumer(Connection connection, int parallel, int prefetch, int maxRetry, boolean fallBack) {
@@ -83,10 +85,10 @@ public class RabbitMqConsumer implements AutoCloseable {
      * @param
      */
     public synchronized void consume(String queue, MsgProcessor msgProcessor) {
-        if (queues.contains(queue)) {
+        if (queues.containsKey(queue)) {
             throw new IllegalArgumentException("queue existed");
         }
-        queues.add(queue);
+        queues.put(queue, msgProcessor);
         Objects.requireNonNull(queue);
         Objects.requireNonNull(msgProcessor);
         for (Channel channel : channelList) {
@@ -101,5 +103,10 @@ public class RabbitMqConsumer implements AutoCloseable {
     @Override
     public void close() {
         isRunning.set(false);
+        for (Map.Entry<String, MsgProcessor> processorEntry : queues.entrySet()) {
+            if (processorEntry.getValue() instanceof AutoCloseable) {
+                CloseUtils.close(processorEntry.getValue());
+            }
+        }
     }
 }

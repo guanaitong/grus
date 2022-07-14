@@ -188,44 +188,108 @@ grus.rabbitmq.consumer.fallBack=true
 编写队列的消息处理器：
 
 ```java
-
 @MessageListener("grus-demo-test-queue") //MessageQueueListener定义消费哪个队列
 public class TestMsgProcessor implements MsgProcessor {
     @Override
-    public State apply(Message message) {
+    public State onMessage(Message message) {
         return State.OK;
     }
 }
-
-// 如果消息是json，可以这么写
-@MessageListener("grus-demo-test-queue-2") //MessageQueueListener定义消费哪个队列
-public class TestMsgProcessor extends JSONObjectProcessor<TestData> {
-    @Override
-    public State handle(Message msg, TestData testData) {
-        return State.OK;
-    }
-}
-
-
-//如果消息处理器是
 ```
+
+!!! waring
+
+    同一个队列，只能注册一个处理器。当试图注册第二个时，会报错。
+
+其中，`Message`为消息体。其包含了以下字段：
+
+```java
+    /**
+     * @param exchange 交换机
+     * @param routingKey 路由
+     * @param queue      队列
+     * @param msgId      消息id，发送时产生的。可用于消费时的幂等逻辑。如果业务已经有用于幂等的字段，可以忽略。老版本msgId为null
+     * @param createdAt  消息生成时间
+     * @param body       消息内容
+     */
+    public Message(String exchange, String routingKey, String queue, String msgId, Date createdAt, byte[] body) {
+        this.exchange = exchange;
+        this.routingKey = routingKey;
+        this.queue = queue;
+        this.msgId = msgId;
+        this.createdAt = createdAt;
+        this.body = body;
+    }
+```
+
+比较重要的变化为：消息内容使用了`字节数组`。
+
+为了方便大家使用，内置了五种消息处理器：
+
+1. ObjectMsgProcessor。
+2. StringMsgProcessor。继承了ObjectMsgProcessor。等价于老版本的MsgProcessor，会自动将字节数组转换为字符串
+3. JSONObjectProcessor。继承了ObjectMsgProcessor，会自动将字节数组使用JSON反序列化为对象
+4. BatchMsgProcessor。批量处理器，消息累计到一定数量之后，再回调。用于一些批处理场景，对数据可靠性要求不高。
+5. DispatcherMsgProcessor。能满足程序想要多个队列共享一个消息处理器的需求。
 
 高级用法，如果程序想要多个队列共享一个消息处理器，程序根据队列名字自己做路由，可以这么写：
 
-```java
+以下为各种处理器的代码示例：
 
+```java
+// 如果消息是string，可以这么写
+@MessageListener("grus-demo-test-queue-2") //MessageQueueListener定义消费哪个队列
+public class TestDataMsgProcessor implements StringMsgProcessor {
+    @Override
+    public State onMessage(Message msg, String value) {
+        return State.OK;
+    }
+}
+// 如果消息是json，可以这么写
+@MessageListener("grus-demo-test-queue-2") //MessageQueueListener定义消费哪个队列
+public class TestDataMsgProcessor extends JSONObjectProcessor<TestData> {
+    @Override
+    public State onMessage(Message msg, TestData testData) {
+        return State.OK;
+    }
+}
+// 如果要实现自己的反序列化方式，可以这么写
+@MessageListener("grus-demo-test-queue-2") //MessageQueueListener定义消费哪个队列
+public class TestDataMsgProcessor implements ObjectMsgProcessor<TestData> {
+    @Override
+    public TestData convert(Message message){
+        TestData testData = GzipUtils.serialize(message.getBody());
+        return testData;
+    }
+    @Override
+    public State onMessage(Message msg, TestData testData) {
+        return State.OK;
+    }
+}
+// 批处理器使用
+@MessageListener("grus-demo-test-queue-2") //MessageQueueListener定义消费哪个队列
+public class TestDataMsgProcessor extends BatchMsgProcessor {
+
+    // 回调的是list
+    @Override
+    public void onBatchMessage(List<Message> messageList) {
+        return State.OK;
+    }
+}
+
+//如果程序想要多个队列共享一个消息处理器，程序根据队列名字自己做路由，可以这么写：
 @Configuration(proxyBeanMethods = false)
 public class XXXConfiguration {
     @Autowired
     MsgProcessor msgProcessor(RabbitMqConsumer rabbitMqConsumer) {
         Map<String, ? extends MsgProcessor> msgProcessorMap = Map.of("q1", new MsgProcessor() {
             @Override
-            public State apply(Message message) {
+            public State onMessage(Message message) {
                 return State.OK;
             }
         }, "q2", new JSONObjectProcessor<TestData>() {
             @Override
-            public State handle(Message msg, TestData testData) {
+            public State onMessage(Message msg, TestData testData) {
                 return State.OK;
             }
         });
@@ -238,9 +302,7 @@ public class XXXConfiguration {
 }
 ```
 
-!!! waring
 
-    同一个队列，只能注册一个处理器。当试图注册第二个时，会报错。
 
 ### 返回值State说明
 
@@ -301,8 +363,6 @@ public class DemoMsgProcessor implements MsgProcessor {
 比如电商的拆单消息里包含订单号，收到消息后，判断该订单是否已经拆单，拆了就忽略，没拆就正常处理。
 
 如果消息体里没有唯一性的业务字段，我们可以使用message的消息`msgId`字段，该字段是这条消息产生时生成的（由生产者生成的）。
-
-
 
 ## 可管理性
 

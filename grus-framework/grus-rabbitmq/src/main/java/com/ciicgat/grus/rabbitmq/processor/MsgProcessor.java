@@ -16,8 +16,8 @@ import com.ciicgat.grus.rabbitmq.State;
  * <p>
  * Created by August.Zhou on 2022/7/8 21:22
  */
-@FunctionalInterface
 public interface MsgProcessor {
+
     /**
      * 该方法是多线程调用，需要保证线程安全。
      * 上层实现时，需要根据情况捕获异常、返回对应的状态。
@@ -26,6 +26,6 @@ public interface MsgProcessor {
      * @param message 消息内容。为了扩展性，换成了对象
      * @return
      */
-    State apply(Message message);
+    State onMessage(Message message);
 
 }
