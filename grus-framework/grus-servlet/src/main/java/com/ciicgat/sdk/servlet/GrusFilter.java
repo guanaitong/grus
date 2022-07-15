@@ -90,13 +90,14 @@ public class GrusFilter implements Filter {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
-        // 服务端降级
         final HttpServletRequest request = (HttpServletRequest) servletRequest;
         final HttpServletResponse response = (HttpServletResponse) servletResponse;
 
         if (disableOldSslProtocol && Systems.IN_K8S) {
+            // 下面两个header由网关传过来的
+            String scheme = request.getHeader("x-scheme");
             String sslProtocol = request.getHeader("x-ssl-protocol");
-            if (sslProtocol != null && !sslProtocol.isEmpty()) {
+            if ("https".equals(scheme) && sslProtocol != null && !sslProtocol.isEmpty()) {
                 if (!"TLSv1.2".equals(sslProtocol) && !"TLSv1.3".equals(sslProtocol)) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     response.getWriter().write(String.format("ssl version %s not support", sslProtocol));
