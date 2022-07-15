@@ -95,7 +95,7 @@ public class GrusFilter implements Filter {
         final HttpServletResponse response = (HttpServletResponse) servletResponse;
 
         if (disableOldSslProtocol && Systems.IN_K8S) {
-            String sslProtocol = request.getHeader("x_ssl_protocol");
+            String sslProtocol = request.getHeader("x-ssl-protocol");
             if (sslProtocol != null && !sslProtocol.isEmpty()) {
                 if (!"TLSv1.2".equals(sslProtocol) && !"TLSv1.3".equals(sslProtocol)) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
