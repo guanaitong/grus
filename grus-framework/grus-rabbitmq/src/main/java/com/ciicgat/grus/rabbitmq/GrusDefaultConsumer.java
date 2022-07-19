@@ -159,6 +159,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
                 headers.put("m-routing-key", envelope.getRoutingKey());
                 headers.put("m-exchange", envelope.getExchange());
                 headers.put("m-queue", this.queue);
+                headers.put("m-created-at", message.getCreatedAt());
                 AMQP.BasicProperties properties = new AMQP.BasicProperties("application/octet-stream", null, headers, 2, 0, null, null, null, null, null, null, null, null, null);
                 getChannel().basicPublish(MqConstants.GLOBAL_DEAD_EXCHANGE_NAME, "", false, properties, body);
             } catch (Exception e) {
