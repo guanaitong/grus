@@ -174,7 +174,7 @@ nav:
           - HttpClient: framework/utils/httpclient.md
           - BeanCopy: framework/utils/beancopy.md
           - JSON: framework/utils/json.md
-          - JSON: framework/utils/others.md
+          - 其他: framework/utils/others.md
   - 升级:
       - 2020.6: upgrade/2020-6.md
       - 2020.7: upgrade/2020-7.md
