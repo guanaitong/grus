@@ -22,7 +22,13 @@ mkdocs:
   only:
     - master
 
-unit-test:
+unit-test-java11:
+  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-11
+  stage: build
+  script:
+    - mvn $MAVEN_CLI_OPTS test -Djava.version=11 -Djacoco.skip=true
+
+unit-test-java17:
   image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
   stage: build
   script:

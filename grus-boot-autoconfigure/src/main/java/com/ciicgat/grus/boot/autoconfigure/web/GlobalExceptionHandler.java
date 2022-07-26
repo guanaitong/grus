@@ -147,7 +147,8 @@ public class GlobalExceptionHandler {
         if (bindingResult.hasErrors()) {
             StringBuilder stringBuilder = new StringBuilder();
             for (ObjectError error : bindingResult.getAllErrors()) {
-                if (error instanceof FieldError fieldError && webProperties.isShowFieldNameInError()) {
+                if (error instanceof FieldError && webProperties.isShowFieldNameInError()) {
+                    var fieldError = (FieldError) error;
                     stringBuilder.append((fieldError).getField()).append(' ').append(fieldError.getDefaultMessage()).append(' ');
                 } else {
                     stringBuilder.append(error.getDefaultMessage()).append(' ');
@@ -186,7 +187,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ApiResponse<Object>> handleThrowable(HttpServletRequest request, Throwable throwable) {
         //为了应用迁移方便
-        if (throwable instanceof ErrorCode errorCode) {
+        if (throwable instanceof ErrorCode) {
+            var errorCode = (ErrorCode) throwable;
             LOGGER.warn("{}, errorCode {} errorMsg {}", throwable.getClass().getSimpleName(), ((ErrorCode) throwable).getErrorCode(), ((ErrorCode) throwable).getErrorMsg());
             return fail(HttpStatus.OK, errorCode);
         }

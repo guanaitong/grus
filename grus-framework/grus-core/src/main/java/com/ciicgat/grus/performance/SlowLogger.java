@@ -47,7 +47,8 @@ public class SlowLogger {
     }
 
     public static boolean logEvent(Module module, Span span, String detail) {
-        if (span instanceof ReadWriteSpan readWriteSpan) {
+        if (span instanceof ReadWriteSpan) {
+            var readWriteSpan = (ReadWriteSpan) span;
             return SlowLogger.logEvent(module, readWriteSpan.getLatencyNanos(), detail);
         }
         return false;

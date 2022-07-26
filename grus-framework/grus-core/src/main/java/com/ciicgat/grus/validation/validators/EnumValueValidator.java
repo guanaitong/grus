@@ -6,8 +6,6 @@
 package com.ciicgat.grus.validation.validators;
 
 
-
-
 import com.ciicgat.grus.validation.constraints.EnumValue;
 
 import javax.validation.ConstraintValidator;
@@ -40,7 +38,8 @@ public class EnumValueValidator implements ConstraintValidator<EnumValue, Object
 
         if (value instanceof String) {
             return Arrays.asList(strValues).contains(value);
-        } else if (value instanceof Integer integerVal) {
+        } else if (value instanceof Integer) {
+            var integerVal = (Integer) value;
             for (int i : intValues) {
                 if (i == integerVal.intValue()) {
                     return true;

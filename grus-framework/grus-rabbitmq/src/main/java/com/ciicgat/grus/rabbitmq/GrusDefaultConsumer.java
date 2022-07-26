@@ -96,7 +96,8 @@ public class GrusDefaultConsumer extends DefaultConsumer {
             traceId = span.getSpanContext().getTraceId();
             String spanId = span.getSpanContext().getSpanId();
             String parentId = "";
-            if (span instanceof ReadWriteSpan readWriteSpan) {
+            if (span instanceof ReadWriteSpan) {
+                var readWriteSpan = (ReadWriteSpan) span;
                 parentId = readWriteSpan.getParentSpanContext().getSpanId();
             }
             LogUtil.putMdcForTrace(traceId, spanId, parentId, properties.getHeaders().containsKey("uber-trace-id"));

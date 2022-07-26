@@ -147,7 +147,8 @@ public class GrusFilter implements Filter {
             String traceId = span.getSpanContext().getTraceId();
             String spanId = span.getSpanContext().getSpanId();
             String parentId = "";
-            if (span instanceof ReadWriteSpan readWriteSpan) {
+            if (span instanceof ReadWriteSpan) {
+                var readWriteSpan = (ReadWriteSpan) span;
                 if (readWriteSpan.getParentSpanContext() != Span.getInvalid().getSpanContext()) {
                     parentId = readWriteSpan.getParentSpanContext().getSpanId();
                 }

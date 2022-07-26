@@ -35,7 +35,8 @@ public class RestClients {
             httpClientBuilder.addInterceptorFirst((HttpRequestInterceptor) (request, context) -> context.setAttribute(SPAN_KEY, System.nanoTime()));
             httpClientBuilder.addInterceptorFirst((HttpResponseInterceptor) (response, context) -> {
                 Object attribute = context.getAttribute(SPAN_KEY);
-                if (attribute instanceof Long start) {
+                if (attribute instanceof Long) {
+                    var start = (Long) attribute;
                     SlowLogger.logEvent(Module.ELASTICSEARCH, System.nanoTime() - start.longValue(), "es slow");
                 }
             });

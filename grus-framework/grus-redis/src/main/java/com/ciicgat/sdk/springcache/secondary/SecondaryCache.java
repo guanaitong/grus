@@ -66,15 +66,15 @@ public class SecondaryCache {
         }
 
         IdObject<ID, VALUE> idObject = valueLoaderBySecondaryKey.get();
-        if (Objects.nonNull(idObject) && Objects.nonNull(idObject.id())) {
+        if (Objects.nonNull(idObject) && Objects.nonNull(idObject.getId())) {
             try {
                 // 直接去数据库加载数据
                 // 保存关联缓存
-                secondaryKeyToPrimaryIdCache.put(secondaryKey, idObject.id());
+                secondaryKeyToPrimaryIdCache.put(secondaryKey, idObject.getId());
             } catch (RuntimeException e) {
                 LOGGER.warn("save secondaryKeyToPrimaryId error：", e);
             }
-            return idObject.object();
+            return idObject.getObject();
         }
         return null;
     }

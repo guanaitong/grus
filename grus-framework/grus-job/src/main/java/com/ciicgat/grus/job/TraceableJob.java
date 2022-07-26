@@ -37,7 +37,8 @@ public class TraceableJob implements SimpleJob {
             String traceId = span.getSpanContext().getTraceId();
             String spanId = span.getSpanContext().getSpanId();
             String parentId = "";
-            if (span instanceof ReadWriteSpan readWriteSpan) {
+            if (span instanceof ReadWriteSpan) {
+                var readWriteSpan = (ReadWriteSpan) span;
                 parentId = readWriteSpan.getParentSpanContext().getSpanId();
             }
             LogUtil.putMdcForTrace(traceId, spanId, parentId, false);

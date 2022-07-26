@@ -8,13 +8,20 @@ package com.ciicgat.sdk.springcache.secondary;
 /**
  * Created by August.Zhou on 2021/12/17 10:13.
  */
-public record IdObject<Id, Value>(Id id, Value object) {
+public class IdObject<Id, Value> {
+    private final Id id;
+    private final Value object;
 
-//    public Id getId() {
-//        return id;
-//    }
-//
-//    public Value getObject() {
-//        return object;
-//    }
+   public IdObject(Id id, Value object) {
+      this.id = id;
+      this.object = object;
+   }
+
+   public Id getId() {
+      return id;
+   }
+
+   public Value getObject() {
+      return object;
+   }
 }

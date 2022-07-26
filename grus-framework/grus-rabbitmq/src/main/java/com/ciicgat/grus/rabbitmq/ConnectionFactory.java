@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -95,6 +96,32 @@ public class ConnectionFactory {
     }
 
 
-    private record ConnectionCacheKey(String host, int port, String user, String pwd, String vhost) {
+    private static class ConnectionCacheKey {
+        private final String host;
+        private final int port;
+        private final String user;
+        private final String pwd;
+        private final String vhost;
+
+        ConnectionCacheKey(String host, int port, String user, String pwd, String vhost) {
+            this.host = host;
+            this.port = port;
+            this.user = user;
+            this.pwd = pwd;
+            this.vhost = vhost;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ConnectionCacheKey that = (ConnectionCacheKey) o;
+            return port == that.port && Objects.equals(host, that.host) && Objects.equals(user, that.user) && Objects.equals(pwd, that.pwd) && Objects.equals(vhost, that.vhost);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(host, port, user, pwd, vhost);
+        }
     }
 }

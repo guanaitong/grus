@@ -32,11 +32,14 @@ public class ApiResponseHeaderAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
-        if (body instanceof ApiResponse apiResponse) {
+        if (body instanceof ApiResponse) {
+            var apiResponse = (ApiResponse) body;
             attachHeader(response, apiResponse.getCode(), apiResponse.getMsg(), VersionConstants.V1);
             return body;
-        } else if (body instanceof ResponseEntity responseEntity) {
-            if (responseEntity.getBody() instanceof ApiResponse apiResponse) {
+        } else if (body instanceof ResponseEntity) {
+            var responseEntity = (ResponseEntity) body;
+            if (responseEntity.getBody() instanceof ApiResponse) {
+                var apiResponse = (ApiResponse) responseEntity.getBody();
                 attachHeader(response, apiResponse.getCode(), apiResponse.getMsg(), VersionConstants.V1);
                 return body;
             }

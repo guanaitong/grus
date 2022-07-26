@@ -11,11 +11,41 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created by August.Zhou on 2021/12/20 13:19.
  */
-public record LatencyConfig(long maxFastDurationNanos, long minSlowDurationNanos) {
+public class LatencyConfig {
+    private final long maxFastDurationNanos;
+    private final long minSlowDurationNanos;
+
+    public LatencyConfig(long maxFastDurationNanos, long minSlowDurationNanos) {
+        this.maxFastDurationNanos = maxFastDurationNanos;
+        this.minSlowDurationNanos = minSlowDurationNanos;
+    }
+
+    public long getMaxFastDurationNanos() {
+        return maxFastDurationNanos;
+    }
+
+    public long getMinSlowDurationNanos() {
+        return minSlowDurationNanos;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LatencyConfig that = (LatencyConfig) o;
+        return maxFastDurationNanos == that.maxFastDurationNanos && minSlowDurationNanos == that.minSlowDurationNanos;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(maxFastDurationNanos, minSlowDurationNanos);
+    }
+
     private static final LatencyConfig DEFAULT = new LatencyConfig(200_000_000L, 2000_000_000L);
 
     public static LatencyConfig getModuleConfig(Module module) {
