@@ -37,9 +37,9 @@ public class ApiResponseHeaderAdvice implements ResponseBodyAdvice<Object> {
             attachHeader(response, apiResponse.getCode(), apiResponse.getMsg(), VersionConstants.V1);
             return body;
         } else if (body instanceof ResponseEntity) {
-            var responseEntity = (ResponseEntity) body;
-            if (responseEntity.getBody() instanceof ApiResponse) {
-                var apiResponse = (ApiResponse) responseEntity.getBody();
+            var apiResponseBody = ((ResponseEntity) body).getBody();
+            if (apiResponseBody instanceof ApiResponse) {
+                var apiResponse = (ApiResponse) apiResponseBody;
                 attachHeader(response, apiResponse.getCode(), apiResponse.getMsg(), VersionConstants.V1);
                 return body;
             }
