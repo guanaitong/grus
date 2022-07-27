@@ -100,7 +100,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
                 var readWriteSpan = (ReadWriteSpan) span;
                 parentId = readWriteSpan.getParentSpanContext().getSpanId();
             }
-            LogUtil.putMdcForTrace(traceId, spanId, parentId, properties.getHeaders().containsKey("uber-trace-id"));
+            LogUtil.putMdcForTrace(traceId, spanId, parentId, properties.getHeaders() == null ? false : properties.getHeaders().containsKey("uber-trace-id"));
         }
 
         String msgId = properties.getMessageId();
@@ -160,8 +160,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
                 headers.put("m-routing-key", envelope.getRoutingKey());
                 headers.put("m-exchange", envelope.getExchange());
                 headers.put("m-queue", this.queue);
-                if (message.getCreatedAt() != null)
-                    headers.put("m-created-at", message.getCreatedAt());
+                if (message.getCreatedAt() != null) headers.put("m-created-at", message.getCreatedAt());
                 AMQP.BasicProperties properties = new AMQP.BasicProperties("application/octet-stream", null, headers, 2, 0, null, null, null, null, null, null, null, null, null);
                 getChannel().basicPublish(MqConstants.GLOBAL_DEAD_EXCHANGE_NAME, "", false, properties, body);
             } catch (Exception e) {

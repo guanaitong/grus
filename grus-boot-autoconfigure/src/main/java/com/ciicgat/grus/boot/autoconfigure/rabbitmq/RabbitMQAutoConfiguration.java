@@ -5,6 +5,7 @@
 
 package com.ciicgat.grus.boot.autoconfigure.rabbitmq;
 
+import com.ciicgat.grus.boot.autoconfigure.condition.ConditionalOnWorkEnv;
 import com.ciicgat.grus.rabbitmq.ConnectionFactory;
 import com.ciicgat.grus.rabbitmq.Exchange;
 import com.ciicgat.grus.rabbitmq.Queue;
@@ -13,6 +14,7 @@ import com.ciicgat.grus.rabbitmq.RabbitMqConsumer;
 import com.ciicgat.grus.rabbitmq.RabbitMqException;
 import com.ciicgat.grus.rabbitmq.RabbitMqInitializer;
 import com.ciicgat.grus.rabbitmq.RabbitMqProducer;
+import com.ciicgat.sdk.util.system.WorkEnv;
 import com.rabbitmq.client.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +73,7 @@ public class RabbitMQAutoConfiguration {
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(name = "grus.rabbitmq.consumer.enable", havingValue = "true")
     @AutoConfigureAfter(InitConfiguration.class)
+    @ConditionalOnWorkEnv({WorkEnv.DEVELOP, WorkEnv.TEST, WorkEnv.PRODUCT})
     public static class ConsumerConfiguration {
 
         @Bean
