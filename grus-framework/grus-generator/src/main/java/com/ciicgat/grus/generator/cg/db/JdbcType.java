@@ -26,7 +26,7 @@ public enum JdbcType {
     FLOAT(Float.class, "FLOAT"),
     DECIMAL(BigDecimal.class, "DECIMAL"),
     DATE(Date.class, "DATE", "DATETIME", "TIMESTAMP", "TIME", "YEAR"),
-    STRING(String.class, "ENUM", "SET", "CHAR", "VARCHAR", "TINYTEXT", "TEXT", "MEDIUMTEXT", "LONGTEXT"),
+    STRING(String.class, "ENUM", "SET", "CHAR", "VARCHAR", "TINYTEXT", "TEXT", "MEDIUMTEXT", "LONGTEXT", "JSON"),
     OBJECT(Object.class, "");
 
 
