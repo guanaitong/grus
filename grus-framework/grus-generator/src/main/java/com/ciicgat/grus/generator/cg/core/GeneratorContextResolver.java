@@ -288,6 +288,7 @@ public class GeneratorContextResolver {
             tableNames.forEach(tableName -> {
                 tables.add(new CodeGeneratorXmlConfig.Table()
                         .setTableName(tableName)
+                        .setEntityObjectSuffix(entityObjectSuffix)
                         .setIgnoreColumns(globalIgnoreColumnSet));
             });
         } else {
