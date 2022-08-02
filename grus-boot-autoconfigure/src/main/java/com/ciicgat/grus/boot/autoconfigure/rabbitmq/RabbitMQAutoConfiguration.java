@@ -37,6 +37,31 @@ import java.io.IOException;
 public class RabbitMQAutoConfiguration {
     private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMQAutoConfiguration.class);
 
+    public RabbitMQAutoConfiguration(RabbitMQProperty rabbitMQProperty) {
+        if (rabbitMQProperty.getInit().isEnable()) {
+            LOGGER.info("start rabbitMQ init");
+            init(rabbitMQProperty);
+            LOGGER.info("end rabbitMQ init");
+        }
+    }
+
+    private void init(RabbitMQProperty rabbitMQProperty) {
+        try (Connection connection = ConnectionFactory.newConnection(rabbitMQProperty.getHost(), rabbitMQProperty.getPort(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), 1)) {
+            RabbitMQProperty.Init rabbitMQPropertyInit = rabbitMQProperty.getInit();
+            for (Exchange exchange : rabbitMQPropertyInit.getExchanges()) {
+                RabbitMqInitializer.exchangeDeclare(connection, exchange);
+            }
+            for (Queue queue : rabbitMQPropertyInit.getQueues()) {
+                RabbitMqInitializer.queueDeclare(connection, queue);
+            }
+            for (QueueBind queueBind : rabbitMQPropertyInit.getBinds()) {
+                RabbitMqInitializer.queueBind(connection, queueBind);
+            }
+        } catch (IOException e) {
+            throw new RabbitMqException(e);
+        }
+    }
+
     private static Connection newConnection(RabbitMQProperty rabbitMQProperty) {
         if (rabbitMQProperty.isUseSingleConnection()) {
             return ConnectionFactory.newConnectionFromCache(rabbitMQProperty.getHost(), rabbitMQProperty.getPort(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), rabbitMQProperty.getConsumer().getParallel());
@@ -45,36 +70,12 @@ public class RabbitMQAutoConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(name = "grus.rabbitmq.init.enable", havingValue = "true")
-    public static class InitConfiguration {
-
-        public InitConfiguration(RabbitMQProperty rabbitMQProperty) {
-            init(rabbitMQProperty);
-        }
-
-        private void init(RabbitMQProperty rabbitMQProperty) {
-            try (Connection connection = ConnectionFactory.newConnection(rabbitMQProperty.getHost(), rabbitMQProperty.getPort(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), 1)) {
-                RabbitMQProperty.Init rabbitMQPropertyInit = rabbitMQProperty.getInit();
-                for (Exchange exchange : rabbitMQPropertyInit.getExchanges()) {
-                    RabbitMqInitializer.exchangeDeclare(connection, exchange);
-                }
-                for (Queue queue : rabbitMQPropertyInit.getQueues()) {
-                    RabbitMqInitializer.queueDeclare(connection, queue);
-                }
-                for (QueueBind queueBind : rabbitMQPropertyInit.getBinds()) {
-                    RabbitMqInitializer.queueBind(connection, queueBind);
-                }
-            } catch (IOException e) {
-                throw new RabbitMqException(e);
-            }
-        }
-    }
-
-    @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(name = "grus.rabbitmq.consumer.enable", havingValue = "true")
-    @AutoConfigureAfter(InitConfiguration.class)
     @ConditionalOnWorkEnv({WorkEnv.DEVELOP, WorkEnv.TEST, WorkEnv.PRODUCT})
-    public static class ConsumerConfiguration {
+    public class ConsumerConfiguration {
+        public ConsumerConfiguration() {
+            LOGGER.info("rabbitMqConsumer enabled");
+        }
 
         @Bean
         @ConditionalOnMissingBean
@@ -97,8 +98,11 @@ public class RabbitMQAutoConfiguration {
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(name = "grus.rabbitmq.producer.enable", havingValue = "true")
-    @AutoConfigureAfter({InitConfiguration.class, ConsumerConfiguration.class})
-    public static class ProducerConfiguration {
+    @AutoConfigureAfter({ConsumerConfiguration.class})
+    public class ProducerConfiguration {
+        public ProducerConfiguration() {
+            LOGGER.info("rabbitMqProducer enabled");
+        }
 
         @Bean
         @ConditionalOnMissingBean

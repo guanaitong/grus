@@ -48,8 +48,8 @@ public class RabbitMQAutoConfigurationTest {
                         "grus.rabbitmq.init.binds[0].exchange=grus-demo-test-exchange",
                         "grus.rabbitmq.init.binds[0].routing_key=grus-demo-test")
                 .run(context -> {
-                    RabbitMQAutoConfiguration.InitConfiguration connection = context.getBean(RabbitMQAutoConfiguration.InitConfiguration.class);
-                    assertThat(connection).isInstanceOf(RabbitMQAutoConfiguration.InitConfiguration.class);
+                    RabbitMQAutoConfiguration connection = context.getBean(RabbitMQAutoConfiguration.class);
+                    assertThat(connection).isInstanceOf(RabbitMQAutoConfiguration.class);
                 });
     }
 
@@ -61,7 +61,7 @@ public class RabbitMQAutoConfigurationTest {
                         "grus.rabbitmq.init.exchanges[0].name=grus-demo-test-exchange2",
                         "grus.rabbitmq.init.exchanges[0].type=1")
                 .run(context -> {
-                    assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> context.getBean(RabbitMQAutoConfiguration.InitConfiguration.class));
+                    assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> context.getBean(RabbitMQAutoConfiguration.class));
                 });
     }
 

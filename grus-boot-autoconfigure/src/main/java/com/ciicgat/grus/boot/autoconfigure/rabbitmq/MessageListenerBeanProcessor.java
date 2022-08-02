@@ -21,7 +21,7 @@ public class MessageListenerBeanProcessor implements BeanPostProcessor {
     }
 
     @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         MessageListener messageListener = bean.getClass().getAnnotation(MessageListener.class);
         if (messageListener == null) {
             return bean;
