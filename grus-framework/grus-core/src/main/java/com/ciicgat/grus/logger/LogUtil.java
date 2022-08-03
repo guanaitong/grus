@@ -46,6 +46,7 @@ public class LogUtil {
             MDC.put("traceId", jaegerTraceId);
             return jaegerTraceId;
         }
+        MDC.put("traceId", traceId);
         return traceId;
     }
 }
