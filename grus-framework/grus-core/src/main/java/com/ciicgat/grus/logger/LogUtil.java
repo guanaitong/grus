@@ -41,12 +41,11 @@ public class LogUtil {
     public static String putMdcForTrace(String traceId, String spanId, String parentId, boolean fromJaeger) {
         MDC.put("spanId", spanId);
         MDC.put("parentId", parentId);
+        String finalTraceId = traceId;
         if (fromJaeger && traceId.startsWith("0000000000000000")) {
-            String jaegerTraceId = traceId.substring(16);
-            MDC.put("traceId", jaegerTraceId);
-            return jaegerTraceId;
+            finalTraceId = traceId.substring(16);
         }
-        MDC.put("traceId", traceId);
-        return traceId;
+        MDC.put("traceId", finalTraceId);
+        return finalTraceId;
     }
 }
