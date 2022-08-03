@@ -58,7 +58,7 @@ public class KubernetesServiceDiscoveryClient implements ServiceDiscoveryClient 
         OkHttpClient httpClient =
                 apiClient.getHttpClient().newBuilder().readTimeout(0, TimeUnit.SECONDS).build();
         apiClient.setHttpClient(httpClient);
-        factory = new SharedInformerFactory();
+        factory = new SharedInformerFactory(apiClient);
         start();
     }
 
