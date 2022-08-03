@@ -14,8 +14,8 @@ import io.kubernetes.client.informer.cache.Lister;
 import io.kubernetes.client.openapi.ApiClient;
 import io.kubernetes.client.openapi.Configuration;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
+import io.kubernetes.client.openapi.models.CoreV1EndpointPort;
 import io.kubernetes.client.openapi.models.V1EndpointAddress;
-import io.kubernetes.client.openapi.models.V1EndpointPort;
 import io.kubernetes.client.openapi.models.V1EndpointSubset;
 import io.kubernetes.client.openapi.models.V1Endpoints;
 import io.kubernetes.client.openapi.models.V1EndpointsList;
@@ -143,7 +143,7 @@ public class KubernetesServiceDiscoveryClient implements ServiceDiscoveryClient 
             if (subset.getPorts() == null || subset.getPorts().size() == 0) {
                 continue;
             }
-            List<V1EndpointPort> endpointPorts = subset.getPorts();
+            List<CoreV1EndpointPort> endpointPorts = subset.getPorts();
             final int port = findEndpointPort(endpointPorts);
 
             if (!CollectionUtils.isEmpty(subset.getAddresses())) {
@@ -159,16 +159,16 @@ public class KubernetesServiceDiscoveryClient implements ServiceDiscoveryClient 
         return kubernetesServiceInstanceList;
     }
 
-    private int findEndpointPort(List<V1EndpointPort> endpointPorts) {
+    private int findEndpointPort(List<CoreV1EndpointPort> endpointPorts) {
         if (endpointPorts.size() == 1) {
             return endpointPorts.get(0).getPort();
         } else {
-            for (V1EndpointPort endpointPort : endpointPorts) {
+            for (CoreV1EndpointPort endpointPort : endpointPorts) {
                 if ("TCP".equals(endpointPort.getProtocol()) && Objects.equals(endpointPort.getPort(), 80)) {
                     return 80;
                 }
             }
-            for (V1EndpointPort endpointPort : endpointPorts) {
+            for (CoreV1EndpointPort endpointPort : endpointPorts) {
                 if ("TCP".equals(endpointPort.getProtocol())) {
                     return endpointPort.getPort();
                 }
