@@ -58,11 +58,6 @@ public class HttpClientHelperTest  {
         str = HttpClientHelper.get(String.format("https://cas.ciicgat.%s/", publicDomainSuffix));
         assertTrue(str.contains("html"));
         System.out.println(System.currentTimeMillis() - start2);
-
-        long start3 = System.currentTimeMillis();
-        str = HttpClientHelper.get(String.format("https://nj.4008885818.%s/", publicDomainSuffix));
-        assertTrue(str.contains("html"));
-        System.out.println(System.currentTimeMillis() - start3);
     }
 
 
