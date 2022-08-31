@@ -19,24 +19,53 @@ import java.util.List;
  */
 public class Alert {
 
+    private static final int STACK_MAX_LENGTH = 1024;
+
     public static void send(String content) {
         send(content, null);
     }
 
     public static void send(String content, Throwable throwable) {
+        send(content, throwable, GroupBot.GLOBAL_GROUP_KEY, AlertLevel.NORMAL);
+    }
+
+    public static void send(String content, Throwable throwable, AlertLevel level) {
+        send(content, throwable, GroupBot.GLOBAL_GROUP_KEY, level);
+
+    }
+
+    public static void send(String content, Throwable throwable, String botKey, AlertLevel level) {
         FrigateMessage frigateMessage = FrigateMessage.newInstance();
 
         frigateMessage.setContent(content == null ? "" : content);
         if (throwable != null) {
             frigateMessage.setStack(StackUtil.getStack(throwable));
         }
-        if (GroupBot.GLOBAL_GROUP_KEY != null) {
+        if (botKey != null) {
             frigateMessage.setChannel(NotifyChannel.DEFAULT.code());
-            GroupBot.sendTextMsg(GroupBot.GLOBAL_GROUP_KEY, frigateMessage.toFormatText());
+            if (level.equals(AlertLevel.NORMAL)) {
+                GroupBot.sendTextMsg(botKey, frigateMessage.toFormatText());
+            } else {
+                GroupBot.sendMarkdownMsg(botKey, buildMarkDown(frigateMessage, level));
+            }
         } else {
             frigateMessage.setChannel(NotifyChannel.QY_WE_CHAT.code());
         }
         FrigateRawNotifier.sendMsgByAppNames(List.of(Systems.APP_NAME), frigateMessage);
+    }
+
+    private static String buildMarkDown(FrigateMessage frigateMessage, AlertLevel level) {
+        StringBuilder markdown = new StringBuilder();
+        markdown.append("# ").append(level.title).append("\n");
+        markdown.append(">").append("<font color=\"").append(level.color).append("\">")
+                .append(frigateMessage.getContent())
+                .append("</font>").append("\n");
+        if (frigateMessage.getStack() != null) {
+            String stack = frigateMessage.getStack().length() > STACK_MAX_LENGTH ? frigateMessage.getStack().substring(0, STACK_MAX_LENGTH) : frigateMessage.getStack();
+            markdown.append("> 异常堆栈：").append(stack);
+        }
+
+        return markdown.toString();
     }
 
 }

@@ -6,6 +6,7 @@
 package com.ciicgat.sdk.util.frigate;
 
 import com.ciicgat.grus.alert.Alert;
+import com.ciicgat.grus.alert.AlertLevel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -29,10 +30,18 @@ public class AlertTest {
     }
 
     @Test
-    public void sendMsg() {
+    public void sendMsg() throws Exception {
         MsgClient.setSkip(false);
         GroupBot.GLOBAL_GROUP_KEY = "ceed6aa3-ca81-4e9e-9638-9bc23e115a16";
         Alert.send("构建知会1：" + new Date());
         Alert.send("构建知会2：" + new Date(), new RuntimeException("ex"));
+        Thread.sleep(1000);
+
+        Alert.send("构建知会3：" + new Date(), new RuntimeException("ex"), AlertLevel.URGE);
+        Alert.send("构建知会4：" + new Date(), new RuntimeException("ex"), AlertLevel.IMPORTANT);
+        Thread.sleep(1000);
+
+        Alert.send("构建知会5：" + new Date(), new RuntimeException("ex"), "ceed6aa3-ca81-4e9e-9638-9bc23e115a16", AlertLevel.URGE);
+        Alert.send("构建知会6：" + new Date(), new RuntimeException("ex"), "ceed6aa3-ca81-4e9e-9638-9bc23e115a16", AlertLevel.IMPORTANT);
     }
 }
