@@ -27,6 +27,8 @@ public class SlowLogger {
 
     private static final String FORMAT = "%s slow,level [%s],cost [%d] millis,detail-> %s";
 
+    private static SlowLogFilter slowLogFilter = SlowLogFilter.DEFAULT;
+
     private SlowLogger() {
     }
 
@@ -46,6 +48,10 @@ public class SlowLogger {
         SlowLogger.sendSlowLog = sendSlowLog;
     }
 
+    public static void setSlowLogFilter(SlowLogFilter slowLogFilter) {
+        SlowLogger.slowLogFilter = slowLogFilter;
+    }
+
     public static boolean logEvent(Module module, Span span, String detail) {
         if (span instanceof ReadWriteSpan) {
             var readWriteSpan = (ReadWriteSpan) span;
@@ -62,7 +68,7 @@ public class SlowLogger {
             if (printSlowLog) {
                 LOGGER.warn(msg);
             }
-            if (sendSlowLog && isHttpThread()) {
+            if (sendSlowLog && slowLogFilter.accept(module, nanosDuration, detail)) {
                 Alert.send(msg);
             }
             return true;
@@ -73,7 +79,4 @@ public class SlowLogger {
         return false;
     }
 
-    private static boolean isHttpThread() {
-        return Thread.currentThread().getName().startsWith("http-nio");
-    }
 }

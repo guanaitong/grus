@@ -43,7 +43,7 @@ public class Alert {
         }
         if (botKey != null) {
             frigateMessage.setChannel(NotifyChannel.DEFAULT.code());
-            if (level.equals(AlertLevel.NORMAL)) {
+            if (level == AlertLevel.NORMAL) {
                 GroupBot.sendTextMsg(botKey, frigateMessage.toFormatText());
             } else {
                 GroupBot.sendMarkdownMsg(botKey, buildMarkDown(frigateMessage, level));
