@@ -194,12 +194,12 @@
         <repository>
             <id>releases</id>
             <name>reg.wuxingdev.cn-releases</name>
-            <url>http://repo.wuxingdev.cn/artifactory/libs-release</url>
+            <url>https://repo.wuxingdev.cn/nexus/content/repositories/releases</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
             <name>reg.wuxingdev.cn-snapshots</name>
-            <url>http://repo.wuxingdev.cn/artifactory/libs-snapshot</url>
+            <url>https://repo.wuxingdev.cn/nexus/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
