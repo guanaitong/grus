@@ -3,11 +3,11 @@
  * All rights reserved.
  */
 
-package com.ciicgat.grus.boot.autoconfigure.web;
+package com.ciicgat.grus.boot.autoconfigure.web.live;
 
-import com.ciicgat.grus.boot.autoconfigure.core.AppName;
 import com.ciicgat.grus.logger.LogExclude;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,13 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping
 public class GrusHealthCheckController {
 
-    @AppName
-    private String appName;
+    @Autowired
+    private GrusHealthChecker grusHealthChecker;
 
     @LogExclude
     @GetMapping("/isLive")
     public ApiResponse<String> isLive() {
-        return ApiResponse.success(String.format("%s is working", appName));
+        return ApiResponse.success(grusHealthChecker.isLive());
     }
 
 }

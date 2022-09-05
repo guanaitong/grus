@@ -5,6 +5,9 @@
 
 package com.ciicgat.grus.boot.autoconfigure.web;
 
+import com.ciicgat.grus.boot.autoconfigure.web.live.DefaultGrusHealthChecker;
+import com.ciicgat.grus.boot.autoconfigure.web.live.GrusHealthCheckController;
+import com.ciicgat.grus.boot.autoconfigure.web.live.GrusHealthChecker;
 import com.ciicgat.sdk.servlet.GrusFilter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -43,6 +46,12 @@ public class GrusWebAutoConfiguration {
         registration.setName("grusFilter");
         registration.setOrder(0);
         return registration;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public GrusHealthChecker grusHealthChecker() {
+        return new DefaultGrusHealthChecker();
     }
 
 }
