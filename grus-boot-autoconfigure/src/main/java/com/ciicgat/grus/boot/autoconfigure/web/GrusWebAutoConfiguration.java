@@ -9,6 +9,7 @@ import com.ciicgat.grus.boot.autoconfigure.web.live.DefaultGrusHealthChecker;
 import com.ciicgat.grus.boot.autoconfigure.web.live.GrusHealthCheckController;
 import com.ciicgat.grus.boot.autoconfigure.web.live.GrusHealthChecker;
 import com.ciicgat.sdk.servlet.GrusFilter;
+import com.ciicgat.sdk.servlet.HandlerCurrencyLimitInterceptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -52,6 +53,12 @@ public class GrusWebAutoConfiguration {
     @ConditionalOnMissingBean
     public GrusHealthChecker grusHealthChecker() {
         return new DefaultGrusHealthChecker();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public HandlerCurrencyLimitInterceptor handlerCurrencyLimitInterceptor(WebProperties webProperties) {
+        return new HandlerCurrencyLimitInterceptor(webProperties.getMaxCurrencyOfSingleInterface());
     }
 
 }

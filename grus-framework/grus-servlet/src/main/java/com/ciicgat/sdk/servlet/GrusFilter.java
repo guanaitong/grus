@@ -46,7 +46,7 @@ public class GrusFilter implements Filter {
     private static final Logger LOGGER = LoggerFactory.getLogger(GrusFilter.class);
     private static final String SERVER_SPAN_CONTEXT = GrusFilter.class.getName() + ".activeSpanContext";
     private static final Object TAG_VALUE = new Object();
-    private final AtomicInteger current = new AtomicInteger();
+    private final AtomicInteger concurrency = new AtomicInteger();
     private final boolean disableOldSslProtocol;
 
     public GrusFilter() {
@@ -120,7 +120,7 @@ public class GrusFilter implements Filter {
         //流量计数
         TrafficCounter.trafficIncrement();
 
-        int con = current.incrementAndGet(); //并发数
+        int con = concurrency.incrementAndGet(); //并发数
         if (con > 64) {
             String logMsg = "服务并发有点高,并发数:" + con;
             LOGGER.warn(logMsg);
@@ -183,7 +183,7 @@ public class GrusFilter implements Filter {
             SlowLogger.logEvent(Module.SERVLET, span, request.getRequestURI());
             //结束清理
             MDC.clear();
-            current.decrementAndGet();
+            concurrency.decrementAndGet();
         }
     }
 
