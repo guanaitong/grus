@@ -10,6 +10,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ public class ExcelUtils {
     private final static Map<Class<?>, ExcelResolver<?>> EXCEL_RESOLVER_MAP = new IdentityHashMap<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExcelUtils.class);
+    private static final Integer USE_FILE_CACHE_SIZE = 10000;
 
     @SuppressWarnings("unchecked")
     public static <T> List<T> readExcel(InputStream inputStream, Class<T> dstClass) throws Exception {
@@ -60,10 +62,11 @@ public class ExcelUtils {
         }
         Class<?> dstClass = dataList.get(0).getClass();
         ExcelSheet excelSheet = checkAndGetSheet(dstClass);
-        Workbook wb = getWorkBook(excelSheet);
 
-        writeOneList(wb, excelSheet, dstClass, dataList);
-        wb.write(outputStream);
+        try (Workbook wb = getWorkBook(excelSheet, dataList.size())) {
+            writeOneList(wb, excelSheet, dstClass, dataList);
+            wb.write(outputStream);
+        }
     }
 
     public static void writeExcelMultiSheets(OutputStream outputStream, List<List<?>> datasList) throws Exception {
@@ -77,19 +80,22 @@ public class ExcelUtils {
             return;
         }
 
+        int size = datasList.stream().map(List::size).reduce(Integer::sum).orElse(0);
+
         Class<?> dstClass = datas.get(0).getClass();
         ExcelSheet excelSheet = checkAndGetSheet(dstClass);
-        Workbook wb = getWorkBook(excelSheet);
 
-        for (List<?> d : datasList) {
-            if (d == null || d.isEmpty()) {
-                continue;
+        try (Workbook wb = getWorkBook(excelSheet, size)) {
+            for (List<?> d : datasList) {
+                if (d == null || d.isEmpty()) {
+                    continue;
+                }
+                Class<?> dclass = d.get(0).getClass();
+                ExcelSheet dSheet = dclass.getAnnotation(ExcelSheet.class);
+                writeOneList(wb, dSheet, dclass, d);
             }
-            Class<?> dclass = d.get(0).getClass();
-            ExcelSheet dSheet = dclass.getAnnotation(ExcelSheet.class);
-            writeOneList(wb, dSheet, dclass, d);
+            wb.write(outputStream);
         }
-        wb.write(outputStream);
     }
 
     private static ExcelSheet checkAndGetSheet(Class<?> clazz) {
@@ -100,8 +106,13 @@ public class ExcelUtils {
         return excelSheet;
     }
 
-    private static Workbook getWorkBook(ExcelSheet excelSheet) {
+    private static Workbook getWorkBook(ExcelSheet excelSheet, Integer dataCount) {
         Workbook wb;
+        if (dataCount >= USE_FILE_CACHE_SIZE) {
+            wb = new SXSSFWorkbook(USE_FILE_CACHE_SIZE);
+            return wb;
+        }
+
         if (excelSheet.type() == ExcelType.XLS) {
             wb = new HSSFWorkbook();
         } else {

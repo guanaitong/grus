@@ -214,4 +214,24 @@ public class ExcelUtilsTest {
         Assertions.assertEquals(dataList.get(0), list.get(0).get(0));
     }
 
+    @Test
+    public void writeBigExcel() throws Exception {
+        List<TestExcelBo> testExcelBos = new ArrayList<>();
+        for (int i = 0; i < 15000; i++) {
+            TestExcelBo testExcelBo = new TestExcelBo();
+            testExcelBo.setAge(0);
+            testExcelBo.setSex("");
+            testExcelBo.setName(String.valueOf(i));
+            testExcelBo.setBirth(new Date());
+            testExcelBo.setParty(false);
+            testExcelBo.setWeight(new BigDecimal("0"));
+            testExcelBo.setNothing(0);
+            testExcelBos.add(testExcelBo);
+        }
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+        ExcelUtils.writeExcel(outputStream, testExcelBos);
+    }
+
 }
