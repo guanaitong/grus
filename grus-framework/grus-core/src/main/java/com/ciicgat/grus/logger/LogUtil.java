@@ -42,10 +42,21 @@ public class LogUtil {
         MDC.put("spanId", spanId);
         MDC.put("parentId", parentId);
         String finalTraceId = traceId;
-        if (fromJaeger && traceId.startsWith("0000000000000000")) {
-            finalTraceId = traceId.substring(16);
+        if (fromJaeger) {
+            finalTraceId = removePrefixZeroChar(traceId);
         }
         MDC.put("traceId", finalTraceId);
         return finalTraceId;
     }
+
+    static String removePrefixZeroChar(String text) {
+        int i = 0;
+        for (int l = text.length(); i < l; ++i) {
+            if (text.charAt(i) != '0') {
+                break;
+            }
+        }
+        return text.substring(i);
+    }
+
 }
