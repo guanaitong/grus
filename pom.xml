@@ -91,12 +91,12 @@
         <guava.version>29.0-jre</guava.version>
         <feign.version>11.6</feign.version>
         <okhttp.version>3.14.9</okhttp.version>
-        <opentelemetry.version>1.15.0</opentelemetry.version>
+        <opentelemetry.version>1.19.0</opentelemetry.version>
         <elastic-job.version>3.0.0</elastic-job.version>
         <curator.version>5.1.0</curator.version>
         <zookeeper.version>3.6.3</zookeeper.version>
         <poi.version>3.17</poi.version>
-        <sentinel.version>1.8.4</sentinel.version>
+        <sentinel.version>1.8.5</sentinel.version>
         <kubernetes-java-client.version>15.0.1</kubernetes-java-client.version>
         <dubbo.version>2.7.3</dubbo.version>
         <jacoco.skip>true</jacoco.skip>
