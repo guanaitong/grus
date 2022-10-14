@@ -7,8 +7,8 @@ package com.ciicgat.sdk.servlet;
 
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
-import com.ciicgat.grus.logger.LogUtil;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import com.ciicgat.grus.opentelemetry.TraceUtil;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeManager;
@@ -21,7 +21,6 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapGetter;
-import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -144,19 +143,10 @@ public class GrusFilter implements Filter {
 
         //将Span信息放入容器
         if (span != Span.getInvalid()) {
-            String traceId = span.getSpanContext().getTraceId();
-            String spanId = span.getSpanContext().getSpanId();
-            String parentId = "";
-            if (span instanceof ReadWriteSpan) {
-                var readWriteSpan = (ReadWriteSpan) span;
-                if (readWriteSpan.getParentSpanContext() != Span.getInvalid().getSpanContext()) {
-                    parentId = readWriteSpan.getParentSpanContext().getSpanId();
-                }
-            }
-            String finalTraceId = LogUtil.putMdcForTrace(traceId, spanId, parentId, request.getHeader("uber-trace-id") != null);
-            response.addHeader("x-trace-id", finalTraceId);
-            response.addHeader("x-span-id", spanId);
-            response.addHeader("x-parent-id", parentId);
+            String traceId = TraceUtil.putMdcForTrace(span, request.getHeader("uber-trace-id") != null);
+            response.addHeader("x-trace-id", traceId);
+            response.addHeader("x-span-id", TraceUtil.getSpanId(span));
+            response.addHeader("x-parent-id", TraceUtil.getParentId(span));
         }
 
 

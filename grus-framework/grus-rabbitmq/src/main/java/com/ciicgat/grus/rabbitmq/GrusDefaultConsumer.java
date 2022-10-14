@@ -7,8 +7,8 @@ package com.ciicgat.grus.rabbitmq;
 
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.json.JSONException;
-import com.ciicgat.grus.logger.LogUtil;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import com.ciicgat.grus.opentelemetry.TraceUtil;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
 import com.ciicgat.sdk.util.system.Systems;
@@ -23,7 +23,6 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapGetter;
-import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,18 +90,9 @@ public class GrusDefaultConsumer extends DefaultConsumer {
         Context context = OpenTelemetrys.getTextMapPropagator().extract(Context.current(), properties.getHeaders(), getter);
 
         Span span = tracer.spanBuilder("consumer").setSpanKind(SpanKind.CONSUMER).setParent(context).startSpan();
-        String traceId = "";
         if (span != Span.getInvalid()) {
-            traceId = span.getSpanContext().getTraceId();
-            String spanId = span.getSpanContext().getSpanId();
-            String parentId = "";
-            if (span instanceof ReadWriteSpan) {
-                var readWriteSpan = (ReadWriteSpan) span;
-                parentId = readWriteSpan.getParentSpanContext().getSpanId();
-            }
-            LogUtil.putMdcForTrace(traceId, spanId, parentId, properties.getHeaders() == null ? false : properties.getHeaders().containsKey("uber-trace-id"));
+            TraceUtil.putMdcForTrace(span, properties.getHeaders() == null ? false : properties.getHeaders().containsKey("uber-trace-id"));
         }
-
         String msgId = properties.getMessageId();
         try (Scope scope = span.makeCurrent()) {
             OpenTelemetrys.configSystemTags(span);

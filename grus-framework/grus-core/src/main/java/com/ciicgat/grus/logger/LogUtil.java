@@ -5,7 +5,6 @@
 
 package com.ciicgat.grus.logger;
 
-import org.slf4j.MDC;
 
 /**
  * @author Wei Jiaju
@@ -36,27 +35,6 @@ public class LogUtil {
 
     public static boolean checkPrintResp(LogExclude logExclude) {
         return logExclude == null || !logExclude.excludeResp();
-    }
-
-    public static String putMdcForTrace(String traceId, String spanId, String parentId, boolean fromJaeger) {
-        MDC.put("spanId", spanId);
-        MDC.put("parentId", parentId);
-        String finalTraceId = traceId;
-        if (fromJaeger) {
-            finalTraceId = removePrefixZeroChar(traceId);
-        }
-        MDC.put("traceId", finalTraceId);
-        return finalTraceId;
-    }
-
-    static String removePrefixZeroChar(String text) {
-        int i = 0;
-        for (int l = text.length(); i < l; ++i) {
-            if (text.charAt(i) != '0') {
-                break;
-            }
-        }
-        return text.substring(i);
     }
 
 }

@@ -7,6 +7,7 @@ package com.ciicgat.sdk.servlet;
 
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import com.ciicgat.grus.opentelemetry.TraceUtil;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
@@ -80,6 +81,9 @@ public class GrusFilterTest {
         Assertions.assertTrue(StringUtils.hasLength(httpResp.getHeader("x-trace-id")));
         Assertions.assertTrue(StringUtils.hasLength(httpResp.getHeader("x-span-id")));
         Assertions.assertFalse(StringUtils.hasLength(httpResp.getHeader("x-parent-id")));
+        Assertions.assertEquals(TraceUtil.getTraceId(), httpResp.getHeader("x-trace-id"));
+        Assertions.assertEquals(TraceUtil.getSpanId(), httpResp.getHeader("x-span-id"));
+        Assertions.assertEquals(TraceUtil.getParentId(), httpResp.getHeader("x-parent-id"));
 
 
         MockHttpServletRequestBuilder post1 = MockMvcRequestBuilders.post("/test?abc=1").params(params).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).header("uber-trace-id", firstRequestTraceId)//把uber-trace-id作为链追踪下去
