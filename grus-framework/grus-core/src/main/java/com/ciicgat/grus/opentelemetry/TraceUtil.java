@@ -6,6 +6,7 @@
 package com.ciicgat.grus.opentelemetry;
 
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import org.slf4j.MDC;
 
@@ -43,7 +44,8 @@ public class TraceUtil {
     public static String getParentId(Span span) {
         if (span != Span.getInvalid()) {
             if (span instanceof ReadWriteSpan) {
-                return ((ReadWriteSpan) span).getParentSpanContext().getSpanId();
+                SpanContext parentSpanContext = ((ReadWriteSpan) span).getParentSpanContext();
+                return parentSpanContext.isValid() ? parentSpanContext.getSpanId() : "";
             }
         }
         return "";

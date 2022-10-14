@@ -146,7 +146,10 @@ public class GrusFilter implements Filter {
             String traceId = TraceUtil.putMdcForTrace(span, request.getHeader("uber-trace-id") != null);
             response.addHeader("x-trace-id", traceId);
             response.addHeader("x-span-id", TraceUtil.getSpanId(span));
-            response.addHeader("x-parent-id", TraceUtil.getParentId(span));
+            String parentId = TraceUtil.getParentId(span);
+            if (StringUtils.isNotEmpty(parentId)) {
+                response.addHeader("x-parent-id", parentId);
+            }
         }
 
 
