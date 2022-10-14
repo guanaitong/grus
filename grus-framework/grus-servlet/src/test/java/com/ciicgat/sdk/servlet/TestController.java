@@ -56,11 +56,11 @@ public class TestController {
         }
 
         String traceId = TraceUtil.getTraceId();
-        if (StringUtils.isEmpty(traceId)){
+        if (StringUtils.isEmpty(traceId)) {
             throw new RuntimeException();
         }
         String spanId = TraceUtil.getSpanId();
-        if (StringUtils.isEmpty(spanId)){
+        if (StringUtils.isEmpty(spanId)) {
             throw new RuntimeException();
         }
         return ApiResponse.success("I am OK ...");
