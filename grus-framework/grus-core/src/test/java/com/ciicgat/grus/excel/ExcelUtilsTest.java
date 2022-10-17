@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -212,6 +213,25 @@ public class ExcelUtilsTest {
 
         Assertions.assertEquals(2, list.size());
         Assertions.assertEquals(dataList.get(0), list.get(0).get(0));
+    }
+
+    @Test
+    public void testMultiIgnore() throws Exception {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        List<List<Integer>> lists = new ArrayList<>();
+        List<Integer> ignore = Collections.singletonList(0);
+        lists.add(ignore);
+        lists.add(ignore);
+
+        ExcelUtils.writeExcelMultiSheets(outputStream, Arrays.asList(dataList, dataList2), lists);
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+        try {
+            // 因为人为删除了一列，所以读取程序串行而引发异常
+            ExcelUtils.readExcelMultiSheets(inputStream, Arrays.asList(TestExcelBo.class, TestExcelBo2.class));
+        } catch (Exception e) {
+            Assert.assertTrue(e instanceof NumberFormatException);
+        }
     }
 
     @Test

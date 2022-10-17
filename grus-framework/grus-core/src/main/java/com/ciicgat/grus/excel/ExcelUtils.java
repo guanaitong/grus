@@ -57,6 +57,11 @@ public class ExcelUtils {
 
     @SuppressWarnings("unchecked")
     public static <T> void writeExcel(OutputStream outputStream, List<T> dataList) throws Exception {
+        writeExcel(outputStream, dataList, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> void writeExcel(OutputStream outputStream, List<T> dataList, List<Integer> ignoreColumns) throws Exception {
         if (dataList == null || dataList.isEmpty()) {
             return;
         }
@@ -64,12 +69,18 @@ public class ExcelUtils {
         ExcelSheet excelSheet = checkAndGetSheet(dstClass);
 
         try (Workbook wb = getWorkBook(excelSheet, dataList.size())) {
-            writeOneList(wb, excelSheet, dstClass, dataList);
+            writeOneList(wb, excelSheet, dstClass, dataList, ignoreColumns);
             wb.write(outputStream);
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static void writeExcelMultiSheets(OutputStream outputStream, List<List<?>> datasList) throws Exception {
+        writeExcelMultiSheets(outputStream, datasList, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void writeExcelMultiSheets(OutputStream outputStream, List<List<?>> datasList, List<List<Integer>> ignoreColumns) throws Exception {
         if (datasList == null || datasList.isEmpty()) {
             return;
         }
@@ -86,13 +97,17 @@ public class ExcelUtils {
         ExcelSheet excelSheet = checkAndGetSheet(dstClass);
 
         try (Workbook wb = getWorkBook(excelSheet, size)) {
+            int i = 0;
+            // 支持人为指定剔除已经申明的列。由调用方根据实际数据确定列是否要展示
+            List<Integer> ignoreList = ignoreColumns == null ? new ArrayList<>() : ignoreColumns.get(i);
             for (List<?> d : datasList) {
+                i++;
                 if (d == null || d.isEmpty()) {
                     continue;
                 }
                 Class<?> dclass = d.get(0).getClass();
                 ExcelSheet dSheet = dclass.getAnnotation(ExcelSheet.class);
-                writeOneList(wb, dSheet, dclass, d);
+                writeOneList(wb, dSheet, dclass, d, ignoreList);
             }
             wb.write(outputStream);
         }
@@ -140,7 +155,7 @@ public class ExcelUtils {
         return excelResolver.read(sheet);
     }
 
-    private static void writeOneList(Workbook wb, ExcelSheet excelSheet, Class<?> dstClass, List<?> dataList) throws Exception {
+    private static void writeOneList(Workbook wb, ExcelSheet excelSheet, Class<?> dstClass, List<?> dataList, List<Integer> ignoreColumns) throws Exception {
         Sheet sheet;
         if (StringUtils.isEmpty(excelSheet.name())) {
             sheet = wb.createSheet();
@@ -150,7 +165,7 @@ public class ExcelUtils {
 
         ExcelResolver excelResolver = getExcelResolver(dstClass);
 
-        excelResolver.write(sheet, dataList);
+        excelResolver.write(sheet, dataList, ignoreColumns);
     }
 
     private static ExcelResolver getExcelResolver(Class<?> dstClass) {

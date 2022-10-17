@@ -76,9 +76,34 @@ public class ExcelResolver<T> {
     }
 
     @SuppressWarnings("unchecked")
-    protected void write(Sheet sheet, List<T> dataList) throws Exception {
+    protected void write(Sheet sheet, List<T> dataList, List<Integer> ignoreColumns) throws Exception {
         Row header = sheet.createRow(0);
-        for (CellResolver cellResolver : cellResolvers) {
+
+        List<CellResolver> writeUseResolvers;
+        if (ignoreColumns != null && ignoreColumns.size() > 0) {
+            writeUseResolvers = new ArrayList<>();
+            for (Integer column : ignoreColumns) {
+                for (CellResolver cellResolver : cellResolvers) {
+                    CellResolver adjustedResolver = new CellResolver();
+                    if (cellResolver.column > column) {
+                        adjustedResolver.field = cellResolver.field;
+                        adjustedResolver.converter = cellResolver.converter;
+                        adjustedResolver.excelColumn = cellResolver.excelColumn;
+                        adjustedResolver.column = cellResolver.column - 1;
+                    } else {
+                        adjustedResolver = cellResolver;
+                    }
+
+                    if (cellResolver.column != column) {
+                        writeUseResolvers.add(adjustedResolver);
+                    }
+                }
+            }
+        } else {
+            writeUseResolvers = cellResolvers;
+        }
+
+        for (CellResolver cellResolver : writeUseResolvers) {
             Cell cell = header.createCell(cellResolver.column);
             cell.setCellType(CellType.STRING);
             cell.setCellValue(cellResolver.excelColumn.name());
@@ -89,7 +114,7 @@ public class ExcelResolver<T> {
             Row row = sheet.createRow(i + 1);
             T data = dataList.get(i);
 
-            for (CellResolver cellResolver : cellResolvers) {
+            for (CellResolver cellResolver : writeUseResolvers) {
                 Cell cell = row.createCell(cellResolver.column);
 
                 Object value = cellResolver.field.get(data);
