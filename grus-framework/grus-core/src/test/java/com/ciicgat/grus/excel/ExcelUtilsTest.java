@@ -230,7 +230,7 @@ public class ExcelUtilsTest {
             // 因为人为删除了一列，所以读取程序串行而引发异常
             ExcelUtils.readExcelMultiSheets(inputStream, Arrays.asList(TestExcelBo.class, TestExcelBo2.class));
         } catch (Exception e) {
-            Assert.assertTrue(e instanceof NumberFormatException);
+            Assertions.assertTrue(e instanceof NumberFormatException);
         }
     }
 
