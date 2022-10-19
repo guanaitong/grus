@@ -67,7 +67,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         this.cacheNull = Objects.isNull(config.getCacheNull()) ? redisCacheConfig.isCacheNull() : config.getCacheNull().booleanValue();
         this.isGlobalRefreshPolicy = Objects.isNull(config.getRefreshPolicy());
         this.refreshPolicy = isGlobalRefreshPolicy ? redisCacheConfig.getRefreshPolicy() : config.getRefreshPolicy();
-        this.reverse = config.getReverse();
+        this.reverse = config.isReverse();
         Objects.requireNonNull(this.refreshPolicy);
     }
 

@@ -32,7 +32,7 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
     /**
      * 是否反转。开启时，走原始数据加载逻辑，只有在失败或者超时时，会fallback到缓存返回。
      */
-    private Boolean reverse;
+    private boolean reverse;
 
     /**
      * 序列化
@@ -59,10 +59,10 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
         return useGzip;
     }
 
-    public Boolean getReverse() {
+    public boolean isReverse() {
         return reverse;
     }
-    public C setReverse(Boolean reverse) {
+    public C setReverse(boolean reverse) {
         this.reverse = reverse;
         return (C) this;
     }
