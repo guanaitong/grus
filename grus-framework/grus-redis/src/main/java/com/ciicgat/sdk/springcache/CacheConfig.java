@@ -30,6 +30,11 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
     private Boolean useGzip;
 
     /**
+     * 是否反转。开启时，走原始数据加载逻辑，只有在失败或者超时时，会fallback到缓存返回。
+     */
+    private Boolean reverse;
+
+    /**
      * 序列化
      * 非NULL时，优先级最高
      */
@@ -54,6 +59,13 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
         return useGzip;
     }
 
+    public Boolean getReverse() {
+        return reverse;
+    }
+    public C setReverse(Boolean reverse) {
+        this.reverse = reverse;
+        return (C) this;
+    }
 
     public C setUseGzip(Boolean useGzip) {
         this.useGzip = useGzip;

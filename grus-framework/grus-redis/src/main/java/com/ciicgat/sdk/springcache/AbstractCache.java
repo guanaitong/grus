@@ -48,6 +48,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
     private final RefreshPolicy refreshPolicy;
     private final boolean isGlobalRefreshPolicy;
     private final CacheChangeListener cacheChangeListener;
+    private final boolean reverse;
 
     public AbstractCache(String name, RedisCacheManager redisCacheManager, C config) {
         this.name = name;
@@ -66,6 +67,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         this.cacheNull = Objects.isNull(config.getCacheNull()) ? redisCacheConfig.isCacheNull() : config.getCacheNull().booleanValue();
         this.isGlobalRefreshPolicy = Objects.isNull(config.getRefreshPolicy());
         this.refreshPolicy = isGlobalRefreshPolicy ? redisCacheConfig.getRefreshPolicy() : config.getRefreshPolicy();
+        this.reverse = config.getReverse();
         Objects.requireNonNull(this.refreshPolicy);
     }
 
@@ -210,6 +212,9 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
      */
     @Override
     public final <T> T get(final Object key, final Callable<T> valueLoader) {
+        if (reverse) {
+            return getWithCacheFallBack(key, valueLoader);
+        }
         String stringKey = CacheKey.key(key);
         final Cache.ValueWrapper valueWrapper = get(stringKey);
         if (valueWrapper == null) {
@@ -238,7 +243,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         String stringKey = CacheKey.key(key);
         try {
             T value = valueLoader.call();
-            put(stringKey, value);
+            redisCacheManager.getRefreshExecutor().execute(() -> put(stringKey, value));
             return value;
         } catch (Exception e) {
             LOGGER.warn("call failed,cache {},key {}", this.name, key, e);
