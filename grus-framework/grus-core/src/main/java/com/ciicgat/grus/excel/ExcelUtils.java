@@ -99,8 +99,8 @@ public class ExcelUtils {
         try (Workbook wb = getWorkBook(excelSheet, size)) {
             int i = 0;
             // 支持人为指定剔除已经申明的列。由调用方根据实际数据确定列是否要展示
-            List<Integer> ignoreList = ignoreColumns == null ? new ArrayList<>() : ignoreColumns.get(i);
             for (List<?> d : datasList) {
+                List<Integer> ignoreList = ignoreColumns == null ? new ArrayList<>() : ignoreColumns.get(i);
                 i++;
                 if (d == null || d.isEmpty()) {
                     continue;
