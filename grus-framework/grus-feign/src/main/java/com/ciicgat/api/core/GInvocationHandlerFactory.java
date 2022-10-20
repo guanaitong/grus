@@ -5,10 +5,13 @@
 
 package com.ciicgat.api.core;
 
+import com.alibaba.csp.sentinel.Entry;
+import com.alibaba.csp.sentinel.EntryType;
+import com.alibaba.csp.sentinel.SphU;
+import com.alibaba.csp.sentinel.Tracer;
+import com.alibaba.csp.sentinel.context.ContextUtil;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.ciicgat.api.core.annotation.ApiCache;
-import com.ciicgat.api.core.annotation.IgnoreError;
-import com.ciicgat.api.core.interceptor.FallbackInterceptor;
-import com.ciicgat.api.core.interceptor.GHandlerInterceptor;
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.logger.LogExclude;
@@ -17,11 +20,11 @@ import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeConfig;
 import com.ciicgat.grus.service.GrusService;
 import com.ciicgat.grus.service.GrusServiceStatus;
+import com.ciicgat.sdk.lang.convert.ErrorCode;
+import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
+import com.ciicgat.sdk.util.system.Systems;
 import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.Scheduler;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Defaults;
 import feign.InvocationHandlerFactory;
 import feign.Target;
 import org.slf4j.Logger;
@@ -30,12 +33,10 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 import static feign.Util.checkNotNull;
 
@@ -63,15 +64,12 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
 
     private final boolean logResp;
 
-    private final boolean enableSentinel;
-
 
     GInvocationHandlerFactory(GrusServiceStatus grusServiceStatus,
                               CacheOptions cacheOptions,
                               FallbackFactory<?> fallbackFactory,
                               boolean logReq,
-                              boolean logResp,
-                              boolean enableSentinel) {
+                              boolean logResp) {
         this.serviceName = Objects.requireNonNull(grusServiceStatus.getGrusService().getServiceName());
         this.cacheOptions = cacheOptions;
         this.grusServiceStatus = grusServiceStatus;
@@ -79,7 +77,6 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
         this.fallbackFactory = fallbackFactory;
         this.logReq = logReq;
         this.logResp = logResp;
-        this.enableSentinel = enableSentinel;
     }
 
     static Map<Method, Method> toFallbackMethod(Map<Method, MethodHandler> dispatch) {
@@ -96,37 +93,32 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
         return new GFeignInvocationHandler(target, dispatch);
     }
 
-    private boolean isIgnoreError(Method method) {
-        return method.getAnnotation(IgnoreError.class) != null ||
-                method.getDeclaringClass().getAnnotation(IgnoreError.class) != null ||
-                method.getDeclaringClass().getPackage().getAnnotation(IgnoreError.class) != null;
-    }
-
-    private Object defaultValue(Method method) {
-        Class<?> returnType = method.getReturnType();
-        if (returnType != null && returnType.isPrimitive()) {
-            return Defaults.defaultValue(returnType);
-        } else if (Optional.class.equals(returnType)) {
-            return Optional.empty();
-        }
-        return null;
-    }
-
 
     private class GFeignInvocationHandler implements InvocationHandler {
-
-
         private final Target target;
-        private final Map<Method, InvocationHandlerFactory.MethodHandler> dispatch;
-        private ConcurrentHashMap<Method, Cache<String, Object>> cacheMap;
-        private final Map<Method, Method> fallbackMethodMap;
-        private final GHandlerInterceptor[] gHandlerInterceptors;
+        private final Map<Method, MethodMeta> methodMetaMap = new HashMap<>();
 
-        GFeignInvocationHandler(Target target, Map<Method, InvocationHandlerFactory.MethodHandler> dispatch) {
+        GFeignInvocationHandler(Target target, Map<Method, InvocationHandlerFactory.MethodHandler> dispatcher) {
             this.target = checkNotNull(target, "target");
-            this.dispatch = checkNotNull(dispatch, "dispatch for %s", target);
-            this.fallbackMethodMap = toFallbackMethod(dispatch);
-            this.gHandlerInterceptors = new GHandlerInterceptor[]{new FallbackInterceptor()};
+            checkNotNull(dispatcher, "dispatch for %s", target);
+            for (Map.Entry<Method, MethodHandler> entry : dispatcher.entrySet()) {
+                Method method = entry.getKey();
+                LogExclude logExclude = method.getAnnotation(LogExclude.class);
+                MethodMeta methodMeta = new MethodMeta(method, entry.getValue(), getApiCache(method),
+                        logReq && LogUtil.checkPrintReq(logExclude),
+                        logResp && LogUtil.checkPrintResp(logExclude));
+                methodMetaMap.put(method, methodMeta);
+            }
+        }
+
+        private ApiCache getApiCache(Method method) {
+            if (cacheOptions == null) {
+                return method.getAnnotation(ApiCache.class);
+            }
+            if (method.getName().equals(cacheOptions.getMethod())) {
+                return cacheOptions;
+            }
+            return null;
         }
 
         @Override
@@ -143,77 +135,126 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
             } else if ("toString".equals(method.getName())) {
                 return toString();
             }
-            if (method.isDefault()) {
-                return dispatch.get(method).invoke(args);
+            MethodMeta methodMeta = methodMetaMap.get(method);
+            // 默认方法
+            if (methodMeta.isDefault()) {
+                return methodMeta.getMethodHandler().invoke(args);
+            }
+            try {
+                if (methodMeta.incrementAndGet() >= 25) {
+                    LOGGER.error("方法 " + method + " 响应过慢，超过最大并发数上限，为了保护其他接口，直接拒绝该方法后续请求！！！");
+                }
+                if (methodMeta.isLogReq()) {
+                    LOGGER.info("FEIGN_REQ METHOD: {} PARAM: {}", getPrintMethod(method), args == null ? "" : LogUtil.truncate(JSON.toJSONString(args)));
+                }
+                Object resp;
+                if (methodMeta.getApiCache() != null) {
+                    resp = invokeWithCache(methodMeta, args);
+                } else {
+                    resp = invokeWithoutCache(methodMeta, args);
+                }
+                grusServiceStatus.incrementSucceeded();
+                if (methodMeta.isLogResp()) {
+                    LOGGER.info("FEIGN_RSP METHOD: {} RESULT: {}", getPrintMethod(method), resp == null ? "" : LogUtil.truncate(JSON.toJSONString(resp)));
+                }
+                return resp;
+            } catch (BusinessFeignException | BusinessRuntimeException throwable) {
+                grusServiceStatus.incrementFailed();
+                throw throwable;
+            } catch (Throwable throwable) {
+                grusServiceStatus.incrementFailed();
+                if (methodMeta.isIgnoreError()) {
+                    LOGGER.warn("Exception has been ignored", throwable);
+                    return methodMeta.getDefaultReturnValue();
+                }
+                if (fallbackFactory == null) {
+                    throw throwable;
+                }
+                Object fallback = fallbackFactory.create(throwable);
+                return method.invoke(fallback, args);
+            } finally {
+                methodMeta.decrementAndGet();
             }
 
-            LogExclude logExclude = method.getAnnotation(LogExclude.class);
-            if (logReq && LogUtil.checkPrintReq(logExclude)) {
-                LOGGER.info("FEIGN_REQ METHOD: {} PARAM: {}", getPrintMethod(method), args == null ? "" : LogUtil.truncate(JSON.toJSONString(args)));
-            }
-            Object resp = invoke0(proxy, method, args);
-            if (logResp && LogUtil.checkPrintResp(logExclude)) {
-                LOGGER.info("FEIGN_RSP METHOD: {} RESULT: {}", getPrintMethod(method), resp == null ? "" : LogUtil.truncate(JSON.toJSONString(resp)));
-            }
-            return resp;
         }
 
-        private Object invoke0(Object proxy, Method method, Object[] args) throws Throwable {
-            final ApiCache apiCache = getApiCache(method);
-
+        private Object invoke0(MethodMeta methodMeta, Object proxy, Object[] args) throws Throwable {
+            Method method = methodMeta.getMethod();
             try {
-                if (apiCache != null) {
-                    grusServiceStatus.incrementSucceeded();
-                    return invokeWithCache(apiCache, method, args);
+                Object res;
+                if (methodMeta.getApiCache() != null) {
+                    res = invokeWithCache(methodMeta, args);
                 } else {
-                    for (GHandlerInterceptor interceptor : gHandlerInterceptors) {
-                        interceptor.preHandle(proxy, method, args, serviceName);
-                    }
-
-                    grusServiceStatus.incrementSucceeded();
-                    return dispatch.get(method).invoke(args);
+                    res = invokeWithoutCache(methodMeta, args);
                 }
+                grusServiceStatus.incrementSucceeded();
+                return res;
             } catch (Throwable throwable) {
                 if (!Objects.equals(throwable.getClass(), BusinessFeignException.class)) {
                     grusServiceStatus.incrementFailed();
                     Alert.send("Feign调用异常,type:" + target.type() + ",method:" + method.getName(), throwable);
                 }
-                if (isIgnoreError(method)) {
+                if (methodMeta.isIgnoreError()) {
                     LOGGER.warn("Exception has been ignored", throwable);
-                    return defaultValue(method);
+                    return methodMeta.getDefaultReturnValue();
                 }
                 if (fallbackFactory == null) {
                     throw throwable;
 
                 }
                 Object fallback = fallbackFactory.create(throwable);
-                return fallbackMethodMap.get(method).invoke(fallback, args);
+                return method.invoke(fallback, args);
             }
         }
 
-
-        private ApiCache getApiCache(Method method) {
-            if (cacheOptions == null) {
-                return method.getAnnotation(ApiCache.class);
+        private Object invokeWithoutCache(MethodMeta methodMeta, Object[] args) throws Throwable {
+            Method method = methodMeta.getMethod();
+            // 拼装资源
+            StringBuilder resourceNameBuilder = new StringBuilder(serviceName).append(":::").append(method.getName());
+            String resourceName = resourceNameBuilder.toString();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.info("resourceName: {}", resourceName);
             }
-            if (method.getName().equals(cacheOptions.getMethod())) {
-                return cacheOptions;
+            // sentinel处理
+            Entry entry = null;
+            try {
+                // 注入调用方appName，需要在SphU.entry方法之前执行才生效，并且需要放到try代码块，故无法使用try resources写法
+                ContextUtil.enter(resourceName, Systems.APP_NAME);
+                entry = SphU.entry(resourceName, EntryType.OUT, 1);
+                return methodMeta.getMethodHandler().invoke(args);
+            } catch (BlockException e) {
+                LOGGER.error("SENTINEL BLOCKED ", e);
+                throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK);
+            } catch (Throwable ex) {
+                if (BlockException.isBlockException(ex)) {
+                    LOGGER.error("SENTINEL BLOCKED WITH MSG ", ex);
+                    throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK);
+                }
+                LOGGER.error("SENTINEL ERROR TRACE ", ex);
+                // 降级跟踪必备代码
+                Tracer.trace(ex);
+                throw ex;
+            } finally {
+                // 推出资源
+                if (entry != null) {
+                    entry.exit(1);
+                }
+                ContextUtil.exit();
             }
-            return null;
         }
 
 
         /**
          * 处理本地缓存
          *
-         * @param apiCache apiCache
-         * @param method   method
-         * @param args     args
+         * @param args args
          * @return 实际对象
          * @throws Throwable
          */
-        private Object invokeWithCache(ApiCache apiCache, Method method, Object[] args) throws Throwable {
-            final Cache<String, Object> cache = getCache(apiCache, method);
+        private Object invokeWithCache(MethodMeta methodMeta, Object[] args) throws Throwable {
+            Method method = methodMeta.getMethod();
+            final ApiCache apiCache = methodMeta.getApiCache();
+            final Cache<String, Object> cache = methodMeta.getCache();
 
             //拼接缓存key
             final StringBuilder sb = new StringBuilder(method.getName());
@@ -222,26 +263,12 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 sb.append("__");
             }
             final String cacheKey = sb.toString();
-
             //获取缓存，如空则加载
             Object cacheValue = cache.getIfPresent(cacheKey);
             if (cacheValue != null) {
                 return cacheValue == NULL ? null : cacheValue;
             }
-
-            Object result = null;
-            try {
-                result = dispatch.get(method).invoke(args);
-            } catch (Throwable throwable) {
-                //当ApiCache和IgnoreError同时标记，遇到异常时，ApiCache会生效。
-                //否则，只有ApiCache标记，遇到异常时，ApiCache不会生效
-                if (isIgnoreError(method)) {
-                    result = defaultValue(method);
-                } else {
-                    throw throwable;
-                }
-            }
-
+            Object result = invokeWithoutCache(methodMeta, args);
             //GUAVA CACHE的value是不能为null的，不然会抛异常
             if (result != null) {
                 cache.put(cacheKey, result);
@@ -249,27 +276,6 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 cache.put(cacheKey, NULL);
             }
             return result;
-        }
-
-
-        private Cache<String, Object> getCache(ApiCache apiCache, Method method) {
-            if (cacheMap == null) {
-                cacheMap = new ConcurrentHashMap<>();
-            }
-            Cache<String, Object> cache = cacheMap.get(method);
-            if (cache == null) {
-                Cache<String, Object> newCache = Caffeine.newBuilder()
-                        .expireAfterWrite(apiCache.expireSeconds(), TimeUnit.SECONDS)
-                        .maximumSize(apiCache.maxCacheSize())
-                        .scheduler(Scheduler.systemScheduler())
-                        .initialCapacity(16)
-                        .build();
-                cache = cacheMap.putIfAbsent(method, newCache);
-                if (cache == null) {
-                    cache = newCache;
-                }
-            }
-            return cache;
         }
 
 

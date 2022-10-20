@@ -24,14 +24,14 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Set;
 
-public class SentinelInterceptor implements Interceptor {
+class SentinelInterceptor implements Interceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SentinelInterceptor.class);
 
     // 被调用的服务名称
     private String serviceName;
 
-    public SentinelInterceptor(String serviceName) {
+    SentinelInterceptor(String serviceName) {
         this.serviceName = serviceName;
     }
 

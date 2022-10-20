@@ -10,6 +10,7 @@ import java.io.Serializable;
 /**
  * Debezium事件内容详情
  * https://debezium.io/documentation/reference/1.5/tutorial.html#viewing-create-event
+ *
  * @author wanchongyang
  * @date 2021/5/7 5:38 下午
  */

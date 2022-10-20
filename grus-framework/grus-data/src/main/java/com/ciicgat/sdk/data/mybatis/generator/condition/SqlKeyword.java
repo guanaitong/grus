@@ -8,7 +8,6 @@ package com.ciicgat.sdk.data.mybatis.generator.condition;
 
 /**
  * SQL 保留关键字枚举
- *
  */
 public enum SqlKeyword {
     AND("AND"),

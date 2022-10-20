@@ -100,7 +100,6 @@ public class TraceableJobTest implements SimpleJob {
         scheduleJobBootstrap1.schedule();
 
 
-
 //        SpringJobScheduler springJobScheduler = new SpringJobScheduler(traceableJob, zookeeperRegistryCenter, liteJobConfiguration);
 //        JobScheduler springJobScheduler = new JobScheduler(zookeeperRegistryCenter,liteJobConfiguration ,new ElasticJobListener[0]);
 

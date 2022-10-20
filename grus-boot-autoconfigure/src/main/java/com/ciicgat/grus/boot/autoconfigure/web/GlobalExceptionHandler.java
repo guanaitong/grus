@@ -63,13 +63,16 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(BusinessRuntimeException.class)
-    public ApiResponse<Object> handleBusinessRuntimeException(BusinessRuntimeException e) {
+    public ResponseEntity<ApiResponse<Object>> handleBusinessRuntimeException(BusinessRuntimeException e) {
         if (webProperties.isPrintBusinessErrorStack()) {
             LOGGER.warn(e.toString(), e);
         } else {
             LOGGER.warn("BusinessRuntimeException, errorCode {} errorMsg {}", e.getErrorCode(), e.getErrorMsg());
         }
-        return ApiResponse.fail(e);
+        if (e.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
+            return fail(HttpStatus.SERVICE_UNAVAILABLE, e);
+        }
+        return fail(HttpStatus.OK, e);
     }
 
     /**
@@ -79,13 +82,16 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(BusinessFeignException.class)
-    public ApiResponse<Object> handleBusinessFeignException(BusinessFeignException e) {
+    public ResponseEntity<ApiResponse<Object>> handleBusinessFeignException(BusinessFeignException e) {
         if (webProperties.isPrintBusinessErrorStack()) {
             LOGGER.warn(e.toString(), e);
         } else {
             LOGGER.warn("BusinessFeignException, errorCode {} errorMsg {}", e.getErrorCode(), e.getErrorMsg());
         }
-        return ApiResponse.fail(e);
+        if (e.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
+            return fail(HttpStatus.SERVICE_UNAVAILABLE, e);
+        }
+        return fail(HttpStatus.OK, e);
     }
 
     /**
@@ -190,6 +196,9 @@ public class GlobalExceptionHandler {
         if (throwable instanceof ErrorCode) {
             var errorCode = (ErrorCode) throwable;
             LOGGER.warn("{}, errorCode {} errorMsg {}", throwable.getClass().getSimpleName(), ((ErrorCode) throwable).getErrorCode(), ((ErrorCode) throwable).getErrorMsg());
+            if (errorCode.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
+                return fail(HttpStatus.SERVICE_UNAVAILABLE, errorCode);
+            }
             return fail(HttpStatus.OK, errorCode);
         }
 

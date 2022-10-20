@@ -23,10 +23,6 @@ public class FeignProperties {
      */
     private boolean logResp;
 
-    /**
-     * 启用sentinel
-     */
-    private boolean enableSentinel;
 
     public boolean isLogReq() {
         return logReq;
@@ -44,11 +40,4 @@ public class FeignProperties {
         this.logResp = logResp;
     }
 
-    public boolean isEnableSentinel() {
-        return enableSentinel;
-    }
-
-    public void setEnableSentinel(boolean enableSentinel) {
-        this.enableSentinel = enableSentinel;
-    }
 }

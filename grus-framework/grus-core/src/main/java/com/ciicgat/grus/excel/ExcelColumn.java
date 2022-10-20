@@ -20,12 +20,14 @@ import java.lang.annotation.Target;
 public @interface ExcelColumn {
     /**
      * 对应excel中的列，从0开始
+     *
      * @return
      */
     int column();
 
     /**
      * 对应excel中的首行的名称
+     *
      * @return
      */
     String name();
@@ -33,6 +35,7 @@ public @interface ExcelColumn {
     /**
      * converter pattern
      * 日期类型需提供,否则按照 yyyy-MM-dd HH:mm:ss
+     *
      * @example "yyyy-MM-dd"
      */
     String pattern() default "";

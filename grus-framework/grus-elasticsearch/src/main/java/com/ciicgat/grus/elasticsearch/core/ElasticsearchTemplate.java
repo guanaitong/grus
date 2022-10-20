@@ -214,6 +214,7 @@ public class ElasticsearchTemplate<T extends IndexAble> {
 
     /**
      * 单条doc根据docId更新
+     *
      * @param value
      * @param sync
      * @return

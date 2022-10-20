@@ -5,8 +5,12 @@
 
 package com.ciicgat.sdk.servlet;
 
+import com.ciicgat.grus.json.JSON;
+import com.ciicgat.sdk.lang.convert.ApiResponse;
+import com.ciicgat.sdk.lang.convert.ErrorCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -48,7 +52,10 @@ public class HandlerCurrencyLimitInterceptor implements HandlerInterceptor {
         }
         if (atomicInteger.incrementAndGet() >= max) {
             LOGGER.error("方法 " + method + " 响应过慢，超过最大并发数上限，为了保护其他接口，直接拒绝该方法后续请求！！！");
-            throw new Exception("服务器开小差了，请稍后再试！");
+            atomicInteger.decrementAndGet();
+            response.getWriter().print(JSON.toJSONString(ApiResponse.fail(ErrorCode.REQUEST_BLOCK)));
+            response.sendError(HttpStatus.SERVICE_UNAVAILABLE.value(), HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase());
+            return false;
         }
         return true;
     }

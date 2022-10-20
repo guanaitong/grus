@@ -46,7 +46,6 @@ public class TestUtil {
                 .serviceClazz(serviceClazz)
                 .logReq(true)
                 .logResp(true)
-                .enableSentinel(enableSentinel)
                 .build());
     }
 
@@ -57,7 +56,6 @@ public class TestUtil {
                 .serviceClazz(serviceClazz)
                 .logReq(true)
                 .logResp(true)
-                .enableSentinel(enableSentinel)
                 .build());
     }
 

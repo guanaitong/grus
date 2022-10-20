@@ -27,8 +27,8 @@ public class ConnectionFactory {
     /**
      * 创建数据库连接
      *
-     * @param driver 驱动类
-     * @param url 连接
+     * @param driver   驱动类
+     * @param url      连接
      * @param username 用户名
      * @param password 密码
      * @return

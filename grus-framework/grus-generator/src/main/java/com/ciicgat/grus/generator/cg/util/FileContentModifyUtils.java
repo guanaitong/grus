@@ -23,6 +23,7 @@ import java.util.List;
  */
 public class FileContentModifyUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileContentModifyUtils.class);
+
     public static void modify(String fileName, String startMark, String endMark, String content) {
         try {
             List<String> newLines = new ArrayList<>();

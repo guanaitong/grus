@@ -62,6 +62,7 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
     public boolean isReverse() {
         return reverse;
     }
+
     public C setReverse(boolean reverse) {
         this.reverse = reverse;
         return (C) this;
@@ -96,6 +97,7 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
 
     /**
      * 本地缓存
+     *
      * @return
      */
     public static Local local() {
@@ -104,6 +106,7 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
 
     /**
      * redis缓存
+     *
      * @return
      */
     public static Redis<? extends Redis> redis() {
@@ -112,6 +115,7 @@ public abstract class CacheConfig<C extends CacheConfig<C>> {
 
     /**
      * 二级缓存（本地+redis）
+     *
      * @return
      */
     public static L2 l2() {

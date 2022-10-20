@@ -63,7 +63,6 @@ public class TestErrorCode {
     }
 
 
-
     @Test
     public void testStandardErrorCode10() {
         StandardErrorCode standardErrorCode = new StandardErrorCode(2146, 9, 99999, "xx异常");

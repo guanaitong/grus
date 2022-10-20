@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author August
  * @date 2021/7/23 13:22
  */
-public class HttpClientHelperTest  {
+public class HttpClientHelperTest {
     private static final Logger log = LoggerFactory.getLogger(HttpClientHelperTest.class);
 
     @Test

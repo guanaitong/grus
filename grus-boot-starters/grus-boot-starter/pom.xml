@@ -27,7 +27,7 @@
             <groupId>com.ciicgat.grus.boot</groupId>
             <artifactId>grus-boot-autoconfigure</artifactId>
         </dependency>
-        
+
     </dependencies>
 
 </project>

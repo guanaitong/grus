@@ -25,38 +25,38 @@ import static feign.Util.emptyToNull;
  */
 public class RequestParamParameterProcessor implements AnnotatedParameterProcessor {
 
-	private static final Class<RequestParam> ANNOTATION = RequestParam.class;
+    private static final Class<RequestParam> ANNOTATION = RequestParam.class;
 
-	@Override
-	public Class<? extends Annotation> getAnnotationType() {
-		return ANNOTATION;
-	}
+    @Override
+    public Class<? extends Annotation> getAnnotationType() {
+        return ANNOTATION;
+    }
 
-	@Override
-	public boolean processArgument(AnnotatedParameterContext context,
-			Annotation annotation, Method method) {
-		int parameterIndex = context.getParameterIndex();
-		Class<?> parameterType = method.getParameterTypes()[parameterIndex];
-		MethodMetadata data = context.getMethodMetadata();
+    @Override
+    public boolean processArgument(AnnotatedParameterContext context,
+                                   Annotation annotation, Method method) {
+        int parameterIndex = context.getParameterIndex();
+        Class<?> parameterType = method.getParameterTypes()[parameterIndex];
+        MethodMetadata data = context.getMethodMetadata();
 
-		if (Map.class.isAssignableFrom(parameterType)) {
-			checkState(data.queryMapIndex() == null,
-					"Query map can only be present once.");
-			data.queryMapIndex(parameterIndex);
+        if (Map.class.isAssignableFrom(parameterType)) {
+            checkState(data.queryMapIndex() == null,
+                    "Query map can only be present once.");
+            data.queryMapIndex(parameterIndex);
 
-			return true;
-		}
+            return true;
+        }
 
-		RequestParam requestParam = ANNOTATION.cast(annotation);
-		String name = requestParam.value();
-		checkState(emptyToNull(name) != null,
-				"RequestParam.value() was empty on parameter %s", parameterIndex);
-		context.setParameterName(name);
+        RequestParam requestParam = ANNOTATION.cast(annotation);
+        String name = requestParam.value();
+        checkState(emptyToNull(name) != null,
+                "RequestParam.value() was empty on parameter %s", parameterIndex);
+        context.setParameterName(name);
 
-		Collection<String> query = context.setTemplateParameter(name,
-				data.template().queries().get(name));
-		data.template().query(name, query);
-		return true;
-	}
+        Collection<String> query = context.setTemplateParameter(name,
+                data.template().queries().get(name));
+        data.template().query(name, query);
+        return true;
+    }
 
 }

@@ -13,6 +13,7 @@ package com.ciicgat.grus.idgen;
 public interface WorkIdHolder {
     /**
      * get current instance Id,
+     *
      * @return
      */
     long getId();

@@ -33,5 +33,4 @@ public interface SentinelService {
     int testParamFlow(@Param("personId") Integer personId, @Param("id") Integer id);
 
 
-
 }

@@ -72,6 +72,7 @@ public @interface Document {
 
     /**
      * 查询的分页最大条数
+     *
      * @return
      */
     int max_result_window() default 0;

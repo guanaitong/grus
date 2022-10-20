@@ -101,7 +101,6 @@ public class FeignServiceBeanProcessor implements BeanPostProcessor {
                 .fromCache(true)
                 .logReq(feignProperties.isLogReq())
                 .logResp(feignProperties.isLogResp())
-                .enableSentinel(feignProperties.isEnableSentinel())
                 .namingService(namingService)
                 .options(new Request.Options(timeoutBinding.connectTimeoutMillis(), timeoutBinding.readTimeoutMillis()));
 

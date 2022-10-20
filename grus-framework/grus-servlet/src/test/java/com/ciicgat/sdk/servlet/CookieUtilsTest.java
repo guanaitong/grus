@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 /**
  * Created by August.Zhou on 2021/9/2 13:03.
  */
-public class CookieUtilsTest  {
+public class CookieUtilsTest {
 
     @Test
     public void testGetCookieValue() {
