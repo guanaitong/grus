@@ -34,7 +34,6 @@
         <module>grus-boot-starter-server-general</module>
         <module>grus-boot-starter-server-service</module>
         <module>grus-boot-starter-server-web</module>
-        <module>grus-boot-starter-server-frigate</module>
         <module>grus-boot-starter-velocity</module>
         <module>grus-boot-starter-zk</module>
         <module>grus-boot-starter-pagehelper</module>

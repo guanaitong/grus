@@ -6,6 +6,9 @@
 package com.ciicgat.sdk.servlet;
 
 import com.ciicgat.grus.json.JSON;
+import com.ciicgat.grus.performance.MaxConcurrency;
+import com.ciicgat.grus.performance.SentinelProperties;
+import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
 import com.ciicgat.sdk.lang.convert.ErrorCode;
 import org.slf4j.Logger;
@@ -29,10 +32,9 @@ public class HandlerCurrencyLimitInterceptor implements HandlerInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(HandlerCurrencyLimitInterceptor.class);
     private final ConcurrentMap<Method, AtomicInteger> concurrentMap = new ConcurrentHashMap<>();
 
-    private final int max;
+    private final int globalMaxConcurrency = GlobalGconfConfig.getConfig().getBean("sentinel.properties", SentinelProperties.class).getWebMaxConcurrency();
 
-    public HandlerCurrencyLimitInterceptor(int max) {
-        this.max = max;
+    public HandlerCurrencyLimitInterceptor() {
     }
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -50,8 +52,13 @@ public class HandlerCurrencyLimitInterceptor implements HandlerInterceptor {
                 atomicInteger = newAtomicInteger;
             }
         }
-        if (atomicInteger.incrementAndGet() >= max) {
-            LOGGER.error("方法 " + method + " 响应过慢，超过最大并发数上限，为了保护其他接口，直接拒绝该方法后续请求！！！");
+        int maxConcurrency = globalMaxConcurrency;
+        MaxConcurrency maxConcurrencyAnnotation = method.getAnnotation(MaxConcurrency.class);
+        if (maxConcurrencyAnnotation != null) {
+            maxConcurrency = maxConcurrencyAnnotation.value();
+        }
+        if (atomicInteger.incrementAndGet() >= maxConcurrency) {
+            LOGGER.error("方法 {} 响应过慢，超过最大并发数上限，为了保护其他接口，直接拒绝该方法后续请求！！！", method);
             atomicInteger.decrementAndGet();
             response.getWriter().print(JSON.toJSONString(ApiResponse.fail(ErrorCode.REQUEST_BLOCK)));
             response.sendError(HttpStatus.SERVICE_UNAVAILABLE.value(), HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase());

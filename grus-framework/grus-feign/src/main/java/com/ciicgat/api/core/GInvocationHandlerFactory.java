@@ -12,14 +12,16 @@ import com.alibaba.csp.sentinel.Tracer;
 import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.ciicgat.api.core.annotation.ApiCache;
-import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.logger.LogExclude;
 import com.ciicgat.grus.logger.LogUtil;
+import com.ciicgat.grus.performance.MaxConcurrency;
+import com.ciicgat.grus.performance.SentinelProperties;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeConfig;
 import com.ciicgat.grus.service.GrusService;
 import com.ciicgat.grus.service.GrusServiceStatus;
+import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.lang.convert.ErrorCode;
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
 import com.ciicgat.sdk.util.system.Systems;
@@ -63,6 +65,7 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
     private final boolean logReq;
 
     private final boolean logResp;
+    private final int globalMaxConcurrency = GlobalGconfConfig.getConfig().getBean("sentinel.properties", SentinelProperties.class).getClientMaxConcurrency();
 
 
     GInvocationHandlerFactory(GrusServiceStatus grusServiceStatus,
@@ -97,6 +100,7 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
     private class GFeignInvocationHandler implements InvocationHandler {
         private final Target target;
         private final Map<Method, MethodMeta> methodMetaMap = new HashMap<>();
+
 
         GFeignInvocationHandler(Target target, Map<Method, InvocationHandlerFactory.MethodHandler> dispatcher) {
             this.target = checkNotNull(target, "target");
@@ -141,8 +145,14 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 return methodMeta.getMethodHandler().invoke(args);
             }
             try {
-                if (methodMeta.incrementAndGet() >= 25) {
-                    LOGGER.error("方法 " + method + " 响应过慢，超过最大并发数上限，为了保护其他接口，直接拒绝该方法后续请求！！！");
+                int maxConcurrency = globalMaxConcurrency;
+                MaxConcurrency maxConcurrencyAnnotation = method.getAnnotation(MaxConcurrency.class);
+                if (maxConcurrencyAnnotation != null) {
+                    maxConcurrency = maxConcurrencyAnnotation.value();
+                }
+                if (methodMeta.incrementAndGet() >= maxConcurrency) {
+                    LOGGER.error("方法 {} 响应过慢，超过最大并发数上限，为了保护其他接口，直接拒绝该方法后续请求！！！", method);
+                    throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK);
                 }
                 if (methodMeta.isLogReq()) {
                     LOGGER.info("FEIGN_REQ METHOD: {} PARAM: {}", getPrintMethod(method), args == null ? "" : LogUtil.truncate(JSON.toJSONString(args)));
@@ -153,16 +163,13 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 } else {
                     resp = invokeWithoutCache(methodMeta, args);
                 }
-                grusServiceStatus.incrementSucceeded();
                 if (methodMeta.isLogResp()) {
                     LOGGER.info("FEIGN_RSP METHOD: {} RESULT: {}", getPrintMethod(method), resp == null ? "" : LogUtil.truncate(JSON.toJSONString(resp)));
                 }
                 return resp;
             } catch (BusinessFeignException | BusinessRuntimeException throwable) {
-                grusServiceStatus.incrementFailed();
                 throw throwable;
             } catch (Throwable throwable) {
-                grusServiceStatus.incrementFailed();
                 if (methodMeta.isIgnoreError()) {
                     LOGGER.warn("Exception has been ignored", throwable);
                     return methodMeta.getDefaultReturnValue();
@@ -178,39 +185,14 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
 
         }
 
-        private Object invoke0(MethodMeta methodMeta, Object proxy, Object[] args) throws Throwable {
-            Method method = methodMeta.getMethod();
-            try {
-                Object res;
-                if (methodMeta.getApiCache() != null) {
-                    res = invokeWithCache(methodMeta, args);
-                } else {
-                    res = invokeWithoutCache(methodMeta, args);
-                }
-                grusServiceStatus.incrementSucceeded();
-                return res;
-            } catch (Throwable throwable) {
-                if (!Objects.equals(throwable.getClass(), BusinessFeignException.class)) {
-                    grusServiceStatus.incrementFailed();
-                    Alert.send("Feign调用异常,type:" + target.type() + ",method:" + method.getName(), throwable);
-                }
-                if (methodMeta.isIgnoreError()) {
-                    LOGGER.warn("Exception has been ignored", throwable);
-                    return methodMeta.getDefaultReturnValue();
-                }
-                if (fallbackFactory == null) {
-                    throw throwable;
-
-                }
-                Object fallback = fallbackFactory.create(throwable);
-                return method.invoke(fallback, args);
-            }
-        }
-
         private Object invokeWithoutCache(MethodMeta methodMeta, Object[] args) throws Throwable {
             Method method = methodMeta.getMethod();
             // 拼装资源
-            StringBuilder resourceNameBuilder = new StringBuilder(serviceName).append(":::").append(method.getName());
+            StringBuilder resourceNameBuilder = new StringBuilder(serviceName)
+                    .append(".")
+                    .append(method.getDeclaringClass().getSimpleName())
+                    .append(".")
+                    .append(method.getName());
             String resourceName = resourceNameBuilder.toString();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.info("resourceName: {}", resourceName);

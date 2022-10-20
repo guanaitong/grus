@@ -57,8 +57,8 @@ public class GrusWebAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public HandlerCurrencyLimitInterceptor handlerCurrencyLimitInterceptor(WebProperties webProperties) {
-        return new HandlerCurrencyLimitInterceptor(webProperties.getMaxCurrencyOfSingleInterface());
+    public HandlerCurrencyLimitInterceptor handlerCurrencyLimitInterceptor() {
+        return new HandlerCurrencyLimitInterceptor();
     }
 
 }

@@ -32,11 +32,6 @@ public class WebProperties {
      */
     private boolean printBusinessErrorStack = false;
 
-    /**
-     * 单个接口的最大并发数
-     */
-    private int maxCurrencyOfSingleInterface = 50;
-
     public int getErrorCodePrefix() {
         return errorCodePrefix;
     }
@@ -67,13 +62,5 @@ public class WebProperties {
 
     public void setDisableOldSslProtocol(boolean disableOldSslProtocol) {
         this.disableOldSslProtocol = disableOldSslProtocol;
-    }
-
-    public int getMaxCurrencyOfSingleInterface() {
-        return maxCurrencyOfSingleInterface;
-    }
-
-    public void setMaxCurrencyOfSingleInterface(int maxCurrencyOfSingleInterface) {
-        this.maxCurrencyOfSingleInterface = maxCurrencyOfSingleInterface;
     }
 }
