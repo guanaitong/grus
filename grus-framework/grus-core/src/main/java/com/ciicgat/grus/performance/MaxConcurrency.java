@@ -19,5 +19,5 @@ import java.lang.annotation.Target;
 @Documented
 public @interface MaxConcurrency {
 
-    int value() default 16;
+    int value() default 32;
 }
