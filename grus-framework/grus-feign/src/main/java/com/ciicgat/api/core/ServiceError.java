@@ -21,8 +21,7 @@ public enum ServiceError {
     TIMEOUT("服务超时"),
     CONNECT_FAILED("服务连接异常"),
     ILLEGAL_ARGUMENT("非法请求参数"),
-    UNKNOWN("服务网络异常"),
-    ;
+    UNKNOWN("服务网络异常"),;
 
     final String desc;
 
