@@ -24,6 +24,7 @@ import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +41,7 @@ public class OpenTelemetryAutoConfiguration {
     @ConditionalOnMissingClass("io.opentelemetry.extension.trace.propagation.JaegerPropagator")
     public static class NoopConfiguration {
         @Bean
+        @ConditionalOnMissingBean
         public OpenTelemetry openTelemetry() {
             OpenTelemetrys.set(OpenTelemetry.noop());
             return GlobalOpenTelemetry.get();
@@ -52,6 +54,7 @@ public class OpenTelemetryAutoConfiguration {
         private static final AttributeKey<String> SERVICE_INSTANCE_ID = AttributeKey.stringKey("service.instance.id");
 
         @Bean(destroyMethod = "close")
+        @ConditionalOnMissingBean
         public SdkTracerProvider sdkTracerProvider(OpenTelemetryProperties openTelemetryProperties) {
             SdkTracerProviderBuilder sdkTracerProviderBuilder = SdkTracerProvider.builder()
                     .setResource(Resource.create(Attributes.builder()
@@ -70,6 +73,7 @@ public class OpenTelemetryAutoConfiguration {
         }
 
         @Bean
+        @ConditionalOnMissingBean
         public OpenTelemetry openTelemetry(SdkTracerProvider sdkTracerProvider) {
             TextMapPropagator textMapPropagator = TextMapPropagator.composite(W3CTraceContextPropagator.getInstance(), JaegerPropagator.getInstance());
             OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
