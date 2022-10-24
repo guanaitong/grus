@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
             LOGGER.warn("BusinessRuntimeException, errorCode {} errorMsg {}", e.getErrorCode(), e.getErrorMsg());
         }
         if (e.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
-            return fail(HttpStatus.SERVICE_UNAVAILABLE, e);
+            return fail(HttpStatus.TOO_MANY_REQUESTS, e);
         }
         return fail(HttpStatus.OK, e);
     }
@@ -89,7 +89,7 @@ public class GlobalExceptionHandler {
             LOGGER.warn("BusinessFeignException, errorCode {} errorMsg {}", e.getErrorCode(), e.getErrorMsg());
         }
         if (e.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
-            return fail(HttpStatus.SERVICE_UNAVAILABLE, e);
+            return fail(HttpStatus.TOO_MANY_REQUESTS, e);
         }
         return fail(HttpStatus.OK, e);
     }
@@ -197,7 +197,7 @@ public class GlobalExceptionHandler {
             var errorCode = (ErrorCode) throwable;
             LOGGER.warn("{}, errorCode {} errorMsg {}", throwable.getClass().getSimpleName(), ((ErrorCode) throwable).getErrorCode(), ((ErrorCode) throwable).getErrorMsg());
             if (errorCode.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
-                return fail(HttpStatus.SERVICE_UNAVAILABLE, errorCode);
+                return fail(HttpStatus.TOO_MANY_REQUESTS, errorCode);
             }
             return fail(HttpStatus.OK, errorCode);
         }

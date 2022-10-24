@@ -61,7 +61,7 @@ public class HandlerCurrencyLimitInterceptor implements HandlerInterceptor {
             LOGGER.error("方法 {} 响应过慢，超过最大并发数上限，为了保护其他接口，直接拒绝该方法后续请求！！！", method);
             atomicInteger.decrementAndGet();
             response.getWriter().print(JSON.toJSONString(ApiResponse.fail(ErrorCode.REQUEST_BLOCK)));
-            response.sendError(HttpStatus.SERVICE_UNAVAILABLE.value(), HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase());
+            response.sendError(HttpStatus.TOO_MANY_REQUESTS.value(), HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase());
             return false;
         }
         return true;
