@@ -73,6 +73,8 @@ CacheConfig.redis().setReverse(true);
 CacheConfig.local().setReverse(true);
 CacheConfig.l2().setReverse(true);
 
+然后使用方法：
+Cache.get(final Object key, final Callable<T> valueLoader)
 ```
 
 方式二，使用AbstractCache特定方法：
@@ -81,7 +83,7 @@ CacheConfig.l2().setReverse(true);
 AbstractCache.getWithCacheFallBack(final Object key, final Callable<T> valueLoader)
 ```
 
-
+推荐使用方法一。
 
 
 
