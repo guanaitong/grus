@@ -60,6 +60,31 @@ redisCacheConfig.getLocalCacheConfig().setEnable(true).setGlobalEvict(true);
 
 注意：本地内存还是尽量要过期，主要目的为了快速刷新缓存，所以本地缓存限制了最大缓存时间 **3600s**。默认本地缓存过期时间和`redis`一致（缓存时间<= 3600s）。虽然本地缓存限制了最大缓存时间，也不用担心性能问题，`redis`缓存未失效的情况下，数据一直都会重新塞入本地缓存。
 
+## 基于缓存的fallback
+
+一些业务场景下，我们希望使用缓存来实现fallback机制，即：**正常情况下走业务接口，在业务接口异常或者超时时，走缓存**。
+
+grus支持这种特性。可以使用两种方式来使用：
+
+方式一，使用cacheconfig开启：
+
+```java
+CacheConfig.redis().setReverse(true);
+CacheConfig.local().setReverse(true);
+CacheConfig.l2().setReverse(true);
+
+```
+
+方式二，使用AbstractCache特定方法：
+
+```java
+AbstractCache.getWithCacheFallBack(final Object key, final Callable<T> valueLoader)
+```
+
+
+
+
+
 ## **grus 缓存新升级**
 
 依赖`grus`版本 > `2021.1.2`。
