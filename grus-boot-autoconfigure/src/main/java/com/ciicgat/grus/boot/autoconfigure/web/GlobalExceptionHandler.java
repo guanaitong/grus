@@ -7,6 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.web;
 
 import com.ciicgat.api.core.BusinessFeignException;
 import com.ciicgat.grus.alert.Alert;
+import com.ciicgat.grus.util.ClassType;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
 import com.ciicgat.sdk.lang.convert.ErrorCode;
 import com.ciicgat.sdk.lang.convert.StandardErrorCode;
@@ -69,10 +70,7 @@ public class GlobalExceptionHandler {
         } else {
             LOGGER.warn("BusinessRuntimeException, errorCode {} errorMsg {}", e.getErrorCode(), e.getErrorMsg());
         }
-        if (e.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
-            return fail(HttpStatus.TOO_MANY_REQUESTS, e);
-        }
-        return fail(HttpStatus.OK, e);
+        return of(HttpStatus.OK, e);
     }
 
     /**
@@ -88,10 +86,7 @@ public class GlobalExceptionHandler {
         } else {
             LOGGER.warn("BusinessFeignException, errorCode {} errorMsg {}", e.getErrorCode(), e.getErrorMsg());
         }
-        if (e.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
-            return fail(HttpStatus.TOO_MANY_REQUESTS, e);
-        }
-        return fail(HttpStatus.OK, e);
+        return of(HttpStatus.OK, e);
     }
 
     /**
@@ -103,7 +98,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<ApiResponse<Object>> handleFeignException(FeignException e) {
         LOGGER.error("error", e);
-        return fail(HttpStatus.INTERNAL_SERVER_ERROR, new StandardErrorCode(webProperties.getErrorCodePrefix(), 4, 0, "依赖服务异常"));
+        return of(HttpStatus.INTERNAL_SERVER_ERROR, new StandardErrorCode(webProperties.getErrorCodePrefix(), 4, 0, "依赖服务异常"));
     }
 
     /**
@@ -120,7 +115,7 @@ public class GlobalExceptionHandler {
             errorMsg = "请求参数缺失";
         }
         HttpStatus status = e instanceof HttpRequestMethodNotSupportedException ? HttpStatus.METHOD_NOT_ALLOWED : HttpStatus.BAD_REQUEST;
-        return fail(status, new StandardErrorCode(webProperties.getErrorCodePrefix(), 2, 0, errorMsg));
+        return of(status, new StandardErrorCode(webProperties.getErrorCodePrefix(), 2, 0, errorMsg));
     }
 
 
@@ -133,7 +128,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({TypeMismatchException.class, MethodArgumentTypeMismatchException.class, MethodArgumentConversionNotSupportedException.class})
     public ResponseEntity<ApiResponse<Object>> handleTypeMismatchException(TypeMismatchException e) {
         LOGGER.warn("TypeMismatchException, error: " + e.getMessage());
-        return fail(HttpStatus.BAD_REQUEST, new StandardErrorCode(webProperties.getErrorCodePrefix(), 2, 0, "前端参数错误"));
+        return of(HttpStatus.BAD_REQUEST, new StandardErrorCode(webProperties.getErrorCodePrefix(), 2, 0, "前端参数错误"));
     }
 
     @ExceptionHandler(BindException.class)
@@ -189,6 +184,16 @@ public class GlobalExceptionHandler {
         return ApiResponse.fail(new StandardErrorCode(webProperties.getErrorCodePrefix(), 2, 0, stringBuilder.toString()));
     }
 
+    //      GlobalExceptionHandler会在有web、service下运行，在web下运行时，依赖的jar包里是没有spring-jdbc、spring-tx包依赖的。
+    //      所以没办法直接像handleBusinessFeignException方法那样子处理异常，只能用classname来判断。
+    private static ClassType dataAccessExceptionClassType = new ClassType("org.springframework.dao.DataAccessException");
+    private static ClassType rabbitMqExceptionClassType = new ClassType("com.ciicgat.grus.rabbitmq.RabbitMqException");
+    private static ClassType esDataExceptionClassType = new ClassType("com.ciicgat.grus.elasticsearch.core.EsDataException");
+    private static ClassType jedisExceptionClassType = new ClassType("redis.clients.jedis.exceptions.JedisException");
+
+    private static ClassType redisSystemExceptionClassType = new ClassType("org.springframework.data.redis.RedisSystemException");
+    private static ClassType blockExceptionClassType = new ClassType("com.alibaba.csp.sentinel.slots.block.BlockException");
+    private static ClassType clientAbortExceptionClassType = new ClassType("org.apache.catalina.connector.ClientAbortException");
 
     @ExceptionHandler
     public ResponseEntity<ApiResponse<Object>> handleThrowable(HttpServletRequest request, Throwable throwable) {
@@ -196,26 +201,50 @@ public class GlobalExceptionHandler {
         if (throwable instanceof ErrorCode) {
             var errorCode = (ErrorCode) throwable;
             LOGGER.warn("{}, errorCode {} errorMsg {}", throwable.getClass().getSimpleName(), ((ErrorCode) throwable).getErrorCode(), ((ErrorCode) throwable).getErrorMsg());
-            if (errorCode.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
-                return fail(HttpStatus.TOO_MANY_REQUESTS, errorCode);
-            }
-            return fail(HttpStatus.OK, errorCode);
+            return of(HttpStatus.OK, errorCode);
         }
+
 
         StringBuffer requestInfo = request.getRequestURL();
         requestInfo.append("，params=>");
         request.getParameterMap().forEach((key, value) -> requestInfo.append(key).append(':').append(Arrays.toString(value)));
         String msg = "发生异常，请求信息为：" + requestInfo;
-        Alert.send(msg, throwable);
         LOGGER.error(msg, throwable);
-        String errorMsg = "系统异常";
-        if (throwable instanceof SQLException) {
-            errorMsg = "数据库异常";
+
+        if (!clientAbortExceptionClassType.isInstance(throwable)) {
+            Alert.send(msg, throwable);
         }
-        return fail(HttpStatus.SERVICE_UNAVAILABLE, new StandardErrorCode(webProperties.getErrorCodePrefix(), 1, 0, errorMsg));
+
+        if (blockExceptionClassType.isInstance(throwable)) {
+            return of(HttpStatus.TOO_MANY_REQUESTS, ErrorCode.REQUEST_BLOCK);
+        }
+
+        if (blockExceptionClassType.isInstance(throwable)) {
+            return of(HttpStatus.TOO_MANY_REQUESTS, ErrorCode.REQUEST_BLOCK);
+        }
+
+
+        String errorMsg = "系统异常";
+        if (jedisExceptionClassType.isInstance(throwable) || redisSystemExceptionClassType.isInstance(throwable)) {
+            errorMsg = "redis访问异常";
+        } else if (rabbitMqExceptionClassType.isInstance(throwable)) {
+            errorMsg = "消息队列访问异常";
+        } else if (esDataExceptionClassType.isInstance(throwable)) {
+            errorMsg = "elasticsearch访问异常";
+        } else if (dataAccessExceptionClassType.isInstance(throwable)) {
+            Throwable throwableCause = throwable.getCause();
+            if (throwableCause instanceof SQLException) {
+                errorMsg = "数据库访问异常";
+            }
+        }
+        LOGGER.error(errorMsg);
+        return of(HttpStatus.INTERNAL_SERVER_ERROR, new StandardErrorCode(webProperties.getErrorCodePrefix(), 1, 0, errorMsg));
     }
 
-    private ResponseEntity<ApiResponse<Object>> fail(HttpStatus status, ErrorCode errorCode) {
+    private ResponseEntity<ApiResponse<Object>> of(HttpStatus status, ErrorCode errorCode) {
+        if (errorCode.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(ApiResponse.fail(errorCode));
+        }
         return ResponseEntity.status(status).body(ApiResponse.fail(errorCode));
     }
 

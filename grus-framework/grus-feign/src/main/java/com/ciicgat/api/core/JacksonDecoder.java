@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import com.google.common.annotations.VisibleForTesting;
+import feign.FeignException;
 import feign.Response;
 import feign.Util;
 import feign.codec.Decoder;
@@ -26,6 +27,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
 
@@ -55,9 +57,22 @@ class JacksonDecoder implements Decoder {
 
     @Override
     public Object decode(final Response response, final Type type) throws IOException {
-        if (response.status() == 404) return Util.emptyValueOf(type);
-        if (response.body() == null) return null;
-        Reader reader = response.body().asReader();
+        if (response.status() == 404 || response.status() == 204) {
+            return Util.emptyValueOf(type);
+        }
+        if (response.status() > 300) {
+            throw FeignException.errorStatus("request", response);
+        }
+        if (response.body() == null) {
+            return null;
+        }
+        if (byte[].class.equals(type)) {
+            return Util.toByteArray(response.body().asInputStream());
+        }
+        if (String.class.equals(type)) {
+            return Util.toString(response.body().asReader(StandardCharsets.UTF_8));
+        }
+        Reader reader = response.body().asReader(StandardCharsets.UTF_8);
         if (!reader.markSupported()) {
             reader = new BufferedReader(reader, 1);
         }

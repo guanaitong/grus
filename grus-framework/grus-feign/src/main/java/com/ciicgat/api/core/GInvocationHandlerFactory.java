@@ -150,8 +150,8 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 if (maxConcurrencyAnnotation != null) {
                     maxConcurrency = maxConcurrencyAnnotation.value();
                 }
-                if (methodMeta.incrementAndGet() >= maxConcurrency) {
-                    LOGGER.error("方法 {} 响应过慢，超过最大并发数上限，为了保护其他接口，直接拒绝该方法后续请求！！！", method);
+                if (methodMeta.incrementAndGet() > maxConcurrency) {
+                    LOGGER.error("{} 响应过慢，超过最大并发数上限，为了保护其他接口，直接拒绝该方法后续请求！！！", method);
                     throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK);
                 }
                 if (methodMeta.isLogReq()) {

@@ -81,3 +81,11 @@ public class TestService{
 
 - 生成器支持 String 和 Long 型两种序号类型，并且有其对应的生成规则。
 - String 类型的序号生成时，日期前缀支持自定义，配置项为{grus.idgen.dateFormat}。但日期应最少包含 yyMMdd，以保证序号在 100 年内不会发生重复。
+
+## 开发环境连接问题
+
+如果大家本地电脑是windows，可能会出现zk连接不上的问题。可以在springboot main方法里加上：
+
+```java
+  System.setProperty("zookeeper.sasl.client","false")
+```
