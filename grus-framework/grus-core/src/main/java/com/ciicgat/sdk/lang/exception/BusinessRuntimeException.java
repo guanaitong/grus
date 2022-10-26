@@ -6,6 +6,7 @@
 package com.ciicgat.sdk.lang.exception;
 
 
+import com.ciicgat.sdk.lang.convert.ApiResponse;
 import com.ciicgat.sdk.lang.convert.ErrorCode;
 
 /**
@@ -15,18 +16,29 @@ public class BusinessRuntimeException extends RuntimeException implements ErrorC
 
     private static final long serialVersionUID = 1L;
 
-    private int errorCode;
+    private final int errorCode;
 
-    private String errorMsg;
+    private final String errorMsg;
+
+    private final Object data;
 
     public BusinessRuntimeException(int errorCode, String errorMsg) {
-        super("errorCode=" + errorCode + ", errorMsg=" + errorMsg);
-        this.errorCode = errorCode;
-        this.errorMsg = errorMsg;
+        this(errorCode, errorMsg, null);
     }
 
     public BusinessRuntimeException(ErrorCode errorCode) {
-        this(errorCode.getErrorCode(), errorCode.getErrorMsg());
+        this(errorCode.getErrorCode(), errorCode.getErrorMsg(), null);
+    }
+
+    public BusinessRuntimeException(ErrorCode errorCode, Object data) {
+        this(errorCode.getErrorCode(), errorCode.getErrorMsg(), data);
+    }
+
+    public BusinessRuntimeException(int errorCode, String errorMsg, Object data) {
+        super("errorCode=" + errorCode + ", errorMsg=" + errorMsg);
+        this.errorCode = errorCode;
+        this.errorMsg = errorMsg;
+        this.data = data;
     }
 
     public int getErrorCode() {
@@ -35,6 +47,14 @@ public class BusinessRuntimeException extends RuntimeException implements ErrorC
 
     public String getErrorMsg() {
         return errorMsg;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public <T> ApiResponse<T> fail() {
+        return ApiResponse.fail(this, (T) data);
     }
 
     public String toString() {
