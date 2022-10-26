@@ -16,6 +16,9 @@ public class BusinessRuntimeException extends RuntimeException implements ErrorC
 
     private static final long serialVersionUID = 1L;
 
+    // 默认值是200
+    private final int httpStatusCode;
+
     private final int errorCode;
 
     private final String errorMsg;
@@ -35,10 +38,19 @@ public class BusinessRuntimeException extends RuntimeException implements ErrorC
     }
 
     public BusinessRuntimeException(int errorCode, String errorMsg, Object data) {
+        this(errorCode, errorMsg, data, 200);
+    }
+
+    public BusinessRuntimeException(ErrorCode errorCode, int httpStatusCode) {
+        this(errorCode.getErrorCode(), errorCode.getErrorMsg(), null, httpStatusCode);
+    }
+
+    public BusinessRuntimeException(int errorCode, String errorMsg, Object data, int httpStatusCode) {
         super("errorCode=" + errorCode + ", errorMsg=" + errorMsg);
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
         this.data = data;
+        this.httpStatusCode = httpStatusCode;
     }
 
     public int getErrorCode() {
@@ -51,6 +63,10 @@ public class BusinessRuntimeException extends RuntimeException implements ErrorC
 
     public Object getData() {
         return data;
+    }
+
+    public int getHttpStatusCode() {
+        return httpStatusCode;
     }
 
     public <T> ApiResponse<T> fail() {

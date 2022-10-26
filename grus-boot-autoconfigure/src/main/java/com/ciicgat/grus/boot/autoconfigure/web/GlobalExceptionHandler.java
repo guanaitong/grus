@@ -70,10 +70,7 @@ public class GlobalExceptionHandler {
         } else {
             LOGGER.warn("BusinessRuntimeException, errorCode {} errorMsg {}", e.getErrorCode(), e.getErrorMsg());
         }
-        if (e.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
-            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(e.fail());
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(e.fail());
+        return ResponseEntity.status(e.getHttpStatusCode()).body(e.fail());
     }
 
     /**
