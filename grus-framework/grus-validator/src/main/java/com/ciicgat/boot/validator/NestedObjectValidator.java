@@ -48,7 +48,7 @@ public class NestedObjectValidator extends ObjectValidator {
     }
 
     public static ObjectValidator build(String paramName, Class<?> paramClass) {
-        if (Object.class.equals(paramClass)) {
+        if (isSimpleType(paramClass)) {
             return NoopObjectValidator.INSTANCE;
         }
         Map<Field, ObjectValidator> fieldObjectValidatorMap = new HashMap<>();

@@ -23,11 +23,14 @@ public class ClassType {
         }
     }
 
-    public boolean isInstance(Object aClass) {
+    public boolean isInstance(Object object) {
+        return isClass(object.getClass());
+    }
+
+    public boolean isClass(Class<?> aClass) {
         if (exist) {
-            return expectClazz.isAssignableFrom(aClass.getClass());
+            return expectClazz.isAssignableFrom(aClass);
         }
         return false;
     }
-
 }

@@ -5,6 +5,8 @@
 
 package com.ciicgat.boot.validator;
 
+import com.ciicgat.grus.util.ClassType;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,9 +61,17 @@ public class MethodValidator {
 
     private void init() {
         List<IndexObjectValidator> indexObjectValidatorList = new ArrayList<>(length);
+        loop:
         for (int i = 0; i < length; i++) {
             Class<?> paramClass = paramTypes[i];
+
             String paramName = paramNames[i];
+            for (ClassType excludeParamType : EXCLUDE_PARAM_TYPES) {
+                if (excludeParamType.isClass(paramClass)) {
+                    indexObjectValidatorList.add(new IndexObjectValidator(NoopObjectValidator.INSTANCE, i));
+                    continue loop;
+                }
+            }
             ObjectValidator objectValidator = SimpleObjectValidator.build(paramName, paramClass, method.getParameterAnnotations()[i]);
             if (objectValidator == NoopObjectValidator.INSTANCE) {
                 objectValidator = NestedObjectValidator.build(paramName, paramClass);
@@ -73,5 +83,9 @@ public class MethodValidator {
         }
         indexObjectValidators = indexObjectValidatorList.toArray(new IndexObjectValidator[0]);
     }
+
+    private static final List<ClassType> EXCLUDE_PARAM_TYPES = List.of(new ClassType("javax.servlet.ServletRequest"),
+            new ClassType("javax.servlet.ServletResponse"),
+            new ClassType("org.springframework.web.multipart.MultipartFile"));
 
 }

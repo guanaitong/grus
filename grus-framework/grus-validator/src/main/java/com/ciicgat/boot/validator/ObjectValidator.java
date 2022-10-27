@@ -30,11 +30,12 @@ public abstract class ObjectValidator {
     public abstract ValidateResult validate(Object paramValue);
 
     static boolean isSimpleType(Class<?> clazz) {
-        return Primitives.allPrimitiveTypes().contains(clazz)
-                || Primitives.allWrapperTypes().contains(clazz)
+        return clazz == Object.class
                 || clazz == String.class
                 || clazz == Character.class
-                || clazz == BigDecimal.class;
+                || clazz == BigDecimal.class
+                || Primitives.allPrimitiveTypes().contains(clazz)
+                || Primitives.allWrapperTypes().contains(clazz);
     }
 
     static boolean isArrayType(Class<?> clazz) {
