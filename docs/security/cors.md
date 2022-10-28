@@ -79,7 +79,7 @@ a.x.guanaitong.xx不在关爱通标准域名
 Invalid CORS request%
 ```
 
-返回200同时返回头包含`Access-Control-Allow-Origin`且值为请求的Origin则代表成功：
+返回200，同时返回头包含`Access-Control-Allow-Origin`，且值为请求的Origin则代表成功：
 
 ```bash
 a.x.guanaitong.dev是关爱通标准域名
