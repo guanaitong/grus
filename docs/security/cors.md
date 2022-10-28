@@ -8,6 +8,7 @@
     @Bean
     public WebMvcConfigurer webMvcConfigurer() {
         String suffix = WorkRegion.getCurrentWorkRegion().getPublicDomainSuffix();
+        // 以下域名为web层c端应用常见域名 
         String[] allowedOriginPatterns = new String[]{
                 "http://*.guanaitong." + suffix,
                 "https://*.guanaitong." + suffix,
