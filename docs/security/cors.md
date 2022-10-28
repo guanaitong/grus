@@ -55,10 +55,10 @@ a.x.guanaitong.xx不在关爱通标准域名
   -H "Access-Control-Request-Method: POST" \
   -H "Access-Control-Request-Headers: X-Requested-With" \
   -X OPTIONS --verbose \
-  http://127.0.0.1:11082/isLive2
+  http://127.0.0.1:11082/isLive
 *   Trying 127.0.0.1:11082...
 * Connected to 127.0.0.1 (127.0.0.1) port 11082 (#0)
-> OPTIONS /isLive2 HTTP/1.1
+> OPTIONS /isLive HTTP/1.1
 > Host: 127.0.0.1:11082
 > User-Agent: curl/7.84.0
 > Accept: */*
@@ -74,7 +74,7 @@ a.x.guanaitong.xx不在关爱通标准域名
 < Vary: Access-Control-Request-Method
 < Vary: Access-Control-Request-Headers
 < Transfer-Encoding: chunked
-< Date: Fri, 28 Oct 2022 14:17:58 GMT
+< Date: Fri, 28 Oct 2022 14:31:13 GMT
 <
 * Connection #0 to host 127.0.0.1 left intact
 Invalid CORS request%
