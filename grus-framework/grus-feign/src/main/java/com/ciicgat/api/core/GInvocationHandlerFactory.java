@@ -154,7 +154,7 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 }
                 if (methodMeta.incrementAndGet() > maxConcurrency) {
                     LOGGER.error("{} 响应过慢，超过最大并发数上限，为了保护其他接口，直接拒绝该方法后续请求！！！", method);
-                    throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, HTTP_STATUS_TOO_MANY_REQUESTS);
+                    throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, null, HTTP_STATUS_TOO_MANY_REQUESTS);
                 }
                 if (methodMeta.isLogReq()) {
                     LOGGER.info("FEIGN_REQ METHOD: {} PARAM: {}", getPrintMethod(method), args == null ? "" : LogUtil.truncate(JSON.toJSONString(args)));
@@ -208,11 +208,11 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 return methodMeta.getMethodHandler().invoke(args);
             } catch (BlockException e) {
                 LOGGER.error("SENTINEL BLOCKED ", e);
-                throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, HTTP_STATUS_TOO_MANY_REQUESTS);
+                throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, null, HTTP_STATUS_TOO_MANY_REQUESTS);
             } catch (Throwable ex) {
                 if (BlockException.isBlockException(ex)) {
                     LOGGER.error("SENTINEL BLOCKED WITH MSG ", ex);
-                    throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, HTTP_STATUS_TOO_MANY_REQUESTS);
+                    throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, null, HTTP_STATUS_TOO_MANY_REQUESTS);
                 }
                 LOGGER.error("SENTINEL ERROR TRACE ", ex);
                 // 降级跟踪必备代码

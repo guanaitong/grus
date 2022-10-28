@@ -92,7 +92,7 @@ public class GrusFilterTest {
         Assertions.assertTrue(StringUtils.hasLength(httpResp1.getHeader("x-parent-id")));
 
         //两个请求，traceId应该相同
-        Assertions.assertEquals(httpResp.getHeader("x-trace-id"), httpResp1.getHeader("x-trace-id"));
+        Assertions.assertTrue(httpResp.getHeader("x-trace-id").contains(httpResp1.getHeader("x-trace-id")));
         //第一请求的span，是下一个请求的parent
         Assertions.assertEquals(httpResp.getHeader("x-span-id"), httpResp1.getHeader("x-parent-id"));
 

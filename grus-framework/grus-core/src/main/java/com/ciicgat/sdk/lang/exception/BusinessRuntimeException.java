@@ -25,20 +25,16 @@ public class BusinessRuntimeException extends RuntimeException implements ErrorC
 
     private final Object data;
 
-    public BusinessRuntimeException(int errorCode, String errorMsg) {
-        this(errorCode, errorMsg, null);
-    }
-
     public BusinessRuntimeException(ErrorCode errorCode) {
-        this(errorCode.getErrorCode(), errorCode.getErrorMsg(), null);
+        this(errorCode.getErrorCode(), errorCode.getErrorMsg());
     }
 
-    public BusinessRuntimeException(ErrorCode errorCode, Object data) {
-        this(errorCode.getErrorCode(), errorCode.getErrorMsg(), data);
+    public BusinessRuntimeException(int errorCode, String errorMsg) {
+        this(errorCode, errorMsg, null, 200);
     }
 
-    public BusinessRuntimeException(int errorCode, String errorMsg, Object data) {
-        this(errorCode, errorMsg, data, 200);
+    public BusinessRuntimeException(ErrorCode errorCode, Object data, int httpStatusCode) {
+        this(errorCode.getErrorCode(), errorCode.getErrorMsg(), data, httpStatusCode);
     }
 
     public BusinessRuntimeException(int errorCode, String errorMsg, Object data, int httpStatusCode) {
