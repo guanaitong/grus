@@ -183,6 +183,7 @@ nav:
       - 2022.0: upgrade/2022-0.md
   - 安全:
       - 安全基础: security/security-base.md
+      - 跨域: security/cors.md
       - CVE-2022-22965: security/CVE-2022-22965.md
   - 其他:
       - 应用开发指南: others/develop-guide.md
