@@ -40,7 +40,7 @@ public class BusinessRuntimeException extends RuntimeException implements ErrorC
     public BusinessRuntimeException(int errorCode, String errorMsg, Object data) {
         this(errorCode, errorMsg, data, 200);
     }
-    
+
     public BusinessRuntimeException(int errorCode, String errorMsg, Object data, int httpStatusCode) {
         super("errorCode=" + errorCode + ", errorMsg=" + errorMsg);
         this.errorCode = errorCode;
