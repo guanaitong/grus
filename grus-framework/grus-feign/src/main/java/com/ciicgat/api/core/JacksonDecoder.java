@@ -69,9 +69,6 @@ class JacksonDecoder implements Decoder {
         if (byte[].class.equals(type)) {
             return Util.toByteArray(response.body().asInputStream());
         }
-        if (String.class.equals(type)) {
-            return Util.toString(response.body().asReader(StandardCharsets.UTF_8));
-        }
         Reader reader = response.body().asReader(StandardCharsets.UTF_8);
         if (!reader.markSupported()) {
             reader = new BufferedReader(reader, 1);
