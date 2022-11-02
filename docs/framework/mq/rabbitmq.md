@@ -318,7 +318,7 @@ public class XXXConfiguration {
 
 在不确定时，可以返回`Retry`。前提是保证消息可重复消费。
 
-另外，新框架会捕获`MsgProcessor`的`apply`方法异常，且默认返回`Retry`。虽然框架做了异常捕获。但是依然建议大家捕获异常，根据实际情况，对异常做出判断，返回对应的状态，毕竟框架只是兜底。
+另外，新框架会捕获`MsgProcessor`的`onMessage`方法异常，且默认返回`Retry`。虽然框架做了异常捕获。但是依然建议大家捕获异常，根据实际情况，对异常做出判断，返回对应的状态，毕竟框架只是兜底。
 
 下面给出一个异常处理比较完善的demo：
 
@@ -327,7 +327,7 @@ public class XXXConfiguration {
 @MessageListener("grus-demo-test-queue") //MessageQueueListener定义消费哪个队列
 public class DemoMsgProcessor implements MsgProcessor {
     @Override
-    public State apply(Message message) {
+    public State onMessage(Message message) {
         try {
             // do something
             return State.OK;
