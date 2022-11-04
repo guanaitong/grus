@@ -70,12 +70,11 @@ grus支持这种特性。可以使用两种方式来使用：
 
 ```java
 CacheConfig.redis().setReverse(true);
-CacheConfig.local().setReverse(true);
-CacheConfig.l2().setReverse(true);
 
 然后使用方法：
 Cache.get(final Object key, final Callable<T> valueLoader)
 ```
+一般的，fallback的缓存使用redis。使用local和l2没意义，因为fallback正常情况下不会用到
 
 方式二，使用AbstractCache特定方法：
 
