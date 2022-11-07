@@ -35,8 +35,10 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -62,6 +64,8 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
     private final CacheOptions cacheOptions;
     private final FallbackFactory<?> fallbackFactory;
 
+    private final List<String> ignoreErrorMethods;
+
     private GrusRuntimeConfig grusRuntimeConfig = GrusFramework.getGrusRuntimeManager().getGrusRuntimeConfig();
 
     private final boolean logReq;
@@ -74,7 +78,8 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                               CacheOptions cacheOptions,
                               FallbackFactory<?> fallbackFactory,
                               boolean logReq,
-                              boolean logResp) {
+                              boolean logResp,
+                              List<String> ignoreErrorMethods) {
         this.serviceName = Objects.requireNonNull(grusServiceStatus.getGrusService().getServiceName());
         this.cacheOptions = cacheOptions;
         this.grusServiceStatus = grusServiceStatus;
@@ -82,6 +87,7 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
         this.fallbackFactory = fallbackFactory;
         this.logReq = logReq;
         this.logResp = logResp;
+        this.ignoreErrorMethods = Collections.unmodifiableList(ignoreErrorMethods);
     }
 
     static Map<Method, Method> toFallbackMethod(Map<Method, MethodHandler> dispatch) {
@@ -112,7 +118,8 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 LogExclude logExclude = method.getAnnotation(LogExclude.class);
                 MethodMeta methodMeta = new MethodMeta(method, entry.getValue(), getApiCache(method),
                         logReq && LogUtil.checkPrintReq(logExclude),
-                        logResp && LogUtil.checkPrintResp(logExclude));
+                        logResp && LogUtil.checkPrintResp(logExclude),
+                        ignoreErrorMethods.contains(method.getName()));
                 methodMetaMap.put(method, methodMeta);
             }
         }

@@ -39,12 +39,12 @@ class MethodMeta {
     private final Object defaultReturnValue;
     private volatile Cache<String, Object> cache = null;
 
-    MethodMeta(Method method, InvocationHandlerFactory.MethodHandler methodHandler, ApiCache apiCache, boolean logReq, boolean logResp) {
+    MethodMeta(Method method, InvocationHandlerFactory.MethodHandler methodHandler, ApiCache apiCache, boolean logReq, boolean logResp, boolean ignoreErrorInclude) {
         this.method = method;
         this.methodHandler = methodHandler;
         this.apiCache = apiCache;
         this.isDefault = method.isDefault();
-        this.ignoreError = isIgnoreError(method);
+        this.ignoreError = ignoreErrorInclude || isIgnoreError(method);
         this.logReq = logReq;
         this.logResp = logResp;
         this.defaultReturnValue = defaultReturnValue(method);

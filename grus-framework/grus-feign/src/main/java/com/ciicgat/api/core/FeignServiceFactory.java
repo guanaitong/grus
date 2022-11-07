@@ -10,6 +10,8 @@ import feign.Client;
 import feign.Request;
 import feign.Retryer;
 
+import java.util.Collections;
+
 /**
  * 本类，采用静态工厂模式
  * <p>
@@ -36,7 +38,7 @@ public class FeignServiceFactory {
 
 
     public static void removeCache(final Class<?> serviceClazz) {
-        FeignServiceBuilder.SERVICE_CACHE.remove(new ServiceCacheKey(serviceClazz, null, null, false, false));
+        FeignServiceBuilder.SERVICE_CACHE.remove(new ServiceCacheKey(serviceClazz, null, null, false, false, Collections.emptyList()));
     }
 
     public static <T> T newInstance(final Class<T> serviceClazz) {

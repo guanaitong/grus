@@ -66,6 +66,8 @@ public class FeignServiceBuilder {
     private Client client;
     private NamingService namingService = NamingService.DEFAULT;
     private FallbackFactory<?> fallbackFactory;
+
+    private List<String> ignoreErrorMethods = new ArrayList<>();
     private List<RequestInterceptor> requestInterceptors = new ArrayList<>();
     private Interceptor interceptor;
     private boolean logReq;
@@ -99,6 +101,13 @@ public class FeignServiceBuilder {
 
     public FeignServiceBuilder namingService(NamingService namingService) {
         this.namingService = namingService;
+        return this;
+    }
+
+    public FeignServiceBuilder addIgnoreErrorMethods(String... ignoreErrorMethods) {
+        for (String ignoreErrorMethod : ignoreErrorMethods) {
+            this.ignoreErrorMethods.add(ignoreErrorMethod);
+        }
         return this;
     }
 
@@ -148,7 +157,7 @@ public class FeignServiceBuilder {
         if (!fromCache) {
             return (T) create();
         }
-        ServiceCacheKey serviceCacheKey = new ServiceCacheKey(serviceClazz, cacheOptions, options, logReq, logResp);
+        ServiceCacheKey serviceCacheKey = new ServiceCacheKey(serviceClazz, cacheOptions, options, logReq, logResp, ignoreErrorMethods);
         Object serviceInstance = SERVICE_CACHE.get(serviceCacheKey);
         if (serviceInstance != null) {
             return (T) serviceInstance;
@@ -199,7 +208,7 @@ public class FeignServiceBuilder {
                     .decoder(new OptionalDecoder(new JacksonDecoder(OBJECT_MAPPER)))
                     .encoder(new FormEncoder(new JacksonEncoder(OBJECT_MAPPER)))
                     .errorDecoder(new ErrorDecoder.Default())
-                    .invocationHandlerFactory(new GInvocationHandlerFactory(grusServiceStatus, cacheOptions, fallbackFactory, this.logReq, this.logResp))
+                    .invocationHandlerFactory(new GInvocationHandlerFactory(grusServiceStatus, cacheOptions, fallbackFactory, this.logReq, this.logResp, ignoreErrorMethods))
                     .client(client)
                     .retryer(retryer)//默认不retry
                     .target(new GrusTarget(serviceClazz, serviceName, namingService));

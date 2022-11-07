@@ -7,6 +7,7 @@ package com.ciicgat.api.core;
 
 import feign.Request;
 
+import java.util.List;
 import java.util.Objects;
 
 import static com.ciicgat.api.core.contants.TimeOutConstants.DEFAULT_CONNECT_TIMEOUT_MILLIS;
@@ -27,7 +28,9 @@ public class ServiceCacheKey {
 
     private boolean logResp;
 
-    public ServiceCacheKey(Class<?> serviceClazz, CacheOptions cacheOptions, Request.Options reqoptions, boolean logReq, boolean logResp) {
+    private List<String> ignoreErrorMethods;
+
+    public ServiceCacheKey(Class<?> serviceClazz, CacheOptions cacheOptions, Request.Options reqoptions, boolean logReq, boolean logResp, List<String> ignoreErrorMethods) {
         this.serviceClazz = serviceClazz;
         this.cacheOptions = cacheOptions;
         if (reqoptions != null) {
@@ -36,23 +39,19 @@ public class ServiceCacheKey {
         }
         this.logReq = logReq;
         this.logResp = logResp;
+        this.ignoreErrorMethods = ignoreErrorMethods;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ServiceCacheKey)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         ServiceCacheKey that = (ServiceCacheKey) o;
-        return connectTimeoutMillis == that.connectTimeoutMillis &&
-                readTimeoutMillis == that.readTimeoutMillis &&
-                logReq == that.logReq &&
-                logResp == that.logResp &&
-                Objects.equals(serviceClazz, that.serviceClazz) &&
-                Objects.equals(cacheOptions, that.cacheOptions);
+        return connectTimeoutMillis == that.connectTimeoutMillis && readTimeoutMillis == that.readTimeoutMillis && logReq == that.logReq && logResp == that.logResp && Objects.equals(serviceClazz, that.serviceClazz) && Objects.equals(cacheOptions, that.cacheOptions) && Objects.equals(ignoreErrorMethods, that.ignoreErrorMethods);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(serviceClazz, cacheOptions, connectTimeoutMillis, readTimeoutMillis, logReq, logResp);
+        return Objects.hash(serviceClazz, cacheOptions, connectTimeoutMillis, readTimeoutMillis, logReq, logResp, ignoreErrorMethods);
     }
 }
