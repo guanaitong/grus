@@ -161,12 +161,13 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
     }
 
     private void evictIgnoreException(Object key) {
+        String stringKey = CacheKey.key(key);
         try {
             statsCounter.recordEviction();
-            evict0(key);
-            cacheChangeListener.onChanged(new CacheChangeEvent(CacheChangeType.EVICT, key, this));
+            evict0(stringKey);
+            cacheChangeListener.onChanged(new CacheChangeEvent(CacheChangeType.EVICT, stringKey, this));
         } catch (Exception e) {
-            LOGGER.warn("evict value failed,cache {},key {}", this.name, key, e);
+            LOGGER.warn("evict value failed,cache {},key {}", this.name, stringKey, e);
         }
     }
 
