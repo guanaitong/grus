@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 /**
  * Created by August.Zhou on 2019-09-11 13:12.
  */
-@Document(index = "frigate-msg-", indexSuffixType = IndexSuffixType.MONTHLY, mappingPath = "/esmapper/messageMapper.json", alias = "frigate-msg")
+@Document(index = "frigate-msg-", indexSuffixType = IndexSuffixType.MONTHLY, mappingPath = "/esmapper/messageMapper.json", alias = "frigate-msg", shards = 1)
 public class Message implements Serializable, IndexAble {
 
     /**
