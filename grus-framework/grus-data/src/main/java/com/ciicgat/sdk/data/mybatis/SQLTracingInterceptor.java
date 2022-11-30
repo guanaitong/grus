@@ -57,7 +57,7 @@ public class SQLTracingInterceptor implements Interceptor {
             span.setAttribute("db.statement", sql);
 
             Object result = invocation.proceed();
-            if (result instanceof List && ((List) result).size() > 10000) {
+            if (result instanceof List && ((List) result).size() > 50000) {
                 String msg = String.format("too large query result size:[%d] ,sql is %s", ((List) result).size(), sql);
                 LOGGER.warn(msg);
                 Alert.send(msg);
