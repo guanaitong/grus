@@ -221,7 +221,9 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                     LOGGER.error("SENTINEL BLOCKED WITH MSG ", ex);
                     throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, null, HTTP_STATUS_TOO_MANY_REQUESTS);
                 }
-                LOGGER.error("SENTINEL ERROR TRACE ", ex);
+                if (!(ex instanceof BusinessFeignException)) {
+                    LOGGER.error("error", ex);
+                }
                 // 降级跟踪必备代码
                 Tracer.trace(ex);
                 throw ex;
