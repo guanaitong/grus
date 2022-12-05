@@ -17,11 +17,22 @@ import java.util.Objects;
  * Created by August.Zhou on 2021/12/20 13:19.
  */
 public class LatencyConfig {
-    private final long maxFastDurationNanos;
-    private final long minSlowDurationNanos;
+    private long maxFastDurationNanos;
+    private long minSlowDurationNanos;
 
     public LatencyConfig(long maxFastDurationNanos, long minSlowDurationNanos) {
         this.maxFastDurationNanos = maxFastDurationNanos;
+        this.minSlowDurationNanos = minSlowDurationNanos;
+    }
+
+    public LatencyConfig() {
+    }
+
+    public void setMaxFastDurationNanos(long maxFastDurationNanos) {
+        this.maxFastDurationNanos = maxFastDurationNanos;
+    }
+
+    public void setMinSlowDurationNanos(long minSlowDurationNanos) {
         this.minSlowDurationNanos = minSlowDurationNanos;
     }
 
