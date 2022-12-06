@@ -31,8 +31,14 @@ public class SlowMessageLoggerTest {
 
     @Test
     public void test1() {
-        Module module = Module.HTTP_CLIENT;
-        LatencyLevel latencyLevel = LatencyConfig.getModuleConfig(module).getLevel(2500_000_000L);
-        Assertions.assertEquals(latencyLevel, LatencyLevel.SLOW);
+        Assertions.assertEquals(getLatencyLevel(10_000_000L), LatencyLevel.FAST);
+        Assertions.assertEquals(getLatencyLevel(199_000_000L), LatencyLevel.FAST);
+        Assertions.assertEquals(getLatencyLevel(201_000_000L), LatencyLevel.MEDIUM);
+        Assertions.assertEquals(getLatencyLevel(1999_000_000L), LatencyLevel.MEDIUM);
+        Assertions.assertEquals(getLatencyLevel(2001_000_000L), LatencyLevel.SLOW);
+    }
+
+    private static LatencyLevel getLatencyLevel(final long nanosDuration) {
+        return LatencyConfig.getModuleConfig(Module.HTTP_CLIENT).getLevel(nanosDuration);
     }
 }

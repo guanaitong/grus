@@ -64,7 +64,7 @@ public class SlowLogger {
         LatencyConfig latencyConfig = LatencyConfig.getModuleConfig(module);
         LatencyLevel latencyLevel = latencyConfig.getLevel(nanosDuration);
         if (latencyLevel == LatencyLevel.SLOW) {
-            String msg = String.format(FORMAT, module.getName(), latencyLevel.name(), nanosDuration / 1000_1000L, detail);
+            String msg = String.format(FORMAT, module.getName(), latencyLevel.name(), nanosDuration / 1000_000L, detail);
             if (printSlowLog) {
                 LOGGER.warn(msg);
             }
@@ -73,7 +73,7 @@ public class SlowLogger {
             }
             return true;
         } else if (latencyLevel == LatencyLevel.MEDIUM) {
-            String msg = String.format(FORMAT, module.getName(), latencyLevel.name(), nanosDuration / 1000_1000L, detail);
+            String msg = String.format(FORMAT, module.getName(), latencyLevel.name(), nanosDuration / 1000_000L, detail);
             LOGGER.warn(msg);
         }
         return false;
