@@ -364,10 +364,18 @@ public class DemoMsgProcessor implements MsgProcessor {
 
 如果消息体里没有唯一性的业务字段，我们可以使用message的消息`msgId`字段，该字段是这条消息产生时生成的（由生产者生成的）。
 
+### 失败消息查询
+
+在`Retry`超过最大次数或者消息`Abort`时，框架会自动将消息发送到一个公共队列里，然后由notify-agent消费落表。
+
+目前，大家可以申请`BSPRO-RISK-MYSQL`实例的notifyagent库权限，失败数据在`MqMsg`表里。
+
 ## 可管理性
 
 新版本，大大提升了rabbitmq的可管理性。主要有几点：
 
 1. 所有的连接、交换机、队列上，均设置了`x-app-name`属性。大家通过console看连接、队列、交换机时，就知道是它哪个应用的。
 2. 在创建交换机、队列时，会默认收集配置数据
+
+
 
