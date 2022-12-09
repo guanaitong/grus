@@ -24,7 +24,9 @@ public class ErrorCenter {
 
     public static void put(ErrorCode errorCode) {
         Objects.requireNonNull(errorCode);
-        ALL_ERROR_CODES.put(errorCode.getErrorCode(), errorCode);
+        if (!ALL_ERROR_CODES.containsKey(errorCode.getErrorCode())) {
+            ALL_ERROR_CODES.put(errorCode.getErrorCode(), errorCode);
+        }
     }
 
     public static void remove(Integer code) {
