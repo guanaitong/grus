@@ -33,6 +33,7 @@ public class TestErrorCode {
 
         int i = 1231111;
         BaseErrorCode baseErrorCode = new BaseErrorCode(i, "yyyyyyyyyy");
+        ErrorCenter.put(baseErrorCode);
 
         Assertions.assertSame(baseErrorCode, ErrorCenter.valueOf(i));
 
