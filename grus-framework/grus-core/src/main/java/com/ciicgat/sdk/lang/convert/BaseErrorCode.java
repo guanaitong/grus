@@ -24,7 +24,6 @@ public class BaseErrorCode implements ErrorCode {
     public BaseErrorCode(int errorCode, String errorMsg) {
         this.errorCode = errorCode;
         this.errorMsg = errorMsg;
-        ErrorCenter.put(this);
     }
 
 

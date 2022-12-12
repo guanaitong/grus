@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 错误中心，维护当前程序用到的所有错误码
@@ -20,13 +20,15 @@ public class ErrorCenter {
     private static final Logger LOGGER = LoggerFactory.getLogger(ErrorCenter.class);
 
 
-    private static final Map<Integer, ErrorCode> ALL_ERROR_CODES = new TreeMap<>();
+    private static final Map<Integer, ErrorCode> ALL_ERROR_CODES = new ConcurrentHashMap<>();
 
-    public static void put(ErrorCode errorCode) {
+    public static boolean put(ErrorCode errorCode) {
         Objects.requireNonNull(errorCode);
         if (!ALL_ERROR_CODES.containsKey(errorCode.getErrorCode())) {
             ALL_ERROR_CODES.put(errorCode.getErrorCode(), errorCode);
+            return true;
         }
+        return false;
     }
 
     public static void remove(Integer code) {
