@@ -54,7 +54,6 @@ public class BusinessFeignException extends FeignException implements ErrorCode 
         return "BusinessFeignException{" +
                 "errorCode=" + errorCode +
                 ", errorMsg='" + errorMsg + '\'' +
-                ", error=" + error +
                 '}';
     }
 }

@@ -6,6 +6,7 @@
 package com.ciicgat.api.core;
 
 import com.ciicgat.sdk.lang.convert.BaseErrorCode;
+import com.ciicgat.sdk.lang.convert.ErrorCenter;
 import feign.FeignException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ public class TestBusinessFeignException {
     public void testBusinessRuntimeException() {
         BaseErrorCode baseErrorCode = new BaseErrorCode(22, "asdf");
         BusinessFeignException businessFeignException = new BusinessFeignException(400, 22, "asdf");
+        ErrorCenter.put(baseErrorCode);
         Assertions.assertNotNull(businessFeignException.toString());
         Assertions.assertTrue((businessFeignException instanceof FeignException));
 
