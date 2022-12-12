@@ -22,13 +22,9 @@ public class ErrorCenter {
 
     private static final Map<Integer, ErrorCode> ALL_ERROR_CODES = new ConcurrentHashMap<>();
 
-    public static boolean put(ErrorCode errorCode) {
+    public static void put(ErrorCode errorCode) {
         Objects.requireNonNull(errorCode);
-        if (!ALL_ERROR_CODES.containsKey(errorCode.getErrorCode())) {
-            ALL_ERROR_CODES.put(errorCode.getErrorCode(), errorCode);
-            return true;
-        }
-        return false;
+        ALL_ERROR_CODES.put(errorCode.getErrorCode(), errorCode);
     }
 
     public static void remove(Integer code) {
