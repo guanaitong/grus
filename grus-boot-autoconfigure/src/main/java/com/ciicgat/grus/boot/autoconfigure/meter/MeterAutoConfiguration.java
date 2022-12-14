@@ -5,8 +5,6 @@
 
 package com.ciicgat.grus.boot.autoconfigure.meter;
 
-import com.ciicgat.grus.rabbitmq.metrics.DelegateMetricsCollector;
-import com.rabbitmq.client.ConnectionFactory;
 import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
@@ -25,11 +23,5 @@ public class MeterAutoConfiguration {
     @Bean
     MeterRegistryCustomizer<MeterRegistry> meterRegistryCustomizer(@Value("${spring.application.name}") String appName) {
         return registry -> registry.config().commonTags("application", appName);
-    }
-
-    @Bean
-    @ConditionalOnClass({ConnectionFactory.class, DelegateMetricsCollector.class})
-    public GrusRabbitMeterBinder grusRabbitMetrics() {
-        return new GrusRabbitMeterBinder();
     }
 }
