@@ -10,6 +10,7 @@ hide:
 Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项目，需保证项目的parent，统一使用`grus-boot-starter-parent`，如下：
 
 ```xml title="pom.xml"
+
 <parent>
     <groupId>com.ciicgat.grus.boot</groupId>
     <artifactId>grus-boot-starter-parent</artifactId>
@@ -19,7 +20,7 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
 
 此 parent 类似 SpringBoot 的 parent，包含了日常开发中需要用到的 SpringBoot、Grus、Grus Boot、常用第三方等所有依赖。
 
-在`grus`版本`2021.1.x`及以前，使用`jdk-11`，自`2022.2.1`（最新版本）开始使用`jdk-17`
+在`grus`版本`2021.1.x`及以前，使用`jdk-11`，自`2022.2.2`（最新版本）开始使用`jdk-17`
 ，详见 [2022.0升级指南](upgrade/2022-0.md)
 
 !!! success
@@ -58,7 +59,7 @@ Java 统一封装了`grus`框架供大家使用开发，所以开发公司的项
 
 ## 发布版本
 
-- 2022.0 - 现已发布 `2022.2.1`，基于`spring-boot-version`为`2.5.14`
+- 2022.0 - 现已发布 `2022.2.2`，基于`spring-boot-version`为`2.5.14`
 - 2021.1 - 推荐使用 `2021.1.21`，基于`spring-boot-version`为`2.3.12.RELEASE`
 
 ??? abstract "Old versions(不推荐使用)"
