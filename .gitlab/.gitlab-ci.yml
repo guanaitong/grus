@@ -12,15 +12,21 @@ stages:
 #  script:
 #    - mvn $MAVEN_CLI_OPTS verify -Djava.version=17  sonar:sonar
 
-mkdocs:
+pages:
   image: registry.wuxingdev.cn/build/python-mkdocs:3-bullseye
   stage: build
   script:
     - mkdocs --version
-    - mkdocs build
-    - curl -O http://filestorage.wuxingdev.cn/build-cli/build-cli && chmod +x build-cli && ./build-cli -jobName guide-java
+    - mkdocs build --site-dir public
+  artifacts:
+    paths:
+      - public
+  tags:
+    - generics
   only:
-    - master
+    changes:
+      - mkdocs.yml
+      - docs/**/*
 
 unit-test-java11:
   image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-11
