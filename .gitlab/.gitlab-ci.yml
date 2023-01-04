@@ -49,3 +49,7 @@ deploy:
     - mvn $MAVEN_CLI_OPTS -f tmp/.flattened-pom.xml  deploy -DskipTests
   only:
     - master
+
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
