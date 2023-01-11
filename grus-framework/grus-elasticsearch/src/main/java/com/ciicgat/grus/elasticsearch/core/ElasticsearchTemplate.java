@@ -11,6 +11,7 @@ import com.google.common.util.concurrent.RateLimiter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
+import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.DocWriteRequest;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.admin.indices.alias.Alias;
@@ -49,6 +50,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
 /**
@@ -63,6 +66,14 @@ public class ElasticsearchTemplate<T extends IndexAble> {
     private final EntityMapper<T> entityMapper;
     private final Document document;
     private RequestOptions options = RequestOptions.DEFAULT;
+
+    /**
+     * 数据操作时，是否校验索引存在。
+     * 开启该参数后，save时，如果不存在，会自动创建索引。
+     */
+    private boolean checkIndexStateOnSave = true;
+
+    private final ConcurrentMap<String, Object> indexStateCache = new ConcurrentHashMap<>();
 
     private final RateLimiter saveRateLimiter = RateLimiter.create(20);
 
@@ -81,10 +92,15 @@ public class ElasticsearchTemplate<T extends IndexAble> {
         this.entityMapper = entityMapper;
     }
 
-    public void setSaveQps(double saveQps) {
+    public ElasticsearchTemplate<T> setSaveQps(double saveQps) {
         saveRateLimiter.setRate(saveQps);
+        return this;
     }
 
+    public ElasticsearchTemplate<T> setCheckIndexStateOnSave(boolean checkIndexStateOnSave) {
+        this.checkIndexStateOnSave = checkIndexStateOnSave;
+        return this;
+    }
 
     private void checkDocument(Document document) {
         if (document == null) {
@@ -98,8 +114,9 @@ public class ElasticsearchTemplate<T extends IndexAble> {
         }
     }
 
-    public void setOptions(RequestOptions options) {
+    public ElasticsearchTemplate<T> setOptions(RequestOptions options) {
         this.options = Objects.requireNonNull(options);
+        return this;
     }
 
     public String getAlias() {
@@ -144,7 +161,7 @@ public class ElasticsearchTemplate<T extends IndexAble> {
             GetIndexRequest getIndexRequest = new GetIndexRequest(indices);
             IndicesClient indicesClient = restHighLevelClient.indices();
             return indicesClient.exists(getIndexRequest, options);
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new EsDataException(e);
         }
     }
@@ -161,9 +178,7 @@ public class ElasticsearchTemplate<T extends IndexAble> {
     public boolean createIndex(String index) {
         IndicesClient indices = restHighLevelClient.indices();
         try {
-            GetIndexRequest getIndexRequest = new GetIndexRequest(index);
-            boolean exists = indices.exists(getIndexRequest, options);
-            if (!exists) {
+            if (!existIndex(index)) {
                 CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
                 //设置别名
                 if (StringUtils.isNotEmpty(document.alias())) {
@@ -186,13 +201,24 @@ public class ElasticsearchTemplate<T extends IndexAble> {
                 CreateIndexResponse createIndexResponse = indices.create(createIndexRequest, options);
                 if (!createIndexResponse.isAcknowledged()) {
                     LOGGER.error("创建索引[{}]发生异常", index);
+                    return false;
                 }
+                LOGGER.info("create index {}", index);
                 return true;
+            } else {
+                LOGGER.info("index {} existed", index);
+                return false;
             }
-        } catch (IOException e) {
+        } catch (ElasticsearchStatusException e) {
+            if (e.status() == RestStatus.BAD_REQUEST) {
+                if (existIndex(index)) {
+                    return false;
+                }
+            }
+            throw new EsDataException(e);
+        } catch (Exception e) {
             throw new EsDataException(e);
         }
-        return false;
     }
 
     private static String getFileContent(final String filePath) {
@@ -228,7 +254,7 @@ public class ElasticsearchTemplate<T extends IndexAble> {
         try {
             UpdateResponse updateResponse = restHighLevelClient.update(updateRequest, options);
             return updateResponse.getResult() == DocWriteResponse.Result.UPDATED ? 1 : 0;
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new EsDataException(e);
         }
     }
@@ -239,6 +265,7 @@ public class ElasticsearchTemplate<T extends IndexAble> {
 
     public int save(T value, boolean sync) {
         String index = getCurrentIndex(value);
+        checkIndexStateOnSave(index);
         IndexRequest request = new IndexRequest(index)
                 .id(value.getDocId())
                 .source(entityMapper.mapToString(value), XContentType.JSON)
@@ -253,7 +280,7 @@ public class ElasticsearchTemplate<T extends IndexAble> {
             IndexResponse indexResponse = restHighLevelClient.index(request, options);
             int status = indexResponse.status().getStatus();
             return (status >= 200 && status < 300) ? 1 : 0;
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new EsDataException(e);
         }
     }
@@ -272,6 +299,7 @@ public class ElasticsearchTemplate<T extends IndexAble> {
         for (T t : dataList) {
             // 如果用户自己设置了docIndex，那么使用用户设置的。否则使用框架的规则
             String index = getCurrentIndex(t);
+            checkIndexStateOnSave(index);
             IndexRequest request = new IndexRequest(index)
                     .id(t.getDocId())
                     .source(entityMapper.mapToString(t), XContentType.JSON)
@@ -305,8 +333,23 @@ public class ElasticsearchTemplate<T extends IndexAble> {
         }
     }
 
+    private void checkIndexStateOnSave(String index) {
+        if (checkIndexStateOnSave) {
+            indexStateCache.computeIfAbsent(index, i -> {
+                LOGGER.info("try create index {} if not exist  ", i);
+                createIndex(i);
+                return Boolean.TRUE;
+            });
+        }
+    }
+
+
     public int delete(String id) {
         String index = getCurrentIndex();
+        return delete(id, index);
+    }
+
+    public int delete(String id, String index) {
         try {
             DeleteRequest deleteRequest = new DeleteRequest(index, id);
             DeleteResponse deleteResponse = restHighLevelClient.delete(deleteRequest, options);
