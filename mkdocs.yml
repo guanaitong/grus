@@ -1,13 +1,13 @@
 # Project information
 site_name: Java Guide
-site_url: https://java.guide.wuxingdev.cn/
+site_url: https://framework.doc.wuxingdev.cn/java/grus/
 site_author: August Zhou
 site_description: >-
   Create a static site from a set of Markdown files to host the
   documentation of Java
 # Repository
 repo_name: java/framework/grus
-repo_url: https://gitlab.wuxingdev.cn/java/framework/grus
+repo_url: https://gitlab.wuxingdev.cn/framework/java/grus
 edit_uri: ""
 
 # Copyright
