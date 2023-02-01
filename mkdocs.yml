@@ -6,7 +6,7 @@ site_description: >-
   Create a static site from a set of Markdown files to host the
   documentation of Java
 # Repository
-repo_name: java/framework/grus
+repo_name: framework/java/grus
 repo_url: https://gitlab.wuxingdev.cn/framework/java/grus
 edit_uri: ""
 
