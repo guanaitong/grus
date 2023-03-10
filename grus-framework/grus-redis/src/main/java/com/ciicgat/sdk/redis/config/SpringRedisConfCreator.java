@@ -11,6 +11,7 @@ import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import io.lettuce.core.TimeoutOptions;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.data.redis.connection.RedisConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisNode;
@@ -18,11 +19,13 @@ import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.util.Assert;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author August
@@ -63,12 +66,26 @@ public class SpringRedisConfCreator {
                 .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
                 .socketOptions(SocketOptions.builder().connectTimeout(Duration.ofSeconds(1L)).build())
                 .build();
-        LettuceClientConfiguration.LettuceClientConfigurationBuilder builder = LettuceClientConfiguration.builder()
+
+        //这里默认使用了连接池。如果不适用连接池，lettuce默认是单连接的。
+        //单连接可能会导致以下问题：
+        //客户端通过1个连接分别发送2个请求，当数据分片2处于异常状态时，请求2（GET Key2）将返回超时，同时由于请求1（GET Key1）和请求2共用同一连接，导致请求1也无法正常返回。
+
+        GenericObjectPoolConfig<?> config = new GenericObjectPoolConfig<>();
+        config.setMaxTotal(redisSetting.getMaxActive());
+        config.setMaxIdle(redisSetting.getMaxIdle());
+        config.setMinIdle(redisSetting.getMinIdle());
+        config.setTimeBetweenEvictionRunsMillis(TimeUnit.MINUTES.toMillis(1));
+        config.setMaxWaitMillis(2000L);
+
+        LettuceClientConfiguration.LettuceClientConfigurationBuilder builder = LettucePoolingClientConfiguration.builder().poolConfig(config)
                 .clientOptions(clientOptions);
         String clientName = RedisSetting.clientName();
         if (org.springframework.util.StringUtils.hasText(clientName)) {
             builder.clientName(clientName);
         }
+
+
 
         LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactoryWrapper(redisConfiguration, builder.build(), redisSetting);
         if (init) {
