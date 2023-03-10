@@ -143,7 +143,7 @@ public class GrusFilter implements Filter {
 
         //将Span信息放入容器
         if (span != Span.getInvalid()) {
-            String traceId = TraceUtil.putMdcForTrace(span, request.getHeader("uber-trace-id") != null);
+            String traceId = TraceUtil.putMdcForTrace(span);
             response.addHeader("x-trace-id", traceId);
             response.addHeader("x-span-id", TraceUtil.getSpanId(span));
             String parentId = TraceUtil.getParentId(span);

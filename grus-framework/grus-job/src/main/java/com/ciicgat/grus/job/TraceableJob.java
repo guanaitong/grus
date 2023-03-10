@@ -33,7 +33,7 @@ public class TraceableJob implements SimpleJob {
         Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder("handleJob").setSpanKind(SpanKind.SERVER).startSpan();
         if (span != Span.getInvalid()) {
-            TraceUtil.putMdcForTrace(span, false);
+            TraceUtil.putMdcForTrace(span);
         }
 
         try (Scope scope = span.makeCurrent()) {

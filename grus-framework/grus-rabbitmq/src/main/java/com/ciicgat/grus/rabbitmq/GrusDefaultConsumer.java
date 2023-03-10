@@ -91,7 +91,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
 
         Span span = tracer.spanBuilder("consumer").setSpanKind(SpanKind.CONSUMER).setParent(context).startSpan();
         if (span != Span.getInvalid()) {
-            TraceUtil.putMdcForTrace(span, properties.getHeaders() == null ? false : properties.getHeaders().containsKey("uber-trace-id"));
+            TraceUtil.putMdcForTrace(span);
         }
         String msgId = properties.getMessageId();
         try (Scope scope = span.makeCurrent()) {

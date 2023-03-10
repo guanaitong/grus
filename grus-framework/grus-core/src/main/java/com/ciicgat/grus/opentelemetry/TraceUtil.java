@@ -51,13 +51,11 @@ public class TraceUtil {
         return "";
     }
 
-    public static String putMdcForTrace(Span span, boolean fromJaeger) {
+    public static String putMdcForTrace(Span span) {
         MDC.put("spanId", getSpanId(span));
         MDC.put("parentId", getParentId(span));
         String traceId = getTraceId(span);
-        if (fromJaeger) {
-            traceId = removePrefixZeroChar(traceId);
-        }
+        traceId = removePrefixZeroChar(traceId);
         MDC.put("traceId", traceId);
         return traceId;
     }
