@@ -1,3 +1,8 @@
+/*
+ * Copyright 2007-2022, CIIC Guanaitong, Co., Ltd.
+ * All rights reserved.
+ */
+
 package com.ciicgat.sdk.lang.digest;
 
 import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
