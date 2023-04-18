@@ -30,6 +30,4 @@ maven-deploy:
     - mvn $MAVEN_CLI_OPTS deploy -DskipTests -Djacoco.skip=true
     - sh generate_parent_pom.sh
     - mvn $MAVEN_CLI_OPTS -f tmp/.flattened-pom.xml  deploy -DskipTests
-  only:
-    - master
 
