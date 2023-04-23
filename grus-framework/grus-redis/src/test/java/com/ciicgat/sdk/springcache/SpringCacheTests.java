@@ -8,6 +8,7 @@ package com.ciicgat.sdk.springcache;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
 import com.ciicgat.sdk.lang.threads.Threads;
+import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import javax.annotation.Resource;
 import java.net.URL;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 
 /**
@@ -123,7 +123,7 @@ public class SpringCacheTests {
 
     @Test
     public void test_l2cache() {
-        String uid = UUID.randomUUID().toString();
+        String uid = new SessionIdGenerator().generateSessionId();
         // 第一次访问，走目标方法，Miss cache
         String first = cacheService.get(uid, 1);
 
@@ -153,7 +153,7 @@ public class SpringCacheTests {
 
     @Test
     public void test_mixCache() {
-        String uid = UUID.randomUUID().toString();
+        String uid = new SessionIdGenerator().generateSessionId();
         // default, use l2cache
         // 第一次访问，走目标方法，Miss cache
         String first = cacheService.getFromDefault(uid, 1);
@@ -216,7 +216,7 @@ public class SpringCacheTests {
         String nullVal = cacheService.get2(uid, 0);
         Assertions.assertNotNull(nullVal);
 
-        uid = UUID.randomUUID().toString();
+        uid = new SessionIdGenerator().generateSessionId();
         String second = cacheService.get(uid, 2);
         Assertions.assertNotNull(second);
 
@@ -227,7 +227,7 @@ public class SpringCacheTests {
         String fourth = cacheService.getFromUseLocalCache2(uid, 4);
         Assertions.assertNull(fourth);
 
-        uid = UUID.randomUUID().toString();
+        uid = new SessionIdGenerator().generateSessionId();
         String fifth = cacheService.getFromUseLocalCache2(uid, 5);
         Assertions.assertNotNull(fifth);
         Assertions.assertTrue(fifth.startsWith("5"));
@@ -235,8 +235,8 @@ public class SpringCacheTests {
 
     @Test
     public void test_cache_key() {
-        String uid2 = UUID.randomUUID().toString();
-        String uid = UUID.randomUUID().toString();
+        String uid2 = new SessionIdGenerator().generateSessionId();
+        String uid = new SessionIdGenerator().generateSessionId();
         // cacheKey test
         String firstUseCacheKey = cacheService.getUseCacheKey(() -> uid2, uid, 1);
         String secondUseCacheKey = frequencyAsyncCache.get(uid2, () -> "customCacheKey");
@@ -246,7 +246,7 @@ public class SpringCacheTests {
 
     @Test
     public void test_frequency_refresh() {
-        String uid = UUID.randomUUID().toString();
+        String uid = new SessionIdGenerator().generateSessionId();
         // default, use l2cache
         // 第一次访问，走目标方法，Miss cache
         String first = cacheService.getUseFrequencyAsyncCacheRefresher(uid, 1);
@@ -273,7 +273,7 @@ public class SpringCacheTests {
 
     @Test
     public void test_random_refresh() {
-        String uid = UUID.randomUUID().toString();
+        String uid = new SessionIdGenerator().generateSessionId();
         // default, use l2cache
         // 第一次访问，走目标方法，Miss cache
         String first = cacheService.getRandomCacheRefresher(uid, 1);
@@ -291,7 +291,7 @@ public class SpringCacheTests {
     public void test_getWithCacheFallBack() {
         AbstractCache<?> abstractCache = (AbstractCache) frequencyAsyncCache;
 
-        String uid = UUID.randomUUID().toString();
+        String uid = new SessionIdGenerator().generateSessionId();
         String value = abstractCache.getWithCacheFallBack(uid, () -> uid);
         Assertions.assertEquals(uid, value);
         String value2 = abstractCache.getWithCacheFallBack(uid, new Callable<String>() {
@@ -302,7 +302,7 @@ public class SpringCacheTests {
         });
         Assertions.assertEquals(uid, value2);
 
-        Integer value3 = abstractCache.getWithCacheFallBack(UUID.randomUUID().toString(), new Callable<Integer>() {
+        Integer value3 = abstractCache.getWithCacheFallBack(new SessionIdGenerator().generateSessionId(), new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
                 throw new RuntimeException("x");
@@ -310,7 +310,7 @@ public class SpringCacheTests {
         });
         Assertions.assertNull(value3);
 
-        Integer value4 = abstractCache.getWithCacheFallBack((CacheKey) () -> UUID.randomUUID().toString(), new Callable<Integer>() {
+        Integer value4 = abstractCache.getWithCacheFallBack((CacheKey) () -> new SessionIdGenerator().generateSessionId(), new Callable<Integer>() {
             @Override
             public Integer call() throws Exception {
                 throw new RuntimeException("x");

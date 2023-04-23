@@ -11,12 +11,15 @@ import com.ciicgat.sdk.redis.config.RedisSetting;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.jedis.util.Pool;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -38,10 +41,19 @@ public class RedisPoolBuilder implements RedisConstants {
         return new RedisExecutorImpl(this.setting, newPool());
     }
 
+    public JedisCluster newJedisCluster() {
+        Set<HostAndPort> jedisClusterNode = new HashSet<>();
+        String nodes = setting.getCluster().getNodes();
+        for (String node : nodes.split(",")) {
+            jedisClusterNode.add(HostAndPort.parseString(node));
+        }
+        return new JedisCluster(jedisClusterNode, 2000, 1000, 3, getPassword(), createJedisPoolConfig());
+    }
+
     public Pool<Jedis> newPool() {
-        if (setting.getType() == 0) {
+        if (setting.getType() == RedisSetting.TYPE_STANDALONE) {
             return newJedisPool();
-        } else if (setting.getType() == 1) {
+        } else if (setting.getType() == RedisSetting.TYPE_SENTINEL) {
             return newJedisSentinelPool();
         }
         throw new UnsupportedOperationException();

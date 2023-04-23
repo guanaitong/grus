@@ -12,6 +12,7 @@ import io.lettuce.core.SocketOptions;
 import io.lettuce.core.TimeoutOptions;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisNode;
@@ -24,6 +25,7 @@ import org.springframework.util.Assert;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -86,7 +88,6 @@ public class SpringRedisConfCreator {
         }
 
 
-
         LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactoryWrapper(redisConfiguration, builder.build(), redisSetting);
         if (init) {
             lettuceConnectionFactory.afterPropertiesSet();
@@ -99,7 +100,7 @@ public class SpringRedisConfCreator {
         if (StringUtils.isNotEmpty(redisSetting.getEncryptedPassword())) {
             password = PublicKeyOwner.decrypt(redisSetting.getEncryptedPassword());
         }
-        if (redisSetting.getType() == 0) {
+        if (redisSetting.getType() == RedisSetting.TYPE_STANDALONE) {
             RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
             RedisSetting.StandaloneConfig standalone = redisSetting.getStandalone();
             if (RedisSetting.isSuitableForOutOfK8sConfig(standalone)) {
@@ -112,13 +113,19 @@ public class SpringRedisConfCreator {
             redisConfiguration.setPassword(password);
             redisConfiguration.setDatabase(redisSetting.getDb());
             return redisConfiguration;
-        } else if (redisSetting.getType() == 1) {
+        } else if (redisSetting.getType() == RedisSetting.TYPE_SENTINEL) {
             RedisSentinelConfiguration redisConfiguration = new RedisSentinelConfiguration();
             RedisSetting.SentinelConfig sentinel = redisSetting.getSentinel();
             redisConfiguration.master(sentinel.getMaster());
             redisConfiguration.setSentinels(createSentinels(sentinel.getNodes()));
             redisConfiguration.setPassword(password);
             redisConfiguration.setDatabase(redisSetting.getDb());
+            return redisConfiguration;
+        } else if (redisSetting.getType() == RedisSetting.TYPE_CLUSTER) {
+            RedisSetting.ClusterConfig cluster = redisSetting.getCluster();
+            RedisClusterConfiguration redisConfiguration = new RedisClusterConfiguration(Arrays.asList(cluster.getNodes().split(",")));
+            redisConfiguration.setMaxRedirects(3);
+            redisConfiguration.setPassword(password);
             return redisConfiguration;
         } else {
             throw new UnsupportedOperationException();
