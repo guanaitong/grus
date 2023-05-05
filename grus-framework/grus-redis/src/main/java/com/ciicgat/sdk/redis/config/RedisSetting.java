@@ -7,12 +7,11 @@ package com.ciicgat.sdk.redis.config;
 
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.redis.RedisExecutor;
-import com.ciicgat.sdk.redis.RedisPoolBuilder;
+import com.ciicgat.sdk.redis.RedisExecutorBuilder;
 import com.ciicgat.sdk.util.system.Systems;
 import com.ciicgat.sdk.util.system.WorkIdc;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import org.apache.commons.lang3.StringUtils;
-import redis.clients.jedis.JedisCluster;
 
 import java.util.Collections;
 import java.util.Map;
@@ -270,11 +269,7 @@ public class RedisSetting {
     }
 
     public RedisExecutor newRedisExecutor() {
-        return new RedisPoolBuilder(this).newRedisExecutor();
-    }
-
-    public JedisCluster newJedisCluster() {
-        return new RedisPoolBuilder(this).newJedisCluster();
+        return new RedisExecutorBuilder(this).newRedisExecutor();
     }
 
     // 主要用于trace追踪

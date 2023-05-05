@@ -7,6 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.redis;
 
 import com.ciicgat.grus.boot.autoconfigure.core.AppName;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
+import com.ciicgat.sdk.redis.RedisExecutor;
 import com.ciicgat.sdk.redis.RedisService;
 import com.ciicgat.sdk.redis.config.RedisSetting;
 import com.ciicgat.sdk.redis.config.SpringRedisConfCreator;
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import redis.clients.jedis.commands.JedisCommands;
 
 /**
  * @author August.Zhou
@@ -41,6 +43,14 @@ public class GrusRedisAutoConfiguration {
     @ConditionalOnMissingBean(name = "redisSetting")
     public RedisSetting redisSetting() {
         return RemoteConfigCollectionFactoryBuilder.getInstance().getConfigCollection(appName).getBean(DEFAULT_REDIS_CONFIG_KEY, RedisSetting.class);
+    }
+
+    @Bean
+    @ConditionalOnBean(RedisSetting.class)
+    @ConditionalOnClass(JedisCommands.class)
+    @ConditionalOnMissingBean(name = "redisExecutor")
+    public RedisExecutor redisExecutor(@Qualifier("redisSetting") RedisSetting redisSetting) {
+        return redisSetting.newRedisExecutor();
     }
 
     @Bean

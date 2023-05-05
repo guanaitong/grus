@@ -81,6 +81,8 @@
         <spring-boot.version>2.5.14</spring-boot.version>
         <spring-boot-admin.version>2.5.6</spring-boot-admin.version>
         <gconf.version>1.0.0</gconf.version>
+        <jedis.version>4.3.2</jedis.version>
+        <commons-pool2.version>2.11.1</commons-pool2.version>
         <elasticsearch.version>7.3.1</elasticsearch.version>
         <springfox-spring.version>3.0.0</springfox-spring.version>
         <mybatis.version>3.5.7</mybatis.version>

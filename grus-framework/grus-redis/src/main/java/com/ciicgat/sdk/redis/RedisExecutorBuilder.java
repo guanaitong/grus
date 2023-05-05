@@ -9,8 +9,10 @@ import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.sdk.gconf.PublicKeyOwner;
 import com.ciicgat.sdk.redis.config.RedisSetting;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Connection;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
@@ -27,17 +29,20 @@ import java.util.Set;
  * @author August.Zhou
  * @date 2019-04-25 18:12
  */
-public class RedisPoolBuilder implements RedisConstants {
+public class RedisExecutorBuilder implements RedisConstants {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RedisPoolBuilder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedisExecutorBuilder.class);
 
     private final RedisSetting setting;
 
-    public RedisPoolBuilder(RedisSetting setting) {
+    public RedisExecutorBuilder(RedisSetting setting) {
         this.setting = setting;
     }
 
     public RedisExecutor newRedisExecutor() {
+        if (setting.getType() == RedisSetting.TYPE_CLUSTER) {
+            return new ClusterRedisExecutorImpl(this.setting, newJedisCluster());
+        }
         return new RedisExecutorImpl(this.setting, newPool());
     }
 
@@ -45,9 +50,14 @@ public class RedisPoolBuilder implements RedisConstants {
         Set<HostAndPort> jedisClusterNode = new HashSet<>();
         String nodes = setting.getCluster().getNodes();
         for (String node : nodes.split(",")) {
-            jedisClusterNode.add(HostAndPort.parseString(node));
+            jedisClusterNode.add(HostAndPort.from(node));
         }
-        return new JedisCluster(jedisClusterNode, 2000, 1000, 3, getPassword(), createJedisPoolConfig());
+        GenericObjectPoolConfig<Connection> poolConfig = new GenericObjectPoolConfig<>();
+        poolConfig.setMaxTotal(getIntValue("maxTotal", DEFAULT_MAX_ACTIVE));
+        poolConfig.setMaxIdle(getIntValue("maxIdle", DEFAULT_MAX_IDLE));
+        poolConfig.setMinIdle(getIntValue("minIdle", DEFAULT_MIN_IDLE));
+        poolConfig.setMaxWaitMillis(getIntValue("maxWaitMillis", DEFAULT_MAX_WAIT_MILLIS));
+        return new JedisCluster(jedisClusterNode, 2000, 1000, 3, getPassword(), poolConfig);
     }
 
     public Pool<Jedis> newPool() {
