@@ -6,7 +6,6 @@
 package com.ciicgat.grus.boot.autoconfigure.redis;
 
 import com.ciicgat.grus.boot.autoconfigure.core.GrusCoreContextInitializer;
-import com.ciicgat.sdk.redis.RedisExecutor;
 import com.ciicgat.sdk.redis.RedisService;
 import com.ciicgat.sdk.redis.config.RedisSetting;
 import org.junit.jupiter.api.Test;
@@ -38,12 +37,9 @@ public class GrusRedisAutoConfigurationTests {
                     assertThat(redisSetting).isInstanceOf(RedisSetting.class);
                     RedisService redisService = context.getBean(RedisService.class);
                     StringRedisTemplate stringRedisTemplate = context.getBean(StringRedisTemplate.class);
-                    RedisExecutor redisExecutor = context.getBean(RedisExecutor.class);
                     redisService.set(TEST_REDIS_KEY, randomValue);
                     String result = stringRedisTemplate.opsForValue().get(TEST_REDIS_KEY);
-                    String resultFromExecute = redisExecutor.execute(jedis -> jedis.get(TEST_REDIS_KEY));
                     assertThat(result).isEqualTo(randomValue);
-                    assertThat(resultFromExecute).isEqualTo(randomValue);
                 });
     }
 

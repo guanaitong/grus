@@ -12,6 +12,7 @@ import com.ciicgat.sdk.util.system.Systems;
 import com.ciicgat.sdk.util.system.WorkIdc;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import org.apache.commons.lang3.StringUtils;
+import redis.clients.jedis.JedisCluster;
 
 import java.util.Collections;
 import java.util.Map;
@@ -23,10 +24,15 @@ import java.util.Map;
  * @date 2020/2/24 2:46 PM
  */
 public class RedisSetting {
+    public static final int TYPE_STANDALONE = 0;
+
+    public static final int TYPE_SENTINEL = 1;
+
+    public static final int TYPE_CLUSTER = 2;
 
     private String name;
     /**
-     * redis类型，type=0时为单机模式，type=1时为哨兵模式
+     * redis类型，type=0时为单机模式，type=1时为哨兵模式，type=2时为集群模式
      */
     private int type;
     /**
@@ -37,6 +43,11 @@ public class RedisSetting {
      * 哨兵模式配置
      */
     private SentinelConfig sentinel;
+
+    /**
+     * 集群配置
+     */
+    private ClusterConfig cluster;
     /**
      * 明文密码，优先使用秘文密码，在秘文密码不存在时使用明文
      */
@@ -159,6 +170,14 @@ public class RedisSetting {
         this.name = name;
     }
 
+    public ClusterConfig getCluster() {
+        return cluster;
+    }
+
+    public void setCluster(ClusterConfig cluster) {
+        this.cluster = cluster;
+    }
+
     @Override
     public String toString() {
         return JSON.toJSONString(this);
@@ -238,19 +257,38 @@ public class RedisSetting {
         }
     }
 
+    public static class ClusterConfig {
+        private String nodes;
+
+        public String getNodes() {
+            return nodes;
+        }
+
+        public void setNodes(String nodes) {
+            this.nodes = nodes;
+        }
+    }
+
     public RedisExecutor newRedisExecutor() {
         return new RedisPoolBuilder(this).newRedisExecutor();
+    }
+
+    public JedisCluster newJedisCluster() {
+        return new RedisPoolBuilder(this).newJedisCluster();
     }
 
     // 主要用于trace追踪
     public String instanceName() {
         if (StringUtils.isNotEmpty(this.getName())) {
             return this.getName();
-        } else if (this.getType() == 0) {
+        } else if (this.getType() == RedisSetting.TYPE_STANDALONE) {
             return this.getStandalone().getHost() + ":" + this.getStandalone().getPort();
-        } else {
+        } else if (this.getType() == RedisSetting.TYPE_SENTINEL) {
             return this.getSentinel().getMaster();
+        } else if (this.getType() == RedisSetting.TYPE_CLUSTER) {
+            return this.getCluster().getNodes();
         }
+        return "redis";
     }
 
     /**

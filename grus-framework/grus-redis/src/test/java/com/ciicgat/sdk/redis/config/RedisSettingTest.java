@@ -10,6 +10,7 @@ import com.ciicgat.sdk.gconf.ConfigCollection;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import redis.clients.jedis.JedisCluster;
 
 /**
  * @author August
@@ -22,7 +23,7 @@ public class RedisSettingTest {
         RedisSetting redisSetting = new RedisSetting();
         redisSetting.setDb(15);
         redisSetting.setPassword("i am secrets");
-        redisSetting.setType(0);
+        redisSetting.setType(RedisSetting.TYPE_STANDALONE);
 
         RedisSetting.StandaloneConfig standaloneConfig = new RedisSetting.StandaloneConfig();
         standaloneConfig.setHost("localhost");
@@ -30,6 +31,10 @@ public class RedisSettingTest {
         redisSetting.setStandalone(standaloneConfig);
 
         System.out.println(JSON.toJSONString(redisSetting));
+
+//        RedisExecutor redisExecutor = redisSetting.newRedisExecutor();
+//        String v = redisExecutor.execute(jedis -> jedis.set("123", "456"));
+//        Assertions.assertEquals(v, redisExecutor.execute(jedis -> jedis.get("123")));
     }
 
     @Test
@@ -37,7 +42,7 @@ public class RedisSettingTest {
         RedisSetting redisSetting = new RedisSetting();
         redisSetting.setDb(15);
         redisSetting.setPassword("i am secrets");
-        redisSetting.setType(1);
+        redisSetting.setType(RedisSetting.TYPE_SENTINEL);
 
         RedisSetting.SentinelConfig sentinelConfig = new RedisSetting.SentinelConfig();
         sentinelConfig.setMaster("mymaster");
@@ -46,8 +51,34 @@ public class RedisSettingTest {
         redisSetting.setSentinel(sentinelConfig);
 
         System.out.println(JSON.toJSONString(redisSetting));
+
+//        RedisExecutor redisExecutor = redisSetting.newRedisExecutor();
+//        String v = redisExecutor.execute(jedis -> jedis.set("123", "456"));
+//        Assertions.assertEquals(v, redisExecutor.execute(jedis -> jedis.get("123")));
     }
 
+    @Test
+    public void testCluster() {
+        RedisSetting redisSetting = new RedisSetting();
+//        redisSetting.setPassword("vEh0jbiGwM");
+//        redisSetting.setPassword("Lucky2021");
+        redisSetting.setPassword("gat@1234");
+        redisSetting.setType(RedisSetting.TYPE_CLUSTER);
+
+        RedisSetting.ClusterConfig clusterConfig = new RedisSetting.ClusterConfig();
+//        clusterConfig.setNodes("10.101.11.59:9001,10.101.11.59:9002,10.101.11.59:9003,10.101.11.59:9004,10.101.11.59:9005,10.101.11.59:9006");
+//        clusterConfig.setNodes("0.100.32.143:7000,10.100.32.143:7001,10.101.11.46:7000,10.101.11.46:7001,10.101.9.171:7000,10.101.9.171:7001");
+        clusterConfig.setNodes("10.101.11.59:9001,10.101.11.59:9002,10.101.11.187:9003,10.101.11.187:9004,10.101.11.58:9005,10.101.11.58:9006");
+
+        redisSetting.setCluster(clusterConfig);
+
+        System.out.println(JSON.toJSONString(redisSetting));
+        try (JedisCluster jedisCluster = redisSetting.newJedisCluster()) {
+            String v = String.valueOf(Math.random());
+            jedisCluster.set("123", v);
+            Assertions.assertEquals(v, jedisCluster.get("123"));
+        }
+    }
 
     @Test
     public void testGetFromGconf() {

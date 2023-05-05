@@ -10,12 +10,20 @@ import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
 import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.lang.tool.Bytes;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -105,5 +113,100 @@ public class SpringRedisConfCreatorTest {
         try (RedisConnection connection = redisConnectionFactory.getConnection()) {
             return callback.apply(connection);
         }
+    }
+
+    @Test
+    public void testCluster() {
+        RedisSetting redisSetting = new RedisSetting();
+        redisSetting.setName("redis-cluster-01");
+//        redisSetting.setPassword("vEh0jbiGwM");
+//        redisSetting.setPassword("Lucky2021");
+        redisSetting.setPassword("gat@1234");
+        redisSetting.setType(RedisSetting.TYPE_CLUSTER);
+
+        RedisSetting.ClusterConfig clusterConfig = new RedisSetting.ClusterConfig();
+//        clusterConfig.setNodes("10.101.11.59:9001,10.101.11.59:9002,10.101.11.59:9003,10.101.11.59:9004,10.101.11.59:9005,10.101.11.59:9006");
+//        clusterConfig.setNodes("10.100.32.143:7000,10.100.32.143:7001,10.101.11.46:7000,10.101.11.46:7001,10.101.9.171:7000,10.101.9.171:7001");
+        clusterConfig.setNodes("10.101.11.59:9001,10.101.11.59:9002,10.101.11.187:9003,10.101.11.187:9004,10.101.11.58:9005,10.101.11.58:9006");
+
+        redisSetting.setCluster(clusterConfig);
+
+        RedisConnectionFactory redisConnectionFactory = SpringRedisConfCreator.newRedisConnectionFactory(redisSetting, true);
+        byte[] key = Bytes.toBytes(Math.random());
+        byte[] value = Bytes.toBytes(Math.random());
+
+        execute(redisConnectionFactory, redisConnection -> redisConnection.set(key, value));
+        byte[] value2 = execute(redisConnectionFactory, redisConnection -> redisConnection.get(key));
+        Assertions.assertArrayEquals(value, value2);
+    }
+
+    @Test
+    @Disabled
+    public void testClusterPublish() {
+        RedisSetting redisSetting = new RedisSetting();
+        redisSetting.setName("redis-cluster-01");
+//        redisSetting.setPassword("vEh0jbiGwM");
+//        redisSetting.setPassword("Lucky2021");
+        redisSetting.setPassword("gat@1234");
+        redisSetting.setType(RedisSetting.TYPE_CLUSTER);
+
+        RedisSetting.ClusterConfig clusterConfig = new RedisSetting.ClusterConfig();
+//        clusterConfig.setNodes("10.101.11.59:9001,10.101.11.59:9002,10.101.11.59:9003,10.101.11.59:9004,10.101.11.59:9005,10.101.11.59:9006");
+//        clusterConfig.setNodes("10.100.32.143:7000,10.100.32.143:7001,10.101.11.46:7000,10.101.11.46:7001,10.101.9.171:7000,10.101.9.171:7001");
+        clusterConfig.setNodes("10.101.11.59:9001,10.101.11.59:9002,10.101.11.187:9003,10.101.11.187:9004,10.101.11.58:9005,10.101.11.58:9006");
+
+        redisSetting.setCluster(clusterConfig);
+
+        RedisConnectionFactory redisConnectionFactory = SpringRedisConfCreator.newRedisConnectionFactory(redisSetting, true);
+        byte[] key = Bytes.toBytes(Math.random());
+        byte[] value = Bytes.toBytes(Math.random());
+
+        execute(redisConnectionFactory, redisConnection -> redisConnection.set(key, value));
+        byte[] value2 = execute(redisConnectionFactory, redisConnection -> redisConnection.get(key));
+        Assertions.assertArrayEquals(value, value2);
+
+        List<Integer> stringList = new ArrayList<>();
+        execute(redisConnectionFactory, new Function<RedisConnection, Object>() {
+            @Override
+            public Object apply(RedisConnection connection) {
+                String prefix = "8";
+                Cursor<byte[]> cursor = connection.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(512).build());
+                while (cursor.hasNext()) {
+                    byte[] key = cursor.next();
+                    try {
+                        stringList.add(Integer.parseInt(Bytes.toString(key)));
+                    } catch (Exception e) {
+
+                    }
+
+//                    System.out.println(Bytes.toString(key));
+                }
+                return null;
+            }
+        });
+        Collections.sort(stringList);
+        System.out.println(stringList);
+
+        execute(redisConnectionFactory, new Function<RedisConnection, Object>() {
+            @Override
+            public Object apply(RedisConnection redisConnection) {
+                redisConnection.subscribe(new MessageListener() {
+                    @Override
+                    public void onMessage(Message message, byte[] pattern) {
+                        System.out.println(Bytes.toString(message.getBody()));
+                    }
+                }, Bytes.toBytes("test"));
+                return null;
+            }
+        });
+        System.out.println(1);
+
+        execute(redisConnectionFactory, new Function<RedisConnection, Object>() {
+            @Override
+            public Object apply(RedisConnection redisConnection) {
+                redisConnection.publish(Bytes.toBytes("test"), Bytes.toBytes("test11111"));
+                return null;
+            }
+        });
     }
 }
