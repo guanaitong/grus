@@ -8,9 +8,9 @@ package com.ciicgat.sdk.redis.config;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.gconf.ConfigCollection;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
+import com.ciicgat.sdk.redis.RedisExecutor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import redis.clients.jedis.JedisCluster;
 
 /**
  * @author August
@@ -73,11 +73,10 @@ public class RedisSettingTest {
         redisSetting.setCluster(clusterConfig);
 
         System.out.println(JSON.toJSONString(redisSetting));
-        try (JedisCluster jedisCluster = redisSetting.newJedisCluster()) {
-            String v = String.valueOf(Math.random());
-            jedisCluster.set("123", v);
-            Assertions.assertEquals(v, jedisCluster.get("123"));
-        }
+        RedisExecutor redisExecutor = redisSetting.newRedisExecutor();
+        String v = String.valueOf(Math.random());
+        redisExecutor.execute(jedis -> jedis.set("123", v));
+        Assertions.assertEquals(v, redisExecutor.execute(jedis -> jedis.get("123")));
     }
 
     @Test

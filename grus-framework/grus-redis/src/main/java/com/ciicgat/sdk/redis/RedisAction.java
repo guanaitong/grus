@@ -5,7 +5,7 @@
 
 package com.ciicgat.sdk.redis;
 
-import redis.clients.jedis.Jedis;
+import redis.clients.jedis.commands.JedisCommands;
 
 import java.util.function.Function;
 
@@ -14,7 +14,7 @@ import java.util.function.Function;
  * Created by August.Zhou on 2017/6/5 16:51.
  */
 @FunctionalInterface
-public interface RedisAction<R> extends Function<Jedis, R> {
+public interface RedisAction<R> extends Function<JedisCommands, R> {
 
 
     /**
@@ -24,7 +24,7 @@ public interface RedisAction<R> extends Function<Jedis, R> {
      * @return
      */
     @Override
-    R apply(Jedis jedis);
+    R apply(JedisCommands jedis);
 
 
 }

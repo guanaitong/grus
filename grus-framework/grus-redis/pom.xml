@@ -16,6 +16,10 @@
 
     <artifactId>grus-redis</artifactId>
 
+    <properties>
+        <jedis.version>4.3.2</jedis.version>
+        <commons-pool2.version>2.11.1</commons-pool2.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -25,6 +29,18 @@
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
+            <version>${jedis.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.commons</groupId>
+                    <artifactId>commons-pool2</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>${commons-pool2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
