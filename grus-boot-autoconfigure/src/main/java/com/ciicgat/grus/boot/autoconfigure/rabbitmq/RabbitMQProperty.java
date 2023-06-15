@@ -24,13 +24,20 @@ import java.util.Properties;
  */
 @ConfigurationProperties(prefix = "grus.rabbitmq")
 public class RabbitMQProperty {
+
     /**
-     * 主机
+     * 地址，支持集群。格式：192.168.1.1:5672,192.168.1.2:5672
      */
+    private String address;
+    /**
+     * 过期。优先使用address
+     */
+    @Deprecated
     private String host;
     /**
-     * 端口
+     * 过期。优先使用address
      */
+    @Deprecated
     private int port = 5672;
     /**
      * 用户，为空时使用全局配置
@@ -66,8 +73,10 @@ public class RabbitMQProperty {
 
     @PostConstruct
     private void init() {
-        if (!StringUtils.hasLength(host)) {
-            host = "mq." + WorkRegion.getCurrentWorkRegion().getServerDomainSuffix();
+        if (!StringUtils.hasLength(address) && !StringUtils.hasLength(host)) {
+            address = "mq." + WorkRegion.getCurrentWorkRegion().getServerDomainSuffix() + ":5672";
+        } else if (StringUtils.hasLength(host)) {
+            address = host + ":" + port;
         }
         if (!StringUtils.hasLength(user)) {
             Properties properties = GlobalGconfConfig.getConfig().getProperties("rabbitmq.properties");
@@ -77,6 +86,15 @@ public class RabbitMQProperty {
         if (Systems.IN_K8S && !WorkRegion.getCurrentWorkRegion().isProduct()) {
             useSingleConnection = true;
         }
+    }
+
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public Init getInit() {

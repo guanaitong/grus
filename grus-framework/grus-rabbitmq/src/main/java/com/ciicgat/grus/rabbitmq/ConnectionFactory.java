@@ -7,6 +7,7 @@ package com.ciicgat.grus.rabbitmq;
 
 import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.util.system.Systems;
+import com.rabbitmq.client.Address;
 import com.rabbitmq.client.BlockedListener;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.impl.AMQConnection;
@@ -32,8 +33,8 @@ public class ConnectionFactory {
 
     private static ConcurrentMap<ConnectionCacheKey, Connection> cache = new ConcurrentHashMap<>();
 
-    public static Connection newConnectionFromCache(String host, int port, String user, String pwd, String vhost, int parallel) {
-        final ConnectionCacheKey connectionCacheKey = new ConnectionCacheKey(host, port, user, pwd, vhost);
+    public static Connection newConnectionFromCache(String addresses, String user, String pwd, String vhost, int parallel) {
+        final ConnectionCacheKey connectionCacheKey = new ConnectionCacheKey(addresses, user, pwd, vhost);
         Connection connection = cache.get(connectionCacheKey);
         if (connection != null) {
             return connection;
@@ -43,7 +44,7 @@ public class ConnectionFactory {
             if (connection != null) {
                 return connection;
             }
-            connection = newConnection(host, port, user, pwd, vhost, parallel);
+            connection = newConnection(addresses, user, pwd, vhost, parallel);
 
             cache.put(connectionCacheKey, connection);
         }
@@ -51,11 +52,9 @@ public class ConnectionFactory {
     }
 
 
-    public static Connection newConnection(String host, int port, String user, String pwd, String vhost, int parallel) {
+    public static Connection newConnection(String addresses, String user, String pwd, String vhost, int parallel) {
         com.rabbitmq.client.ConnectionFactory factory = new com.rabbitmq.client.ConnectionFactory();
         //初始化工厂
-        factory.setHost(host);
-        factory.setPort(port);
         factory.setUsername(user);
         factory.setPassword(pwd);
         factory.setVirtualHost(vhost);
@@ -71,7 +70,7 @@ public class ConnectionFactory {
         ExecutorService threadPoolExecutor = new ThreadPoolExecutor(parallel, parallel, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), Threads.newThreadFactory("Grus-MQ", Thread.NORM_PRIORITY, false));
         Connection connection = null;
         try {
-            connection = factory.newConnection(threadPoolExecutor);
+            connection = factory.newConnection(threadPoolExecutor, Address.parseAddresses(addresses));
         } catch (IOException e) {
             throw new RabbitMqException(e);
         } catch (TimeoutException e) {
@@ -95,15 +94,13 @@ public class ConnectionFactory {
 
 
     private static class ConnectionCacheKey {
-        private final String host;
-        private final int port;
+        private final String addresses;
         private final String user;
         private final String pwd;
         private final String vhost;
 
-        ConnectionCacheKey(String host, int port, String user, String pwd, String vhost) {
-            this.host = host;
-            this.port = port;
+        ConnectionCacheKey(String addresses, String user, String pwd, String vhost) {
+            this.addresses = addresses;
             this.user = user;
             this.pwd = pwd;
             this.vhost = vhost;
@@ -114,12 +111,12 @@ public class ConnectionFactory {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             ConnectionCacheKey that = (ConnectionCacheKey) o;
-            return port == that.port && Objects.equals(host, that.host) && Objects.equals(user, that.user) && Objects.equals(pwd, that.pwd) && Objects.equals(vhost, that.vhost);
+            return Objects.equals(addresses, that.addresses) && Objects.equals(user, that.user) && Objects.equals(pwd, that.pwd) && Objects.equals(vhost, that.vhost);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(host, port, user, pwd, vhost);
+            return Objects.hash(addresses, user, pwd, vhost);
         }
     }
 }

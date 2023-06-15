@@ -46,7 +46,7 @@ public class RabbitMQAutoConfiguration {
     }
 
     private void init(RabbitMQProperty rabbitMQProperty) {
-        try (Connection connection = ConnectionFactory.newConnection(rabbitMQProperty.getHost(), rabbitMQProperty.getPort(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), 1)) {
+        try (Connection connection = ConnectionFactory.newConnection(rabbitMQProperty.getAddress(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), 1)) {
             RabbitMQProperty.Init rabbitMQPropertyInit = rabbitMQProperty.getInit();
             for (Exchange exchange : rabbitMQPropertyInit.getExchanges()) {
                 RabbitMqInitializer.exchangeDeclare(connection, exchange);
@@ -64,9 +64,9 @@ public class RabbitMQAutoConfiguration {
 
     private static Connection newConnection(RabbitMQProperty rabbitMQProperty) {
         if (rabbitMQProperty.isUseSingleConnection()) {
-            return ConnectionFactory.newConnectionFromCache(rabbitMQProperty.getHost(), rabbitMQProperty.getPort(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), rabbitMQProperty.getConsumer().getParallel());
+            return ConnectionFactory.newConnectionFromCache(rabbitMQProperty.getAddress(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), rabbitMQProperty.getConsumer().getParallel());
         }
-        return ConnectionFactory.newConnection(rabbitMQProperty.getHost(), rabbitMQProperty.getPort(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), rabbitMQProperty.getConsumer().getParallel());
+        return ConnectionFactory.newConnection(rabbitMQProperty.getAddress(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), rabbitMQProperty.getConsumer().getParallel());
     }
 
     @Configuration(proxyBeanMethods = false)
