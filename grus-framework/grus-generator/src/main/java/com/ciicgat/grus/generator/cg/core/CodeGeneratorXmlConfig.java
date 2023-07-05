@@ -327,6 +327,7 @@ public class CodeGeneratorXmlConfig implements Serializable {
         private String tableName;
         private String entityObjectName;
         private Set<String> ignoreColumns;
+        private Set<String> encryptColumns;
         private String entityObjectSuffix;
 
         public String getTableName() {
@@ -353,6 +354,15 @@ public class CodeGeneratorXmlConfig implements Serializable {
 
         public Table setIgnoreColumns(Set<String> ignoreColumns) {
             this.ignoreColumns = ignoreColumns;
+            return this;
+        }
+
+        public Set<String> getEncryptColumns() {
+            return encryptColumns;
+        }
+
+        public Table setEncryptColumns(Set<String> encryptColumns) {
+            this.encryptColumns = encryptColumns;
             return this;
         }
 

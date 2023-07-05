@@ -5,6 +5,7 @@
 
 package com.ciicgat.sdk.data.mybatis.generator.entity;
 
+import com.ciicgat.sdk.data.encryption.EncryptField;
 import com.ciicgat.sdk.data.mybatis.generator.annotation.TableField;
 import com.ciicgat.sdk.data.mybatis.generator.annotation.TableId;
 import com.ciicgat.sdk.data.mybatis.generator.annotation.TableName;
@@ -28,6 +29,7 @@ public class ShopTip {
     private String title;
     private String content;
     private Integer enable;
+    private EncryptField mobile;
 
     public Long getId() {
         return id;
@@ -91,6 +93,14 @@ public class ShopTip {
 
     public void setEnable(Integer enable) {
         this.enable = enable;
+    }
+
+    public EncryptField getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(EncryptField mobile) {
+        this.mobile = mobile;
     }
 
     @Override

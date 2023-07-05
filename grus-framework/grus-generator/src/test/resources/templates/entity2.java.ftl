@@ -21,6 +21,9 @@ import org.hibernate.validator.constraints.Length;
 [#if entity.hasBigDecimalField]
 import java.math.BigDecimal;
 [/#if]
+[#if entity.hasEncryptField]
+import com.ciicgat.sdk.data.encryption.EncryptField;
+[/#if]
 
 
 /**
@@ -60,17 +63,17 @@ public class ${entity.entityName} implements Serializable {
     [#if field.primaryKey]
     @TableId
     [/#if]
-    private ${field.jdbcType.javaType.simpleName} ${field.lowerCamelName};
+    private [#if field.dbEncrypt]EncryptField[#else]${field.jdbcType.javaType.simpleName}[/#if] ${field.lowerCamelName};
 
 [/#list]
 [#-- getters & setters --]
 [#if !baseConfig.enableLombok]
 [#list entity.fields as field]
-    public ${field.jdbcType.javaType.simpleName} get${field.upperCamelName}() {
+    public [#if field.dbEncrypt]EncryptField[#else]${field.jdbcType.javaType.simpleName}[/#if] get${field.upperCamelName}() {
         return ${field.lowerCamelName};
     }
 
-    public void set${field.upperCamelName}(${field.jdbcType.javaType.simpleName} ${field.lowerCamelName}) {
+    public void set${field.upperCamelName}([#if field.dbEncrypt]EncryptField[#else]${field.jdbcType.javaType.simpleName}[/#if] ${field.lowerCamelName}) {
         this.${field.lowerCamelName} = ${field.lowerCamelName};
     }
 

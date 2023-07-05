@@ -90,4 +90,5 @@
                 tableName CDATA #REQUIRED
                 ignoreColumns CDATA #IMPLIED
                 entityObjectName CDATA #IMPLIED
+                encryptColumns CDATA #IMPLIED
                 >

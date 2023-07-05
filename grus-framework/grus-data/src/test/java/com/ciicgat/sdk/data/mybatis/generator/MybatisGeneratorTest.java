@@ -5,6 +5,8 @@
 
 package com.ciicgat.sdk.data.mybatis.generator;
 
+import com.ciicgat.grus.json.JSON;
+import com.ciicgat.sdk.data.encryption.EncryptField;
 import com.ciicgat.sdk.data.mybatis.generator.condition.ConditionExample;
 import com.ciicgat.sdk.data.mybatis.generator.condition.Example;
 import com.ciicgat.sdk.data.mybatis.generator.condition.LambdaCriteria;
@@ -15,6 +17,8 @@ import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -32,8 +36,10 @@ import java.util.stream.Collectors;
  */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = MybatisGeneratorApplication.class)
-@TestPropertySource("classpath:mg-application.properties")
+@TestPropertySource(locations = "classpath:mg-application.properties")
 public class MybatisGeneratorTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(MybatisGeneratorTest.class);
 
     @Resource
     private ShopTipMapper shopTipMapper;
@@ -202,6 +208,27 @@ public class MybatisGeneratorTest {
     }
 
     @Test
+    public void encryptQueryExample() {
+        ShopTip entity = buildShopTip();
+        shopTipMapper.insert(entity);
+        Long id = entity.getId();
+        Assertions.assertNotNull(id);
+        logger.info("shopTip={}", JSON.toJSONString(entity));
+        EncryptField mobile = entity.getMobile();
+
+        Example<ShopTip> example = new QueryExample<>();
+        example.createLambdaCriteria().eq(ShopTip::getMobile, mobile);
+        List<ShopTip> list = shopTipMapper.list(example);
+        Assertions.assertTrue(list.size() > 0);
+        List<Long> idList = list.stream().map(ShopTip::getId).collect(Collectors.toList());
+        Assertions.assertTrue(idList.contains(id));
+        List<String> mobileList = list.stream().map(x -> x.getMobile().getValue()).distinct().collect(Collectors.toList());
+        logger.info("query result, mobile list={}", JSON.toJSONString(mobileList));
+        Assertions.assertEquals(1, mobileList.size());
+        Assertions.assertEquals(mobileList.get(0), mobile.getValue());
+    }
+
+    @Test
     public void batchGet() {
         List<ShopTip> list = new ArrayList<>();
         int count = 10;
@@ -330,6 +357,33 @@ public class MybatisGeneratorTest {
         Assertions.assertTrue(throwError);
     }
 
+    @Test
+    public void testListByMobile() {
+        String content = "condition-" + UUID.randomUUID();
+        ShopTip entity01 = buildShopTip();
+        entity01.setContent(content);
+        logger.info(entity01.getMobile().getValue());
+        shopTipMapper.insert(entity01);
+        logger.info(entity01.getMobile().getValue());
+
+        ShopTip entity02 = buildShopTip();
+        entity02.setContent(content);
+        logger.info(entity02.getMobile().getValue());
+        shopTipMapper.insert(entity02);
+        logger.info(entity02.getMobile().getValue());
+
+        List<EncryptField> reqMobileList = new ArrayList<>();
+        reqMobileList.add(entity01.getMobile());
+        reqMobileList.add(entity02.getMobile());
+
+        List<ShopTip> list = shopTipMapper.listByMobile(reqMobileList);
+        Assertions.assertTrue(list.size() > 1);
+        List<String> mobileList = list.stream().map(x -> x.getMobile().getValue()).distinct().collect(Collectors.toList());
+        Assertions.assertTrue(mobileList.size() <= 2);
+        Assertions.assertTrue(mobileList.contains(entity01.getMobile().getValue()));
+        Assertions.assertTrue(mobileList.contains(entity02.getMobile().getValue()));
+    }
+
     private ShopTip buildShopTip() {
         ShopTip shopTip = new ShopTip();
         shopTip.setEcappId(RandomUtils.nextLong(10000000, 999999999));
@@ -337,6 +391,8 @@ public class MybatisGeneratorTest {
         shopTip.setEnable(1);
         shopTip.setType(1);
         shopTip.setTitle("Junit-test" + UUID.randomUUID().toString());
+        String mobile = "130" + RandomUtils.nextLong(10000000, 999999999);
+        shopTip.setMobile(new EncryptField(mobile));
         return shopTip;
     }
 

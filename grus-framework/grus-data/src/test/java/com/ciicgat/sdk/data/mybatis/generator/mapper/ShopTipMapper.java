@@ -5,9 +5,12 @@
 
 package com.ciicgat.sdk.data.mybatis.generator.mapper;
 
+import com.ciicgat.sdk.data.encryption.EncryptField;
 import com.ciicgat.sdk.data.mybatis.generator.entity.ShopTip;
 import com.ciicgat.sdk.data.mybatis.generator.template.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * @author Clive Yuan
@@ -15,5 +18,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface ShopTipMapper extends BaseMapper<ShopTip> {
+
+    List<ShopTip> listByMobile(List<EncryptField> mobileList);
 
 }

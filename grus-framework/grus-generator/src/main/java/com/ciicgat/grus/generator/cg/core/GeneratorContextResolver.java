@@ -108,6 +108,7 @@ public class GeneratorContextResolver {
         this.matchIdType(fields, tableInfo.getColumns());
         entity.setFields(fields);
         entity.setHasBigDecimalField(this.hasBigDecimalField(entity.getFields()));
+        entity.setHasEncryptField(this.hasEncryptField(entity.getFields()));
         return entity;
     }
 
@@ -128,7 +129,16 @@ public class GeneratorContextResolver {
     private List<Field> column2Field(CodeGeneratorXmlConfig.Table table, List<ColumnInfo> columns) {
         return columns.stream()
                 .filter(x -> !table.getIgnoreColumns().contains(x.getName())) // 排除忽略字段
-                .map(this::convertColumnInfo2Field).collect(Collectors.toList());
+                .map(columnInfo -> {
+                    Field field = convertColumnInfo2Field(columnInfo);
+                    if (table.getEncryptColumns().contains(columnInfo.getName())) {
+                        //check下, 仅支持String
+                        Assert.isTrue(columnInfo.getType().equals("VARCHAR") || columnInfo.getType().equals("CHAR"),
+                                "table [" + table.getTableName() + "] - encrypt column [" + columnInfo.getName() + "] must be varchar or char");
+                        field.setDbEncrypt(true);
+                    }
+                    return field;
+                }).collect(Collectors.toList());
     }
 
     private Field convertColumnInfo2Field(ColumnInfo columnInfo) {
@@ -150,6 +160,10 @@ public class GeneratorContextResolver {
 
     private boolean hasBigDecimalField(List<Field> fields) {
         return fields.stream().anyMatch(x -> JdbcType.DECIMAL == x.getJdbcType());
+    }
+
+    private boolean hasEncryptField(List<Field> fields) {
+        return fields.stream().anyMatch(Field::isDbEncrypt);
     }
 
     private CodeGeneratorXmlConfig parseXmlConfig(String configFilePath) {
@@ -295,13 +309,17 @@ public class GeneratorContextResolver {
             Iterator iterator = tableEls.elementIterator("table");
             while (iterator.hasNext()) {
                 Element tableEl = (Element) iterator.next();
+                //忽略字段
                 Set<String> tableIgnoreColumnSet = new HashSet<>(globalIgnoreColumnSet);
                 tableIgnoreColumnSet.addAll(this.getIgnoreColumnSet(tableEl));
+                //加密字段
+                Set<String> tableEncryptColumnSet = new HashSet<>(this.getEncryptColumnSet(tableEl));
                 tables.add(new CodeGeneratorXmlConfig.Table()
                         .setTableName(this.getAttributeValue(tableEl, "tableName"))
                         .setEntityObjectName(this.getAttributeValue(tableEl, "entityObjectName", true))
                         .setEntityObjectSuffix(entityObjectSuffix)
-                        .setIgnoreColumns(tableIgnoreColumnSet));
+                        .setIgnoreColumns(tableIgnoreColumnSet)
+                        .setEncryptColumns(tableEncryptColumnSet));
             }
         }
 
@@ -347,6 +365,15 @@ public class GeneratorContextResolver {
 
     private Set<String> getIgnoreColumnSet(Element element) {
         String ignoreColumns = this.getAttributeValue(element, "ignoreColumns", true);
+        Set<String> ignoreColumnSet = new HashSet<>();
+        if (StringUtils.isNotBlank(ignoreColumns)) {
+            ignoreColumnSet.addAll(List.of(ignoreColumns.split(",")));
+        }
+        return ignoreColumnSet;
+    }
+
+    private Set<String> getEncryptColumnSet(Element element) {
+        String ignoreColumns = this.getAttributeValue(element, "encryptColumns", true);
         Set<String> ignoreColumnSet = new HashSet<>();
         if (StringUtils.isNotBlank(ignoreColumns)) {
             ignoreColumnSet.addAll(List.of(ignoreColumns.split(",")));

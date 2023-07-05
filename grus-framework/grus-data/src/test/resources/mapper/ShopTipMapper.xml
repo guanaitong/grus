@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ciicgat.sdk.data.mybatis.generator.mapper.ShopTipMapper">
+
+    <resultMap id="BaseResultMap" type="com.ciicgat.sdk.data.mybatis.generator.entity.ShopTip">
+        <id column="id" property="id"/>
+        <result column="timeCreated" property="timeCreated"/>
+        <result column="timeModified" property="timeModified"/>
+        <result column="ecappId" property="ecappId"/>
+        <result column="type" property="type"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="enable" property="enable"/>
+        <result column="mobile" property="mobile"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        <!--@sql SELECT -->
+        id,
+        ecappId,
+        type,
+        title,
+        content,
+        enable,
+        timeCreated,
+        timeModified,
+        mobile
+        <!--@sql FROM grus_demo.ShopTip-->
+    </sql>
+
+    <select id="listByMobile" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumns"/>
+        FROM grus_demo.ShopTip
+        WHERE mobile IN
+        <foreach collection="list" open="(" close=")" index="index" item="item" separator=",">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

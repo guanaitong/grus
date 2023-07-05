@@ -56,6 +56,7 @@
         <table tableName="Test" ignoreColumns="double"/>
         <table tableName="t_Test" entityObjectName="Test2"/>
         <table tableName="Person"/>
+        <table tableName="ShopTip" encryptColumns="mobile"/>
     </tables>
 
 </code-generator>

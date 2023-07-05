@@ -31,4 +31,6 @@ public @interface TableField {
      * 是否保存时忽略
      */
     boolean ignoreSaving() default false;
+
+    boolean encrypt() default false;
 }

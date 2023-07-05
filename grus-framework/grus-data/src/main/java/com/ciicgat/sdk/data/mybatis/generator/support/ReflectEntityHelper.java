@@ -89,7 +89,13 @@ public class ReflectEntityHelper {
     }
 
     private String conditionalFieldsParamString() {
-        return this.getNotIgnoreSavingFields().stream().map(x -> String.format("<if test=\"%s != null\">#{%s},</if>", x.getName(), x.getName()))
+        return this.getNotIgnoreSavingFields().stream().map(x -> {
+                    if (x.getEncrypt() != null && x.getEncrypt()) {
+                        return String.format("<if test=\"%s != null\">#{%s,typeHandler=com.ciicgat.sdk.data.encryption.DefaultEncryptStringTypeHandler},</if>", x.getName(), x.getName());
+                    } else {
+                        return String.format("<if test=\"%s != null\">#{%s},</if>", x.getName(), x.getName());
+                    }
+                })
                 .collect(Collectors.joining(""));
     }
 

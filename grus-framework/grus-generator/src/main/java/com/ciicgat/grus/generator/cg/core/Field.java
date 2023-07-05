@@ -61,6 +61,10 @@ public class Field implements Serializable {
      * swagger 字段隐藏
      */
     private boolean swaggerHidden;
+    /**
+     * 加密存储
+     */
+    private boolean dbEncrypt;
 
     public JdbcType getJdbcType() {
         return jdbcType;
@@ -158,6 +162,15 @@ public class Field implements Serializable {
 
     public Field setSwaggerHidden(boolean swaggerHidden) {
         this.swaggerHidden = swaggerHidden;
+        return this;
+    }
+
+    public boolean isDbEncrypt() {
+        return dbEncrypt;
+    }
+
+    public Field setDbEncrypt(boolean dbEncrypt) {
+        this.dbEncrypt = dbEncrypt;
         return this;
     }
 }

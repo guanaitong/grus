@@ -20,6 +20,10 @@ public class Entity implements Serializable {
      */
     private boolean hasBigDecimalField;
     /**
+     * 是否有加密字段
+     */
+    private boolean hasEncryptField;
+    /**
      * 小写驼峰名
      */
     private String lowerCamelName;
@@ -56,6 +60,15 @@ public class Entity implements Serializable {
 
     public Entity setHasBigDecimalField(boolean hasBigDecimalField) {
         this.hasBigDecimalField = hasBigDecimalField;
+        return this;
+    }
+
+    public boolean isHasEncryptField() {
+        return hasEncryptField;
+    }
+
+    public Entity setHasEncryptField(boolean hasEncryptField) {
+        this.hasEncryptField = hasEncryptField;
         return this;
     }
 

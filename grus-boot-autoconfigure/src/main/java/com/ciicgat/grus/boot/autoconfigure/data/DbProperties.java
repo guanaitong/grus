@@ -30,6 +30,8 @@ public class DbProperties {
      */
     private Map<String, String> dataSourceExtParams;
 
+    private FieldEncryption fieldEncryption;
+
     public boolean isReadWriteSeparation() {
         return readWriteSeparation;
     }
@@ -53,4 +55,30 @@ public class DbProperties {
     public void setDataSourceExtParams(Map<String, String> dataSourceExtParams) {
         this.dataSourceExtParams = dataSourceExtParams;
     }
+
+    public FieldEncryption getFieldEncryption() {
+        return fieldEncryption;
+    }
+
+    public void setFieldEncryption(FieldEncryption fieldEncryption) {
+        this.fieldEncryption = fieldEncryption;
+    }
+
+    public static class FieldEncryption {
+
+        /**
+         * 字段加解密使用的salt
+         */
+        private String secretKey;
+
+
+        public String getSecretKey() {
+            return secretKey;
+        }
+
+        public void setSecretKey(String secretKey) {
+            this.secretKey = secretKey;
+        }
+    }
+
 }
