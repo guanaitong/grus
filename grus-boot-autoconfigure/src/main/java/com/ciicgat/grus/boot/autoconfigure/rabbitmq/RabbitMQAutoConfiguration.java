@@ -83,7 +83,7 @@ public class RabbitMQAutoConfiguration {
             return newConnection(rabbitMQProperty);
         }
 
-        @Bean(initMethod = "init", destroyMethod = "close")
+        @Bean(destroyMethod = "close")
         @ConditionalOnMissingBean
         public RabbitMqConsumer rabbitMqConsumer(RabbitMQProperty rabbitMQProperty, Connection consumerConnection) {
             return new RabbitMqConsumer(consumerConnection, rabbitMQProperty.getConsumer().getParallel(), rabbitMQProperty.getConsumer().getPrefetch(), rabbitMQProperty.getConsumer().getMaxRetry(), rabbitMQProperty.getConsumer().isFallBack());

@@ -72,7 +72,7 @@ public class RabbitMqConsumer implements AutoCloseable {
         init();
     }
 
-    public void init() {
+    private void init() {
         for (int i = 0; i < parallel; i++) {
             try {
                 Channel channel = connection.createChannel();

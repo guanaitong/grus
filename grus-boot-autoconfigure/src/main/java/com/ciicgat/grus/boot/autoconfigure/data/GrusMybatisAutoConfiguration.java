@@ -7,6 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.data;
 
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -50,6 +51,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -187,11 +189,63 @@ public class GrusMybatisAutoConfiguration implements InitializingBean {
         return factory.getObject();
     }
 
+
     private void applyConfiguration(SqlSessionFactoryBean factory) {
-        org.apache.ibatis.session.Configuration configuration = this.properties.getConfiguration();
-        if (configuration == null && !StringUtils.hasText(this.properties.getConfigLocation())) {
+        org.apache.ibatis.session.Configuration configuration = null;
+        org.apache.ibatis.session.Configuration orinalConfiguration = this.properties.getConfiguration();
+        if (orinalConfiguration == null) {
+            if (StringUtils.hasText(this.properties.getConfigLocation())) {
+                Resource resource = this.resourceLoader.getResource(this.properties.getConfigLocation());
+                try {
+                    XMLConfigBuilder xmlConfigBuilder = new XMLConfigBuilder(resource.getInputStream(), null, this.properties.getConfigurationProperties());
+                    configuration = xmlConfigBuilder.getConfiguration();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                configuration = new org.apache.ibatis.session.Configuration();
+                this.properties.setConfiguration(configuration);
+            }
+        } else {
+            // 这里基于orinalConfiguration克隆一个新的configuration。解决不同数据源共享同一个Configuration的问题
+            // Configuration里面有一个environment，environment里有datasource。
+            // 如果共用同一个Configuration，那么也意味着多数据情况下只有最后一个datasource生效。显然不符合预期
             configuration = new org.apache.ibatis.session.Configuration();
+            configuration.setSafeRowBoundsEnabled(orinalConfiguration.isSafeRowBoundsEnabled());
+            configuration.setSafeResultHandlerEnabled(orinalConfiguration.isSafeResultHandlerEnabled());
+            configuration.setMapUnderscoreToCamelCase(orinalConfiguration.isMapUnderscoreToCamelCase());
+            configuration.setAggressiveLazyLoading(orinalConfiguration.isAggressiveLazyLoading());
+            configuration.setMultipleResultSetsEnabled(orinalConfiguration.isMultipleResultSetsEnabled());
+            configuration.setUseGeneratedKeys(orinalConfiguration.isUseGeneratedKeys());
+            configuration.setUseColumnLabel(orinalConfiguration.isUseColumnLabel());
+            configuration.setCacheEnabled(orinalConfiguration.isCacheEnabled());
+            configuration.setCallSettersOnNulls(orinalConfiguration.isCallSettersOnNulls());
+            configuration.setUseActualParamName(orinalConfiguration.isUseActualParamName());
+            configuration.setReturnInstanceForEmptyRow(orinalConfiguration.isReturnInstanceForEmptyRow());
+            configuration.setShrinkWhitespacesInSql(orinalConfiguration.isShrinkWhitespacesInSql());
+            configuration.setLogPrefix(orinalConfiguration.getLogPrefix());
+            configuration.setLogImpl(orinalConfiguration.getLogImpl());
+            configuration.setVfsImpl(orinalConfiguration.getVfsImpl());
+            configuration.setDefaultSqlProviderType(orinalConfiguration.getDefaultSqlProviderType());
+            configuration.setLocalCacheScope(orinalConfiguration.getLocalCacheScope());
+            configuration.setJdbcTypeForNull(orinalConfiguration.getJdbcTypeForNull());
+            configuration.setLazyLoadTriggerMethods(orinalConfiguration.getLazyLoadTriggerMethods());
+            configuration.setDefaultStatementTimeout(orinalConfiguration.getDefaultStatementTimeout());
+            configuration.setDefaultFetchSize(orinalConfiguration.getDefaultFetchSize());
+            configuration.setDefaultResultSetType(orinalConfiguration.getDefaultResultSetType());
+            configuration.setDefaultExecutorType(orinalConfiguration.getDefaultExecutorType());
+            configuration.setAutoMappingBehavior(orinalConfiguration.getAutoMappingBehavior());
+            configuration.setAutoMappingUnknownColumnBehavior(orinalConfiguration.getAutoMappingUnknownColumnBehavior());
+            configuration.setVariables(orinalConfiguration.getVariables());
+            configuration.setReflectorFactory(orinalConfiguration.getReflectorFactory());
+            configuration.setObjectFactory(orinalConfiguration.getObjectFactory());
+            configuration.setObjectWrapperFactory(orinalConfiguration.getObjectWrapperFactory());
+            configuration.setLazyLoadingEnabled(orinalConfiguration.isLazyLoadingEnabled());
+            configuration.setProxyFactory(orinalConfiguration.getProxyFactory());
+            configuration.setConfigurationFactory(orinalConfiguration.getConfigurationFactory());
         }
+
+
         if (configuration != null && !CollectionUtils.isEmpty(this.configurationCustomizers)) {
             for (ConfigurationCustomizer customizer : this.configurationCustomizers) {
                 customizer.customize(configuration);
