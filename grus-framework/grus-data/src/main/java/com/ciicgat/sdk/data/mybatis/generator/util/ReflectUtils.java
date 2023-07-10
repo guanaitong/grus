@@ -111,7 +111,6 @@ public class ReflectUtils {
             String name = declaredField.getName();
             boolean primaryKey = false;
             boolean ignoreSaving = false;
-            boolean encrypt = false;
             String fieldName = name;
             TableId tableIdAnnotation = declaredField.getAnnotation(TableId.class);
             if (Objects.nonNull(tableIdAnnotation)) {
@@ -120,7 +119,6 @@ public class ReflectUtils {
                 }
                 primaryKey = true;
                 ignoreSaving = true;
-                encrypt = true;
             }
 
             TableField tableFieldAnnotation = declaredField.getAnnotation(TableField.class);
@@ -129,7 +127,6 @@ public class ReflectUtils {
                     fieldName = tableFieldAnnotation.value();
                 }
                 ignoreSaving = tableFieldAnnotation.ignoreSaving();
-                encrypt = tableFieldAnnotation.encrypt();
             }
 
             ReflectField field = new ReflectField();
@@ -137,7 +134,6 @@ public class ReflectUtils {
             field.setFieldName(fieldName);
             field.setIgnoreSaving(ignoreSaving);
             field.setPrimaryKey(primaryKey);
-            field.setEncrypt(encrypt);
             fields.add(field);
         }
         reflectEntity.setReflectEntityHelper(ReflectEntityHelper.build(reflectEntity));

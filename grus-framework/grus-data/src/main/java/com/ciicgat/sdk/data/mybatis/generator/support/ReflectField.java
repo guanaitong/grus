@@ -19,7 +19,6 @@ public class ReflectField implements Serializable {
     private String fieldName;
     private Boolean isPrimaryKey;
     private Boolean ignoreSaving;
-    private Boolean encrypt;
 
     public String getFieldName() {
         return fieldName;
@@ -53,11 +52,4 @@ public class ReflectField implements Serializable {
         this.name = name;
     }
 
-    public Boolean getEncrypt() {
-        return encrypt;
-    }
-
-    public void setEncrypt(Boolean encrypt) {
-        this.encrypt = encrypt;
-    }
 }

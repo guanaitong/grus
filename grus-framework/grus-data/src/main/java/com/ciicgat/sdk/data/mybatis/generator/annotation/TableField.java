@@ -32,5 +32,4 @@ public @interface TableField {
      */
     boolean ignoreSaving() default false;
 
-    boolean encrypt() default false;
 }
