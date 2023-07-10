@@ -39,7 +39,7 @@ public class GrusFieldEncryptionAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DbEncryptHelper dbEncryptDecrypt() {
+    public DbEncryptHelper dbEncryptHelper() {
         Assert.state(StringUtils.isNotBlank(dbProperties.getFieldEncryption().getSecretKey()),
                 "FieldEncryption SecretKey can't be empty when enable field encryption, please set grus.db.field-encryption-secret-key");
         return new DbEncryptHelper(dbProperties.getFieldEncryption().getSecretKey());
