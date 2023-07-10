@@ -5,7 +5,11 @@
 
 package com.ciicgat.sdk.data.encryption;
 
-public class EncryptField {
+import java.io.Serializable;
+
+public class EncryptField implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final String value;
 
