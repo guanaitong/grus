@@ -29,7 +29,7 @@ public class RabbitMqInitializer {
 
     public static void exchangeDeclare(Connection connection, Exchange exchange) {
         execute(connection, channel -> {
-            channel.exchangeDeclare(exchange.getName(), exchange.getType(), exchange.isDurable(), exchange.isAutoDelete(), getFinalArgs(exchange.getArgs(), false));
+            channel.exchangeDeclare(exchange.getName(), exchange.getType(), true, false, getFinalArgs(exchange.getArgs(), false));
             addConfigData(exchange.getName(), null, "", false, channel);
         });
         LOGGER.info("exchange[{}] type[{}] declared", exchange.getName(), exchange.getType());
@@ -41,7 +41,7 @@ public class RabbitMqInitializer {
             execute(connection, channel -> channel.queueDeclarePassive(name));
         } catch (RabbitMqException e) {
             LOGGER.warn("queue[{}] not found", name);
-            execute(connection, channel -> channel.queueDeclare(name, queue.isDurable(), queue.isExclusive(), queue.isAutoDelete(), getFinalArgs(queue.getArgs(), true)));
+            execute(connection, channel -> channel.queueDeclare(name, true, false, false, getFinalArgs(queue.getArgs(), true)));
         }
         LOGGER.info("queue[{}] declared", name);
     }

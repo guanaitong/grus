@@ -22,18 +22,7 @@ public class Queue {
      * 队列的配置参数
      */
     private Map<String, Object> args = new HashMap<>();
-    /**
-     * 是否持久化，默认是
-     */
-    private boolean durable = true;
-    /**
-     * 是否链接断开时自动删除，默认否
-     */
-    private boolean exclusive = false;
-    /**
-     * 是否自动删除，默认否
-     */
-    private boolean autoDelete = false;
+
 
     public String getName() {
         return name;
@@ -51,27 +40,4 @@ public class Queue {
         this.args = args;
     }
 
-    public boolean isDurable() {
-        return durable;
-    }
-
-    public void setDurable(boolean durable) {
-        this.durable = durable;
-    }
-
-    public boolean isExclusive() {
-        return exclusive;
-    }
-
-    public void setExclusive(boolean exclusive) {
-        this.exclusive = exclusive;
-    }
-
-    public boolean isAutoDelete() {
-        return autoDelete;
-    }
-
-    public void setAutoDelete(boolean autoDelete) {
-        this.autoDelete = autoDelete;
-    }
 }

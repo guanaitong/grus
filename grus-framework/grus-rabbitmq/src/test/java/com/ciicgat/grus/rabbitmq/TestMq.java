@@ -56,8 +56,6 @@ public class TestMq {
     private static Queue newTestQueue(String randomText) {
         Queue queue = new Queue();
         queue.setName(randomText);
-        queue.setAutoDelete(true);
-        queue.setExclusive(true);
         return queue;
     }
 
