@@ -37,4 +37,14 @@
             #{item}
         </foreach>
     </select>
+
+    <select id="listByMobileStr" resultMap="BaseResultMap">
+        SELECT
+        <include refid="BaseColumns"/>
+        FROM grus_demo.ShopTip
+        WHERE mobile IN
+        <foreach collection="list" open="(" close=")" index="index" item="item" separator=",">
+            #{item,typeHandler=com.ciicgat.sdk.data.encryption.DbEncryptStringTypeHandler}
+        </foreach>
+    </select>
 </mapper>

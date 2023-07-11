@@ -382,6 +382,18 @@ public class MybatisGeneratorTest {
         Assertions.assertTrue(mobileList.size() <= 2);
         Assertions.assertTrue(mobileList.contains(entity01.getMobile().getValue()));
         Assertions.assertTrue(mobileList.contains(entity02.getMobile().getValue()));
+
+
+        List<String> reqMobileStrList = new ArrayList<>();
+        reqMobileStrList.add(entity01.getMobile().getValue());
+        reqMobileStrList.add(entity02.getMobile().getValue());
+
+        list = shopTipMapper.listByMobileStr(reqMobileStrList);
+        Assertions.assertTrue(list.size() > 1);
+        List<String> mobileStrList = list.stream().map(x -> x.getMobile().getValue()).distinct().collect(Collectors.toList());
+        Assertions.assertTrue(mobileStrList.size() <= 2);
+        Assertions.assertTrue(mobileStrList.contains(entity01.getMobile().getValue()));
+        Assertions.assertTrue(mobileStrList.contains(entity02.getMobile().getValue()));
     }
 
     private ShopTip buildShopTip() {

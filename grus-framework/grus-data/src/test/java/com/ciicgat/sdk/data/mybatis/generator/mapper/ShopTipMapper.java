@@ -20,5 +20,6 @@ import java.util.List;
 public interface ShopTipMapper extends BaseMapper<ShopTip> {
 
     List<ShopTip> listByMobile(List<EncryptField> mobileList);
+    List<ShopTip> listByMobileStr(List<String> mobileList);
 
 }
