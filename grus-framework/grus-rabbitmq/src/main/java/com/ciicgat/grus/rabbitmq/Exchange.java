@@ -51,7 +51,6 @@ public class Exchange {
     public void setType(BuiltinExchangeType type) {
         this.type = type;
     }
-    
     public Map<String, Object> getArgs() {
         return args;
     }
