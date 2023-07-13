@@ -76,6 +76,7 @@ public class RabbitMqConsumer implements AutoCloseable {
         for (int i = 0; i < parallel; i++) {
             try {
                 Channel channel = connection.createChannel();
+                LOGGER.info("created channel {}", channel.getChannelNumber());
                 channel.basicQos(prefetch);
                 channelList.add(channel);
             } catch (IOException e) {
