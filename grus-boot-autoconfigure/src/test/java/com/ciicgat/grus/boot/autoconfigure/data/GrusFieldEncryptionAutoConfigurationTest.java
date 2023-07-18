@@ -6,7 +6,7 @@
 package com.ciicgat.grus.boot.autoconfigure.data;
 
 import com.ciicgat.sdk.data.encryption.DbEncryptHelper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
