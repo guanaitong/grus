@@ -5,12 +5,10 @@
 
 package com.ciicgat.sdk.redis.config;
 
-import com.ciicgat.sdk.gconf.PublicKeyOwner;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import io.lettuce.core.TimeoutOptions;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConfiguration;
@@ -27,7 +25,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+
+import static com.ciicgat.sdk.redis.config.RedisConstants.DEFAULT_MAX_ATTEMPTS;
 
 /**
  * @author August
@@ -65,8 +64,9 @@ public class SpringRedisConfCreator {
     public static RedisConnectionFactory newRedisConnectionFactory(RedisSetting redisSetting, boolean init) {
         RedisConfiguration redisConfiguration = newRedisConfiguration(redisSetting);
         ClientOptions clientOptions = ClientOptions.builder().timeoutOptions(TimeoutOptions.enabled())
-                .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
-                .socketOptions(SocketOptions.builder().connectTimeout(Duration.ofSeconds(1L)).build())
+                .disconnectedBehavior(ClientOptions.DisconnectedBehavior.DEFAULT)
+                .autoReconnect(true)
+                .socketOptions(SocketOptions.builder().connectTimeout(Duration.ofMillis(redisSetting.getConnectTimeoutMillis())).build())
                 .build();
 
         //这里默认使用了连接池。如果不适用连接池，lettuce默认是单连接的。
@@ -74,14 +74,11 @@ public class SpringRedisConfCreator {
         //客户端通过1个连接分别发送2个请求，当数据分片2处于异常状态时，请求2（GET Key2）将返回超时，同时由于请求1（GET Key1）和请求2共用同一连接，导致请求1也无法正常返回。
 
         GenericObjectPoolConfig<?> config = new GenericObjectPoolConfig<>();
-        config.setMaxTotal(redisSetting.getMaxActive());
-        config.setMaxIdle(redisSetting.getMaxIdle());
-        config.setMinIdle(redisSetting.getMinIdle());
-        config.setTimeBetweenEvictionRunsMillis(TimeUnit.MINUTES.toMillis(1));
-        config.setMaxWaitMillis(2000L);
+        redisSetting.configPool(config);
 
         LettuceClientConfiguration.LettuceClientConfigurationBuilder builder = LettucePoolingClientConfiguration.builder().poolConfig(config)
-                .clientOptions(clientOptions);
+                .clientOptions(clientOptions)
+                .commandTimeout(Duration.ofMillis(redisSetting.getTimeoutMillis()));
         String clientName = RedisSetting.clientName();
         if (org.springframework.util.StringUtils.hasText(clientName)) {
             builder.clientName(clientName);
@@ -96,10 +93,7 @@ public class SpringRedisConfCreator {
     }
 
     private static RedisConfiguration newRedisConfiguration(RedisSetting redisSetting) {
-        String password = redisSetting.getPassword();
-        if (StringUtils.isNotEmpty(redisSetting.getEncryptedPassword())) {
-            password = PublicKeyOwner.decrypt(redisSetting.getEncryptedPassword());
-        }
+        String password = redisSetting.getFinalPassword();
         if (redisSetting.getType() == RedisSetting.TYPE_STANDALONE) {
             RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
             RedisSetting.StandaloneConfig standalone = redisSetting.getStandalone();
@@ -124,7 +118,7 @@ public class SpringRedisConfCreator {
         } else if (redisSetting.getType() == RedisSetting.TYPE_CLUSTER) {
             RedisSetting.ClusterConfig cluster = redisSetting.getCluster();
             RedisClusterConfiguration redisConfiguration = new RedisClusterConfiguration(Arrays.asList(cluster.getNodes().split(",")));
-            redisConfiguration.setMaxRedirects(3);
+            redisConfiguration.setMaxRedirects(DEFAULT_MAX_ATTEMPTS);
             redisConfiguration.setPassword(password);
             return redisConfiguration;
         } else {

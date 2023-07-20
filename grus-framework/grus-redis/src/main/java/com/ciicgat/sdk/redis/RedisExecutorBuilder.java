@@ -6,9 +6,7 @@
 package com.ciicgat.sdk.redis;
 
 import com.ciicgat.grus.alert.Alert;
-import com.ciicgat.sdk.gconf.PublicKeyOwner;
 import com.ciicgat.sdk.redis.config.RedisSetting;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +20,16 @@ import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.jedis.util.Pool;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+
+import static com.ciicgat.sdk.redis.config.RedisConstants.DEFAULT_MAX_ATTEMPTS;
+
 
 /**
  * @author August.Zhou
  * @date 2019-04-25 18:12
  */
-public class RedisExecutorBuilder implements RedisConstants {
+public class RedisExecutorBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisExecutorBuilder.class);
 
@@ -53,11 +53,9 @@ public class RedisExecutorBuilder implements RedisConstants {
             jedisClusterNode.add(HostAndPort.from(node));
         }
         GenericObjectPoolConfig<Connection> poolConfig = new GenericObjectPoolConfig<>();
-        poolConfig.setMaxTotal(getIntValue("maxTotal", DEFAULT_MAX_ACTIVE));
-        poolConfig.setMaxIdle(getIntValue("maxIdle", DEFAULT_MAX_IDLE));
-        poolConfig.setMinIdle(getIntValue("minIdle", DEFAULT_MIN_IDLE));
-        poolConfig.setMaxWaitMillis(getIntValue("maxWaitMillis", DEFAULT_MAX_WAIT_MILLIS));
-        return new JedisCluster(jedisClusterNode, 2000, 1000, 3, getPassword(), poolConfig);
+        setting.configPool(poolConfig);
+        return new JedisCluster(jedisClusterNode,
+                setting.getConnectTimeoutMillis(), setting.getTimeoutMillis(), DEFAULT_MAX_ATTEMPTS, setting.getFinalPassword(), poolConfig);
     }
 
     public Pool<Jedis> newPool() {
@@ -82,8 +80,9 @@ public class RedisExecutorBuilder implements RedisConstants {
         return new JedisPool(jedisPoolConfig,
                 host,
                 port,
-                getIntValue("timeout", 2000),
-                getPassword(),
+                setting.getConnectTimeoutMillis(),
+                setting.getTimeoutMillis(),
+                setting.getFinalPassword(),
                 this.setting.getDb(),
                 RedisSetting.clientName()
         ) {
@@ -110,9 +109,9 @@ public class RedisExecutorBuilder implements RedisConstants {
                 sentinelConfig.getMaster(),
                 Set.of(sentinelConfig.getNodes().split(",")),
                 jedisPoolConfig,
-                getIntValue("timeout", DEFAULT_TIME_OUT_MILLIS),
-                getIntValue("timeout", DEFAULT_TIME_OUT_MILLIS),
-                getPassword(),
+                setting.getConnectTimeoutMillis(),
+                setting.getTimeoutMillis(),
+                setting.getFinalPassword(),
                 this.setting.getDb(),
                 RedisSetting.clientName()
         ) {
@@ -132,38 +131,11 @@ public class RedisExecutorBuilder implements RedisConstants {
         };
     }
 
-    private int getIntValue(String key, int defaultValue) {
-        Map<String, String> params = this.setting.getParams();
-        if (!params.containsKey(key)) {
-            return defaultValue;
-        }
-        try {
-            return Integer.parseInt(params.get(key));
-        } catch (NumberFormatException e) {
-            return defaultValue;
-        }
-    }
 
     private JedisPoolConfig createJedisPoolConfig() {
         JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-        jedisPoolConfig.setMaxTotal(getIntValue("maxTotal", DEFAULT_MAX_ACTIVE));
-        jedisPoolConfig.setMaxIdle(getIntValue("maxIdle", DEFAULT_MAX_IDLE));
-        jedisPoolConfig.setMinIdle(getIntValue("minIdle", DEFAULT_MIN_IDLE));
-        jedisPoolConfig.setMaxWaitMillis(getIntValue("maxWaitMillis", DEFAULT_MAX_WAIT_MILLIS));
+        setting.configPool(jedisPoolConfig);
         return jedisPoolConfig;
-    }
-
-    /**
-     * 如果有加密密码，优先把其解密内容作为 redis 的密码
-     *
-     * @return redis 链接的密码
-     */
-    private String getPassword() {
-        String password = this.setting.getPassword();
-        if (StringUtils.isNotEmpty(this.setting.getEncryptedPassword())) {
-            password = PublicKeyOwner.decrypt(this.setting.getEncryptedPassword());
-        }
-        return password;
     }
 
 }

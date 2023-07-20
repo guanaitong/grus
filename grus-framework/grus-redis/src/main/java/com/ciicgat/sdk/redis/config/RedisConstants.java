@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.redis;
+package com.ciicgat.sdk.redis.config;
 
 /**
  * @author August
@@ -15,6 +15,10 @@ public interface RedisConstants {
     int DEFAULT_MIN_IDLE = 1;
     int DEFAULT_MAX_ACTIVE = 128;
     int DEFAULT_MAX_WAIT_MILLIS = 50;
-    int DEFAULT_TIME_OUT_MILLIS = 2000;
+
+    int DEFAULT_CONNECT_TIME_OUT_MILLIS = 100;
+    int DEFAULT_TIME_OUT_MILLIS = 500;
+
+    int DEFAULT_MAX_ATTEMPTS = 3;
 
 }

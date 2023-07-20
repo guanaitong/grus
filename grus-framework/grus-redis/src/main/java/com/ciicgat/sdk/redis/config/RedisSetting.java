@@ -6,15 +6,20 @@
 package com.ciicgat.sdk.redis.config;
 
 import com.ciicgat.grus.json.JSON;
+import com.ciicgat.sdk.gconf.PublicKeyOwner;
 import com.ciicgat.sdk.redis.RedisExecutor;
 import com.ciicgat.sdk.redis.RedisExecutorBuilder;
 import com.ciicgat.sdk.util.system.Systems;
 import com.ciicgat.sdk.util.system.WorkIdc;
 import com.ciicgat.sdk.util.system.WorkRegion;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
+
 
 /**
  * gconf上标准的redis配置
@@ -22,7 +27,7 @@ import java.util.Map;
  * @author August
  * @date 2020/2/24 2:46 PM
  */
-public class RedisSetting {
+public class RedisSetting implements RedisConstants {
     public static final int TYPE_STANDALONE = 0;
 
     public static final int TYPE_SENTINEL = 1;
@@ -133,6 +138,19 @@ public class RedisSetting {
         return password;
     }
 
+    /**
+     * 如果有加密密码，优先把其解密内容作为 redis 的密码
+     *
+     * @return redis 链接的密码
+     */
+    @JsonIgnore
+    public String getFinalPassword() {
+        if (StringUtils.isNotEmpty(this.getEncryptedPassword())) {
+            return PublicKeyOwner.decrypt(this.getEncryptedPassword());
+        }
+        return password;
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }
@@ -159,6 +177,37 @@ public class RedisSetting {
 
     public void setParams(Map<String, String> params) {
         this.params = params;
+    }
+
+    @JsonIgnore
+    public int getParamsIntValue(String key, int defaultValue) {
+        if (!params.containsKey(key)) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(params.get(key));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    @JsonIgnore
+    public int getConnectTimeoutMillis() {
+        return getParamsIntValue("connectTimeout", DEFAULT_CONNECT_TIME_OUT_MILLIS);
+    }
+
+    @JsonIgnore
+    public int getTimeoutMillis() {
+        return getParamsIntValue("timeout", DEFAULT_TIME_OUT_MILLIS);
+    }
+
+    @JsonIgnore
+    public void configPool(GenericObjectPoolConfig<?> poolConfig) {
+        poolConfig.setMaxTotal(this.getParamsIntValue("maxTotal", DEFAULT_MAX_ACTIVE));
+        poolConfig.setMaxIdle(this.getParamsIntValue("maxIdle", DEFAULT_MAX_IDLE));
+        poolConfig.setMinIdle(this.getParamsIntValue("minIdle", DEFAULT_MIN_IDLE));
+        poolConfig.setMaxWait(Duration.ofMillis(this.getParamsIntValue("maxWaitMillis", DEFAULT_MAX_WAIT_MILLIS)));
+        poolConfig.setTimeBetweenEvictionRuns(Duration.ofMillis(30000L));
     }
 
     public String getName() {

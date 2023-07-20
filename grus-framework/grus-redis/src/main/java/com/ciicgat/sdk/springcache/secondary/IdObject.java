@@ -12,16 +12,16 @@ public class IdObject<Id, Value> {
     private final Id id;
     private final Value object;
 
-   public IdObject(Id id, Value object) {
-      this.id = id;
-      this.object = object;
-   }
+    public IdObject(Id id, Value object) {
+        this.id = id;
+        this.object = object;
+    }
 
-   public Id getId() {
-      return id;
-   }
+    public Id getId() {
+        return id;
+    }
 
-   public Value getObject() {
-      return object;
-   }
+    public Value getObject() {
+        return object;
+    }
 }
