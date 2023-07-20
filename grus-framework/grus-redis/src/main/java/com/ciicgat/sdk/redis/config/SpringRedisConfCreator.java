@@ -83,8 +83,6 @@ public class SpringRedisConfCreator {
         if (org.springframework.util.StringUtils.hasText(clientName)) {
             builder.clientName(clientName);
         }
-
-
         LettuceConnectionFactory lettuceConnectionFactory = new LettuceConnectionFactoryWrapper(redisConfiguration, builder.build(), redisSetting);
         if (init) {
             lettuceConnectionFactory.afterPropertiesSet();

@@ -207,7 +207,6 @@ public class RedisSetting implements RedisConstants {
         poolConfig.setMaxIdle(this.getParamsIntValue("maxIdle", DEFAULT_MAX_IDLE));
         poolConfig.setMinIdle(this.getParamsIntValue("minIdle", DEFAULT_MIN_IDLE));
         poolConfig.setMaxWait(Duration.ofMillis(this.getParamsIntValue("maxWaitMillis", DEFAULT_MAX_WAIT_MILLIS)));
-        poolConfig.setTimeBetweenEvictionRuns(Duration.ofMillis(30000L));
     }
 
     public String getName() {
