@@ -40,6 +40,9 @@ public class CoreProperties {
      */
     private boolean sendSlowLog = true;
 
+    private boolean metricBusinessException = true;
+
+    private boolean metricSystemException = true;
 
     @PostConstruct
     private void init() {
@@ -77,5 +80,21 @@ public class CoreProperties {
 
     public void setSendSlowLog(boolean sendSlowLog) {
         this.sendSlowLog = sendSlowLog;
+    }
+
+    public boolean isMetricBusinessException() {
+        return metricBusinessException;
+    }
+
+    public void setMetricBusinessException(boolean metricBusinessException) {
+        this.metricBusinessException = metricBusinessException;
+    }
+
+    public boolean isMetricSystemException() {
+        return metricSystemException;
+    }
+
+    public void setMetricSystemException(boolean metricSystemException) {
+        this.metricSystemException = metricSystemException;
     }
 }

@@ -32,6 +32,8 @@ public class WebProperties {
      */
     private boolean printBusinessErrorStack = false;
 
+
+
     public int getErrorCodePrefix() {
         return errorCodePrefix;
     }
@@ -63,4 +65,5 @@ public class WebProperties {
     public void setDisableOldSslProtocol(boolean disableOldSslProtocol) {
         this.disableOldSslProtocol = disableOldSslProtocol;
     }
+
 }

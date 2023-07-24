@@ -8,6 +8,12 @@ package com.ciicgat.grus.elasticsearch.core;
 import com.ciicgat.grus.elasticsearch.annotations.Document;
 import com.ciicgat.sdk.lang.convert.Pagination;
 import com.google.common.util.concurrent.RateLimiter;
+import io.micrometer.core.instrument.FunctionTimer;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.binder.BaseUnits;
+import io.micrometer.core.instrument.binder.MeterBinder;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
@@ -52,12 +58,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.DoubleAdder;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Function;
 
 /**
  * Created by August.Zhou on 2019-08-22 17:47.
  */
-public class ElasticsearchTemplate<T extends IndexAble> {
+public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ElasticsearchTemplate.class);
     private final RestHighLevelClient restHighLevelClient;
     private final String index;
@@ -66,6 +76,18 @@ public class ElasticsearchTemplate<T extends IndexAble> {
     private final EntityMapper<T> entityMapper;
     private final Document document;
     private RequestOptions options = RequestOptions.DEFAULT;
+
+    private AtomicInteger readConcurrency = new AtomicInteger();
+
+    private AtomicInteger writeConcurrency = new AtomicInteger();
+
+    private LongAdder readOps = new LongAdder();
+
+    private DoubleAdder readTimeTotal = new DoubleAdder();
+
+    private LongAdder writeOps = new LongAdder();
+
+    private DoubleAdder writeTimeTotal = new DoubleAdder();
 
     /**
      * 数据操作时，是否校验索引存在。
@@ -81,7 +103,8 @@ public class ElasticsearchTemplate<T extends IndexAble> {
         this(restHighLevelClient, clazz, new DefaultEntityMapper<>());
     }
 
-    public ElasticsearchTemplate(RestHighLevelClient restHighLevelClient, Class<T> clazz, EntityMapper<T> entityMapper) {
+    public ElasticsearchTemplate(RestHighLevelClient restHighLevelClient, Class<T> clazz,
+                                 EntityMapper<T> entityMapper) {
         this.clazz = clazz;
         Document document = clazz.getAnnotation(Document.class);
         checkDocument(document);
@@ -139,7 +162,8 @@ public class ElasticsearchTemplate<T extends IndexAble> {
      * @return 索引
      */
     private String getCurrentIndex(T value) {
-        return StringUtils.isNotBlank(value.getDocIndex()) ? value.getDocIndex() : indexSuffixType.getCurrentIndex(this.index, value.getTimestampSupplier());
+        return StringUtils.isNotBlank(value.getDocIndex()) ? value.getDocIndex() :
+                indexSuffixType.getCurrentIndex(this.index, value.getTimestampSupplier());
     }
 
     /**
@@ -176,6 +200,8 @@ public class ElasticsearchTemplate<T extends IndexAble> {
     }
 
     public boolean createIndex(String index) {
+        writeConcurrency.incrementAndGet();
+        long startTimeMs = System.currentTimeMillis();
         IndicesClient indices = restHighLevelClient.indices();
         try {
             if (!existIndex(index)) {
@@ -218,6 +244,9 @@ public class ElasticsearchTemplate<T extends IndexAble> {
             throw new EsDataException(e);
         } catch (Exception e) {
             throw new EsDataException(e);
+        } finally {
+            writeConcurrency.decrementAndGet();
+            time(startTimeMs, true);
         }
     }
 
@@ -246,6 +275,8 @@ public class ElasticsearchTemplate<T extends IndexAble> {
      * @return
      */
     public int update(T value, boolean sync) {
+        writeConcurrency.incrementAndGet();
+        long startTimeMs = System.currentTimeMillis();
         String index = getCurrentIndex(value);
         UpdateRequest updateRequest = new UpdateRequest(index, value.getDocId())
                 .doc(entityMapper.mapToString(value), XContentType.JSON)
@@ -256,6 +287,9 @@ public class ElasticsearchTemplate<T extends IndexAble> {
             return updateResponse.getResult() == DocWriteResponse.Result.UPDATED ? 1 : 0;
         } catch (Exception e) {
             throw new EsDataException(e);
+        } finally {
+            writeConcurrency.decrementAndGet();
+            time(startTimeMs, true);
         }
     }
 
@@ -264,6 +298,8 @@ public class ElasticsearchTemplate<T extends IndexAble> {
     }
 
     public int save(T value, boolean sync) {
+        writeConcurrency.incrementAndGet();
+        long startTimeMs = System.currentTimeMillis();
         String index = getCurrentIndex(value);
         checkIndexStateOnSave(index);
         IndexRequest request = new IndexRequest(index)
@@ -282,6 +318,9 @@ public class ElasticsearchTemplate<T extends IndexAble> {
             return (status >= 200 && status < 300) ? 1 : 0;
         } catch (Exception e) {
             throw new EsDataException(e);
+        } finally {
+            writeConcurrency.decrementAndGet();
+            time(startTimeMs, true);
         }
     }
 
@@ -294,6 +333,8 @@ public class ElasticsearchTemplate<T extends IndexAble> {
             return save(dataList.get(0), sync);
         }
 
+        writeConcurrency.incrementAndGet();
+        long startTimeMs = System.currentTimeMillis();
         BulkRequest bulkRequest = new BulkRequest();
         bulkRequest.setRefreshPolicy(sync ? WriteRequest.RefreshPolicy.WAIT_UNTIL : WriteRequest.RefreshPolicy.NONE);
         for (T t : dataList) {
@@ -330,6 +371,9 @@ public class ElasticsearchTemplate<T extends IndexAble> {
             return dataList.size() - failedCount;
         } catch (IOException e) {
             throw new EsDataException(e);
+        } finally {
+            writeConcurrency.decrementAndGet();
+            time(startTimeMs, true);
         }
     }
 
@@ -350,12 +394,17 @@ public class ElasticsearchTemplate<T extends IndexAble> {
     }
 
     public int delete(String id, String index) {
+        writeConcurrency.incrementAndGet();
+        long startTimeMs = System.currentTimeMillis();
         try {
             DeleteRequest deleteRequest = new DeleteRequest(index, id);
             DeleteResponse deleteResponse = restHighLevelClient.delete(deleteRequest, options);
             return deleteResponse.status() == RestStatus.OK ? 1 : 0;
         } catch (IOException e) {
             throw new EsDataException(e);
+        } finally {
+            writeConcurrency.decrementAndGet();
+            time(startTimeMs, true);
         }
     }
 
@@ -365,7 +414,9 @@ public class ElasticsearchTemplate<T extends IndexAble> {
     }
 
     public T get(String id, String index) {
+        long startTimeMs = System.currentTimeMillis();
         try {
+            readConcurrency.incrementAndGet();
             GetRequest getRequest = new GetRequest(index).id(id);
             GetResponse getResponse = restHighLevelClient.get(getRequest, options);
             if (getResponse.isExists()) {
@@ -376,15 +427,23 @@ public class ElasticsearchTemplate<T extends IndexAble> {
             }
         } catch (IOException e) {
             throw new EsDataException(e);
+        } finally {
+            readConcurrency.decrementAndGet();
+            time(startTimeMs, false);
         }
         return null;
     }
 
     private SearchResponse search0(SearchRequest searchRequest) {
+        long startTimeMs = System.currentTimeMillis();
         try {
+            readConcurrency.incrementAndGet();
             return restHighLevelClient.search(searchRequest, options);
         } catch (IOException e) {
             throw new EsDataException(e);
+        } finally {
+            readConcurrency.decrementAndGet();
+            time(startTimeMs, false);
         }
     }
 
@@ -419,4 +478,58 @@ public class ElasticsearchTemplate<T extends IndexAble> {
     public IndexSuffixType getIndexSuffixType() {
         return indexSuffixType;
     }
+
+    private void time(long startTimeMs, boolean isWrite) {
+        double timeCost = (double) (System.currentTimeMillis() - startTimeMs);
+        if (isWrite) {
+            writeOps.increment();
+            writeTimeTotal.add(timeCost);
+        } else {
+            readOps.increment();
+            readTimeTotal.add(timeCost);
+        }
+    }
+
+    private int getReadConcurrency() {
+        return readConcurrency.get();
+    }
+
+    private int getWriteConcurrency() {
+        return writeConcurrency.get();
+    }
+
+    public long getReadOps() {
+        return readOps.longValue();
+    }
+
+    public double getReadTimeTotal() {
+        return readTimeTotal.doubleValue();
+    }
+
+    public long getWriteOps() {
+        return writeOps.longValue();
+    }
+
+    public double getWriteTimeTotal() {
+        return writeTimeTotal.doubleValue();
+    }
+
+    @Override
+    public void bindTo(MeterRegistry registry) {
+        Gauge.builder("grus.elasticsearch.read.concurrency", this, ElasticsearchTemplate::getReadConcurrency).tags(Tags.of(
+                "index",
+                        index))
+                .baseUnit(BaseUnits.THREADS).register(registry);
+        Gauge.builder("grus.elasticsearch.write.concurrency", this, ElasticsearchTemplate::getWriteConcurrency).tags(Tags.of("index",
+                        index))
+                .baseUnit(BaseUnits.THREADS).register(registry);
+
+        FunctionTimer.builder("grus.elasticsearch.read.time", this, ElasticsearchTemplate::getReadOps,
+                ElasticsearchTemplate::getReadTimeTotal, TimeUnit.MILLISECONDS).tags(Tags.of("index",
+                index)).register(registry);
+        FunctionTimer.builder("grus.elasticsearch.write.time", this, ElasticsearchTemplate::getWriteOps,
+                ElasticsearchTemplate::getWriteTimeTotal, TimeUnit.MILLISECONDS).tags(Tags.of("index",
+                index)).register(registry);
+    }
+
 }

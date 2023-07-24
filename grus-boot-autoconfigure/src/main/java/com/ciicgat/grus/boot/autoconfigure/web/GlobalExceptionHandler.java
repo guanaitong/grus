@@ -7,12 +7,15 @@ package com.ciicgat.grus.boot.autoconfigure.web;
 
 import com.ciicgat.api.core.BusinessFeignException;
 import com.ciicgat.grus.alert.Alert;
+import com.ciicgat.grus.boot.autoconfigure.core.CoreProperties;
 import com.ciicgat.grus.util.ClassType;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
 import com.ciicgat.sdk.lang.convert.ErrorCode;
 import com.ciicgat.sdk.lang.convert.StandardErrorCode;
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
 import feign.FeignException;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
@@ -37,7 +40,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -51,10 +56,16 @@ public class GlobalExceptionHandler {
 
     private static Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    private MeterRegistry registry;
+
     private WebProperties webProperties;
 
-    public GlobalExceptionHandler(WebProperties webProperties) {
+    private CoreProperties coreProperties;
+
+    public GlobalExceptionHandler(MeterRegistry registry, WebProperties webProperties, CoreProperties coreProperties) {
+        this.registry = registry;
         this.webProperties = webProperties;
+        this.coreProperties = coreProperties;
     }
 
     /**
@@ -70,6 +81,7 @@ public class GlobalExceptionHandler {
         } else {
             LOGGER.warn("BusinessRuntimeException, errorCode {} errorMsg {}", e.getErrorCode(), e.getErrorMsg());
         }
+        metricException(true, e);
         return ResponseEntity.status(e.getHttpStatusCode()).body(e.fail());
     }
 
@@ -86,6 +98,7 @@ public class GlobalExceptionHandler {
         } else {
             LOGGER.warn("BusinessFeignException, errorCode {} errorMsg {}", e.getErrorCode(), e.getErrorMsg());
         }
+        metricException(true, e);
         return of(HttpStatus.OK, e);
     }
 
@@ -98,6 +111,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FeignException.class)
     public ResponseEntity<ApiResponse<Object>> handleFeignException(FeignException e) {
         LOGGER.error("error", e);
+        metricException(false, e);
         return of(HttpStatus.INTERNAL_SERVER_ERROR, new StandardErrorCode(webProperties.getErrorCodePrefix(), 4, 0, "依赖服务异常"));
     }
 
@@ -110,6 +124,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({ServletException.class, MissingServletRequestParameterException.class, HttpRequestMethodNotSupportedException.class, NoHandlerFoundException.class})
     public ResponseEntity<ApiResponse<Object>> handleServletException(ServletException e) {
         LOGGER.warn("error", e);
+        metricException(false, e);
         String errorMsg = "请求格式不正确";
         if (e.getClass() == MissingServletRequestParameterException.class) {
             errorMsg = "请求参数缺失";
@@ -128,18 +143,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({TypeMismatchException.class, MethodArgumentTypeMismatchException.class, MethodArgumentConversionNotSupportedException.class})
     public ResponseEntity<ApiResponse<Object>> handleTypeMismatchException(TypeMismatchException e) {
         LOGGER.warn("TypeMismatchException, error: " + e.getMessage());
+        metricException(false, e);
         return of(HttpStatus.BAD_REQUEST, new StandardErrorCode(webProperties.getErrorCodePrefix(), 2, 0, "前端参数错误"));
     }
 
     @ExceptionHandler(BindException.class)
     public ApiResponse<Object> handleBindException(BindException e) {
         LOGGER.warn("BindException, param validate error: " + e.getMessage());
+        metricException(false, e);
         return handleBindingResult(e.getBindingResult());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ApiResponse<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         LOGGER.warn("MethodArgumentNotValidException, param validate error: " + e.getMessage());
+        metricException(false, e);
         return handleBindingResult(e.getBindingResult());
     }
 
@@ -173,6 +191,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     public ApiResponse<Object> handleValidationException(ConstraintViolationException e) {
         LOGGER.warn("ConstraintViolationException param validate error: " + e.getMessage());
+        metricException(false, e);
         Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
         StringBuilder stringBuilder = new StringBuilder();
         for (ConstraintViolation<?> item : violations) {
@@ -211,6 +230,8 @@ public class GlobalExceptionHandler {
         String msg = "发生异常，请求信息为：" + requestInfo;
         LOGGER.error(msg, throwable);
 
+        metricException(false, throwable);
+
         if (!clientAbortExceptionClassType.isInstance(throwable)) {
             Alert.send(msg, throwable);
         }
@@ -218,11 +239,6 @@ public class GlobalExceptionHandler {
         if (blockExceptionClassType.isInstance(throwable)) {
             return of(HttpStatus.TOO_MANY_REQUESTS, ErrorCode.REQUEST_BLOCK);
         }
-
-        if (blockExceptionClassType.isInstance(throwable)) {
-            return of(HttpStatus.TOO_MANY_REQUESTS, ErrorCode.REQUEST_BLOCK);
-        }
-
 
         String errorMsg = "系统异常";
         if (jedisExceptionClassType.isInstance(throwable) || redisSystemExceptionClassType.isInstance(throwable)) {
@@ -248,5 +264,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(ApiResponse.fail(errorCode));
     }
 
+    private void metricException(boolean isBusinessException, Throwable throwable) {
+        if (isBusinessException && !coreProperties.isMetricBusinessException())
+            return;
+        if (!isBusinessException && !coreProperties.isMetricSystemException())
+            return;
+        List<Tag> tags = new ArrayList();
+//        tags.add(Tag.of("app_name", Systems.APP_NAME));
+//        tags.add(Tag.of("app_instance", Systems.APP_INSTANCE));
+//        tags.add(Tag.of("host_name", Systems.HOST_NAME));
+        if (throwable instanceof ErrorCode) {
+            tags.add(Tag.of("error_code", "" + ((ErrorCode) throwable).getErrorCode()));
+        }
+        tags.add(Tag.of("error_type", throwable.getClass().toString()));
+        tags.add(Tag.of("error_msg", throwable.getMessage()));
+        this.registry.counter(isBusinessException ? "grus_business_exception" : "grus_system_exception", tags).increment();
+    }
 
 }
