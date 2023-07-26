@@ -7,8 +7,6 @@ package com.ciicgat.sdk.redis;
 
 import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.redis.config.RedisSetting;
-import com.ciicgat.sdk.redis.config.SpringRedisConfCreator;
-import com.ciicgat.sdk.redis.config.SpringRedisConfCreatorTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnectionFactory;

@@ -3,9 +3,10 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.redis.config;
+package com.ciicgat.sdk.redis;
 
 import com.ciicgat.grus.alert.Alert;
+import com.ciicgat.sdk.redis.config.RedisSetting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConfiguration;

@@ -3,12 +3,13 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.redis.config;
+package com.ciicgat.sdk.redis;
 
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
+import com.ciicgat.sdk.redis.config.RedisSetting;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;

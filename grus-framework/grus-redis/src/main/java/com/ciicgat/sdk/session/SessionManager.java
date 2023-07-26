@@ -11,7 +11,7 @@ import com.ciicgat.sdk.lang.tool.Bytes;
 import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
 import com.ciicgat.sdk.lang.url.UrlCoder;
 import com.ciicgat.sdk.redis.config.RedisSetting;
-import com.ciicgat.sdk.redis.config.SpringRedisConfCreator;
+import com.ciicgat.sdk.redis.SpringRedisConfCreator;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;

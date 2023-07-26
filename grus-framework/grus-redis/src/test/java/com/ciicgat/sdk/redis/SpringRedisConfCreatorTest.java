@@ -3,12 +3,13 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.redis.config;
+package com.ciicgat.sdk.redis;
 
 import com.ciicgat.sdk.gconf.ConfigCollection;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
 import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.lang.tool.Bytes;
+import com.ciicgat.sdk.redis.config.RedisSetting;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

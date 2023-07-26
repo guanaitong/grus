@@ -10,7 +10,7 @@ import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
 import com.ciicgat.sdk.redis.RedisExecutor;
 import com.ciicgat.sdk.redis.RedisService;
 import com.ciicgat.sdk.redis.config.RedisSetting;
-import com.ciicgat.sdk.redis.config.SpringRedisConfCreator;
+import com.ciicgat.sdk.redis.SpringRedisConfCreator;
 import io.lettuce.core.RedisClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;

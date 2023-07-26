@@ -8,7 +8,7 @@ package com.ciicgat.sdk.springcache;
 import com.ciicgat.sdk.lang.tool.Bytes;
 import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
 import com.ciicgat.sdk.redis.config.RedisSetting;
-import com.ciicgat.sdk.redis.config.SpringRedisConfCreator;
+import com.ciicgat.sdk.redis.SpringRedisConfCreator;
 import com.ciicgat.sdk.util.system.Systems;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
