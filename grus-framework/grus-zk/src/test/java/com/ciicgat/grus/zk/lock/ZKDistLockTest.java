@@ -66,7 +66,7 @@ public class ZKDistLockTest {
     @Test
     public void testLock() throws Exception {
         CuratorFramework curator = ZKUtils.init(TestZkConfig.ZK);
-        ZKDistLockFactory factory = new ZKDistLockFactory(curator, "payment");
+        ZKDistLockFactory factory = new ZKDistLockFactory(curator, "payment" + Runtime.version().feature());
         DistLock distLock = factory.buildLock("for-test");
 
         for (int i = 0; i < threadNums; i++) {
