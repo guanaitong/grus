@@ -5,9 +5,15 @@
 
 package com.ciicgat.sdk.redis;
 
-import com.ciicgat.sdk.gconf.ConfigCollection;
-import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
+import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.sdk.redis.config.RedisSetting;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
+import io.opentelemetry.context.propagation.ContextPropagators;
+import io.opentelemetry.context.propagation.TextMapPropagator;
+import io.opentelemetry.extension.trace.propagation.JaegerPropagator;
+import io.opentelemetry.sdk.OpenTelemetrySdk;
+import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;
@@ -34,16 +40,33 @@ public class RedisBenchmarksTest {
     private static RedisExecutor redisExecutor;
 
     static {
-        ConfigCollection configCollection = RemoteConfigCollectionFactoryBuilder.getInstance().getConfigCollection("for-test-java");
-        RedisSetting redisSetting = configCollection.getBean("redis-config.json", RedisSetting.class);
+        SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder().build();
+        TextMapPropagator textMapPropagator = TextMapPropagator.composite(W3CTraceContextPropagator.getInstance(), JaegerPropagator.getInstance());
+
+        OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(sdkTracerProvider::close));
+        GlobalOpenTelemetry.resetForTest();
+        OpenTelemetrys.set(sdk);
+        RedisSetting redisSetting = new RedisSetting();
+        redisSetting.setDb(0);
+        redisSetting.setType(0);
+        RedisSetting.StandaloneConfig standaloneConfig = new RedisSetting.StandaloneConfig();
+        standaloneConfig.setHost("10.101.11.46");
+        standaloneConfig.setPort(6379);
+        redisSetting.setStandalone(standaloneConfig);
         redisExecutor = redisSetting.newRedisExecutor();
+        String key = String.valueOf(1);
+        final String value = Math.random() + "";
+        redisExecutor.execute(jedis -> jedis.set(key, value));
     }
+
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
                 .include(RedisBenchmarksTest.class.getSimpleName())
                 .forks(1)
-                .warmupIterations(30)
+                .warmupIterations(100)
                 .warmupTime(TimeValue.milliseconds(1))
                 .measurementTime(TimeValue.milliseconds(1))
                 .measurementIterations(500)

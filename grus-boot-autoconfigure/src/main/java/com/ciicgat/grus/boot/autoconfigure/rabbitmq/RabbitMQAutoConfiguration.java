@@ -72,7 +72,7 @@ public class RabbitMQAutoConfiguration {
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(name = "grus.rabbitmq.consumer.enable", havingValue = "true")
     @ConditionalOnWorkEnv({WorkEnv.DEVELOP, WorkEnv.TEST, WorkEnv.PRODUCT})
-    public class ConsumerConfiguration {
+    public static class ConsumerConfiguration {
         public ConsumerConfiguration() {
             LOGGER.info("rabbitMqConsumer enabled");
         }
@@ -99,7 +99,7 @@ public class RabbitMQAutoConfiguration {
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(name = "grus.rabbitmq.producer.enable", havingValue = "true")
     @AutoConfigureAfter({ConsumerConfiguration.class})
-    public class ProducerConfiguration {
+    public static class ProducerConfiguration {
         public ProducerConfiguration() {
             LOGGER.info("rabbitMqProducer enabled");
         }

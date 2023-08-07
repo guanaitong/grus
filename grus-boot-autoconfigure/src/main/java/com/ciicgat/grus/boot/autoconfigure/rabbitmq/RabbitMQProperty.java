@@ -29,16 +29,7 @@ public class RabbitMQProperty {
      * 地址，支持集群。格式：192.168.1.1:5672,192.168.1.2:5672
      */
     private String address;
-    /**
-     * 过期。优先使用address
-     */
-    @Deprecated
-    private String host;
-    /**
-     * 过期。优先使用address
-     */
-    @Deprecated
-    private int port = 5672;
+
     /**
      * 用户，为空时使用全局配置
      */
@@ -73,15 +64,21 @@ public class RabbitMQProperty {
 
     @PostConstruct
     private void init() {
-        if (!StringUtils.hasLength(address) && !StringUtils.hasLength(host)) {
-            address = "mq." + WorkRegion.getCurrentWorkRegion().getServerDomainSuffix() + ":5672";
-        } else if (StringUtils.hasLength(host)) {
-            address = host + ":" + port;
-        }
+        Properties properties = GlobalGconfConfig.getConfig().getProperties("rabbitmq.properties");
         if (!StringUtils.hasLength(user)) {
-            Properties properties = GlobalGconfConfig.getConfig().getProperties("rabbitmq.properties");
             user = properties.getProperty("mq.default.username");
+        }
+        if (!StringUtils.hasLength(pwd)) {
             pwd = properties.getProperty("mq.default.pwd");
+        }
+        if (!StringUtils.hasLength(address)) {
+            if (properties.containsKey("mq.cluster.address")) {
+                address = properties.getProperty("mq.cluster.address");
+            } else if (properties.containsKey("mq.ha.address")) {
+                address = properties.getProperty("mq.ha.address");
+            } else {
+                address = "mq." + WorkRegion.getCurrentWorkRegion().getServerDomainSuffix() + ":5672";
+            }
         }
         if (Systems.IN_K8S && !WorkRegion.getCurrentWorkRegion().isProduct()) {
             useSingleConnection = true;
@@ -111,22 +108,6 @@ public class RabbitMQProperty {
 
     public void setUseSingleConnection(boolean useSingleConnection) {
         this.useSingleConnection = useSingleConnection;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
     }
 
     public String getUser() {
