@@ -46,7 +46,7 @@ public class RabbitMQProperty {
     /**
      * 生产者和消费者是否共用同一个连接
      */
-    private boolean useSingleConnection = true;
+    private boolean useSingleConnection = false;
     /**
      * 生产者配置
      */
@@ -80,7 +80,7 @@ public class RabbitMQProperty {
                 address = "mq." + WorkRegion.getCurrentWorkRegion().getServerDomainSuffix() + ":5672";
             }
         }
-        if (Systems.IN_K8S && !WorkRegion.getCurrentWorkRegion().isProduct()) {
+        if (WorkRegion.getCurrentWorkRegion().isDevelopOrTest()) {
             useSingleConnection = true;
         }
     }
