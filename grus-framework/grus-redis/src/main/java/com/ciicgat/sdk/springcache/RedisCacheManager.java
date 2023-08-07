@@ -10,6 +10,7 @@ import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
 import com.ciicgat.sdk.redis.config.RedisSetting;
 import com.ciicgat.sdk.redis.SpringRedisConfCreator;
 import com.ciicgat.sdk.util.system.Systems;
+import io.lettuce.core.ClientOptions;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.MeterBinder;
@@ -53,7 +54,7 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
             redisSetting = SpringRedisConfCreator.getDefaultRedisSetting();
         }
         Objects.requireNonNull(redisCacheConfig);
-        this.redisConnectionFactory = SpringRedisConfCreator.newRedisConnectionFactory(redisSetting, true);
+        this.redisConnectionFactory = SpringRedisConfCreator.newRedisConnectionFactory(redisSetting, true, ClientOptions.DisconnectedBehavior.REJECT_COMMANDS);
         this.id = new SessionIdGenerator().generateSessionId(8);
     }
 

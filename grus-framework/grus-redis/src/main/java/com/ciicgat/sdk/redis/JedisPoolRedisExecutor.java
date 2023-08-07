@@ -18,43 +18,51 @@ import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.util.Pool;
+
 
 /**
- * Created by August.Zhou on 2023/5/5 13:40
+ * Created by August.Zhou on 2019-04-25 17:43.
  */
-class ClusterRedisExecutorImpl implements RedisExecutor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClusterRedisExecutorImpl.class);
-
+class JedisPoolRedisExecutor implements RedisExecutor {
+    private static final Logger LOGGER = LoggerFactory.getLogger(JedisPoolRedisExecutor.class);
     private final RedisSetting redisSetting;
-    private final JedisCluster jedisCluster;
+    private final Pool<Jedis> pool;
 
-    ClusterRedisExecutorImpl(RedisSetting redisSetting, JedisCluster jedisCluster) {
+    private final String instance;
+
+    JedisPoolRedisExecutor(RedisSetting redisSetting, Pool<Jedis> pool) {
         this.redisSetting = redisSetting;
-        this.jedisCluster = jedisCluster;
+        this.pool = pool;
+        this.instance = redisSetting.instanceName();
     }
 
     @Override
-    public <T> T execute(RedisAction<T> redisAction) {
+    public final <T> T execute(RedisAction<T> redisAction) {
         Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder("executeRedisCMD").setSpanKind(SpanKind.CLIENT).setParent(Context.current()).startSpan();
+        Jedis jedis = pool.getResource();
         try (Scope scope = span.makeCurrent()) {
             OpenTelemetrys.configSystemTags(span);
             span.setAttribute("component", "redis");
             span.setAttribute("db.type", "redis");
-            return redisAction.apply(jedisCluster);
+            span.setAttribute("db.instance", instance);
+            return redisAction.apply(jedis);
         } catch (Throwable e) {
             Alert.send("redis error:" + redisSetting.toString(), e);
             LOGGER.error("redis error:" + redisSetting, e);
             throw e;
         } finally {
+            CloseUtils.close(jedis);
             span.end();
             SlowLogger.logEvent(Module.REDIS, span, redisAction.toString());
         }
     }
 
+
     @Override
     public void close() throws Exception {
-        CloseUtils.close(jedisCluster);
+        CloseUtils.close(pool);
     }
 }

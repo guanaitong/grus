@@ -10,10 +10,11 @@ import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.lang.tool.Bytes;
 import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
 import com.ciicgat.sdk.lang.url.UrlCoder;
-import com.ciicgat.sdk.redis.config.RedisSetting;
 import com.ciicgat.sdk.redis.SpringRedisConfCreator;
+import com.ciicgat.sdk.redis.config.RedisSetting;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import com.google.common.annotations.VisibleForTesting;
+import io.lettuce.core.ClientOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -53,7 +54,7 @@ public class SessionManager {
             synchronized (SessionManager.class) {
                 if (redisConnectionFactory == null) {
                     RedisSetting redisSetting = GlobalGconfConfig.getConfig().getBean("session-redis-config.json", RedisSetting.class);
-                    redisConnectionFactory = SpringRedisConfCreator.newRedisConnectionFactory(redisSetting, true);
+                    redisConnectionFactory = SpringRedisConfCreator.newRedisConnectionFactory(redisSetting, true, ClientOptions.DisconnectedBehavior.REJECT_COMMANDS);
                 }
             }
         }

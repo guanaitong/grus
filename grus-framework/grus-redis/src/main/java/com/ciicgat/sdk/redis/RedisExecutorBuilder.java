@@ -41,9 +41,9 @@ public class RedisExecutorBuilder {
 
     public RedisExecutor newRedisExecutor() {
         if (setting.getType() == RedisSetting.TYPE_CLUSTER) {
-            return new ClusterRedisExecutorImpl(this.setting, newJedisCluster());
+            return new JedisClusterRedisExecutor(this.setting, newJedisCluster());
         }
-        return new RedisExecutorImpl(this.setting, newPool());
+        return new JedisPoolRedisExecutor(this.setting, newPool());
     }
 
     public JedisCluster newJedisCluster() {

@@ -16,14 +16,16 @@ import redis.clients.jedis.commands.JedisCommands;
 /**
  * Created by August.Zhou on 2023/7/21 15:07
  */
-public class RedisTimeoutTest {
+public class RedisAvailabilityTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(SpringRedisConfCreatorTest.class);
 
     public static void main(String[] args) {
-        test2();
+//        testJedisTimeoutWhenRedisDown();
+        testLettuceTimeoutWhenRedisDown();
     }
 
-    private static void test1() {
+    // 测试jedis故障恢复
+    private static void testJedisRecovery() {
         RedisSetting redisSetting = new RedisSetting();
         redisSetting.setDb(0);
         redisSetting.setType(0);
@@ -62,7 +64,7 @@ public class RedisTimeoutTest {
         LOGGER.info("end");
     }
 
-    private static void test2() {
+    private static void testLettuceRecovery() {
         RedisSetting redisSetting = new RedisSetting();
         redisSetting.setDb(0);
         redisSetting.setType(0);
@@ -99,5 +101,80 @@ public class RedisTimeoutTest {
             LOGGER.error("", e);
         }
         LOGGER.info("end2");
+    }
+
+    // 结果：如果redis宕机，那么执行redis api操作的耗时为设置的连接超时时间connectTimeout
+    private static void testJedisTimeoutWhenRedisDown() {
+        RedisSetting redisSetting = new RedisSetting();
+        redisSetting.setDb(0);
+        redisSetting.setType(0);
+
+        RedisSetting.StandaloneConfig standaloneConfig = new RedisSetting.StandaloneConfig();
+        standaloneConfig.setHost("10.101.11.46");
+        standaloneConfig.setPort(6379);
+        redisSetting.setStandalone(standaloneConfig);
+        RedisExecutor redisExecutor = redisSetting.newRedisExecutor();
+        redisExecutor.execute(new RedisAction<Object>() {
+            @Override
+            public Object apply(JedisCommands jedis) {
+                jedis.set("123", "xxx");
+                System.out.println(jedis.get("123"));
+                return null;
+            }
+        });
+
+        Threads.sleepSeconds(10);
+        LOGGER.info("start");
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 100; i++) {
+            try {
+                final int j = i;
+                redisExecutor.execute(new RedisAction<Object>() {
+                    @Override
+                    public Object apply(JedisCommands jedis) {
+                        return jedis.get("123");
+                    }
+                });
+            } catch (Exception e) {
+
+            }
+        }
+        long end = System.currentTimeMillis();
+        LOGGER.info(String.valueOf((end - start) / 100.0));
+        LOGGER.info("end");
+
+    }
+
+    // 结果：如果redis宕机，那么执行redis api操作的耗时依赖于ClientOptions.DisconnectedBehavior的设置
+    // 如果为Default，那么为所设置的commandTimeout时间
+    // 如果为REJECT_COMMANDS，那么基本不消耗时间，0.2毫秒，即内存里的计算时间。
+    private static void testLettuceTimeoutWhenRedisDown() {
+        RedisSetting redisSetting = new RedisSetting();
+        redisSetting.setDb(0);
+        redisSetting.setType(0);
+
+        RedisSetting.StandaloneConfig standaloneConfig = new RedisSetting.StandaloneConfig();
+        standaloneConfig.setHost("10.101.11.46");
+        standaloneConfig.setPort(6379);
+        redisSetting.setStandalone(standaloneConfig);
+
+        RedisConnectionFactory redisConnectionFactory = SpringRedisConfCreator.newRedisConnectionFactory(redisSetting, true);
+        StringRedisTemplate stringRedisTemplate = new StringRedisTemplate(redisConnectionFactory);
+
+        stringRedisTemplate.opsForValue().set("123", "xxxx");
+
+        Threads.sleepSeconds(10);
+        LOGGER.info("start");
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 100; i++) {
+            try {
+                stringRedisTemplate.opsForValue().get("123");
+            } catch (Exception e) {
+
+            }
+        }
+        long end = System.currentTimeMillis();
+        LOGGER.info(String.valueOf((end - start) / 100.0));
+        LOGGER.info("end");
     }
 }

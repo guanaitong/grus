@@ -53,6 +53,10 @@ public class SpringRedisConfCreator {
         return newRedisConnectionFactory(redisSetting, false);
     }
 
+    public static RedisConnectionFactory newRedisConnectionFactory(RedisSetting redisSetting, boolean init) {
+        return newRedisConnectionFactory(redisSetting, init, ClientOptions.DisconnectedBehavior.DEFAULT);
+    }
+
     /**
      * 如果其交给Spring管理，那么因为lettuceConnectionFactory继承了InitializingBean，
      * 无须大家手动调用afterPropertiesSet()方法,容器会自动调用，即init为false。<br/>
@@ -60,12 +64,13 @@ public class SpringRedisConfCreator {
      *
      * @param redisSetting gconf 上 Redis 配置对象
      * @param init         是否不交给 spring 管理
+     * @param disconnectedBehavior      如果设置REJECT_COMMANDS，那么当连接断开时，如果来了新的命令，那会拒绝。符合failfast要求。如果设置default会出现默认500ms的commandtimeout
      * @return RedisConnectionFactory
      */
-    public static RedisConnectionFactory newRedisConnectionFactory(RedisSetting redisSetting, boolean init) {
+    public static RedisConnectionFactory newRedisConnectionFactory(RedisSetting redisSetting, boolean init, ClientOptions.DisconnectedBehavior disconnectedBehavior) {
         RedisConfiguration redisConfiguration = newRedisConfiguration(redisSetting);
         ClientOptions clientOptions = ClientOptions.builder().timeoutOptions(TimeoutOptions.enabled())
-                .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS) //当连接断开时，如果来了新的命令，那会拒绝。符合failfast要求。如果设置default会出现默认500ms的commandtimeout
+                .disconnectedBehavior(disconnectedBehavior)
                 .autoReconnect(true) //lettuce会启动后台线程，检测连接状态以及尝试重连接
                 .socketOptions(SocketOptions.builder().keepAlive(true).connectTimeout(Duration.ofMillis(redisSetting.getConnectTimeoutMillis())).build())
                 .build();
