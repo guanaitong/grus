@@ -9,7 +9,6 @@ import com.ciicgat.grus.rabbitmq.Exchange;
 import com.ciicgat.grus.rabbitmq.Queue;
 import com.ciicgat.grus.rabbitmq.QueueBind;
 import com.ciicgat.sdk.gconf.GlobalGconfConfig;
-import com.ciicgat.sdk.util.system.Systems;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
