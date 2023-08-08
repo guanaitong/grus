@@ -112,10 +112,14 @@ public class L2Cache extends RedisCache<CacheConfig.L2> implements ILocalCache {
     @Override
     public void clearLocal(Object key) {
         if (key == null) {
-            LOGGER.info("invalidateAll cache {}", name);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("invalidateAll cache {}", name);
+            }
             localCache.invalidateAll();
         } else {
-            LOGGER.info("invalidateKey cache {},key {}", name, key);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("invalidateKey cache {},key {}", name, key);
+            }
             localCache.invalidate(key);
         }
     }
