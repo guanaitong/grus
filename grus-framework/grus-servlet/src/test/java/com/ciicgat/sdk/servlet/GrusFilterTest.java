@@ -30,6 +30,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * Created by August.Zhou on 2021/9/24 16:48.
  */
@@ -51,7 +53,8 @@ public class GrusFilterTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
-        this.mockMvc = MockMvcBuilders.standaloneSetup(new TestController()).addFilters(new GrusFilter()).build();
+        this.mockMvc =
+                MockMvcBuilders.standaloneSetup(new TestController()).addFilters(new GrusFilter(true)).build();
     }
 
     @Test
@@ -109,5 +112,26 @@ public class GrusFilterTest {
         MockHttpServletResponse httpResp = mockMvc.perform(post).andReturn().getResponse();
         Assertions.assertEquals(HttpStatus.OK.value(), httpResp.getStatus());
         Assertions.assertTrue(!httpResp.getHeader("x-trace-id").isEmpty());
+    }
+
+    @Test
+    public void testHignConcurrency() throws Exception {
+        int threadNum = 70;
+        CountDownLatch latch = new CountDownLatch(threadNum);
+        for (int i = 0; i < threadNum; i++) {
+            new Thread(() -> {
+                try {
+                    MockHttpServletRequestBuilder post =
+                            MockMvcRequestBuilders.post("/testConcurrency").contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON);
+                    MockHttpServletResponse httpResp = mockMvc.perform(post).andReturn().getResponse();
+                    Assertions.assertEquals(HttpStatus.OK.value(), httpResp.getStatus());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    latch.countDown();
+                }
+            }).start();
+        }
+        latch.await();
     }
 }

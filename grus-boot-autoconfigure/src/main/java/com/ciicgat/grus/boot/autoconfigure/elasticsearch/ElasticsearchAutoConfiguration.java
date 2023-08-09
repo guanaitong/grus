@@ -41,7 +41,8 @@ public class ElasticsearchAutoConfiguration {
             Assert.state(s.length == 2, "Must be defined as 'host:port'");
             httpHosts.add(new HttpHost(s[0], Integer.parseInt(s[1])));
         }
-        RestHighLevelClient client = new RestHighLevelClient(RestClients.builder(httpHosts.toArray(new HttpHost[0])));
+        RestHighLevelClient client =
+                new RestHighLevelClient(RestClients.builder(httpHosts.toArray(new HttpHost[0])));
 
         int nodeSize = client.getLowLevelClient().getNodes().size();
         LOGGER.info("nodeSize {}", nodeSize);

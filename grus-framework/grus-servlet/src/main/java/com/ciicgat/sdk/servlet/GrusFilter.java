@@ -15,6 +15,10 @@ import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.GrusServiceHttpHeader;
 import com.ciicgat.grus.service.GrusServiceStatus;
 import com.ciicgat.sdk.util.system.Systems;
+import io.micrometer.core.instrument.FunctionCounter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.binder.BaseUnits;
+import io.micrometer.core.instrument.binder.MeterBinder;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
@@ -36,24 +40,34 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 
 
 /**
  * Created by August.Zhou on 2019-06-19 13:51.
  */
-public class GrusFilter implements Filter {
+public class GrusFilter implements Filter, MeterBinder {
     private static final Logger LOGGER = LoggerFactory.getLogger(GrusFilter.class);
     private static final String SERVER_SPAN_CONTEXT = GrusFilter.class.getName() + ".activeSpanContext";
     private static final Object TAG_VALUE = new Object();
     private final AtomicInteger concurrency = new AtomicInteger();
+
+    private final LongAdder highConcurrencyEvents = new LongAdder();
+
     private final boolean disableOldSslProtocol;
 
-    public GrusFilter() {
-        this(true);
-    }
 
     public GrusFilter(boolean disableOldSslProtocol) {
         this.disableOldSslProtocol = disableOldSslProtocol;
+    }
+
+    @Override
+    public void bindTo(MeterRegistry registry) {
+        FunctionCounter.builder("grus.web.high.concurrency.event", this, GrusFilter::getHighConcurrencyEvents).baseUnit(BaseUnits.EVENTS).register(registry);
+    }
+
+    public long getHighConcurrencyEvents() {
+        return highConcurrencyEvents.longValue();
     }
 
     @Override
@@ -75,7 +89,6 @@ public class GrusFilter implements Filter {
             return "";
         }
     };
-
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -124,8 +137,8 @@ public class GrusFilter implements Filter {
             String logMsg = "服务并发有点高,并发数:" + con;
             LOGGER.warn(logMsg);
             Alert.send(logMsg);
+            highConcurrencyEvents.increment();
         }
-
 
         GrusServiceStatus grusServiceStatus = null;
         String reqAppName = request.getHeader(GrusServiceHttpHeader.REQ_APP_NAME);
@@ -136,7 +149,8 @@ public class GrusFilter implements Filter {
 
         Tracer tracer = OpenTelemetrys.getTracer();
         Context context = OpenTelemetrys.getTextMapPropagator().extract(Context.current(), request, getter);
-        Span span = tracer.spanBuilder(request.getMethod() + " " + uri).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
+        Span span =
+                tracer.spanBuilder(request.getMethod() + " " + uri).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
 
 
         request.setAttribute(SERVER_SPAN_CONTEXT, TAG_VALUE);
@@ -183,4 +197,5 @@ public class GrusFilter implements Filter {
     private static boolean isExclude(String uri) {
         return uri.contains("isLive") || uri.endsWith(".css") || uri.endsWith(".js") || uri.endsWith(".ico") || uri.endsWith(".png") || uri.endsWith(".jpg");
     }
+
 }

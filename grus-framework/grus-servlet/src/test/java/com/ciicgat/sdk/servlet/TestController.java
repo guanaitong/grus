@@ -72,4 +72,15 @@ public class TestController {
         LOGGER.info("Test headers is:{}", Span.current());
         return ApiResponse.success("I am OK ...");
     }
+
+    @RequestMapping(path = "/testConcurrency")
+    public ApiResponse<String> testConcurrency() {
+        //mock method execute time
+        try {
+            Thread.currentThread().sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return ApiResponse.success("I am OK ...");
+    }
 }
