@@ -66,9 +66,7 @@ public class RedisSettingTest {
         redisSetting.setType(RedisSetting.TYPE_CLUSTER);
 
         RedisSetting.ClusterConfig clusterConfig = new RedisSetting.ClusterConfig();
-//        clusterConfig.setNodes("10.101.11.59:9001,10.101.11.59:9002,10.101.11.59:9003,10.101.11.59:9004,10.101.11.59:9005,10.101.11.59:9006");
-//        clusterConfig.setNodes("0.100.32.143:7000,10.100.32.143:7001,10.101.11.46:7000,10.101.11.46:7001,10.101.9.171:7000,10.101.9.171:7001");
-        clusterConfig.setNodes("10.101.11.59:9001,10.101.11.59:9002,10.101.11.187:9003,10.101.11.187:9004,10.101.11.58:9005,10.101.11.58:9006");
+        clusterConfig.setNodes("10.101.11.59:9001,10.101.11.158:9001,10.101.11.187:9001,10.101.11.158:9002,10.101.11.187:9002,10.101.11.59:9002");
 
         redisSetting.setCluster(clusterConfig);
 
