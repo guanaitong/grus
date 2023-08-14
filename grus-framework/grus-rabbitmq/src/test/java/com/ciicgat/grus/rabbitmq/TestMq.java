@@ -56,7 +56,7 @@ public class TestMq {
     private static Queue newTestQueue(String randomText) {
         Queue queue = new Queue();
         queue.setName(randomText);
-        queue.setArgs(Map.of("x-expires",3600000,"x-queue-type","quorum"));
+        queue.setArgs(Map.of("x-expires", 3600000, "x-queue-type", "quorum"));
         return queue;
     }
 
