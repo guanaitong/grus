@@ -267,15 +267,21 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
     public void compareThenRefresh(String key, Cache.ValueWrapper oldValueWrapper, Callable<Object> valueLoader) {
         redisCacheManager.getRefreshExecutor().execute(() -> {
             try {
-                LOGGER.info("start refresh,cache {},key {}", this.name, key);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("start refresh,cache {},key {}", this.name, key);
+                }
                 Object newValue = valueLoader.call();
                 Object oldValue = oldValueWrapper.get();
                 if (refreshPolicy.isUseEqualFunction() ? Objects.equals(newValue, oldValue) : JSON.equals(newValue, oldValue)) {
-                    LOGGER.info("no changed,cache {},key {}", this.name, key);
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.debug("no changed,cache {},key {}", this.name, key);
+                    }
                     return;
                 }
                 putNewValue(key, newValue);
-                LOGGER.info("refresh success,cache {},key {}", this.name, key);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("refresh success,cache {},key {}", this.name, key);
+                }
             } catch (Exception e) {
                 LOGGER.warn("refresh failed,cache {},key {}", this.name, key, e);
             }
