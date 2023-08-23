@@ -25,6 +25,6 @@ public @interface MessageListener {
      *
      * @return
      */
-    String value();
+    String[] value();
 
 }

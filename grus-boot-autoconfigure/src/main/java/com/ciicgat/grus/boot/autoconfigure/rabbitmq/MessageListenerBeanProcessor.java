@@ -29,7 +29,10 @@ public class MessageListenerBeanProcessor implements BeanPostProcessor {
         if (!(bean instanceof MsgProcessor)) {
             throw new RuntimeException("bean class " + bean.getClass().getName() + " should implements com.ciicgat.sdk.mq.MsgProcessor");
         }
-        rabbitMqConsumer.consume(messageListener.value(), (MsgProcessor) bean);
+        String[] queues = messageListener.value();
+        for (String queue : queues) {
+            rabbitMqConsumer.consume(queue, (MsgProcessor) bean);
+        }
         return bean;
     }
 
