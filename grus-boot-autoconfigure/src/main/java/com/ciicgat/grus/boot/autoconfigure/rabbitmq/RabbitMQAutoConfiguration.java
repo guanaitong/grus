@@ -18,6 +18,7 @@ import com.ciicgat.sdk.util.system.WorkEnv;
 import com.rabbitmq.client.Connection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -85,13 +86,13 @@ public class RabbitMQAutoConfiguration {
 
         @Bean(destroyMethod = "close")
         @ConditionalOnMissingBean(name = "rabbitMqConsumer")
-        public RabbitMqConsumer rabbitMqConsumer(RabbitMQProperty rabbitMQProperty, Connection consumerConnection) {
+        public RabbitMqConsumer rabbitMqConsumer(RabbitMQProperty rabbitMQProperty, @Qualifier("consumerConnection") Connection consumerConnection) {
             return new RabbitMqConsumer(consumerConnection, rabbitMQProperty.getConsumer().getParallel(), rabbitMQProperty.getConsumer().getPrefetch(), rabbitMQProperty.getConsumer().getMaxRetry(), rabbitMQProperty.getConsumer().isFallBack());
         }
 
         @Bean
         @ConditionalOnMissingBean
-        public MessageListenerBeanProcessor messageQueueListenerJobBeanProcessor(RabbitMqConsumer rabbitMqConsumer) {
+        public MessageListenerBeanProcessor messageQueueListenerJobBeanProcessor(@Qualifier("rabbitMqConsumer") RabbitMqConsumer rabbitMqConsumer) {
             return new MessageListenerBeanProcessor(rabbitMqConsumer);
         }
     }
@@ -112,7 +113,7 @@ public class RabbitMQAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean(name = "rabbitMqProducer")
-        public RabbitMqProducer rabbitMqProducer(RabbitMQProperty rabbitMQProperty, Connection producerConnection) {
+        public RabbitMqProducer rabbitMqProducer(RabbitMQProperty rabbitMQProperty, @Qualifier("producerConnection") Connection producerConnection) {
             return new RabbitMqProducer(producerConnection, rabbitMQProperty.getProducer().getParallel(), rabbitMQProperty.getProducer().isConfirm(), rabbitMQProperty.getProducer().isCreateMessageId(), rabbitMQProperty.getProducer().isCreateTimestamp());
         }
     }
