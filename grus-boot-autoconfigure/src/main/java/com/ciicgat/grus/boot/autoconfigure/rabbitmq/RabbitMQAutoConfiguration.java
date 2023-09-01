@@ -105,13 +105,13 @@ public class RabbitMQAutoConfiguration {
         }
 
         @Bean
-        @ConditionalOnMissingBean
+        @ConditionalOnMissingBean(name = "producerConnection")
         public Connection producerConnection(RabbitMQProperty rabbitMQProperty) {
             return newConnection(rabbitMQProperty);
         }
 
         @Bean
-        @ConditionalOnMissingBean
+        @ConditionalOnMissingBean(name = "rabbitMqProducer")
         public RabbitMqProducer rabbitMqProducer(RabbitMQProperty rabbitMQProperty, Connection producerConnection) {
             return new RabbitMqProducer(producerConnection, rabbitMQProperty.getProducer().getParallel(), rabbitMQProperty.getProducer().isConfirm(), rabbitMQProperty.getProducer().isCreateMessageId(), rabbitMQProperty.getProducer().isCreateTimestamp());
         }
