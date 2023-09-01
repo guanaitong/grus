@@ -78,13 +78,13 @@ public class RabbitMQAutoConfiguration {
         }
 
         @Bean
-        @ConditionalOnMissingBean
+        @ConditionalOnMissingBean(name = "consumerConnection")
         public Connection consumerConnection(RabbitMQProperty rabbitMQProperty) {
             return newConnection(rabbitMQProperty);
         }
 
         @Bean(destroyMethod = "close")
-        @ConditionalOnMissingBean
+        @ConditionalOnMissingBean(name = "rabbitMqConsumer")
         public RabbitMqConsumer rabbitMqConsumer(RabbitMQProperty rabbitMQProperty, Connection consumerConnection) {
             return new RabbitMqConsumer(consumerConnection, rabbitMQProperty.getConsumer().getParallel(), rabbitMQProperty.getConsumer().getPrefetch(), rabbitMQProperty.getConsumer().getMaxRetry(), rabbitMQProperty.getConsumer().isFallBack());
         }
