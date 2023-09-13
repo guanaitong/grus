@@ -62,7 +62,7 @@ public class RedisSettingTest {
         RedisSetting redisSetting = new RedisSetting();
 //        redisSetting.setPassword("vEh0jbiGwM");
 //        redisSetting.setPassword("Lucky2021");
-        redisSetting.setPassword("gat@1234");
+        redisSetting.setPassword("Gat@1234");
         redisSetting.setType(RedisSetting.TYPE_CLUSTER);
 
         RedisSetting.ClusterConfig clusterConfig = new RedisSetting.ClusterConfig();
