@@ -57,14 +57,14 @@ public @interface Document {
     String settingPath() default "";
 
     /**
-     * 分片数
+     * 分片数，只有产线生效。其他环境固定为1
      *
      * @return
      */
     short shards() default 3;
 
     /**
-     * 副本数
+     * 副本数，只有产线生效。其他环境固定为1
      *
      * @return
      */

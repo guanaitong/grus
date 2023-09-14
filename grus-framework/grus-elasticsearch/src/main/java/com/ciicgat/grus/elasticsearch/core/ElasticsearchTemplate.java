@@ -7,6 +7,7 @@ package com.ciicgat.grus.elasticsearch.core;
 
 import com.ciicgat.grus.elasticsearch.annotations.Document;
 import com.ciicgat.sdk.lang.convert.Pagination;
+import com.ciicgat.sdk.util.system.WorkRegion;
 import com.google.common.util.concurrent.RateLimiter;
 import io.micrometer.core.instrument.FunctionTimer;
 import io.micrometer.core.instrument.Gauge;
@@ -97,7 +98,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
 
     private final ConcurrentMap<String, Object> indexStateCache = new ConcurrentHashMap<>();
 
-    private final RateLimiter saveRateLimiter = RateLimiter.create(20);
+    private final RateLimiter saveRateLimiter = RateLimiter.create(50);
 
     public ElasticsearchTemplate(RestHighLevelClient restHighLevelClient, Class<T> clazz) {
         this(restHighLevelClient, clazz, new DefaultEntityMapper<>());
@@ -212,8 +213,9 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
                 }
                 //设置settings
                 if (StringUtils.isEmpty(document.settingPath())) {
+                    int shards = WorkRegion.getCurrentWorkRegion().isDevelopOrTest() ? 1 : document.shards();
                     Settings.Builder settings = Settings.builder()
-                            .put("index.number_of_shards", document.shards())
+                            .put("index.number_of_shards", shards)
                             .put("index.number_of_replicas", document.replicas());
                     if (document.max_result_window() > 0) {
                         settings.put("index.max_result_window", document.max_result_window());
@@ -517,7 +519,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
     @Override
     public void bindTo(MeterRegistry registry) {
         Gauge.builder("grus.elasticsearch.read.concurrency", this, ElasticsearchTemplate::getReadConcurrency).tags(Tags.of(
-                "index",
+                        "index",
                         index))
                 .baseUnit(BaseUnits.THREADS).register(registry);
         Gauge.builder("grus.elasticsearch.write.concurrency", this, ElasticsearchTemplate::getWriteConcurrency).tags(Tags.of("index",
