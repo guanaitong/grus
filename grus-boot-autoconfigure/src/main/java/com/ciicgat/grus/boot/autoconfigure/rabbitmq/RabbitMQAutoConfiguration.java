@@ -40,9 +40,8 @@ public class RabbitMQAutoConfiguration {
 
     public RabbitMQAutoConfiguration(RabbitMQProperty rabbitMQProperty) {
         if (rabbitMQProperty.getInit().isEnable()) {
-            LOGGER.info("start rabbitMQ init");
-            init(rabbitMQProperty);
-            LOGGER.info("end rabbitMQ init");
+            LOGGER.info("rabbitmq initialization function has been removed");
+//            init(rabbitMQProperty);
         }
     }
 
