@@ -177,6 +177,10 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 }
                 return resp;
             } catch (BusinessFeignException | BusinessRuntimeException throwable) {
+                if (methodMeta.isIgnoreError()) {
+                    LOGGER.warn("Exception has been ignored", throwable);
+                    return methodMeta.getDefaultReturnValue();
+                }
                 throw throwable;
             } catch (Throwable throwable) {
                 if (methodMeta.isIgnoreError()) {
