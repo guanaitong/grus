@@ -71,7 +71,8 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
     private final boolean logReq;
 
     private final boolean logResp;
-    private final int globalMaxConcurrency = GlobalGconfConfig.getConfig().getBean("sentinel.properties", SentinelProperties.class).getClientMaxConcurrency();
+    private final int globalMaxConcurrency = GlobalGconfConfig.getConfig().getBean("sentinel.properties",
+            SentinelProperties.class).getClientMaxConcurrency();
 
 
     GInvocationHandlerFactory(GrusServiceStatus grusServiceStatus,
@@ -138,7 +139,8 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             if ("equals".equals(method.getName())) {
                 try {
-                    Object otherHandler = args.length > 0 && args[0] != null ? Proxy.getInvocationHandler(args[0]) : null;
+                    Object otherHandler = args.length > 0 && args[0] != null ? Proxy.getInvocationHandler(args[0]) :
+                            null;
                     return equals(otherHandler);
                 } catch (IllegalArgumentException e) {
                     return Boolean.FALSE;
@@ -161,10 +163,16 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 }
                 if (methodMeta.incrementAndGet() > maxConcurrency) {
                     LOGGER.error("{} 响应过慢，超过最大并发数上限，为了保护其他接口，直接拒绝该方法后续请求！！！", method);
-                    throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, null, HTTP_STATUS_TOO_MANY_REQUESTS);
+                    if (methodMeta.isIgnoreError()) {
+                        return methodMeta.getDefaultReturnValue();
+                    } else {
+                        throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, null,
+                                HTTP_STATUS_TOO_MANY_REQUESTS);
+                    }
                 }
                 if (methodMeta.isLogReq()) {
-                    LOGGER.info("FEIGN_REQ METHOD: {} PARAM: {}", getPrintMethod(method), args == null ? "" : LogUtil.truncate(JSON.toJSONString(args)));
+                    LOGGER.info("FEIGN_REQ METHOD: {} PARAM: {}", getPrintMethod(method), args == null ? "" :
+                            LogUtil.truncate(JSON.toJSONString(args)));
                 }
                 Object resp;
                 if (methodMeta.getApiCache() != null) {
@@ -173,14 +181,11 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                     resp = invokeWithoutCache(methodMeta, args);
                 }
                 if (methodMeta.isLogResp()) {
-                    LOGGER.info("FEIGN_RSP METHOD: {} RESULT: {}", getPrintMethod(method), resp == null ? "" : LogUtil.truncate(JSON.toJSONString(resp)));
+                    LOGGER.info("FEIGN_RSP METHOD: {} RESULT: {}", getPrintMethod(method), resp == null ? "" :
+                            LogUtil.truncate(JSON.toJSONString(resp)));
                 }
                 return resp;
             } catch (BusinessFeignException | BusinessRuntimeException throwable) {
-                if (methodMeta.isIgnoreError()) {
-                    LOGGER.warn("Exception has been ignored", throwable);
-                    return methodMeta.getDefaultReturnValue();
-                }
                 throw throwable;
             } catch (Throwable throwable) {
                 if (methodMeta.isIgnoreError()) {
