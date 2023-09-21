@@ -51,7 +51,19 @@ public class ApiResponseHeaderAdvice implements ResponseBodyAdvice<Object> {
 
     private void attachHeader(ServerHttpResponse response, int errorCode, String errorMsg, String version) {
         response.getHeaders().add(HeaderConstants.ERROR_CODE_HEADER, String.valueOf(errorCode));
-        response.getHeaders().add(HeaderConstants.ERROR_MSG_HEADER, errorMsg == null ? "" : UrlCoder.encode(errorMsg));
+        //header上的文本内容有长度限制，比请求体小很多。此处限制下header的长度，避免因为header中的errorMsg过大出现报错
+        response.getHeaders().add(HeaderConstants.ERROR_MSG_HEADER, handleErrorMsg(errorMsg));
         response.getHeaders().add(HeaderConstants.API_VERSION_HEADER, version);
+    }
+
+    private static String handleErrorMsg(String errorMsg) {
+        if (errorMsg == null) {
+            return "";
+        }
+        if (errorMsg.length() > 300) {
+            return UrlCoder.encode(errorMsg.substring(0, 300) + "...");
+        } else {
+            return UrlCoder.encode(errorMsg);
+        }
     }
 }
