@@ -25,7 +25,7 @@ public class OpenTelemetryProperties {
 
     public static class Collector {
         /**
-         * zk里的命名空间。一般不用填写，默认使用应用名
+         * 是否启用collector
          */
         private boolean enable = false;
 
