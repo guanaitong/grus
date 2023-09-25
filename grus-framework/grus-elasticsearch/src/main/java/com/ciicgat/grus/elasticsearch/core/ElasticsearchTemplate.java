@@ -314,7 +314,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
             request.setPipeline(pipeline);
         }
         try {
-            saveRateLimiter.acquire();
+            acquirePermits(1);
             IndexResponse indexResponse = restHighLevelClient.index(request, options);
             int status = indexResponse.status().getStatus();
             return (status >= 200 && status < 300) ? 1 : 0;
@@ -355,7 +355,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
             bulkRequest.add(request);
         }
         try {
-            saveRateLimiter.acquire(dataList.size());
+            acquirePermits(dataList.size());
             BulkResponse bulkResponse = restHighLevelClient.bulk(bulkRequest, options);
             if (bulkResponse.status() != RestStatus.OK) {
                 return 0;
@@ -446,6 +446,15 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
         } finally {
             readConcurrency.decrementAndGet();
             time(startTimeMs, false);
+        }
+    }
+
+    private void acquirePermits(int permits) {
+        long acquireStartTime = System.currentTimeMillis();
+        saveRateLimiter.acquire(permits);
+        long acquireCostTime = System.currentTimeMillis() - acquireStartTime;
+        if (acquireCostTime > 2_000) {
+            LOGGER.warn("saveRateLimiter acquire slow, permits = {}, cost {} mills", permits, acquireCostTime);
         }
     }
 
