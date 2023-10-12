@@ -16,7 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-        properties = {"spring.application.name=grus-demo", "grus.rabbitmq.consumer.enable=true", "spring.quartz.autoStartup=false"})
+        properties = {"spring.application.name=grus-demo", "grus.rabbitmq.consumer.enable=true", "grus.rabbitmq.useSingleConnection=false", "spring.quartz.autoStartup=false"})
 public class RabbitMQConfigurationTest {
 
     @Autowired

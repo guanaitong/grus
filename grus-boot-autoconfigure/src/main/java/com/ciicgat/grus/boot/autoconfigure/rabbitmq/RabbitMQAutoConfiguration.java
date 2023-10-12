@@ -63,9 +63,6 @@ public class RabbitMQAutoConfiguration {
     }
 
     private static Connection newConnection(RabbitMQProperty rabbitMQProperty) {
-        if (rabbitMQProperty.isUseSingleConnection()) {
-            return ConnectionFactory.newConnectionFromCache(rabbitMQProperty.getAddress(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), rabbitMQProperty.getConsumer().getParallel());
-        }
         return ConnectionFactory.newConnection(rabbitMQProperty.getAddress(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), rabbitMQProperty.getConsumer().getParallel());
     }
 

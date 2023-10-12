@@ -43,10 +43,6 @@ public class RabbitMQProperty {
     private String vhost = "/";
 
     /**
-     * 生产者和消费者是否共用同一个连接
-     */
-    private boolean useSingleConnection = false;
-    /**
      * 生产者配置
      */
     private Producer producer = new Producer();
@@ -79,9 +75,6 @@ public class RabbitMQProperty {
                 address = "mq." + WorkRegion.getCurrentWorkRegion().getServerDomainSuffix() + ":5672";
             }
         }
-        if (WorkRegion.getCurrentWorkRegion().isDevelopOrTest()) {
-            useSingleConnection = true;
-        }
     }
 
 
@@ -99,14 +92,6 @@ public class RabbitMQProperty {
 
     public void setInit(Init init) {
         this.init = init;
-    }
-
-    public boolean isUseSingleConnection() {
-        return useSingleConnection;
-    }
-
-    public void setUseSingleConnection(boolean useSingleConnection) {
-        this.useSingleConnection = useSingleConnection;
     }
 
     public String getUser() {
