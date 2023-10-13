@@ -86,6 +86,9 @@ public class RabbitMqProducer {
      */
     public void publish(String exchange, String routingKey, Object value, AMQP.BasicProperties properties) {
         Objects.requireNonNull(value);
+        if (Objects.isNull(routingKey)) {
+            throw new IllegalArgumentException("routingKey must be non-null!!! If the exchangeType is fanout,you could use empty string");
+        }
         byte[] bytes;
         if (value instanceof String) {  // value是字符串时，通过utf8转换为字节数组
             bytes = ((String) value).getBytes(StandardCharsets.UTF_8);
