@@ -29,7 +29,7 @@ public class GconfBeanProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        var gConfBeanAnnotation = bean.getClass().getAnnotation(GConfBean.class);
+        GConfBean gConfBeanAnnotation = AnnotationUtils.findAnnotation(bean.getClass(), GConfBean.class);
         if (gConfBeanAnnotation == null) {
             return bean;
         }

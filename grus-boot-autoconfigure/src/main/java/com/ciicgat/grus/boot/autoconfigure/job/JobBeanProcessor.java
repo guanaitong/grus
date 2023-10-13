@@ -20,6 +20,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.Objects;
 
@@ -45,7 +46,7 @@ public class JobBeanProcessor implements BeanPostProcessor, BeanFactoryAware {
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        JobBean jobBeanAnnotation = bean.getClass().getAnnotation(JobBean.class);
+        JobBean jobBeanAnnotation = AnnotationUtils.findAnnotation(bean.getClass(), JobBean.class);
         if (jobBeanAnnotation == null) {
             return bean;
         }

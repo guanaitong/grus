@@ -9,6 +9,7 @@ import com.ciicgat.grus.rabbitmq.RabbitMqConsumer;
 import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.core.annotation.AnnotationUtils;
 
 /**
  * Created by August.Zhou on 2022/7/7 16:17
@@ -22,7 +23,7 @@ public class MessageListenerBeanProcessor implements BeanPostProcessor {
 
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        MessageListener messageListener = bean.getClass().getAnnotation(MessageListener.class);
+        MessageListener messageListener = AnnotationUtils.findAnnotation(bean.getClass(), MessageListener.class);
         if (messageListener == null) {
             return bean;
         }
