@@ -22,6 +22,11 @@ unit-test-java17:
   script:
     - mvn $MAVEN_CLI_OPTS test -Djava.version=17 -Djacoco.skip=true
 
+unit-test-java21:
+  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-21
+  stage: test
+  script:
+    - mvn $MAVEN_CLI_OPTS test -Djava.version=21 -Djacoco.skip=true
 
 maven-deploy:
   image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-11
