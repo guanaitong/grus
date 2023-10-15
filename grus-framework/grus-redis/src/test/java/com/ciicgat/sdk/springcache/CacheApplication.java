@@ -89,7 +89,7 @@ public class CacheApplication {
     public CacheManager cacheManager1(RedisSetting redisSetting, ClearAfterHttpCompletionCacheChangeListener clearAfterHttpCompletionCacheChangeListener) {
         RedisCacheConfig redisCacheConfig = new RedisCacheConfig();
         redisCacheConfig.setRedisSetting(redisSetting);
-        redisCacheConfig.setPrefix("GRUS_DEMO_1_" + RandomStringUtils.random(2));
+        redisCacheConfig.setPrefix("GRUS_DEMO_1_" + RandomStringUtils.randomAlphabetic(2));
         redisCacheConfig.setSerializer(RedisSerializer.java());
         redisCacheConfig.setCacheConfigFunc(name -> {
             switch (name) {
@@ -115,7 +115,7 @@ public class CacheApplication {
     public CacheManager cacheManager2(RedisSetting redisSetting) {
         RedisCacheConfig redisCacheConfig = new RedisCacheConfig();
         redisCacheConfig.setRedisSetting(redisSetting);
-        redisCacheConfig.setPrefix("GRUS_DEMO_2_" + RandomStringUtils.random(2));
+        redisCacheConfig.setPrefix("GRUS_DEMO_2_" + RandomStringUtils.randomAlphabetic(2));
         redisCacheConfig.setSerializer(RedisSerializer.java());
         redisCacheConfig.setUseGzip(true);
         redisCacheConfig.setCacheConfigFunc(name -> {
@@ -139,7 +139,7 @@ public class CacheApplication {
     public CacheManager cacheManager3(RedisSetting redisSetting) {
         RedisCacheConfig redisCacheConfig = new RedisCacheConfig();
         redisCacheConfig.setRedisSetting(redisSetting);
-        redisCacheConfig.setPrefix("GRUS_DEMO_3_" + RandomStringUtils.random(2));
+        redisCacheConfig.setPrefix("GRUS_DEMO_3_" + RandomStringUtils.randomAlphabetic(2));
         redisCacheConfig.setSerializer(RedisSerializer.java());
         redisCacheConfig.setUseGzip(true);
         redisCacheConfig.setCacheConfigFunc(name -> {
@@ -171,7 +171,7 @@ public class CacheApplication {
     public CacheManager cacheManager4(RedisSetting redisSetting) {
         RedisCacheConfig redisCacheConfig = new RedisCacheConfig();
         redisCacheConfig.setRedisSetting(redisSetting);
-        redisCacheConfig.setPrefix("GRUS_DEMO_4_" + RandomStringUtils.random(2));
+        redisCacheConfig.setPrefix("GRUS_DEMO_4_" + RandomStringUtils.randomAlphabetic(2));
         redisCacheConfig.setSerializer(RedisSerializer.java());
         redisCacheConfig.setUseGzip(true);
         redisCacheConfig.setCacheConfigFunc(name -> CacheConfig.redis());
