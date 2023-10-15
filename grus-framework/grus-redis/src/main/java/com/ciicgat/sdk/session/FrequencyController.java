@@ -5,8 +5,8 @@
 
 package com.ciicgat.sdk.session;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Created by August.Zhou on 2017/5/10 17:33.

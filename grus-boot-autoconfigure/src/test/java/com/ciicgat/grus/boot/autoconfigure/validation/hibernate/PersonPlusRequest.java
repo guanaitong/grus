@@ -7,7 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.validation.hibernate;
 
 import org.hibernate.validator.constraints.URL;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * @author wanchongyang

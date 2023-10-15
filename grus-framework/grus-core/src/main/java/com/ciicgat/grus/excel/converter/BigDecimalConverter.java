@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 public class BigDecimalConverter implements Converter<BigDecimal> {
     @Override
     public BigDecimal read(Cell cell) {
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case STRING:
                 String num = cell.getStringCellValue();
                 return new BigDecimal(num);

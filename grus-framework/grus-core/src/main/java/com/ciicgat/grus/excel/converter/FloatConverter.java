@@ -17,7 +17,7 @@ import org.apache.poi.ss.usermodel.CellType;
 public class FloatConverter implements Converter<Float> {
     @Override
     public Float read(Cell cell) {
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case STRING:
                 String num = cell.getStringCellValue();
                 return Float.valueOf(num);

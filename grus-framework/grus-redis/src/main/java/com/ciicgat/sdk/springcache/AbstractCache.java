@@ -11,6 +11,7 @@ import com.ciicgat.sdk.springcache.event.CacheChangeEvent;
 import com.ciicgat.sdk.springcache.event.CacheChangeListener;
 import com.ciicgat.sdk.springcache.event.CacheChangeType;
 import com.ciicgat.sdk.springcache.refresh.RefreshPolicy;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.github.benmanes.caffeine.cache.stats.ConcurrentStatsCounter;
 import org.slf4j.Logger;
@@ -163,7 +164,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
     private void evictIgnoreException(Object key) {
         String stringKey = CacheKey.key(key);
         try {
-            statsCounter.recordEviction();
+            statsCounter.recordEviction(1, RemovalCause.EXPIRED);
             evict0(stringKey);
             cacheChangeListener.onChanged(new CacheChangeEvent(CacheChangeType.EVICT, stringKey, this));
         } catch (Exception e) {

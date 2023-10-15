@@ -84,8 +84,8 @@ public class MethodValidator {
         indexObjectValidators = indexObjectValidatorList.toArray(new IndexObjectValidator[0]);
     }
 
-    private static final List<ClassType> EXCLUDE_PARAM_TYPES = List.of(new ClassType("javax.servlet.ServletRequest"),
-            new ClassType("javax.servlet.ServletResponse"),
+    private static final List<ClassType> EXCLUDE_PARAM_TYPES = List.of(new ClassType("jakarta.servlet.ServletRequest"),
+            new ClassType("jakarta.servlet.ServletResponse"),
             new ClassType("org.springframework.web.multipart.MultipartFile"));
 
 }

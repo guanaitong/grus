@@ -8,6 +8,8 @@ package com.ciicgat.sdk.servlet;
 import com.ciicgat.grus.performance.MaxConcurrency;
 import com.ciicgat.grus.performance.SentinelProperties;
 import com.ciicgat.sdk.gconf.GlobalGconfConfig;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,8 +17,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;

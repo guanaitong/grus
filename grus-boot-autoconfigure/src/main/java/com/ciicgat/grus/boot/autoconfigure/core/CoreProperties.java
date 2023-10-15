@@ -9,11 +9,11 @@ import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.sdk.util.frigate.GroupBot;
 import com.ciicgat.sdk.util.system.Systems;
+import jakarta.annotation.PostConstruct;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 /**

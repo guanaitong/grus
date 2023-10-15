@@ -5,13 +5,12 @@
 
 package com.ciicgat.sdk.util.http;
 
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
-import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created by August.Zhou on 2017/8/3 10:03.
@@ -26,7 +25,7 @@ public class TestApacheHttpClientSingleton {
         try {
             CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(httpGet);
             EntityUtils.toString(closeableHttpResponse.getEntity());
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -39,7 +38,7 @@ public class TestApacheHttpClientSingleton {
         try {
             CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(httpGet);
             EntityUtils.toString(closeableHttpResponse.getEntity(), "UTF-8");
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -52,7 +51,7 @@ public class TestApacheHttpClientSingleton {
         try {
             CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(httpGet);
             EntityUtils.toString(closeableHttpResponse.getEntity(), "UTF-8");
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -65,7 +64,7 @@ public class TestApacheHttpClientSingleton {
         try {
             CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(httpGet);
             EntityUtils.toString(closeableHttpResponse.getEntity(), "UTF-8");
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

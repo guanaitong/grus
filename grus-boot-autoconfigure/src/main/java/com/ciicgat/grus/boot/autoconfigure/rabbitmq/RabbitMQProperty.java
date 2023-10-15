@@ -10,10 +10,10 @@ import com.ciicgat.grus.rabbitmq.Queue;
 import com.ciicgat.grus.rabbitmq.QueueBind;
 import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.util.system.WorkRegion;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;

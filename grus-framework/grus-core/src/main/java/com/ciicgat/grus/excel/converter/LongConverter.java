@@ -17,7 +17,7 @@ import org.apache.poi.ss.usermodel.CellType;
 public class LongConverter implements Converter<Long> {
     @Override
     public Long read(Cell cell) {
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case STRING:
                 String num = cell.getStringCellValue();
                 return Long.valueOf(num);

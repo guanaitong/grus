@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.AbstractRedisConnection;
 import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.data.redis.connection.RedisCommands;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.connection.RedisHashCommands;
@@ -81,6 +82,11 @@ class TracingRedisConnection extends AbstractRedisConnection {
         }
     }
 
+
+    @Override
+    public RedisCommands commands() {
+        return redisConnection.commands();
+    }
 
     @Override
     public RedisGeoCommands geoCommands() {

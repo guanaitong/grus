@@ -16,6 +16,10 @@ import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
 import feign.FeignException;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
@@ -35,10 +39,6 @@ import org.springframework.web.method.annotation.MethodArgumentConversionNotSupp
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;

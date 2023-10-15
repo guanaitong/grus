@@ -7,16 +7,17 @@ package com.ciicgat.sdk.util.http;
 
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.performance.SlowLogger;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.http.io.support.ClassicRequestBuilder;
+import org.apache.hc.core5.http.message.BasicHeader;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +80,7 @@ public class ApacheHttpClientHelper {
      * @return
      */
     public static String get(String url, Map<String, ? extends Object> queryParameters, Map<String, String> headers, HttpTimeout httpTimeout) {
-        RequestBuilder requestBuilder = RequestBuilder.get(url).setCharset(StandardCharsets.UTF_8);
+        ClassicRequestBuilder requestBuilder = ClassicRequestBuilder.get(url).setCharset(StandardCharsets.UTF_8);
 
         if (queryParameters != null) {
             queryParameters.forEach((k, v) -> {
@@ -127,7 +128,7 @@ public class ApacheHttpClientHelper {
      * @return
      */
     public static String postForm(String url, Map<String, ? extends Object> formParameters, Map<String, String> headers, HttpTimeout httpTimeout) {
-        RequestBuilder requestBuilder = RequestBuilder.post(url).setCharset(StandardCharsets.UTF_8);
+        ClassicRequestBuilder requestBuilder = ClassicRequestBuilder.post(url).setCharset(StandardCharsets.UTF_8);
         if (formParameters != null) {
             formParameters.forEach((k, v) -> {
                 if (k != null && v != null) {
@@ -174,7 +175,7 @@ public class ApacheHttpClientHelper {
 
     public static String postJson(String url, String jsonBody, Map<String, String> headers, HttpTimeout httpTimeout) {
         Objects.requireNonNull(jsonBody, "jsonBody should not be null");
-        RequestBuilder requestBuilder = RequestBuilder.post(url).setCharset(StandardCharsets.UTF_8);
+        ClassicRequestBuilder requestBuilder = ClassicRequestBuilder.post(url).setCharset(StandardCharsets.UTF_8);
 
         StringEntity stringEntity = new StringEntity(jsonBody, ContentType.APPLICATION_JSON);
         requestBuilder.setEntity(stringEntity);
@@ -182,7 +183,7 @@ public class ApacheHttpClientHelper {
     }
 
 
-    private static String executeRequest(RequestBuilder requestBuilder, Map<String, String> headers, HttpTimeout httpTimeout) {
+    private static String executeRequest(ClassicRequestBuilder requestBuilder, Map<String, String> headers, HttpTimeout httpTimeout) {
         if (requestBuilder.getCharset() == null) {
             requestBuilder.setCharset(StandardCharsets.UTF_8);
         }
@@ -194,13 +195,15 @@ public class ApacheHttpClientHelper {
             RequestConfig requestConfig = RequestConfig
                     .custom()
                     .setRedirectsEnabled(false)
-                    .setSocketTimeout((int) httpTimeout.readTimeout.toMillis())
-                    .setConnectTimeout((int) httpTimeout.connectTimeout.toMillis())
+                    .setResponseTimeout(Timeout.of(httpTimeout.readTimeout))
+                    .setConnectTimeout(Timeout.of(httpTimeout.connectTimeout))
+//                    .setSocketTimeout((int) httpTimeout.readTimeout.toMillis())
+//                    .setConnectTimeout((int) httpTimeout.connectTimeout.toMillis())
                     .build();
-            requestBuilder.setConfig(requestConfig);
+//            requestBuilder.setConfig(requestConfig);
         }
 
-        HttpUriRequest httpUriRequest = requestBuilder.build();
+        ClassicHttpRequest httpUriRequest = requestBuilder.build();
         return request(httpUriRequest);
     }
 
@@ -211,15 +214,15 @@ public class ApacheHttpClientHelper {
      * @param httpUriRequest http请求结构体
      * @return
      */
-    public static String request(HttpUriRequest httpUriRequest) {
+    public static String request(ClassicHttpRequest httpUriRequest) {
         long start = System.nanoTime();
         CloseableHttpClient closeableHttpClient = HttpClientSingleton.getApacheHttpClient();
         try (CloseableHttpResponse response = closeableHttpClient.execute(httpUriRequest)) {
-            int statusCode = response.getStatusLine().getStatusCode(); //NOSONAR
+            int statusCode = response.getCode(); //NOSONAR
             HttpEntity entity = response.getEntity();
             String result = EntityUtils.toString(entity, StandardCharsets.UTF_8);
             if (statusCode >= 400) {
-                LOGGER.error("{}|[{}] -> {}", statusCode, httpUriRequest.getURI().toString(), result);
+                LOGGER.error("{}|[{}] -> {}", statusCode, httpUriRequest.getRequestUri(), result);
             }
             return result;
         } catch (Exception e) {
@@ -238,20 +241,20 @@ public class ApacheHttpClientHelper {
      * @param <T>
      * @return
      */
-    public static <T> T request(HttpUriRequest httpUriRequest,
-                                org.apache.http.client.ResponseHandler<? extends T> responseHandler) {
-        long start = System.currentTimeMillis();
-        CloseableHttpClient closeableHttpClient = HttpClientSingleton.getApacheHttpClient();
-        try (CloseableHttpResponse response = closeableHttpClient.execute(httpUriRequest)) {
-            long cost = System.currentTimeMillis() - start;
-            if (cost > 500) { //超过500毫秒就定义为慢请求
-                LOGGER.warn("slow request,cost {} millis,request {}", cost, httpUriRequest);
-            }
-            return responseHandler.handleResponse(response);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    public static <T> T request(HttpUriRequest httpUriRequest,
+//                                ResponseHandler<? extends T> responseHandler) {
+//        long start = System.currentTimeMillis();
+//        CloseableHttpClient closeableHttpClient = HttpClientSingleton.getApacheHttpClient();
+//        try (CloseableHttpResponse response = closeableHttpClient.execute(httpUriRequest)) {
+//            long cost = System.currentTimeMillis() - start;
+//            if (cost > 500) { //超过500毫秒就定义为慢请求
+//                LOGGER.warn("slow request,cost {} millis,request {}", cost, httpUriRequest);
+//            }
+//            return responseHandler.handleResponse(response);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
 
 }

@@ -6,9 +6,9 @@
 package com.ciicgat.sdk.servlet;
 
 import com.ciicgat.sdk.lang.url.UrlCoder;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
 /**

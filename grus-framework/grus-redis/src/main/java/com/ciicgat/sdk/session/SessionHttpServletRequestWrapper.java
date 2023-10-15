@@ -5,10 +5,10 @@
 
 package com.ciicgat.sdk.session;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Created by August.Zhou on 2018/1/8 16:17.
@@ -65,11 +65,6 @@ public class SessionHttpServletRequestWrapper extends HttpServletRequestWrapper 
 
     @Override
     public boolean isRequestedSessionIdFromURL() {
-        return false;
-    }
-
-    @Override
-    public boolean isRequestedSessionIdFromUrl() {
         return false;
     }
 }

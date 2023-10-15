@@ -8,6 +8,8 @@ package com.ciicgat.grus.boot.autoconfigure.web.logger;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.logger.LogExclude;
 import com.ciicgat.grus.logger.LogUtil;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -19,8 +21,6 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;

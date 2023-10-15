@@ -17,7 +17,7 @@ import org.apache.poi.ss.usermodel.CellType;
 public class IntegerConverter implements Converter<Integer> {
     @Override
     public Integer read(Cell cell) {
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case STRING:
                 String num = cell.getStringCellValue();
                 return Integer.valueOf(num);

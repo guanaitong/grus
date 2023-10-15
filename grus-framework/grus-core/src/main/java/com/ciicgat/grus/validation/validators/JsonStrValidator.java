@@ -10,8 +10,8 @@ import com.ciicgat.grus.json.JSONException;
 import com.ciicgat.grus.validation.constraints.JsonStr;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 /**
  * Validator自定义实现，验证是否是JSON字符串

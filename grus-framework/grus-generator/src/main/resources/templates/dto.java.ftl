@@ -12,7 +12,7 @@ import io.swagger.annotations.ApiModelProperty;
 [#if baseConfig.enableValidation]
 import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 [/#if]
 import java.io.Serializable;
 import java.util.Date;

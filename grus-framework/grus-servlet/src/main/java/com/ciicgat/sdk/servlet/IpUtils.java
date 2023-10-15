@@ -5,7 +5,7 @@
 
 package com.ciicgat.sdk.servlet;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Created by August.Zhou on 2017/1/4 13:28.

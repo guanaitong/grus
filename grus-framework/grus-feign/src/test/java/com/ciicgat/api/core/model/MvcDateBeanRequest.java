@@ -10,7 +10,8 @@ import com.ciicgat.grus.json.SimpleDateSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
+
 import java.util.Date;
 
 /**

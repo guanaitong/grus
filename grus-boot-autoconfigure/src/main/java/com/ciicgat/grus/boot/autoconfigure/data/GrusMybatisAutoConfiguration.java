@@ -10,17 +10,21 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.type.TypeHandler;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
 import org.mybatis.spring.boot.autoconfigure.MybatisProperties;
 import org.mybatis.spring.boot.autoconfigure.SpringBootVFS;
+import org.mybatis.spring.boot.autoconfigure.SqlSessionFactoryBeanCustomizer;
 import org.mybatis.spring.mapper.ClassPathMapperScanner;
 import org.mybatis.spring.mapper.MapperFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
@@ -51,8 +55,12 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by August.Zhou on 2019-04-03 14:58.
@@ -72,25 +80,32 @@ public class GrusMybatisAutoConfiguration implements InitializingBean {
 
     private final Interceptor[] interceptors;
 
+    private final TypeHandler[] typeHandlers;
+
+    private final LanguageDriver[] languageDrivers;
+
     private final ResourceLoader resourceLoader;
 
     private final DatabaseIdProvider databaseIdProvider;
 
     private final List<ConfigurationCustomizer> configurationCustomizers;
 
+    private final List<SqlSessionFactoryBeanCustomizer> sqlSessionFactoryBeanCustomizers;
 
-    public GrusMybatisAutoConfiguration(MybatisProperties properties,
-                                        ObjectProvider<Interceptor[]> interceptorsProvider,
-                                        ResourceLoader resourceLoader,
-                                        ObjectProvider<DatabaseIdProvider> databaseIdProvider,
-                                        ObjectProvider<List<ConfigurationCustomizer>> configurationCustomizersProvider) {
+    public GrusMybatisAutoConfiguration(MybatisProperties properties, ObjectProvider<Interceptor[]> interceptorsProvider,
+                                        ObjectProvider<TypeHandler[]> typeHandlersProvider, ObjectProvider<LanguageDriver[]> languageDriversProvider,
+                                        ResourceLoader resourceLoader, ObjectProvider<DatabaseIdProvider> databaseIdProvider,
+                                        ObjectProvider<List<ConfigurationCustomizer>> configurationCustomizersProvider,
+                                        ObjectProvider<List<SqlSessionFactoryBeanCustomizer>> sqlSessionFactoryBeanCustomizers) {
         this.properties = properties;
         this.interceptors = interceptorsProvider.getIfAvailable();
+        this.typeHandlers = typeHandlersProvider.getIfAvailable();
+        this.languageDrivers = languageDriversProvider.getIfAvailable();
         this.resourceLoader = resourceLoader;
         this.databaseIdProvider = databaseIdProvider.getIfAvailable();
         this.configurationCustomizers = configurationCustomizersProvider.getIfAvailable();
+        this.sqlSessionFactoryBeanCustomizers = sqlSessionFactoryBeanCustomizers.getIfAvailable();
     }
-
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(prefix = "grus.db", value = "read-write-separation", havingValue = "false", matchIfMissing = true)
@@ -158,7 +173,9 @@ public class GrusMybatisAutoConfiguration implements InitializingBean {
     public SqlSessionFactory createFactory(DataSource dataSource) throws Exception {
         SqlSessionFactoryBean factory = new SqlSessionFactoryBean();
         factory.setDataSource(dataSource);
-        factory.setVfs(SpringBootVFS.class);
+        if (properties.getConfiguration() == null || properties.getConfiguration().getVfsImpl() == null) {
+            factory.setVfs(SpringBootVFS.class);
+        }
         if (StringUtils.hasText(this.properties.getConfigLocation())) {
             factory.setConfigLocation(this.resourceLoader.getResource(this.properties.getConfigLocation()));
         }
@@ -181,71 +198,57 @@ public class GrusMybatisAutoConfiguration implements InitializingBean {
         if (StringUtils.hasLength(this.properties.getTypeHandlersPackage())) {
             factory.setTypeHandlersPackage(this.properties.getTypeHandlersPackage());
         }
-        Resource[] resources = this.properties.resolveMapperLocations();
-        if (!ObjectUtils.isEmpty(resources)) {
-            factory.setMapperLocations(resources);
+        if (!ObjectUtils.isEmpty(this.typeHandlers)) {
+            factory.setTypeHandlers(this.typeHandlers);
         }
-
+        Resource[] mapperLocations = this.properties.resolveMapperLocations();
+        if (!ObjectUtils.isEmpty(mapperLocations)) {
+            factory.setMapperLocations(mapperLocations);
+        }
+        Set<String> factoryPropertyNames = Stream
+                .of(new BeanWrapperImpl(SqlSessionFactoryBean.class).getPropertyDescriptors()).map(PropertyDescriptor::getName)
+                .collect(Collectors.toSet());
+        Class<? extends LanguageDriver> defaultLanguageDriver = this.properties.getDefaultScriptingLanguageDriver();
+        if (factoryPropertyNames.contains("scriptingLanguageDrivers") && !ObjectUtils.isEmpty(this.languageDrivers)) {
+            // Need to mybatis-spring 2.0.2+
+            factory.setScriptingLanguageDrivers(this.languageDrivers);
+            if (defaultLanguageDriver == null && this.languageDrivers.length == 1) {
+                defaultLanguageDriver = this.languageDrivers[0].getClass();
+            }
+        }
+        if (factoryPropertyNames.contains("defaultScriptingLanguageDriver")) {
+            // Need to mybatis-spring 2.0.2+
+            factory.setDefaultScriptingLanguageDriver(defaultLanguageDriver);
+        }
+        applySqlSessionFactoryBeanCustomizers(factory);
         return factory.getObject();
     }
 
+    private void applySqlSessionFactoryBeanCustomizers(SqlSessionFactoryBean factory) {
+        if (!CollectionUtils.isEmpty(this.sqlSessionFactoryBeanCustomizers)) {
+            for (SqlSessionFactoryBeanCustomizer customizer : this.sqlSessionFactoryBeanCustomizers) {
+                customizer.customize(factory);
+            }
+        }
+    }
 
     private void applyConfiguration(SqlSessionFactoryBean factory) {
         org.apache.ibatis.session.Configuration configuration = null;
-        org.apache.ibatis.session.Configuration orinalConfiguration = this.properties.getConfiguration();
-        if (orinalConfiguration == null) {
-            if (StringUtils.hasText(this.properties.getConfigLocation())) {
-                Resource resource = this.resourceLoader.getResource(this.properties.getConfigLocation());
-                try {
-                    XMLConfigBuilder xmlConfigBuilder = new XMLConfigBuilder(resource.getInputStream(), null, this.properties.getConfigurationProperties());
-                    configuration = xmlConfigBuilder.getConfiguration();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                configuration = new org.apache.ibatis.session.Configuration();
-                this.properties.setConfiguration(configuration);
+        if (StringUtils.hasText(this.properties.getConfigLocation())) {
+            Resource resource = this.resourceLoader.getResource(this.properties.getConfigLocation());
+            try {
+                XMLConfigBuilder xmlConfigBuilder = new XMLConfigBuilder(resource.getInputStream(), null, this.properties.getConfigurationProperties());
+                configuration = xmlConfigBuilder.getConfiguration();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         } else {
-            // 这里基于orinalConfiguration克隆一个新的configuration。解决不同数据源共享同一个Configuration的问题
-            // Configuration里面有一个environment，environment里有datasource。
-            // 如果共用同一个Configuration，那么也意味着多数据情况下只有最后一个datasource生效。显然不符合预期
             configuration = new org.apache.ibatis.session.Configuration();
-            configuration.setSafeRowBoundsEnabled(orinalConfiguration.isSafeRowBoundsEnabled());
-            configuration.setSafeResultHandlerEnabled(orinalConfiguration.isSafeResultHandlerEnabled());
-            configuration.setMapUnderscoreToCamelCase(orinalConfiguration.isMapUnderscoreToCamelCase());
-            configuration.setAggressiveLazyLoading(orinalConfiguration.isAggressiveLazyLoading());
-            configuration.setMultipleResultSetsEnabled(orinalConfiguration.isMultipleResultSetsEnabled());
-            configuration.setUseGeneratedKeys(orinalConfiguration.isUseGeneratedKeys());
-            configuration.setUseColumnLabel(orinalConfiguration.isUseColumnLabel());
-            configuration.setCacheEnabled(orinalConfiguration.isCacheEnabled());
-            configuration.setCallSettersOnNulls(orinalConfiguration.isCallSettersOnNulls());
-            configuration.setUseActualParamName(orinalConfiguration.isUseActualParamName());
-            configuration.setReturnInstanceForEmptyRow(orinalConfiguration.isReturnInstanceForEmptyRow());
-            configuration.setShrinkWhitespacesInSql(orinalConfiguration.isShrinkWhitespacesInSql());
-            configuration.setLogPrefix(orinalConfiguration.getLogPrefix());
-            configuration.setLogImpl(orinalConfiguration.getLogImpl());
-            configuration.setVfsImpl(orinalConfiguration.getVfsImpl());
-            configuration.setDefaultSqlProviderType(orinalConfiguration.getDefaultSqlProviderType());
-            configuration.setLocalCacheScope(orinalConfiguration.getLocalCacheScope());
-            configuration.setJdbcTypeForNull(orinalConfiguration.getJdbcTypeForNull());
-            configuration.setLazyLoadTriggerMethods(orinalConfiguration.getLazyLoadTriggerMethods());
-            configuration.setDefaultStatementTimeout(orinalConfiguration.getDefaultStatementTimeout());
-            configuration.setDefaultFetchSize(orinalConfiguration.getDefaultFetchSize());
-            configuration.setDefaultResultSetType(orinalConfiguration.getDefaultResultSetType());
-            configuration.setDefaultExecutorType(orinalConfiguration.getDefaultExecutorType());
-            configuration.setAutoMappingBehavior(orinalConfiguration.getAutoMappingBehavior());
-            configuration.setAutoMappingUnknownColumnBehavior(orinalConfiguration.getAutoMappingUnknownColumnBehavior());
-            configuration.setVariables(orinalConfiguration.getVariables());
-            configuration.setReflectorFactory(orinalConfiguration.getReflectorFactory());
-            configuration.setObjectFactory(orinalConfiguration.getObjectFactory());
-            configuration.setObjectWrapperFactory(orinalConfiguration.getObjectWrapperFactory());
-            configuration.setLazyLoadingEnabled(orinalConfiguration.isLazyLoadingEnabled());
-            configuration.setProxyFactory(orinalConfiguration.getProxyFactory());
-            configuration.setConfigurationFactory(orinalConfiguration.getConfigurationFactory());
         }
-
-
+        MybatisProperties.CoreConfiguration coreConfiguration = this.properties.getConfiguration();
+        if (configuration != null && coreConfiguration != null) {
+            coreConfiguration.applyTo(configuration);
+        }
         if (configuration != null && !CollectionUtils.isEmpty(this.configurationCustomizers)) {
             for (ConfigurationCustomizer customizer : this.configurationCustomizers) {
                 customizer.customize(configuration);

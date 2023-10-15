@@ -6,10 +6,9 @@
 package com.ciicgat.sdk.servlet;
 
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import javax.servlet.http.HttpServletRequest;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

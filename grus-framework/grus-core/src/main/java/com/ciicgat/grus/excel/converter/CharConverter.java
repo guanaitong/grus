@@ -18,7 +18,7 @@ import org.apache.poi.ss.usermodel.CellType;
 public class CharConverter implements Converter<Character> {
     @Override
     public Character read(Cell cell) {
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case STRING:
                 String val = cell.getStringCellValue();
                 return val.charAt(0);

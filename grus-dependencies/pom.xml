@@ -144,11 +144,6 @@
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <artifactId>grus-boot-starter-velocity</artifactId>
-                <groupId>com.ciicgat.grus.boot</groupId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
                 <artifactId>grus-boot-starter-server-minor</artifactId>
                 <groupId>com.ciicgat.grus.boot</groupId>
                 <version>${revision}</version>

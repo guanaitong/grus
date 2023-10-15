@@ -8,8 +8,9 @@ package com.ciicgat.grus.validation.validators;
 
 import com.ciicgat.grus.validation.constraints.CheckHTMLTag;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+
 import java.util.regex.Pattern;
 
 /**

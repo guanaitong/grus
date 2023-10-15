@@ -13,6 +13,7 @@ import com.ciicgat.sdk.data.mybatis.generator.condition.LambdaCriteria;
 import com.ciicgat.sdk.data.mybatis.generator.condition.QueryExample;
 import com.ciicgat.sdk.data.mybatis.generator.entity.ShopTip;
 import com.ciicgat.sdk.data.mybatis.generator.mapper.ShopTipMapper;
+import jakarta.annotation.Resource;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

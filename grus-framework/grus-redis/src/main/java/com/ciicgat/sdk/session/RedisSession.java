@@ -7,18 +7,15 @@ package com.ciicgat.sdk.session;
 
 import com.ciicgat.sdk.lang.tool.Bytes;
 import com.ciicgat.sdk.util.system.Systems;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 
 import static com.ciicgat.sdk.session.SessionManager.execute;
@@ -115,10 +112,6 @@ class RedisSession implements HttpSession {
         execute(redisConnection -> redisConnection.expire(redisKeyBytes, interval));
     }
 
-    @Override
-    public HttpSessionContext getSessionContext() {
-        throw new UnsupportedOperationException();
-    }
 
     @Override
     public Object getAttribute(final String name) {
@@ -129,11 +122,6 @@ class RedisSession implements HttpSession {
             LOGGER.error("redisValue: " + redisValue, e);
             return null;
         }
-    }
-
-    @Override
-    public Object getValue(String name) {
-        return this.getAttribute(name);
     }
 
     @Override
@@ -159,16 +147,6 @@ class RedisSession implements HttpSession {
         };
     }
 
-    @Override
-    public String[] getValueNames() {
-        final var res = execute(redisConnection -> redisConnection.hGetAll(redisKeyBytes));
-        res.remove(CREATIONTIME_TAG);
-        List<String> stringList = new ArrayList<>(res.size());
-        for (byte[] bytes : res.keySet()) {
-            stringList.add(Bytes.toString(bytes));
-        }
-        return stringList.toArray(new String[0]);
-    }
 
     @Override
     public void setAttribute(final String name, final Object value) {
@@ -186,20 +164,12 @@ class RedisSession implements HttpSession {
         });
     }
 
-    @Override
-    public void putValue(String name, Object value) {
-        this.setAttribute(name, value);
-    }
 
     @Override
     public void removeAttribute(final String name) {
         execute(redisConnection -> redisConnection.hDel(redisKeyBytes, Bytes.toBytes(name)));
     }
 
-    @Override
-    public void removeValue(String name) {
-        this.removeAttribute(name);
-    }
 
     @Override
     public void invalidate() {

@@ -6,10 +6,9 @@
 package com.ciicgat.grus.boot.autoconfigure.zk;
 
 import com.ciicgat.sdk.gconf.GlobalGconfConfig;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
-
-import javax.annotation.PostConstruct;
 
 /**
  * @Auther: Jiaju Wei

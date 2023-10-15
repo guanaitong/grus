@@ -17,7 +17,7 @@ import org.apache.poi.ss.usermodel.CellType;
 public class StringConverter implements Converter<String> {
     @Override
     public String read(Cell cell) {
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case STRING:
                 return cell.getStringCellValue();
             case NUMERIC:

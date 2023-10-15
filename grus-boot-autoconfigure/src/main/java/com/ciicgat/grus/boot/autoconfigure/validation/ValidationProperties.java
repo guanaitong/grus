@@ -8,7 +8,7 @@ package com.ciicgat.grus.boot.autoconfigure.validation;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Created by Josh on 17-11-9.

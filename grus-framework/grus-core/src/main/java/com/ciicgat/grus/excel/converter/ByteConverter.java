@@ -19,7 +19,7 @@ import org.apache.poi.ss.usermodel.CellType;
 public class ByteConverter implements Converter<Byte> {
     @Override
     public Byte read(Cell cell) {
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case STRING:
                 String num = cell.getStringCellValue();
                 return Byte.valueOf(num);

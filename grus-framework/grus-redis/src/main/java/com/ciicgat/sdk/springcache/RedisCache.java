@@ -99,7 +99,7 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
     @Override
     protected void clear0() {
         execute(connection -> {
-            Cursor<byte[]> cursor = connection.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(64).build());
+            Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions().match(prefix + "*").count(64).build());
             while (cursor.hasNext()) {
                 byte[] key = cursor.next();
                 connection.del(key);

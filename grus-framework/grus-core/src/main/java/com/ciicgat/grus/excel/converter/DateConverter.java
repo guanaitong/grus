@@ -31,7 +31,7 @@ public class DateConverter implements Converter<Date> {
     @Override
     public Date read(Cell cell) {
 
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case STRING:
                 String val = cell.getStringCellValue();
                 try {

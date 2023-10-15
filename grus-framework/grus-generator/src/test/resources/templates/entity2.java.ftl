@@ -15,7 +15,7 @@ import lombok.Data;
 import com.ciicgat.grus.json.JSON;
 [/#if]
 [#if baseConfig.enableValidation]
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
 [/#if]
 [#if entity.hasBigDecimalField]

@@ -11,8 +11,7 @@ import okhttp3.ConnectionPool;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import okhttp3.internal.Util;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +45,7 @@ public class HttpClientSingleton {
      *
      * @return
      */
-    public static org.apache.http.impl.client.CloseableHttpClient getApacheHttpClient() {
+    public static CloseableHttpClient getApacheHttpClient() {
         return ApacheHttpClientSingletonHolder.CLOSEABLE_HTTP_CLIENT;
     }
 
@@ -82,27 +81,27 @@ public class HttpClientSingleton {
     }
 
     private static class ApacheHttpClientSingletonHolder {
-        private static final org.apache.http.impl.client.CloseableHttpClient CLOSEABLE_HTTP_CLIENT;
+        private static final org.apache.hc.client5.http.impl.classic.CloseableHttpClient CLOSEABLE_HTTP_CLIENT;
 
 
         static {
-            org.apache.http.client.config.RequestConfig requestConfig = org.apache.http.client.config.RequestConfig
+            org.apache.hc.client5.http.config.RequestConfig requestConfig = org.apache.hc.client5.http.config.RequestConfig
                     .custom()
                     .setRedirectsEnabled(false)
-                    .setConnectTimeout((int) TimeUnit.SECONDS.toMillis(10))
-                    .setConnectionRequestTimeout((int) TimeUnit.MINUTES.toMillis(1))
-                    .setSocketTimeout((int) TimeUnit.MINUTES.toMillis(1))
+                    .setConnectTimeout(10, TimeUnit.SECONDS)
+                    .setConnectionRequestTimeout(1, TimeUnit.MINUTES)
+                    .setResponseTimeout(1, TimeUnit.MINUTES)
                     .build();
 
-            org.apache.http.impl.client.HttpClientBuilder builder = HttpClientBuilder
+            org.apache.hc.client5.http.impl.classic.HttpClientBuilder builder = org.apache.hc.client5.http.impl.classic.HttpClientBuilder
                     .create()
                     .setUserAgent("JAVA_APACHE_HTTP_CLIENT")
-                    .setMaxConnPerRoute(500)
-                    .setMaxConnTotal(2000)
-                    .setDefaultRequestConfig(requestConfig)
-                    .setDnsResolver(ApacheCacheDnsResolver.INSTANCE)
-                    .setSSLSocketFactory(new SSLConnectionSocketFactory(
-                            SSL.sslSocketFactory, SSL.hostnameVerifier));
+//                    .setMaxConnPerRoute(500)
+//                    .setMaxConnTotal(2000)
+                    .setDefaultRequestConfig(requestConfig);
+//                    .setDnsResolver(ApacheCacheDnsResolver.INSTANCE)
+//                    .setSSLSocketFactory(new SSLConnectionSocketFactory(
+//                            SSL.sslSocketFactory, SSL.hostnameVerifier));
 
             CLOSEABLE_HTTP_CLIENT = builder.build();
 

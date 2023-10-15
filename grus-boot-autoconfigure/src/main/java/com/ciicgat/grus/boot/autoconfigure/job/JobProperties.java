@@ -6,10 +6,9 @@
 package com.ciicgat.grus.boot.autoconfigure.job;
 
 import com.ciicgat.sdk.util.system.Systems;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
-
-import javax.annotation.PostConstruct;
 
 /**
  * Created by August.Zhou on 2019-04-04 10:19.

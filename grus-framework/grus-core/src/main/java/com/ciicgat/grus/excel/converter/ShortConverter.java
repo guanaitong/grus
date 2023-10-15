@@ -17,7 +17,7 @@ import org.apache.poi.ss.usermodel.CellType;
 public class ShortConverter implements Converter<Short> {
     @Override
     public Short read(Cell cell) {
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case STRING:
                 String num = cell.getStringCellValue();
                 return Short.valueOf(num);

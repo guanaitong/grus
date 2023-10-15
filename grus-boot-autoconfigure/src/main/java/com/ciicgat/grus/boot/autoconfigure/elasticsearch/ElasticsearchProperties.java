@@ -6,10 +6,10 @@
 package com.ciicgat.grus.boot.autoconfigure.elasticsearch;
 
 import com.ciicgat.sdk.gconf.GlobalGconfConfig;
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 
 /**

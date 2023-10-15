@@ -13,7 +13,7 @@ import org.apache.poi.ss.usermodel.CellType;
 public class BooleanConverter implements Converter<Boolean> {
     @Override
     public Boolean read(Cell cell) {
-        switch (cell.getCellTypeEnum()) {
+        switch (cell.getCellType()) {
             case STRING:
                 String val = cell.getStringCellValue();
                 if ("true".equals(val)) {

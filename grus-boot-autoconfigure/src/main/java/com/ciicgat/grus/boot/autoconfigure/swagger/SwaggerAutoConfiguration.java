@@ -8,6 +8,9 @@ package com.ciicgat.grus.boot.autoconfigure.swagger;
 import com.ciicgat.grus.boot.autoconfigure.condition.ConditionalOnWorkEnv;
 import com.ciicgat.sdk.util.system.Systems;
 import com.ciicgat.sdk.util.system.WorkEnv;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.License;
+import org.springdoc.core.configuration.SpringDocConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -17,16 +20,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
-import springfox.boot.starter.autoconfigure.OpenApiAutoConfiguration;
-import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.service.Contact;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger.web.UiConfiguration;
-import springfox.documentation.swagger.web.UiConfigurationBuilder;
 
 /**
  * 启用API的标准文档输出。
@@ -39,34 +32,23 @@ import springfox.documentation.swagger.web.UiConfigurationBuilder;
  * @date 2020/10/15
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties(SwaggerProperty.class)
-@ConditionalOnClass(Docket.class)
+@EnableConfigurationProperties({SwaggerProperty.class, SpringDocConfiguration.class})
+@ConditionalOnClass(OpenAPI.class)
 @ConditionalOnProperty(prefix = "grus.swagger", value = "enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnWorkEnv({WorkEnv.DEVELOP, WorkEnv.TEST})
-@AutoConfigureBefore(OpenApiAutoConfiguration.class)
+@AutoConfigureBefore(SpringDocConfiguration.class)
 public class SwaggerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public Docket docket(SwaggerProperty swaggerProperty) {
+    public OpenAPI openAPI(SwaggerProperty swaggerProperty) {
         checkValid(swaggerProperty);
-        return new Docket(DocumentationType.OAS_30)
-                .enable(true)
-                .apiInfo(apiInfo(swaggerProperty))
-                .select()
-                .apis(RequestHandlerSelectors.basePackage(swaggerProperty.getBasePackage()))
-                .paths(PathSelectors.any())
-                .build()
-                .useDefaultResponseMessages(false);
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
-    public UiConfiguration uiConfig() {
-        return UiConfigurationBuilder.builder()
-                .showCommonExtensions(Boolean.TRUE)
-                .build();
+        return new OpenAPI()
+                .info(new io.swagger.v3.oas.models.info.Info().title(swaggerProperty.getTitle())
+                        .description(swaggerProperty.getDescription())
+                        .version(swaggerProperty.getVersion())
+                        .license(new License().name("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0.txt")));
     }
 
     private void checkValid(SwaggerProperty swaggerProperty) {
@@ -96,18 +78,6 @@ public class SwaggerAutoConfiguration {
             // Swallow and continue
         }
         return null;
-    }
-
-    private ApiInfo apiInfo(SwaggerProperty swaggerProperty) {
-        return new ApiInfoBuilder()
-                .title(swaggerProperty.getTitle())
-                .description(swaggerProperty.getDescription())
-                .termsOfServiceUrl(swaggerProperty.getTermsOfServiceUrl())
-                .contact(new Contact(swaggerProperty.getContactName(), swaggerProperty.getContactUrl(), swaggerProperty.getContactEmail()))
-                .license(swaggerProperty.getLicense())
-                .licenseUrl(swaggerProperty.getLicenseUrl())
-                .version(swaggerProperty.getVersion())
-                .build();
     }
 
 }
