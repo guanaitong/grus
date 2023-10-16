@@ -96,13 +96,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>io.opentelemetry</groupId>
-                <artifactId>opentelemetry-bom</artifactId>
-                <version>${opentelemetry.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>io.opentelemetry</groupId>-->
+<!--                <artifactId>opentelemetry-bom</artifactId>-->
+<!--                <version>${opentelemetry.version}</version>-->
+<!--                <type>pom</type>-->
+<!--                <scope>import</scope>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>com.ciicgat.sdk.gconf</groupId>
                 <artifactId>gconf-java-client</artifactId>
