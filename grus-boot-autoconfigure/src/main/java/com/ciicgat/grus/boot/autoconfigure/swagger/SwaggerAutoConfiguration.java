@@ -32,8 +32,8 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * @date 2020/10/15
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties({SwaggerProperty.class, SpringDocConfiguration.class})
-@ConditionalOnClass(OpenAPI.class)
+@EnableConfigurationProperties(SwaggerProperty.class)
+@ConditionalOnClass({OpenAPI.class, SpringDocConfiguration.class})
 @ConditionalOnProperty(prefix = "grus.swagger", value = "enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnWorkEnv({WorkEnv.DEVELOP, WorkEnv.TEST})
