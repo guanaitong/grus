@@ -12,7 +12,7 @@ unit-test-java17:
   image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
   stage: test
   script:
-    - mvn $MAVEN_CLI_OPTS package sonar:sonar
+    - mvn $MAVEN_CLI_OPTS package sonar:sonar  -Dsonar.projectKey=grus-2024 -Dsonar.projectName=grus-2024
 
 
 
