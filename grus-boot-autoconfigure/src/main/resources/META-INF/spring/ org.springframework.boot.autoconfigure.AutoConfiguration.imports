@@ -7,7 +7,7 @@ com.ciicgat.grus.boot.autoconfigure.web.GrusWebAutoConfiguration
 com.ciicgat.grus.boot.autoconfigure.data.GrusDataAutoConfiguration
 com.ciicgat.grus.boot.autoconfigure.data.GrusMybatisAutoConfiguration
 com.ciicgat.grus.boot.autoconfigure.data.GrusPageHelperAutoConfiguration
-com.ciicgat.grus.boot.autoconfigure.openapi.OpenApiAutoConfiguration
+com.ciicgat.grus.boot.autoconfigure.swagger.SwaggerAutoConfiguration
 com.ciicgat.grus.boot.autoconfigure.validation.ValidationAutoConfiguration
 com.ciicgat.grus.boot.autoconfigure.validation.GrusValidationAutoConfiguration
 com.ciicgat.grus.boot.autoconfigure.job.ElasticJobAutoConfiguration
