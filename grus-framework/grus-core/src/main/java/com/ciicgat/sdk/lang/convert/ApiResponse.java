@@ -6,6 +6,8 @@
 package com.ciicgat.sdk.lang.convert;
 
 import com.ciicgat.grus.json.JSON;
+import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 
@@ -77,6 +79,14 @@ public class ApiResponse<T> implements Serializable {
     }
 
     public T getData() {
+        return data;
+    }
+
+    @JsonIgnore
+    public T getOrThrow() {
+        if (code != 0) {
+            throw new BusinessRuntimeException(code, msg);
+        }
         return data;
     }
 

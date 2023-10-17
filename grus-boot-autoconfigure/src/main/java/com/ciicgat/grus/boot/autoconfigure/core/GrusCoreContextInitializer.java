@@ -7,6 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.core;
 
 import com.ciicgat.grus.boot.autoconfigure.constants.GrusConstants;
 import com.ciicgat.grus.service.GrusFramework;
+import com.ciicgat.grus.service.GrusRuntimeContext;
 import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.impl.StandardGrusRuntimeContext;
 import com.ciicgat.grus.service.impl.StandardGrusRuntimeManager;
@@ -22,7 +23,7 @@ import org.springframework.util.StringUtils;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * 主要负责初始化{@link com.ciicgat.grus.service.GrusRuntimeContext}
+ * 主要负责初始化{@link GrusRuntimeContext}
  *
  * @author August Zhou
  * @date 2019-03-06 10:02

@@ -29,25 +29,13 @@ class GrusTarget<T> implements Target<T> {
     GrusTarget(Class<T> serviceClazz, ServiceName serviceName, NamingService namingService) {
         this.type = serviceClazz;
         this.name = serviceName.value();
-        this.url = buildTargetUrl(namingService.resolve(serviceName.value()), serviceName.urlPathPrefix());
+        this.url = namingService.resolveBaseUrl(serviceName);
         LOGGER.info("create service instance of {},  serviceName {}, baseUrl {}", serviceClazz, serviceName, url);
         isK8sService = K8sNamingService.isK8sService(name);
         if (isK8sService) {
             ServiceDiscoveryClientUtil.tryInitClient(name);
         }
     }
-
-    private static String buildTargetUrl(String hostUrl, String urlPathPrefix) {
-        if (!urlPathPrefix.isEmpty()) {
-            if (hostUrl.endsWith("/") || urlPathPrefix.startsWith("/")) {
-                return hostUrl + urlPathPrefix;
-            } else {
-                return hostUrl + "/" + urlPathPrefix;
-            }
-        }
-        return hostUrl;
-    }
-
 
     @Override
     public Class<T> type() {
