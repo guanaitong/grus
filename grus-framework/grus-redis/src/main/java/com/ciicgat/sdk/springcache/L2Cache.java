@@ -21,12 +21,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class L2Cache extends RedisCache<CacheConfig.L2> implements ILocalCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(L2Cache.class);
-    private final com.github.benmanes.caffeine.cache.Cache<Object, Object> localCache;
+    private final com.github.benmanes.caffeine.cache.Cache<String, Object> localCache;
 
     public L2Cache(String name, RedisCacheManager redisCacheManager, CacheConfig.L2 localRedis) {
         super(name, redisCacheManager, localRedis);
 
-        Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
+        var caffeine = Caffeine.newBuilder()
                 .maximumSize(this.config.getMaximumSize())
                 .initialCapacity(this.config.getInitialCapacity());
 
