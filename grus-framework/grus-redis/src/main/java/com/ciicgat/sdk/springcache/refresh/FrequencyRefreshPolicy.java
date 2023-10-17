@@ -43,7 +43,7 @@ class FrequencyRefreshPolicy extends RefreshPolicy {
     }
 
     @Override
-    public boolean mayRefresh(boolean global, AbstractCache cache, String key) {
+    public boolean mayRefresh(boolean global, AbstractCache<?> cache, String key) {
         final String localCacheKey = makeLocalCacheKey(global, cache, key);
         // 1、先过本地缓存、再通过redis，两层频率限制。
         // 2、本地缓存可以降低redis的访问量
@@ -66,7 +66,7 @@ class FrequencyRefreshPolicy extends RefreshPolicy {
     }
 
     @Override
-    public void recordCacheInit(boolean global, AbstractCache cache, String key) {
+    public void recordCacheInit(boolean global, AbstractCache<?> cache, String key) {
         final String cacheKey = makeLocalCacheKey(global, cache, key);
         localCache.put(cacheKey, Boolean.TRUE);
         try (RedisConnection connection = cache.getRedisConnectionFactory().getConnection()) {
@@ -76,11 +76,11 @@ class FrequencyRefreshPolicy extends RefreshPolicy {
         }
     }
 
-    private static String makeLocalCacheKey(boolean global, AbstractCache cache, String key) {
+    private static String makeLocalCacheKey(boolean global, AbstractCache<?> cache, String key) {
         return global ? cache.getName() + ":::" + key : key;
     }
 
-    private static byte[] makeRedisCacheKey(AbstractCache cache, String key) {
+    private static byte[] makeRedisCacheKey(AbstractCache<?> cache, String key) {
         return Bytes.toBytes(Systems.APP_NAME + "_EX_" + cache.getName() + ":::" + key);
     }
 }

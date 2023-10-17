@@ -29,7 +29,7 @@ public abstract class RefreshPolicy {
      * @param cache
      * @param key
      */
-    public abstract boolean mayRefresh(boolean global, AbstractCache cache, String key);
+    public abstract boolean mayRefresh(boolean global, AbstractCache<?> cache, String key);
 
     /**
      * 在缓存未命中，初始化缓存后，记录下这次事件。
@@ -37,7 +37,7 @@ public abstract class RefreshPolicy {
      * @param cache
      * @param key
      */
-    public abstract void recordCacheInit(boolean global, AbstractCache cache, String key);
+    public abstract void recordCacheInit(boolean global, AbstractCache<?> cache, String key);
 
     public static RefreshPolicy random(double sample) {
         return new RandomRefreshPolicy(sample);
@@ -53,12 +53,12 @@ public abstract class RefreshPolicy {
 
     static final RefreshPolicy NEVER = new RefreshPolicy() {
         @Override
-        public boolean mayRefresh(boolean global, AbstractCache cache, String key) {
+        public boolean mayRefresh(boolean global, AbstractCache<?> cache, String key) {
             return false;
         }
 
         @Override
-        public void recordCacheInit(boolean global, AbstractCache cache, String key) {
+        public void recordCacheInit(boolean global, AbstractCache<?> cache, String key) {
 
         }
     };

@@ -24,12 +24,12 @@ class RandomRefreshPolicy extends RefreshPolicy {
     }
 
     @Override
-    public boolean mayRefresh(boolean global, AbstractCache cache, String key) {
+    public boolean mayRefresh(boolean global, AbstractCache<?> cache, String key) {
         return ThreadLocalRandom.current().nextDouble(1) <= sample;
     }
 
     @Override
-    public void recordCacheInit(boolean global, AbstractCache cache, String key) {
+    public void recordCacheInit(boolean global, AbstractCache<?> cache, String key) {
         ThreadLocalRandom.current().nextDouble(1);
     }
 }

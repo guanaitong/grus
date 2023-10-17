@@ -280,7 +280,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements EnhanceCac
     }
 
 
-    public void compareThenRefresh(String key, Cache.ValueWrapper oldValueWrapper, Callable<Object> valueLoader) {
+    private void compareThenRefresh(String key, Cache.ValueWrapper oldValueWrapper, Callable<Object> valueLoader) {
         redisCacheManager.getRefreshExecutor().execute(() -> {
             try {
                 if (LOGGER.isDebugEnabled()) {
