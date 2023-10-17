@@ -31,6 +31,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.time.Duration;
+import java.util.List;
 
 /**
  * Created by August.Zhou on 2018-11-15 13:20.
@@ -183,5 +184,33 @@ public class CacheApplication {
     @Bean(name = "randomAsyncCache")
     public Cache randomAsyncCache(@Qualifier("cacheManager4") CacheManager cacheManager) {
         return cacheManager.getCache("randomAsyncCache");
+    }
+
+    @Bean(name = {"cacheManager5"})
+    public CacheManager cacheManager5(RedisSetting redisSetting) {
+        RedisCacheConfig redisCacheConfig = new RedisCacheConfig();
+        redisCacheConfig.setRedisSetting(redisSetting);
+        redisCacheConfig.setPrefix("GRUS_DEMO_5_" + RandomStringUtils.randomAlphabetic(2));
+        redisCacheConfig.setSerializer(RedisSerializer.java());
+        redisCacheConfig.setUseGzip(true);
+        redisCacheConfig.setCacheNull(true);
+        redisCacheConfig.setCacheConfigFunc(name -> {
+            switch (name) {
+                case "redis":
+                    return CacheConfig.redis().setExpireSeconds(600);
+                case "l2":
+                    return CacheConfig.l2().setExpireSeconds(600).setLocalExpireSeconds(120).setSerialize(true);
+                case "local":
+                    return CacheConfig.local().setExpireSeconds(60);
+            }
+            return CacheConfig.l2().setSerialize(false);
+        });
+        return new RedisCacheManager(redisCacheConfig);
+    }
+
+    @Bean(name = "caches")
+    public Caches caches(@Qualifier("cacheManager5") CacheManager cacheManager) {
+        return new Caches(List.of(cacheManager.getCache("redis"),
+                cacheManager.getCache("l2"), cacheManager.getCache("local")));
     }
 }

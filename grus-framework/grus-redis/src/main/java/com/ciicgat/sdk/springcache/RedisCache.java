@@ -34,12 +34,12 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
         return this;
     }
 
-    private byte[] makeKey(Object key) {
+    private byte[] makeKey(String key) {
         return Bytes.toBytes(this.prefix + key);
     }
 
     @Override
-    protected final ValueWrapper get0(Object key) {
+    protected final ValueWrapper get0(String key) {
         BytesValue bytesValue = getValue(key);
         if (Objects.isNull(bytesValue)) {
             return null;
@@ -48,12 +48,12 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
     }
 
     @Override
-    public void putNewValue(Object key, Object value) {
+    public void putNewValue(String key, Object value) {
         putIgnoreException(key, value);
     }
 
 
-    protected BytesValue getValue(Object key) {
+    protected BytesValue getValue(String key) {
         byte[] redisKey = makeKey(key);
         byte[] redisValue = execute(redisConnection -> redisConnection.get(redisKey));
         if (redisValue == null) {
@@ -66,18 +66,18 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
     }
 
     @Override
-    public long ttl(Object key) {
+    public long ttl(String key) {
         byte[] redisKey = makeKey(key);
         return execute(redisConnection -> redisConnection.ttl(redisKey)).longValue();
     }
 
     @Override
-    protected void put0(final Object key, final Object value) {
+    protected void put0(final String key, final Object value) {
         BytesValue bytesValue = value == null ? NULL_BYTES_VALUE : new BytesValue(valueSerializer.serialize(value), value);
         saveRedisCache(key, bytesValue);
     }
 
-    protected final void saveRedisCache(final Object key, final BytesValue bytesValue) {
+    protected final void saveRedisCache(final String key, final BytesValue bytesValue) {
         byte[] redisKey = makeKey(key);
         execute(redisConnection -> {
             var redisValue = bytesValue.getBytes();
@@ -90,7 +90,7 @@ public class RedisCache<R extends CacheConfig.Redis> extends AbstractCache<R> im
 
 
     @Override
-    protected void evict0(Object key) {
+    protected void evict0(String key) {
         byte[] redisKey = makeKey(key);
         execute(redisConnection -> redisConnection.del(redisKey));
     }

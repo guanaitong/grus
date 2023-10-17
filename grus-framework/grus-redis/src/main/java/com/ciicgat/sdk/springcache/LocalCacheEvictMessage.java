@@ -13,14 +13,14 @@ import com.ciicgat.sdk.lang.tool.Bytes;
  * Created by August.Zhou on 2020/12/15 17:13.
  */
 public class LocalCacheEvictMessage {
-    private Object key;
+    private String key;
     private String name;
     private String id;
 
     public LocalCacheEvictMessage() {
     }
 
-    public LocalCacheEvictMessage(Object key, String name, String id) {
+    public LocalCacheEvictMessage(String key, String name, String id) {
         this.key = key;
         this.name = name;
         this.id = id;
@@ -43,11 +43,11 @@ public class LocalCacheEvictMessage {
         return JSON.parse(Bytes.toString(bytes), LocalCacheEvictMessage.class);
     }
 
-    public Object getKey() {
+    public String getKey() {
         return key;
     }
 
-    public void setKey(Object key) {
+    public void setKey(String key) {
         this.key = key;
     }
 

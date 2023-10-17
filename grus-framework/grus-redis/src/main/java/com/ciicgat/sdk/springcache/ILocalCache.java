@@ -11,5 +11,5 @@ package com.ciicgat.sdk.springcache;
  */
 interface ILocalCache {
 
-    void clearLocal(Object key);
+    void clearLocal(String key);
 }

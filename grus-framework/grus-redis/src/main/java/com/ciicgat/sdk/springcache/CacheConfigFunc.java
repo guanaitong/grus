@@ -12,5 +12,5 @@ package com.ciicgat.sdk.springcache;
 public interface CacheConfigFunc {
     CacheConfigFunc DEFAULT = cacheName -> CacheConfig.redis();
 
-    CacheConfig getCacheConfig(String cacheName);
+    CacheConfig<?> getCacheConfig(String cacheName);
 }

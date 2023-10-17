@@ -7,8 +7,8 @@ package com.ciicgat.sdk.springcache;
 
 import com.ciicgat.sdk.lang.tool.Bytes;
 import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
-import com.ciicgat.sdk.redis.config.RedisSetting;
 import com.ciicgat.sdk.redis.SpringRedisConfCreator;
+import com.ciicgat.sdk.redis.config.RedisSetting;
 import com.ciicgat.sdk.util.system.Systems;
 import io.lettuce.core.ClientOptions;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -80,7 +80,7 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
     }
 
 
-    void sendEvictMessage(Object key, String name) {
+    void sendEvictMessage(String key, String name) {
         try (RedisConnection connection = redisConnectionFactory.getConnection()) {
             connection.publish(getChannel(), new LocalCacheEvictMessage(key, name, id).toBytes());
         } catch (Exception e) {

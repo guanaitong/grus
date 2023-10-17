@@ -11,6 +11,7 @@ import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.annotation.Resource;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,6 +50,8 @@ public class SpringCacheTests {
     private CacheManager cacheManager3;
     @Resource
     private Cache frequencyAsyncCache;
+    @Resource
+    private Caches caches;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -318,4 +321,28 @@ public class SpringCacheTests {
         });
         Assertions.assertNull(value4);
     }
+
+    @Test
+    public void test_caches() {
+        for (Cache cache : caches.getCaches()) {
+            RandomKey randomKey = new RandomKey();
+            String value = RandomStringUtils.randomAlphabetic(4);
+            Cache.ValueWrapper valueWrapper1 = cache.get(randomKey);
+            Assertions.assertNull(valueWrapper1);
+            cache.put(randomKey, value);
+            Cache.ValueWrapper valueWrapper2 = cache.get(randomKey);
+            Assertions.assertEquals(value, valueWrapper2.get());
+            cache.evict(randomKey);
+            Cache.ValueWrapper valueWrapper3 = cache.get(randomKey);
+            Assertions.assertNull(valueWrapper3);
+
+            RandomKey randomKey2 = new RandomKey();
+            cache.put(randomKey2, null);
+
+            Cache.ValueWrapper valueWrapper4 = cache.get(randomKey2);
+            Assertions.assertNotNull(valueWrapper4);
+            Assertions.assertNull(valueWrapper4.get());
+        }
+    }
+
 }

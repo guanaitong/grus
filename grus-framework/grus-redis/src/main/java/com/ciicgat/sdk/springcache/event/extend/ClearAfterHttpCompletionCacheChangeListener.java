@@ -68,7 +68,7 @@ public class ClearAfterHttpCompletionCacheChangeListener implements CacheChangeL
          */
         CacheChangeEvent[] cacheChangeEventsCopy = cacheChangeEvents.toArray(new CacheChangeEvent[cacheChangeEvents.size()]);
         for (CacheChangeEvent cacheChangeEvent : cacheChangeEventsCopy) {
-            cacheChangeEvent.getCache().evict(cacheChangeEvent.getKey());
+            cacheChangeEvent.getCache().evictByStringKey(cacheChangeEvent.getKey());
             LOGGER.info("evicted,cache {},key {}", cacheChangeEvent.getCache().getName(), cacheChangeEvent.getKey());
         }
     }

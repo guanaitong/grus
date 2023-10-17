@@ -31,7 +31,7 @@ import java.util.function.Function;
  * @Author: August
  * @Date: 2021/4/15 9:46
  */
-public abstract class AbstractCache<C extends CacheConfig> implements Cache {
+public abstract class AbstractCache<C extends CacheConfig> implements EnhanceCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCache.class);
     protected static final Object NULL = new Object();
     protected static final BytesValue NULL_BYTES_VALUE = new BytesValue(Bytes.EMPTY_BYTE_ARRAY, NULL);
@@ -90,13 +90,18 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         }
     }
 
-    protected final void sendEvictMessage(Object key) {
+    protected final void sendEvictMessage(String key) {
         redisCacheManager.sendEvictMessage(key, name);
     }
 
 
     @Override
     public final ValueWrapper get(Object key) {
+        return getByStringKey(CacheKey.key(key));
+    }
+
+    @Override
+    public final ValueWrapper getByStringKey(String key) {
         long start = System.nanoTime();
         try {
             ValueWrapper valueWrapper = get0(key);
@@ -114,10 +119,15 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         return null;
     }
 
-    protected abstract ValueWrapper get0(Object key);
+    protected abstract ValueWrapper get0(String key);
 
     @Override
     public final void put(Object key, Object value) {
+        putByStringKey(CacheKey.key(key), value);
+    }
+
+    @Override
+    public final void putByStringKey(String key, Object value) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
@@ -130,9 +140,10 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         }
     }
 
-    public abstract void putNewValue(Object key, Object value);
+    @Override
+    public abstract void putNewValue(String key, Object value);
 
-    protected boolean putIgnoreException(Object key, Object value) {
+    protected boolean putIgnoreException(String key, Object value) {
         try {
             if (Objects.isNull(value) && !cacheNull) {
                 return false;
@@ -146,10 +157,15 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         return false;
     }
 
-    protected abstract void put0(Object key, Object value);
+    protected abstract void put0(String key, Object value);
 
     @Override
     public final void evict(Object key) {
+        evictByStringKey(CacheKey.key(key));
+    }
+
+    @Override
+    public final void evictByStringKey(String key) {
         evictIgnoreException(key);
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
@@ -161,18 +177,17 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         }
     }
 
-    private void evictIgnoreException(Object key) {
-        String stringKey = CacheKey.key(key);
+    private void evictIgnoreException(String key) {
         try {
-            statsCounter.recordEviction(1, RemovalCause.EXPIRED);
-            evict0(stringKey);
-            cacheChangeListener.onChanged(new CacheChangeEvent(CacheChangeType.EVICT, stringKey, this));
+            statsCounter.recordEviction(1, RemovalCause.REPLACED);
+            evict0(key);
+            cacheChangeListener.onChanged(new CacheChangeEvent(CacheChangeType.EVICT, key, this));
         } catch (Exception e) {
-            LOGGER.warn("evict value failed,cache {},key {}", this.name, stringKey, e);
+            LOGGER.warn("evict value failed,cache {},key {}", this.name, key, e);
         }
     }
 
-    protected abstract void evict0(Object key);
+    protected abstract void evict0(String key);
 
 
     @Override
@@ -218,10 +233,10 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
             return getWithCacheFallBack(key, valueLoader);
         }
         String stringKey = CacheKey.key(key);
-        final Cache.ValueWrapper valueWrapper = get(stringKey);
+        final Cache.ValueWrapper valueWrapper = getByStringKey(stringKey);
         if (valueWrapper == null) {
             Object o = applyCall(valueLoader);
-            put(stringKey, o);
+            putByStringKey(stringKey, o);
             this.refreshPolicy.recordCacheInit(isGlobalRefreshPolicy, this, stringKey);
             return (T) o;
         } else {
@@ -245,11 +260,11 @@ public abstract class AbstractCache<C extends CacheConfig> implements Cache {
         String stringKey = CacheKey.key(key);
         try {
             T value = valueLoader.call();
-            redisCacheManager.getRefreshExecutor().execute(() -> put(stringKey, value));
+            redisCacheManager.getRefreshExecutor().execute(() -> putByStringKey(stringKey, value));
             return value;
         } catch (Exception e) {
-            LOGGER.warn("call failed,cache {},key {}", this.name, key, e);
-            final Cache.ValueWrapper valueWrapper = get(stringKey);
+            LOGGER.warn("call failed,cache {},key {}", this.name, stringKey, e);
+            final Cache.ValueWrapper valueWrapper = getByStringKey(stringKey);
             return valueWrapper == null ? null : (T) valueWrapper.get();
         }
     }

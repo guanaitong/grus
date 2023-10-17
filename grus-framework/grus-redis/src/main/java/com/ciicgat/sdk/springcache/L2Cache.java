@@ -45,7 +45,7 @@ public class L2Cache extends RedisCache<CacheConfig.L2> implements ILocalCache {
     }
 
     @Override
-    protected BytesValue getValue(Object key) {
+    protected BytesValue getValue(String key) {
         Object value = localCache.getIfPresent(key);
         if (value == null) {
             // 从redis中取
@@ -71,7 +71,7 @@ public class L2Cache extends RedisCache<CacheConfig.L2> implements ILocalCache {
 
 
     @Override
-    protected void put0(Object key, Object value) {
+    protected void put0(String key, Object value) {
         if (Objects.isNull(value)) {
             localCache.put(key, NULL);
             saveRedisCache(key, NULL_BYTES_VALUE);
@@ -88,14 +88,14 @@ public class L2Cache extends RedisCache<CacheConfig.L2> implements ILocalCache {
     }
 
     @Override
-    public void putNewValue(Object key, Object value) {
+    public void putNewValue(String key, Object value) {
         if (putIgnoreException(key, value)) {
             sendEvictMessage(key);
         }
     }
 
     @Override
-    public void evict0(Object key) {
+    public void evict0(String key) {
         super.evict0(key);
         localCache.invalidate(key);
         sendEvictMessage(key);
@@ -110,7 +110,7 @@ public class L2Cache extends RedisCache<CacheConfig.L2> implements ILocalCache {
     }
 
     @Override
-    public void clearLocal(Object key) {
+    public void clearLocal(String key) {
         if (key == null) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("invalidateAll cache {}", name);

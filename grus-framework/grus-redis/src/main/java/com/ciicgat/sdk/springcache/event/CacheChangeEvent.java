@@ -12,10 +12,10 @@ import com.ciicgat.sdk.springcache.AbstractCache;
  */
 public class CacheChangeEvent {
     private final CacheChangeType cacheChangeType;
-    private final Object key;
+    private final String key;
     private final AbstractCache<?> cache;
 
-    public CacheChangeEvent(CacheChangeType cacheChangeType, Object key, AbstractCache<?> cache) {
+    public CacheChangeEvent(CacheChangeType cacheChangeType, String key, AbstractCache<?> cache) {
         this.cacheChangeType = cacheChangeType;
         this.key = key;
         this.cache = cache;
@@ -29,7 +29,7 @@ public class CacheChangeEvent {
         return cacheChangeType;
     }
 
-    public Object getKey() {
+    public String getKey() {
         return key;
     }
 }

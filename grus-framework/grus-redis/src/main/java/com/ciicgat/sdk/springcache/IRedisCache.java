@@ -19,5 +19,5 @@ public interface IRedisCache {
      * @param key
      * @return
      */
-    long ttl(Object key);
+    long ttl(String key);
 }

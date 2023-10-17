@@ -21,12 +21,12 @@ import java.util.concurrent.TimeUnit;
  */
 public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILocalCache {
     private static final Logger LOGGER = LoggerFactory.getLogger(LocalCache.class);
-    private final com.github.benmanes.caffeine.cache.Cache<Object, Object> localCache;
+    private final com.github.benmanes.caffeine.cache.Cache<String, Object> localCache;
 
 
     public LocalCache(String name, RedisCacheManager redisCacheManager, CacheConfig.Local local) {
         super(name, redisCacheManager, local);
-        Caffeine<Object, Object> caffeine = Caffeine.newBuilder()
+        var caffeine = Caffeine.newBuilder()
                 .maximumSize(local.getMaximumSize())
                 .initialCapacity(local.getInitialCapacity());
         if (local.getExpireSeconds() > 0) {
@@ -44,7 +44,7 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
     }
 
     @Override
-    protected ValueWrapper get0(Object key) {
+    protected ValueWrapper get0(String key) {
         Object value = localCache.getIfPresent(key);
         if (value == null) {
             return null;
@@ -53,20 +53,20 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
     }
 
     @Override
-    public void putNewValue(Object key, Object value) {
+    public void putNewValue(String key, Object value) {
         if (putIgnoreException(key, value)) {
             sendEvictMessage(key);
         }
     }
 
     @Override
-    protected void put0(Object key, Object value) {
+    protected void put0(String key, Object value) {
         Object putValue = value == null ? NULL : this.config.isSerialize() ? valueSerializer.serialize(value) : value;
         localCache.put(key, putValue);
     }
 
     @Override
-    protected void evict0(Object key) {
+    protected void evict0(String key) {
         localCache.invalidate(key);
         sendEvictMessage(key);
     }
@@ -83,7 +83,7 @@ public class LocalCache extends AbstractCache<CacheConfig.Local> implements ILoc
      * @param key 缓存key
      */
     @Override
-    public void clearLocal(Object key) {
+    public void clearLocal(String key) {
         if (key == null) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("invalidateAll cache {}", name);
