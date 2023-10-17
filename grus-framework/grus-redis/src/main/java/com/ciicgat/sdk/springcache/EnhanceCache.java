@@ -26,4 +26,6 @@ public interface EnhanceCache extends Cache {
      * @param value
      */
     void putNewValue(String key, Object value);
+
+    <T> T getWithCacheFallBack(Object key, Callable<T> valueLoader);
 }
