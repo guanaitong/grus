@@ -7,6 +7,8 @@ package com.ciicgat.sdk.springcache;
 
 import org.springframework.cache.Cache;
 
+import java.util.concurrent.Callable;
+
 /**
  * Created by August.Zhou on 2023/10/17 21:22
  */
@@ -28,4 +30,5 @@ public interface EnhanceCache extends Cache {
     void putNewValue(String key, Object value);
 
     <T> T getWithCacheFallBack(Object key, Callable<T> valueLoader);
+
 }
