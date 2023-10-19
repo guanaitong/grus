@@ -14,7 +14,15 @@ unit-test-java17:
   script:
     - mvn $MAVEN_CLI_OPTS install -Djacoco.skip=false
     - mvn sonar:sonar -Dsonar.projectKey=grus-2024 -Dsonar.projectName=grus-2024
-
+  artifacts:
+    expire_in: 7 days
+    when: always
+    reports:
+      junit:
+        - grus-boot-autoconfigure/target/surefire-reports/TEST-*.xml
+        - grus-boot-autoconfigure/target/failsafe-reports/TEST-*.xml
+        - grus-framework/*/target/surefire-reports/TEST-*.xml
+        - grus-framework/*/target/failsafe-reports/TEST-*.xml
 
 
 unit-test-java21:
