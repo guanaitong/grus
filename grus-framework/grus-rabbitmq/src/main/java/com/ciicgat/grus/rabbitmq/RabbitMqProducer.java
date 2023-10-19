@@ -11,6 +11,7 @@ import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
+import com.google.common.util.concurrent.RateLimiter;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -54,6 +55,8 @@ public class RabbitMqProducer {
      */
     private final boolean confirm;
 
+    private final RateLimiter rateLimiter = RateLimiter.create(2000);
+
     public RabbitMqProducer(Connection connection, int parallel, boolean confirm, boolean createMessageId, boolean createTimestamp) {
         this.channelPool = new ChannelPool(connection, parallel, confirm);
         this.confirm = confirm;
@@ -63,6 +66,10 @@ public class RabbitMqProducer {
 
     public ExchangePublisher exchangePublisher(String exchange) {
         return new ExchangePublisher(this, exchange);
+    }
+
+    public void setSaveQps(double qps) {
+        rateLimiter.setRate(qps);
     }
 
     /**
@@ -99,6 +106,7 @@ public class RabbitMqProducer {
         } else { // 其他类型时，默认直接转化为json
             bytes = JSON.toBytes(value);
         }
+        rateLimiter.acquire();
         Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder("producer").setSpanKind(SpanKind.PRODUCER).setParent(Context.current()).startSpan();
         Channel channel = null;
