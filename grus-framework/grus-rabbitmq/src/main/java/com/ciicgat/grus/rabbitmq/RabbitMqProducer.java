@@ -68,7 +68,7 @@ public class RabbitMqProducer {
         return new ExchangePublisher(this, exchange);
     }
 
-    public void setSaveQps(double qps) {
+    public void setQps(double qps) {
         rateLimiter.setRate(qps);
     }
 

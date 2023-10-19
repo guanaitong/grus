@@ -124,7 +124,7 @@ public class TestMq {
         receiver.consume(forTestRoutingKeyB, multiRouteProcessor);
         receiver.consume(forTestRoutingKeyC, multiRouteProcessor);
 
-
+        dispatcher.setQps(1000);
         ExchangePublisher exchangePublisher = dispatcher.exchangePublisher(forTestExchangeName);
         for (TestData s : msgList) {
             exchangePublisher.publish(forTestRoutingKeyA, s);
