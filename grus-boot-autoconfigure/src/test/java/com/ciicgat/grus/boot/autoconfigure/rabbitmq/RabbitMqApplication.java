@@ -6,6 +6,7 @@
 package com.ciicgat.grus.boot.autoconfigure.rabbitmq;
 
 import com.ciicgat.grus.boot.autoconfigure.data.GrusDataAutoConfiguration;
+import com.ciicgat.grus.boot.autoconfigure.data.GrusPageHelperAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.elasticsearch.ElasticsearchAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.feign.FeignAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.job.ElasticJobAutoConfiguration;
@@ -30,6 +31,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
         OpenTelemetryAutoConfiguration.class,
         GrusWebAutoConfiguration.class,
         ValidationAutoConfiguration.class,
+        GrusPageHelperAutoConfiguration.class,
         ZKAutoConfiguration.class,
         ElasticsearchAutoConfiguration.class,
         QuartzAutoConfiguration.class,

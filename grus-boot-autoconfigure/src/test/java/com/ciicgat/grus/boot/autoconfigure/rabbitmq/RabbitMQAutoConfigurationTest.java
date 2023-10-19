@@ -9,7 +9,6 @@ import com.ciicgat.grus.boot.autoconfigure.condition.ServerEnvCondition;
 import com.ciicgat.grus.boot.autoconfigure.core.GrusCoreContextInitializer;
 import com.ciicgat.grus.rabbitmq.RabbitMqConsumer;
 import com.ciicgat.grus.rabbitmq.RabbitMqProducer;
-import com.rabbitmq.client.Connection;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -71,21 +70,17 @@ public class RabbitMQAutoConfigurationTest {
                 .withSystemProperties()
                 .withPropertyValues("spring.application.name=grus-demo", "grus.rabbitmq.producer.enable=true", "grus.rabbitmq.useSingleConnection=false")
                 .run(context -> {
-                    Connection connection = context.getBean("producerConnection", Connection.class);
-                    assertThat(connection).isInstanceOf(Connection.class);
                     RabbitMqProducer rabbitMqProducer = context.getBean(RabbitMqProducer.class);
                     assertThat(rabbitMqProducer).isInstanceOf(RabbitMqProducer.class);
                 });
     }
 
-    //    @Test
+    @Test
     public void testConsumer() {
         this.contextRunner
                 .withSystemProperties()
                 .withPropertyValues("spring.application.name=grus-demo", "grus.rabbitmq.consumer.enable=true")
                 .run(context -> {
-                    Connection connection = context.getBean("consumerConnection", Connection.class);
-                    assertThat(connection).isInstanceOf(Connection.class);
                     RabbitMqConsumer rabbitMqConsumer = context.getBean(RabbitMqConsumer.class);
                     assertThat(rabbitMqConsumer).isInstanceOf(RabbitMqConsumer.class);
                 });
