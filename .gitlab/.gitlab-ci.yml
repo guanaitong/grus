@@ -4,7 +4,7 @@ variables:
 
 stages:
   - test
-  - build
+  - visualize
   - deploy
 
 
@@ -15,15 +15,35 @@ unit-test-java17:
     - mvn $MAVEN_CLI_OPTS install -Djacoco.skip=false
     - mvn sonar:sonar -Dsonar.projectKey=grus-2024 -Dsonar.projectName=grus-2024
   artifacts:
-    expire_in: 7 days
+    expire_in: 14 days
     when: always
     reports:
       junit:
-        - grus-boot-autoconfigure/target/surefire-reports/TEST-*.xml
-        - grus-boot-autoconfigure/target/failsafe-reports/TEST-*.xml
-        - grus-framework/*/target/surefire-reports/TEST-*.xml
-        - grus-framework/*/target/failsafe-reports/TEST-*.xml
+        - "*/target/surefire-reports/TEST-*.xml"
+        - "*/target/failsafe-reports/TEST-*.xml"
+        - "*/*/target/surefire-reports/TEST-*.xml"
+        - "*/*/target/failsafe-reports/TEST-*.xml"
+    paths:
+      - "grus-boot-autoconfigure/target/site/jacoco-aggregate/jacoco.xml"
 
+visualize-coverage:
+  # Must be in a stage later than test-jdk11's stage.
+  # The `visualize` stage does not exist by default.
+  # Please define it first, or choose an existing stage like `deploy`.
+  stage: visualize
+  image: registry.wuxingdev.cn/build/jacoco2cobertura:1.0.9
+  script:
+    - jacoco_paths=`find * -path "**/src/main/java" -type d | sed -e 's@^@'"$CI_PROJECT_DIR"'/@'`
+    - python /opt/cover2cover.py grus-boot-autoconfigure/target/site/jacoco-aggregate/jacoco.xml $jacoco_paths > grus-boot-autoconfigure/target/site/jacoco-aggregate/coverage.xml
+  needs: [ "unit-test-java17" ]
+  dependencies:
+    - unit-test-java17
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: grus-boot-autoconfigure/target/site/jacoco-aggregate/coverage.xml
+    expire_in: "14 days"
 
 unit-test-java21:
   image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-21

@@ -1,3 +1,6 @@
 # Grus
 
 Grus ("鹤"), 关爱通 Java 框架2.0。
+
+
+[![Quality Gate Status](https://sonarqube.wuxingdev.cn/api/project_badges/measure?project=grus-2024&metric=alert_status&token=sqb_898261a3257a572d2724e39d2fffc473af76e043)](https://sonarqube.wuxingdev.cn/dashboard?id=grus-2024) [![Coverage](https://sonarqube.wuxingdev.cn/api/project_badges/measure?project=grus-2024&metric=coverage&token=sqb_898261a3257a572d2724e39d2fffc473af76e043)](https://sonarqube.wuxingdev.cn/dashboard?id=grus-2024) [![Lines of Code](https://sonarqube.wuxingdev.cn/api/project_badges/measure?project=grus-2024&metric=ncloc&token=sqb_898261a3257a572d2724e39d2fffc473af76e043)](https://sonarqube.wuxingdev.cn/dashboard?id=grus-2024) [![Bugs](https://sonarqube.wuxingdev.cn/api/project_badges/measure?project=grus-2024&metric=bugs&token=sqb_898261a3257a572d2724e39d2fffc473af76e043)](https://sonarqube.wuxingdev.cn/dashboard?id=grus-2024) [![Vulnerabilities](https://sonarqube.wuxingdev.cn/api/project_badges/measure?project=grus-2024&metric=vulnerabilities&token=sqb_898261a3257a572d2724e39d2fffc473af76e043)](https://sonarqube.wuxingdev.cn/dashboard?id=grus-2024) [![Duplicated Lines (%)](https://sonarqube.wuxingdev.cn/api/project_badges/measure?project=grus-2024&metric=duplicated_lines_density&token=sqb_898261a3257a572d2724e39d2fffc473af76e043)](https://sonarqube.wuxingdev.cn/dashboard?id=grus-2024) 
