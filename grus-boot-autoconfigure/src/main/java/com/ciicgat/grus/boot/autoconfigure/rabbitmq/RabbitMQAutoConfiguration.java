@@ -62,7 +62,7 @@ public class RabbitMQAutoConfiguration {
         }
     }
 
-    private static Connection newConnection(RabbitMQProperty rabbitMQProperty) {
+    public static Connection newConnection(RabbitMQProperty rabbitMQProperty) {
         return ConnectionFactory.newConnection(rabbitMQProperty.getAddress(), rabbitMQProperty.getUser(), rabbitMQProperty.getPwd(), rabbitMQProperty.getVhost(), rabbitMQProperty.getConsumer().getParallel());
     }
 
@@ -74,15 +74,11 @@ public class RabbitMQAutoConfiguration {
             LOGGER.info("rabbitMqConsumer enabled");
         }
 
-        @Bean
-        @ConditionalOnMissingBean(name = "consumerConnection")
-        public Connection consumerConnection(RabbitMQProperty rabbitMQProperty) {
-            return newConnection(rabbitMQProperty);
-        }
 
         @Bean(destroyMethod = "close")
         @ConditionalOnMissingBean(name = "rabbitMqConsumer")
-        public RabbitMqConsumer rabbitMqConsumer(RabbitMQProperty rabbitMQProperty, @Qualifier("consumerConnection") Connection consumerConnection) {
+        public RabbitMqConsumer rabbitMqConsumer(RabbitMQProperty rabbitMQProperty) {
+            Connection consumerConnection = newConnection(rabbitMQProperty);
             return new RabbitMqConsumer(consumerConnection, rabbitMQProperty.getConsumer().getParallel(), rabbitMQProperty.getConsumer().getPrefetch(), rabbitMQProperty.getConsumer().getMaxRetry(), rabbitMQProperty.getConsumer().isFallBack());
         }
 
@@ -102,14 +98,9 @@ public class RabbitMQAutoConfiguration {
         }
 
         @Bean
-        @ConditionalOnMissingBean(name = "producerConnection")
-        public Connection producerConnection(RabbitMQProperty rabbitMQProperty) {
-            return newConnection(rabbitMQProperty);
-        }
-
-        @Bean
         @ConditionalOnMissingBean(name = "rabbitMqProducer")
-        public RabbitMqProducer rabbitMqProducer(RabbitMQProperty rabbitMQProperty, @Qualifier("producerConnection") Connection producerConnection) {
+        public RabbitMqProducer rabbitMqProducer(RabbitMQProperty rabbitMQProperty) {
+            Connection producerConnection = newConnection(rabbitMQProperty);
             return new RabbitMqProducer(producerConnection, rabbitMQProperty.getProducer().getParallel(), rabbitMQProperty.getProducer().isConfirm(), rabbitMQProperty.getProducer().isCreateMessageId(), rabbitMQProperty.getProducer().isCreateTimestamp());
         }
     }

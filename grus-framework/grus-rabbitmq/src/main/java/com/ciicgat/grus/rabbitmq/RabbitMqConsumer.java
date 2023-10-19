@@ -6,7 +6,6 @@
 package com.ciicgat.grus.rabbitmq;
 
 import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
-import com.ciicgat.sdk.lang.tool.CloseUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Scheduler;
@@ -19,7 +18,6 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -110,10 +108,5 @@ public class RabbitMqConsumer implements AutoCloseable {
     @Override
     public void close() {
         isRunning.set(false);
-        for (Map.Entry<String, MsgProcessor> processorEntry : queues.entrySet()) {
-            if (processorEntry.getValue() instanceof AutoCloseable) {
-                CloseUtils.close(processorEntry.getValue());
-            }
-        }
     }
 }
