@@ -6,6 +6,7 @@
 package com.ciicgat.grus.boot.autoconfigure.validation.hibernate;
 
 import com.ciicgat.grus.boot.autoconfigure.data.GrusDataAutoConfiguration;
+import com.ciicgat.grus.boot.autoconfigure.elasticsearch.ElasticsearchAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.feign.FeignAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.gconf.GconfAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.job.ElasticJobAutoConfiguration;
@@ -31,6 +32,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
         DataSourceAutoConfiguration.class,
         GrusWebAutoConfiguration.class,
         OpenTelemetryAutoConfiguration.class,
+        ElasticsearchAutoConfiguration.class,
         ElasticJobAutoConfiguration.class,
         ValidationAutoConfiguration.class,
         RabbitMQAutoConfiguration.class,
