@@ -67,7 +67,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>21</java.version>
-        <jacoco-maven-plugin.version>0.8.10</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
         <grus.version>GRUS_VERSION</grus.version>
         <!--DO NOT change es version,because server version is 7.3.1-->
         <elasticsearch.version>7.3.1</elasticsearch.version>
