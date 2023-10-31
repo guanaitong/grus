@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.grus.springservice.trace;
+package com.ciicgat.grus.webflux.client.trace;
 
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;

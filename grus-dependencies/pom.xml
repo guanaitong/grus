@@ -79,7 +79,7 @@
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <artifactId>grus-spring-service</artifactId>
+                <artifactId>grus-spring-webflux</artifactId>
                 <groupId>com.ciicgat.grus</groupId>
                 <version>${revision}</version>
             </dependency>
@@ -109,7 +109,7 @@
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <artifactId>grus-boot-starter-spring-service</artifactId>
+                <artifactId>grus-boot-starter-spring-webflux</artifactId>
                 <groupId>com.ciicgat.grus.boot</groupId>
                 <version>${revision}</version>
             </dependency>

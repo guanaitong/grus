@@ -3,12 +3,12 @@
  * All rights reserved.
  */
 
-package com.ciicgat.grus.springservice;
+package com.ciicgat.grus.webflux.client;
 
 import com.ciicgat.api.core.annotation.ServiceName;
 import com.ciicgat.grus.service.ServiceNames;
 import com.ciicgat.grus.service.naming.NamingService;
-import com.ciicgat.grus.springservice.trace.TraceInterceptor;
+import com.ciicgat.grus.webflux.client.trace.TraceInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;

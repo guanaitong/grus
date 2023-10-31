@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.grus.springservice;
+package com.ciicgat.grus.webflux.client;
 
 import com.ciicgat.api.core.EndPointConfigs;
 import okhttp3.mockwebserver.MockWebServer;

@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.grus.springservice.service;
+package com.ciicgat.grus.webflux.client.service;
 
 import java.io.Serializable;
 import java.util.Objects;

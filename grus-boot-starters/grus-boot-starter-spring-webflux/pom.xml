@@ -14,7 +14,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>grus-boot-starter-spring-service</artifactId>
+    <artifactId>grus-boot-starter-spring-webflux</artifactId>
 
 
     <dependencies>
@@ -24,7 +24,7 @@
         </dependency>
 
         <dependency>
-            <artifactId>grus-spring-service</artifactId>
+            <artifactId>grus-spring-webflux</artifactId>
             <groupId>com.ciicgat.grus</groupId>
         </dependency>
         <dependency>

@@ -3,11 +3,11 @@
  * All rights reserved.
  */
 
-package com.ciicgat.grus.springservice;
+package com.ciicgat.grus.webflux.client;
 
 import com.ciicgat.grus.json.JSON;
-import com.ciicgat.grus.springservice.service.Region;
-import com.ciicgat.grus.springservice.service.RegionService;
+import com.ciicgat.grus.webflux.client.service.Region;
+import com.ciicgat.grus.webflux.client.service.RegionService;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.commons.lang3.tuple.Pair;
