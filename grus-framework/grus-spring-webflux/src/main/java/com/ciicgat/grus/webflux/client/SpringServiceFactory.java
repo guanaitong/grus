@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.grus.springservice;
+package com.ciicgat.grus.webflux.client;
 
 import java.time.Duration;
 

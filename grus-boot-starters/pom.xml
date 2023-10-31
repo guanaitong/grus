@@ -22,7 +22,7 @@
         <module>grus-boot-starter</module>
         <module>grus-boot-starter-opentelemetry</module>
         <module>grus-boot-starter-fegin</module>
-        <module>grus-boot-starter-spring-service</module>
+        <module>grus-boot-starter-spring-webflux</module>
         <module>grus-boot-starter-gfs</module>
         <module>grus-boot-starter-rabbitmq</module>
         <module>grus-boot-starter-redis</module>

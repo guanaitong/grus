@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.grus.springservice.service;
+package com.ciicgat.grus.webflux.client.service;
 
 import com.ciicgat.api.core.annotation.ServiceName;
 import org.springframework.web.bind.annotation.RequestBody;
