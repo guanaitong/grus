@@ -11,6 +11,7 @@ import com.ciicgat.api.core.form.FormEncoder;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.GrusServiceStatus;
+import com.ciicgat.grus.service.ServiceNames;
 import com.ciicgat.grus.service.naming.NamingService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -180,7 +181,7 @@ public class FeignServiceBuilder {
         if (retryer == null) {
             retryer = new ConfigRetryer();
         }
-        ServiceName serviceName = getServiceName();
+        ServiceName serviceName = ServiceNames.getServiceName(this.serviceClazz);
 
         Objects.requireNonNull(serviceName.value(), "serviceName cannot be null");
 
@@ -222,24 +223,6 @@ public class FeignServiceBuilder {
     }
 
 
-    /**
-     * 找appName，优先在类上找，其次才是包
-     *
-     * @return
-     */
-    private ServiceName getServiceName() {
-        ServiceName serviceEndPoint = serviceClazz.getAnnotation(ServiceName.class);
-        if (serviceEndPoint != null) {
-            return serviceEndPoint;
-        }
-
-        serviceEndPoint = serviceClazz.getPackage().getAnnotation(ServiceName.class);
-        if (serviceEndPoint != null) {
-            return serviceEndPoint;
-        }
-
-        throw new RuntimeException("cannot find the appName");
-    }
 
 
 }

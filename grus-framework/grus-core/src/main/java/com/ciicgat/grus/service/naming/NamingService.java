@@ -5,6 +5,7 @@
 
 package com.ciicgat.grus.service.naming;
 
+import com.ciicgat.api.core.annotation.ServiceName;
 import com.ciicgat.sdk.util.system.Systems;
 
 /**
@@ -22,6 +23,19 @@ public interface NamingService {
      * @return http://userdoor或者http://userdoor.services.dev.ofc
      */
     String resolve(String serviceName);
+
+    default String resolveBaseUrl(ServiceName serviceName) {
+        String hostUrl = resolve(serviceName.value());
+        String urlPathPrefix = serviceName.urlPathPrefix();
+        if (!urlPathPrefix.isEmpty()) {
+            if (hostUrl.endsWith("/") || urlPathPrefix.startsWith("/")) {
+                return hostUrl + urlPathPrefix;
+            } else {
+                return hostUrl + "/" + urlPathPrefix;
+            }
+        }
+        return hostUrl;
+    }
 
     /**
      * 通过应用域名反解析出应用名

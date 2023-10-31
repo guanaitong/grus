@@ -46,6 +46,10 @@
             <groupId>com.ciicgat.grus.boot</groupId>
         </dependency>
         <dependency>
+            <artifactId>grus-boot-starter-spring-service</artifactId>
+            <groupId>com.ciicgat.grus.boot</groupId>
+        </dependency>
+        <dependency>
             <artifactId>grus-boot-starter-web</artifactId>
             <groupId>com.ciicgat.grus.boot</groupId>
         </dependency>

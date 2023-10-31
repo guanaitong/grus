@@ -79,6 +79,11 @@
                 <version>${revision}</version>
             </dependency>
             <dependency>
+                <artifactId>grus-spring-service</artifactId>
+                <groupId>com.ciicgat.grus</groupId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
                 <artifactId>grus-generator</artifactId>
                 <groupId>com.ciicgat.grus</groupId>
                 <version>${revision}</version>
@@ -100,6 +105,11 @@
             </dependency>
             <dependency>
                 <artifactId>grus-boot-starter-fegin</artifactId>
+                <groupId>com.ciicgat.grus.boot</groupId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <artifactId>grus-boot-starter-spring-service</artifactId>
                 <groupId>com.ciicgat.grus.boot</groupId>
                 <version>${revision}</version>
             </dependency>
