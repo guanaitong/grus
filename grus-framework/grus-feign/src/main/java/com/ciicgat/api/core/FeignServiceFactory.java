@@ -43,30 +43,38 @@ public class FeignServiceFactory {
 
     public static <T> T newInstance(final Class<T> serviceClazz) {
         return newInstance(serviceClazz,
-                null, null, null, true);
+                null, null, null, true, null);
     }
 
 
     @VisibleForTesting
     public static <T> T newInstance(final Class<T> serviceClazz, Client client) {
         return newInstance(serviceClazz,
-                null, null, client, false);
+                null, null, client, false, null);
+    }
+
+    @VisibleForTesting
+    public static <T> T newInstance(final Class<T> serviceClazz, Client client, FallbackFactory fallbackFactory) {
+        return newInstance(serviceClazz,
+                null, null, client, false, fallbackFactory);
     }
 
 
     public static <T> T newInstance(final Class<T> serviceClazz, Request.Options options) {
         return newInstance(serviceClazz,
-                options, null, null, false);
+                options, null, null, false, null);
     }
 
     public static <T> T newInstance(final Class<T> serviceClazz, Request.Options options,
-                                    Retryer retryer, Client client, boolean fromCache) {
+                                    Retryer retryer, Client client, boolean fromCache,
+                                    FallbackFactory fallbackFactory) {
         return FeignServiceBuilder
                 .newBuilder()
                 .serviceClazz(serviceClazz)
                 .options(options)
                 .retryer(retryer)
                 .client(client)
+                .fallbackFactory(fallbackFactory)
                 .fromCache(fromCache)
                 .build();
     }

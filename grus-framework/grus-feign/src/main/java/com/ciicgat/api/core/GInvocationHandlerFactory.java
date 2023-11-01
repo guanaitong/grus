@@ -185,8 +185,15 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                             LogUtil.truncate(JSON.toJSONString(resp)));
                 }
                 return resp;
-            } catch (BusinessFeignException | BusinessRuntimeException throwable) {
+            } catch (BusinessFeignException throwable) {
                 throw throwable;
+            } catch (BusinessRuntimeException throwable) {
+                // 如果是有定义fallback且抛出的是熔断异常，则执行fallback；反之继续抛出异常
+                if (ErrorCode.REQUEST_BLOCK.getErrorCode() != throwable.getErrorCode() || fallbackFactory == null) {
+                    throw throwable;
+                }
+                Object fallback = fallbackFactory.create(throwable);
+                return method.invoke(fallback, args);
             } catch (Throwable throwable) {
                 if (methodMeta.isIgnoreError()) {
                     LOGGER.warn("Exception has been ignored", throwable);

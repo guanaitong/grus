@@ -5,6 +5,7 @@
 
 package com.ciicgat.api.core;
 
+import feign.Client;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -59,5 +60,15 @@ public class TestUtil {
                 .build());
     }
 
-
+    public static <T> Pair<T, MockWebServer> newInstance(final String appName, final Class<T> serviceClazz,
+                                                         Client client, FallbackFactory<T> factory) {
+        return newInstance(appName, () -> FeignServiceBuilder
+                .newBuilder()
+                .fallbackFactory(factory)
+                .serviceClazz(serviceClazz)
+                .client(client)
+                .logReq(true)
+                .logResp(true)
+                .build());
+    }
 }
