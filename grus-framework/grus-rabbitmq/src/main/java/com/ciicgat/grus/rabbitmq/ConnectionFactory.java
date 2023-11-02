@@ -76,9 +76,7 @@ public class ConnectionFactory {
         } catch (TimeoutException e) {
             throw new RabbitMqException(e);
         }
-        connection.addShutdownListener(cause -> {
-            LOGGER.error("[rabbitMQ 连接被关闭],close:{}", cause.getLocalizedMessage(), cause);
-        });
+        connection.addShutdownListener(cause -> LOGGER.error("[rabbitMQ 连接被关闭],close:{}", cause.getLocalizedMessage(), cause));
         connection.addBlockedListener(new BlockedListener() {
             @Override
             public void handleBlocked(String reason) {
