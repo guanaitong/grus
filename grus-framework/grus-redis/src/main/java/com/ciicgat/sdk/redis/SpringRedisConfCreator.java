@@ -165,6 +165,7 @@ public class SpringRedisConfCreator {
     }
 
     private static void setPool(RedisProperties.Pool pool, RedisSetting redisSetting) {
+        pool.setEnabled(true);
         pool.setMaxActive(redisSetting.getMaxTotal());
         pool.setMaxIdle(redisSetting.getMaxIdle());
         pool.setMinIdle(redisSetting.getMinIdle());
@@ -183,10 +184,6 @@ public class SpringRedisConfCreator {
         redisProperties.setPassword(password);
         redisProperties.setConnectTimeout(Duration.ofMillis(redisSetting.getConnectTimeoutMillis()));
         redisProperties.setTimeout(Duration.ofMillis(redisSetting.getTimeoutMillis()));
-        RedisProperties.Pool pool = new RedisProperties.Pool();
-        pool.setMaxActive(redisSetting.getMaxTotal());
-        pool.setMaxIdle(redisSetting.getMaxIdle());
-        pool.setMinIdle(redisSetting.getMinIdle());
         setPool(redisProperties.getLettuce().getPool(), redisSetting);
         setPool(redisProperties.getJedis().getPool(), redisSetting);
         if (redisSetting.getType() == RedisSetting.TYPE_STANDALONE) {
