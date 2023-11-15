@@ -214,10 +214,6 @@ public class RedisSetting implements RedisConstants {
          */
         private int port;
 
-        private String nodeHost;
-
-        private int nodePort;
-
         public String getHost() {
             return host;
         }
@@ -234,21 +230,6 @@ public class RedisSetting implements RedisConstants {
             this.port = port;
         }
 
-        public String getNodeHost() {
-            return nodeHost;
-        }
-
-        public void setNodeHost(String nodeHost) {
-            this.nodeHost = nodeHost;
-        }
-
-        public int getNodePort() {
-            return nodePort;
-        }
-
-        public void setNodePort(int nodePort) {
-            this.nodePort = nodePort;
-        }
     }
 
     public static class SentinelConfig {
@@ -308,18 +289,6 @@ public class RedisSetting implements RedisConstants {
         return "redis";
     }
 
-    /**
-     * 是否会使用nodePort方式。如果是上海预发环境，那么会优先使用nodeHost和nodePort
-     *
-     * @param standalone 单机模式 redis 配置
-     * @return redis 是否在 k8s 中
-     */
-    public static boolean isSuitableForOutOfK8sConfig(StandaloneConfig standalone) {
-        return WorkRegion.getCurrentWorkRegion().isPrepare()
-                && (WorkRegion.getCurrentWorkRegion().getWorkIdc() == WorkIdc.SH)
-                && StringUtils.isNotEmpty(standalone.getNodeHost())
-                && standalone.getNodePort() > 0;
-    }
 
     public static String clientName() {
         return WorkRegion.getCurrentWorkRegion().getWorkIdc() == WorkIdc.ALI ? null : Systems.APP_NAME;

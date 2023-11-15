@@ -70,16 +70,10 @@ public class RedisExecutorBuilder {
 
     public final JedisPool newJedisPool() {
         RedisSetting.StandaloneConfig standalone = setting.getStandalone();
-        String host = standalone.getHost();
-        int port = standalone.getPort();
-        if (RedisSetting.isSuitableForOutOfK8sConfig(standalone)) {
-            host = standalone.getNodeHost();
-            port = standalone.getNodePort();
-        }
         JedisPoolConfig jedisPoolConfig = createJedisPoolConfig();
         return new JedisPool(jedisPoolConfig,
-                host,
-                port,
+                standalone.getHost(),
+                standalone.getPort(),
                 setting.getConnectTimeoutMillis(),
                 setting.getTimeoutMillis(),
                 setting.getFinalPassword(),

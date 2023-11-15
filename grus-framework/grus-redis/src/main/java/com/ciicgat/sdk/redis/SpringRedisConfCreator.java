@@ -118,13 +118,8 @@ public class SpringRedisConfCreator {
         if (redisSetting.getType() == RedisSetting.TYPE_STANDALONE) {
             RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
             RedisSetting.StandaloneConfig standalone = redisSetting.getStandalone();
-            if (RedisSetting.isSuitableForOutOfK8sConfig(standalone)) {
-                redisConfiguration.setHostName(standalone.getNodeHost());
-                redisConfiguration.setPort(standalone.getNodePort());
-            } else {
-                redisConfiguration.setHostName(standalone.getHost());
-                redisConfiguration.setPort(standalone.getPort());
-            }
+            redisConfiguration.setHostName(standalone.getHost());
+            redisConfiguration.setPort(standalone.getPort());
             redisConfiguration.setPassword(password);
             redisConfiguration.setDatabase(redisSetting.getDb());
             return redisConfiguration;
@@ -189,13 +184,8 @@ public class SpringRedisConfCreator {
         if (redisSetting.getType() == RedisSetting.TYPE_STANDALONE) {
             redisProperties.setDatabase(redisSetting.getDb());
             RedisSetting.StandaloneConfig standalone = redisSetting.getStandalone();
-            if (RedisSetting.isSuitableForOutOfK8sConfig(standalone)) {
-                redisProperties.setHost(standalone.getNodeHost());
-                redisProperties.setPort(standalone.getNodePort());
-            } else {
-                redisProperties.setHost(standalone.getHost());
-                redisProperties.setPort(standalone.getPort());
-            }
+            redisProperties.setHost(standalone.getHost());
+            redisProperties.setPort(standalone.getPort());
         } else if (redisSetting.getType() == RedisSetting.TYPE_SENTINEL) {
             redisProperties.setDatabase(redisSetting.getDb());
             RedisSetting.SentinelConfig sentinel = redisSetting.getSentinel();
