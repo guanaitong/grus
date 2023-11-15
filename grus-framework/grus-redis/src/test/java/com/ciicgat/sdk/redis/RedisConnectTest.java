@@ -107,7 +107,7 @@ public class RedisConnectTest {
             @Override
             public Object apply(RedisConnection connection) {
                 String prefix = "8";
-                Cursor<byte[]> cursor = connection.scan(new ScanOptions.ScanOptionsBuilder().match(prefix + "*").count(512).build());
+                Cursor<byte[]> cursor = connection.scan(ScanOptions.scanOptions().match(prefix + "*").count(512).build());
                 while (cursor.hasNext()) {
                     byte[] key = cursor.next();
                     try {

@@ -164,6 +164,12 @@ public class SpringRedisConfCreator {
         return nodes;
     }
 
+    private static void setPool(RedisProperties.Pool pool, RedisSetting redisSetting) {
+        pool.setMaxActive(redisSetting.getMaxTotal());
+        pool.setMaxIdle(redisSetting.getMaxIdle());
+        pool.setMinIdle(redisSetting.getMinIdle());
+    }
+
     /**
      * 改方法，将redisSetting配置，转换为spring RedisProperties的配置。
      *
@@ -181,8 +187,8 @@ public class SpringRedisConfCreator {
         pool.setMaxActive(redisSetting.getMaxTotal());
         pool.setMaxIdle(redisSetting.getMaxIdle());
         pool.setMinIdle(redisSetting.getMinIdle());
-        redisProperties.getLettuce().setPool(pool);
-        redisProperties.getJedis().setPool(pool);
+        setPool(redisProperties.getLettuce().getPool(), redisSetting);
+        setPool(redisProperties.getJedis().getPool(), redisSetting);
         if (redisSetting.getType() == RedisSetting.TYPE_STANDALONE) {
             redisProperties.setDatabase(redisSetting.getDb());
             RedisSetting.StandaloneConfig standalone = redisSetting.getStandalone();
