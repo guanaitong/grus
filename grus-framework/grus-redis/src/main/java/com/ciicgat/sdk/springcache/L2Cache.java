@@ -104,8 +104,8 @@ public class L2Cache extends RedisCache<CacheConfig.L2> implements ILocalCache {
 
     @Override
     protected void clear0() {
-        super.clear0();
         localCache.invalidateAll();
+        super.clear0();
         sendEvictMessage(null);
     }
 

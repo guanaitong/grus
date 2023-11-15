@@ -67,49 +67,6 @@ public class RedisSetting implements RedisConstants {
 
     private Map<String, String> params = Collections.emptyMap();
 
-    /**
-     * Maximum number of "idle" connections in the pool. Use a negative value to
-     * indicate an unlimited number of idle connections.
-     */
-    private int maxIdle = 8;
-
-    /**
-     * Target for the minimum number of idle connections to maintain in the pool. This
-     * setting only has an effect if both it and time between eviction runs are
-     * positive.
-     */
-    private int minIdle = 0;
-
-    /**
-     * Maximum number of connections that can be allocated by the pool at a given
-     * time. Use a negative value for no limit.
-     */
-    private int maxActive = 8;
-
-    public int getMaxIdle() {
-        return maxIdle;
-    }
-
-    public void setMaxIdle(int maxIdle) {
-        this.maxIdle = maxIdle;
-    }
-
-    public int getMinIdle() {
-        return minIdle;
-    }
-
-    public void setMinIdle(int minIdle) {
-        this.minIdle = minIdle;
-    }
-
-    public int getMaxActive() {
-        return maxActive;
-    }
-
-    public void setMaxActive(int maxActive) {
-        this.maxActive = maxActive;
-    }
-
     public int getType() {
         return type;
     }
@@ -145,10 +102,11 @@ public class RedisSetting implements RedisConstants {
      */
     @JsonIgnore
     public String getFinalPassword() {
+        String finalPassword = password;
         if (StringUtils.isNotEmpty(this.getEncryptedPassword())) {
-            return PublicKeyOwner.decrypt(this.getEncryptedPassword());
+            finalPassword = PublicKeyOwner.decrypt(this.getEncryptedPassword());
         }
-        return password;
+        return StringUtils.isEmpty(finalPassword) ? null : finalPassword;
     }
 
     public void setPassword(String password) {
@@ -202,10 +160,26 @@ public class RedisSetting implements RedisConstants {
     }
 
     @JsonIgnore
+    public int getMaxTotal() {
+        return this.getParamsIntValue("maxTotal", DEFAULT_MAX_ACTIVE);
+    }
+
+    @JsonIgnore
+    public int getMinIdle() {
+        return this.getParamsIntValue("minIdle", DEFAULT_MIN_IDLE);
+    }
+
+    @JsonIgnore
+    public int getMaxIdle() {
+        return this.getParamsIntValue("maxIdle", DEFAULT_MAX_IDLE);
+    }
+
+
+    @JsonIgnore
     public void configPool(GenericObjectPoolConfig<?> poolConfig) {
-        poolConfig.setMaxTotal(this.getParamsIntValue("maxTotal", DEFAULT_MAX_ACTIVE));
-        poolConfig.setMaxIdle(this.getParamsIntValue("maxIdle", DEFAULT_MAX_IDLE));
-        poolConfig.setMinIdle(this.getParamsIntValue("minIdle", DEFAULT_MIN_IDLE));
+        poolConfig.setMaxTotal(this.getMaxTotal());
+        poolConfig.setMaxIdle(this.getMaxIdle());
+        poolConfig.setMinIdle(this.getMinIdle());
         poolConfig.setMaxWait(Duration.ofMillis(this.getParamsIntValue("maxWaitMillis", DEFAULT_MAX_WAIT_MILLIS)));
     }
 

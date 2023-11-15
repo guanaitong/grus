@@ -10,7 +10,10 @@ import com.ciicgat.sdk.redis.config.RedisSetting;
 import io.lettuce.core.ClientOptions;
 import io.lettuce.core.SocketOptions;
 import io.lettuce.core.TimeoutOptions;
+import io.lettuce.core.cluster.ClusterClientOptions;
+import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -20,11 +23,9 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
-import org.springframework.util.Assert;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.ciicgat.sdk.redis.config.RedisConstants.DEFAULT_MAX_ATTEMPTS;
@@ -62,18 +63,34 @@ public class SpringRedisConfCreator {
      * 无须大家手动调用afterPropertiesSet()方法,容器会自动调用，即init为false。<br/>
      * 如果不交给spring管理，那么传入的init需要为true
      *
-     * @param redisSetting gconf 上 Redis 配置对象
-     * @param init         是否不交给 spring 管理
-     * @param disconnectedBehavior      如果设置REJECT_COMMANDS，那么当连接断开时，如果来了新的命令，那会拒绝。符合failfast要求。如果设置default会出现默认500ms的commandtimeout
+     * @param redisSetting         gconf 上 Redis 配置对象
+     * @param init                 是否不交给 spring 管理
+     * @param disconnectedBehavior 如果设置REJECT_COMMANDS，那么当连接断开时，如果来了新的命令，那会拒绝。符合failfast要求。如果设置default会出现默认500ms的commandtimeout
      * @return RedisConnectionFactory
      */
     public static RedisConnectionFactory newRedisConnectionFactory(RedisSetting redisSetting, boolean init, ClientOptions.DisconnectedBehavior disconnectedBehavior) {
         RedisConfiguration redisConfiguration = newRedisConfiguration(redisSetting);
-        ClientOptions clientOptions = ClientOptions.builder().timeoutOptions(TimeoutOptions.enabled())
+        ClientOptions.Builder clientOptionBuilder;
+        if (redisSetting.getType() == RedisSetting.TYPE_CLUSTER) {
+            ClusterTopologyRefreshOptions topologyRefreshOptions = ClusterTopologyRefreshOptions.builder()
+                    .dynamicRefreshSources(true)
+                    //开启自适应刷新
+                    //.enableAdaptiveRefreshTrigger(ClusterTopologyRefreshOptions.RefreshTrigger.MOVED_REDIRECT, ClusterTopologyRefreshOptions.RefreshTrigger.PERSISTENT_RECONNECTS)
+                    .enableAllAdaptiveRefreshTriggers() //开启所有自适应刷新，MOVED，ASK，PERSISTENT都会触发
+                    .adaptiveRefreshTriggersTimeout(Duration.ofSeconds(30)) // 自适应刷新超时时间(默认30秒)
+                    .enablePeriodicRefresh(Duration.ofSeconds(60))  // 开周期刷新
+                    .build();
+            ClusterClientOptions.Builder clusterClientOptionBuilder = ClusterClientOptions.builder();
+            clusterClientOptionBuilder.topologyRefreshOptions(topologyRefreshOptions);
+            clientOptionBuilder = clusterClientOptionBuilder;
+        } else {
+            clientOptionBuilder = ClientOptions.builder();
+        }
+        clientOptionBuilder.timeoutOptions(TimeoutOptions.enabled())
                 .disconnectedBehavior(disconnectedBehavior)
                 .autoReconnect(true) //lettuce会启动后台线程，检测连接状态以及尝试重连接
-                .socketOptions(SocketOptions.builder().keepAlive(true).connectTimeout(Duration.ofMillis(redisSetting.getConnectTimeoutMillis())).build())
-                .build();
+                .socketOptions(SocketOptions.builder().keepAlive(true).connectTimeout(Duration.ofMillis(redisSetting.getConnectTimeoutMillis())).build());
+        ClientOptions clientOptions = clientOptionBuilder.build();
 
         //这里默认使用了连接池。如果不适用连接池，lettuce默认是单连接的。
         //单连接可能会导致以下问题：
@@ -115,13 +132,18 @@ public class SpringRedisConfCreator {
             RedisSentinelConfiguration redisConfiguration = new RedisSentinelConfiguration();
             RedisSetting.SentinelConfig sentinel = redisSetting.getSentinel();
             redisConfiguration.master(sentinel.getMaster());
-            redisConfiguration.setSentinels(createSentinels(sentinel.getNodes()));
+            List<RedisNode> nodes = new ArrayList<>();
+            for (String node : convertNodes(sentinel.getNodes())) {
+                String[] parts = node.split(":");
+                nodes.add(new RedisNode(parts[0], Integer.parseInt(parts[1])));
+            }
+            redisConfiguration.setSentinels(nodes);
             redisConfiguration.setPassword(password);
             redisConfiguration.setDatabase(redisSetting.getDb());
             return redisConfiguration;
         } else if (redisSetting.getType() == RedisSetting.TYPE_CLUSTER) {
             RedisSetting.ClusterConfig cluster = redisSetting.getCluster();
-            RedisClusterConfiguration redisConfiguration = new RedisClusterConfiguration(Arrays.asList(cluster.getNodes().split(",")));
+            RedisClusterConfiguration redisConfiguration = new RedisClusterConfiguration(convertNodes(cluster.getNodes()));
             redisConfiguration.setMaxRedirects(DEFAULT_MAX_ATTEMPTS);
             redisConfiguration.setPassword(password);
             return redisConfiguration;
@@ -130,17 +152,69 @@ public class SpringRedisConfCreator {
         }
     }
 
-    private static List<RedisNode> createSentinels(String nodesText) {
-        List<RedisNode> nodes = new ArrayList<>();
+    private static List<String> convertNodes(String nodesText) {
+        List<String> nodes = new ArrayList<>();
         for (String node : nodesText.split(",")) {
-            try {
-                String[] parts = node.split(":");
-                Assert.state(parts.length == 2, "Must be defined as 'host:port'");
-                nodes.add(new RedisNode(parts[0], Integer.parseInt(parts[1])));
-            } catch (RuntimeException ex) {
-                throw new IllegalStateException("Invalid redis sentinel " + "property '" + node + "'", ex);
+            String[] parts = node.split(":");
+            if (parts.length != 2) {
+                throw new IllegalStateException("Invalid nodesText '" + node + "'");
             }
+            nodes.add(node);
         }
         return nodes;
+    }
+
+    /**
+     * 改方法，将redisSetting配置，转换为spring RedisProperties的配置。
+     *
+     * @param redisSetting
+     * @return
+     */
+    public static RedisProperties newRedisProperties(RedisSetting redisSetting) {
+        RedisProperties redisProperties = new RedisProperties();
+        redisProperties.setClientName(RedisSetting.clientName());
+        String password = redisSetting.getFinalPassword();
+        redisProperties.setPassword(password);
+        redisProperties.setConnectTimeout(Duration.ofMillis(redisSetting.getConnectTimeoutMillis()));
+        redisProperties.setTimeout(Duration.ofMillis(redisSetting.getTimeoutMillis()));
+        RedisProperties.Pool pool = new RedisProperties.Pool();
+        pool.setMaxActive(redisSetting.getMaxTotal());
+        pool.setMaxIdle(redisSetting.getMaxIdle());
+        pool.setMinIdle(redisSetting.getMinIdle());
+        redisProperties.getLettuce().setPool(pool);
+        redisProperties.getJedis().setPool(pool);
+        if (redisSetting.getType() == RedisSetting.TYPE_STANDALONE) {
+            redisProperties.setDatabase(redisSetting.getDb());
+            RedisSetting.StandaloneConfig standalone = redisSetting.getStandalone();
+            if (RedisSetting.isSuitableForOutOfK8sConfig(standalone)) {
+                redisProperties.setHost(standalone.getNodeHost());
+                redisProperties.setPort(standalone.getNodePort());
+            } else {
+                redisProperties.setHost(standalone.getHost());
+                redisProperties.setPort(standalone.getPort());
+            }
+        } else if (redisSetting.getType() == RedisSetting.TYPE_SENTINEL) {
+            redisProperties.setDatabase(redisSetting.getDb());
+            RedisSetting.SentinelConfig sentinel = redisSetting.getSentinel();
+            RedisProperties.Sentinel rSentinel = new RedisProperties.Sentinel();
+            redisProperties.setSentinel(rSentinel);
+            rSentinel.setMaster(sentinel.getMaster());
+            rSentinel.setNodes(convertNodes(sentinel.getNodes()));
+        } else if (redisSetting.getType() == RedisSetting.TYPE_CLUSTER) {
+            redisProperties.setDatabase(0);
+            RedisSetting.ClusterConfig cluster = redisSetting.getCluster();
+            RedisProperties.Cluster rCluster = new RedisProperties.Cluster();
+            redisProperties.setCluster(rCluster);
+            rCluster.setMaxRedirects(DEFAULT_MAX_ATTEMPTS);
+            rCluster.setNodes(convertNodes(cluster.getNodes()));
+            RedisProperties.Lettuce.Cluster.Refresh refresh = redisProperties.getLettuce().getCluster().getRefresh();
+            refresh.setDynamicRefreshSources(true);
+            refresh.setAdaptive(true);
+            refresh.setPeriod(Duration.ofSeconds(60));
+        } else {
+            throw new UnsupportedOperationException();
+        }
+
+        return redisProperties;
     }
 }

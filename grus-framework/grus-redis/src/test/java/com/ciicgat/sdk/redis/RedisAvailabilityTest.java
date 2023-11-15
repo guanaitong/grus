@@ -17,7 +17,7 @@ import redis.clients.jedis.commands.JedisCommands;
  * Created by August.Zhou on 2023/7/21 15:07
  */
 public class RedisAvailabilityTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpringRedisConfCreatorTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedisConnectTest.class);
 
     public static void main(String[] args) {
 //        testJedisTimeoutWhenRedisDown();

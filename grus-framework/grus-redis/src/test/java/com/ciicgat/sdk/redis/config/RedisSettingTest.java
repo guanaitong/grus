@@ -8,7 +8,6 @@ package com.ciicgat.sdk.redis.config;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.sdk.gconf.ConfigCollection;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
-import com.ciicgat.sdk.redis.RedisExecutor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,12 +28,7 @@ public class RedisSettingTest {
         standaloneConfig.setHost("localhost");
         standaloneConfig.setPort(6379);
         redisSetting.setStandalone(standaloneConfig);
-
         System.out.println(JSON.toJSONString(redisSetting));
-
-//        RedisExecutor redisExecutor = redisSetting.newRedisExecutor();
-//        String v = redisExecutor.execute(jedis -> jedis.set("123", "456"));
-//        Assertions.assertEquals(v, redisExecutor.execute(jedis -> jedis.get("123")));
     }
 
     @Test
@@ -47,14 +41,8 @@ public class RedisSettingTest {
         RedisSetting.SentinelConfig sentinelConfig = new RedisSetting.SentinelConfig();
         sentinelConfig.setMaster("mymaster");
         sentinelConfig.setNodes("10.130.0.4:28000,10.130.0.5:28000,10.130.0.20:28000");
-
         redisSetting.setSentinel(sentinelConfig);
-
         System.out.println(JSON.toJSONString(redisSetting));
-
-//        RedisExecutor redisExecutor = redisSetting.newRedisExecutor();
-//        String v = redisExecutor.execute(jedis -> jedis.set("123", "456"));
-//        Assertions.assertEquals(v, redisExecutor.execute(jedis -> jedis.get("123")));
     }
 
     @Test
@@ -64,17 +52,10 @@ public class RedisSettingTest {
 //        redisSetting.setPassword("Lucky2021");
         redisSetting.setPassword("Gat@1234");
         redisSetting.setType(RedisSetting.TYPE_CLUSTER);
-
         RedisSetting.ClusterConfig clusterConfig = new RedisSetting.ClusterConfig();
         clusterConfig.setNodes("10.101.11.59:9001,10.101.11.158:9001,10.101.11.187:9001,10.101.11.158:9002,10.101.11.187:9002,10.101.11.59:9002");
-
         redisSetting.setCluster(clusterConfig);
-
         System.out.println(JSON.toJSONString(redisSetting));
-        RedisExecutor redisExecutor = redisSetting.newRedisExecutor();
-        String v = String.valueOf(Math.random());
-        redisExecutor.execute(jedis -> jedis.set("123", v));
-        Assertions.assertEquals(v, redisExecutor.execute(jedis -> jedis.get("123")));
     }
 
     @Test
