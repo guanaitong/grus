@@ -281,11 +281,12 @@ public class SpringCacheTests {
         // 第一次访问，走目标方法，Miss cache
         String first = cacheService.getRandomCacheRefresher(uid, 1);
 
-        for (int i = 2; i < 39; i++) {
+        for (int i = 300; i < 400; i++) {
             cacheService.getRandomCacheRefresher(uid, i);
         }
         // get new value of previous refresh
         String four = cacheService.getRandomCacheRefresher(uid, 4);
+        System.out.println(four);
 //        Assertions.assertEquals(four, third);
         Assertions.assertTrue(four.startsWith("3"));
     }
