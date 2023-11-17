@@ -19,22 +19,25 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by August.Zhou on 2021/12/17 17:53.
  */
 public class OpenTelemetrys {
-    private static final AtomicBoolean STATE = new AtomicBoolean(true);
+    private static final AtomicBoolean STATE = new AtomicBoolean(false);
 
     public static void set(OpenTelemetry openTelemetry) {
-        STATE.set(false);
+        if (STATE.get()) {
+            return;
+        }
+        STATE.set(true);
         GlobalOpenTelemetry.set(openTelemetry);
     }
 
     public static TextMapPropagator getTextMapPropagator() {
-        if (STATE.get()) {
+        if (!STATE.get()) {
             return TextMapPropagator.noop();
         }
         return GlobalOpenTelemetry.get().getPropagators().getTextMapPropagator();
     }
 
     public static Tracer getTracer() {
-        if (STATE.get()) {
+        if (!STATE.get()) {
             return TracerProvider.noop().get("grus-instrumentation", "1.0.0");
         }
         return GlobalOpenTelemetry.get().getTracer("grus-instrumentation", "1.0.0");
