@@ -78,7 +78,7 @@ public class SpringRedisConfCreator {
                     //.enableAdaptiveRefreshTrigger(ClusterTopologyRefreshOptions.RefreshTrigger.MOVED_REDIRECT, ClusterTopologyRefreshOptions.RefreshTrigger.PERSISTENT_RECONNECTS)
                     .enableAllAdaptiveRefreshTriggers() //开启所有自适应刷新，MOVED，ASK，PERSISTENT都会触发
                     .adaptiveRefreshTriggersTimeout(Duration.ofSeconds(30)) // 自适应刷新超时时间(默认30秒)
-                    .enablePeriodicRefresh(Duration.ofSeconds(60))  // 开周期刷新
+                    .enablePeriodicRefresh(Duration.ofSeconds(30))  // 开周期刷新
                     .build();
             ClusterClientOptions.Builder clusterClientOptionBuilder = ClusterClientOptions.builder();
             clusterClientOptionBuilder.topologyRefreshOptions(topologyRefreshOptions);
