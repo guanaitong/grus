@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.grus.opentelemetry;
+package com.ciicgat.sdk.trace;
 
 import org.junit.jupiter.api.Test;
 

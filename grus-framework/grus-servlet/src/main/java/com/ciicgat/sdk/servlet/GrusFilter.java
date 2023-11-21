@@ -8,7 +8,7 @@ package com.ciicgat.sdk.servlet;
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
-import com.ciicgat.grus.opentelemetry.TraceUtil;
+import com.ciicgat.sdk.trace.TraceUtil;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeManager;

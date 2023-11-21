@@ -5,7 +5,7 @@
 
 package com.ciicgat.sdk.servlet;
 
-import com.ciicgat.grus.opentelemetry.TraceUtil;
+import com.ciicgat.sdk.trace.TraceUtil;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
