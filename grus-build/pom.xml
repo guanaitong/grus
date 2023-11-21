@@ -259,11 +259,7 @@
                     </exclusion>
                     <exclusion>
                         <groupId>org.bouncycastle</groupId>
-                        <artifactId>bcpkix-jdk15on</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.bouncycastle</groupId>
-                        <artifactId>bcprov-ext-jdk15on</artifactId>
+                        <artifactId>bcpkix-jdk18on</artifactId>
                     </exclusion>
                     <exclusion>
                         <groupId>org.bitbucket.b_c</groupId>
@@ -281,10 +277,10 @@
                         <groupId>org.apache.commons</groupId>
                         <artifactId>commons-compress</artifactId>
                     </exclusion>
-                    <exclusion>
-                        <groupId>io.swagger</groupId>
-                        <artifactId>swagger-annotations</artifactId>
-                    </exclusion>
+                    <!--                    <exclusion>-->
+                    <!--                        <groupId>io.swagger</groupId>-->
+                    <!--                        <artifactId>swagger-annotations</artifactId>-->
+                    <!--                    </exclusion>-->
                 </exclusions>
             </dependency>
 
