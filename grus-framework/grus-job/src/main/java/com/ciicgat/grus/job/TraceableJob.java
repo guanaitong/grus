@@ -6,7 +6,7 @@
 package com.ciicgat.grus.job;
 
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
-import com.ciicgat.grus.opentelemetry.TraceUtil;
+import com.ciicgat.sdk.trace.TraceUtil;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;

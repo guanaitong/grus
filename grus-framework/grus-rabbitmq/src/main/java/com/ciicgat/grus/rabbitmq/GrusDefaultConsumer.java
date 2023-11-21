@@ -8,7 +8,7 @@ package com.ciicgat.grus.rabbitmq;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.json.JSONException;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
-import com.ciicgat.grus.opentelemetry.TraceUtil;
+import com.ciicgat.sdk.trace.TraceUtil;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
 import com.ciicgat.sdk.util.system.Systems;
