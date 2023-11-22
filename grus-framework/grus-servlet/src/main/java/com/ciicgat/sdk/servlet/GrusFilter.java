@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
 
@@ -55,12 +56,15 @@ public class GrusFilter implements Filter, MeterBinder {
     private final LongAdder highConcurrencyEvents = new LongAdder();
 
     private final boolean disableOldSslProtocol;
-
+    private final RequestIdProvider requestIdProvider;
 
     public GrusFilter(boolean disableOldSslProtocol) {
-        this.disableOldSslProtocol = disableOldSslProtocol;
+        this(disableOldSslProtocol, RequestIdProvider.NONE);
     }
-
+    public GrusFilter(boolean disableOldSslProtocol, RequestIdProvider requestIdProvider) {
+        this.disableOldSslProtocol = disableOldSslProtocol;
+        this.requestIdProvider = Objects.requireNonNull(requestIdProvider);
+    }
     @Override
     public void bindTo(MeterRegistry registry) {
         FunctionCounter.builder("grus.web.high.concurrency.event", this, GrusFilter::getHighConcurrencyEvents).baseUnit(BaseUnits.EVENTS).register(registry);
@@ -149,6 +153,13 @@ public class GrusFilter implements Filter, MeterBinder {
 
         Tracer tracer = OpenTelemetrys.getTracer();
         Context context = OpenTelemetrys.getTextMapPropagator().extract(Context.current(), request, getter);
+        String requestId = requestIdProvider.getRequestId(request);
+        if (requestId != null) {
+            context = TraceUtil.withRequestContext(context, requestId);
+        } else {
+            requestId = TraceUtil.getRequestIdId(context);
+        }
+
         Span span =
                 tracer.spanBuilder(request.getMethod() + " " + uri).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
 
@@ -157,14 +168,16 @@ public class GrusFilter implements Filter, MeterBinder {
 
         //将Span信息放入容器
         if (span != Span.getInvalid()) {
-            String traceId = TraceUtil.putMdcForTrace(span);
-            response.addHeader("x-trace-id", traceId);
+            TraceUtil.putMdcForTrace(span, requestId);
+            response.addHeader("x-trace-id", TraceUtil.getTraceId(span));
             response.addHeader("x-span-id", TraceUtil.getSpanId(span));
             String parentId = TraceUtil.getParentId(span);
             if (StringUtils.isNotEmpty(parentId)) {
                 response.addHeader("x-parent-id", parentId);
             }
         }
+
+
 
 
         //执行应用处理

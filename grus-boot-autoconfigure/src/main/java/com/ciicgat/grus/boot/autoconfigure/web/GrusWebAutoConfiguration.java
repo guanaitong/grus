@@ -10,6 +10,7 @@ import com.ciicgat.grus.boot.autoconfigure.web.live.GrusHealthCheckController;
 import com.ciicgat.grus.boot.autoconfigure.web.live.GrusHealthChecker;
 import com.ciicgat.sdk.servlet.GrusFilter;
 import com.ciicgat.sdk.servlet.HandlerCurrencyLimitInterceptor;
+import com.ciicgat.sdk.servlet.RequestIdProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -34,8 +35,14 @@ public class GrusWebAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public GrusFilter grusFilter(WebProperties webProperties) {
-        return new GrusFilter(webProperties.isDisableOldSslProtocol());
+    public GrusFilter grusFilter(WebProperties webProperties, RequestIdProvider requestIdProvider) {
+        return new GrusFilter(webProperties.isDisableOldSslProtocol(), requestIdProvider);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RequestIdProvider requestIdProvider() {
+        return RequestIdProvider.NONE;
     }
 
     @Bean
