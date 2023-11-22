@@ -14,6 +14,7 @@ import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.extension.trace.propagation.JaegerPropagator;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +55,12 @@ public class GrusFilterTest {
     public void setup() {
         MockitoAnnotations.openMocks(this);
         this.mockMvc =
-                MockMvcBuilders.standaloneSetup(new TestController()).addFilters(new GrusFilter(true)).build();
+                MockMvcBuilders.standaloneSetup(new TestController()).addFilters(new GrusFilter(true, new RequestIdProvider() {
+                    @Override
+                    public String getRequestId(HttpServletRequest httpServletRequest) {
+                        return "test_";
+                    }
+                })).build();
     }
 
     @Test

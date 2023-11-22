@@ -5,8 +5,10 @@
 
 package com.ciicgat.sdk.trace;
 
+import io.opentelemetry.api.baggage.Baggage;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.context.Context;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import org.slf4j.MDC;
 
@@ -14,6 +16,7 @@ import org.slf4j.MDC;
  * Created by August.Zhou on 2022/10/14 16:34
  */
 public class TraceUtil {
+    public static final String REQUEST_ID_KEY = "__request_id__";
 
     public static String getTraceId() {
         return getTraceId(Span.current());
@@ -51,22 +54,29 @@ public class TraceUtil {
         return "";
     }
 
-    public static String putMdcForTrace(Span span) {
+    public static void putMdcForTrace(Span span, String requestId) {
         MDC.put("spanId", getSpanId(span));
         MDC.put("parentId", getParentId(span));
-        String traceId = getTraceId(span);
-        traceId = removePrefixZeroChar(traceId);
-        MDC.put("traceId", traceId);
-        return traceId;
+        MDC.put("traceId", getTraceId(span));
+        if (requestId != null) {
+            MDC.put("req.xRequestId", requestId);
+        }
     }
 
-    static String removePrefixZeroChar(String text) {
-        int i = 0;
-        for (int l = text.length(); i < l; ++i) {
-            if (text.charAt(i) != '0') {
-                break;
-            }
+    public static void putMdcForTrace(Span span) {
+        putMdcForTrace(span, null);
+    }
+
+    public static Context withRequestContext(Context context, String requestId) {
+        Baggage baggage = Baggage.builder().put(REQUEST_ID_KEY, requestId).build();
+        return baggage.storeInContext(context);
+    }
+
+    public static String getRequestIdId(Context context) {
+        Baggage baggage = Baggage.fromContextOrNull(context);
+        if (baggage == null) {
+            return null;
         }
-        return text.substring(i);
+        return baggage.getEntryValue(REQUEST_ID_KEY);
     }
 }
