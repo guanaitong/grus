@@ -78,6 +78,7 @@ public class OpenTelemetryAutoConfiguration {
             TextMapPropagator textMapPropagator = TextMapPropagator.composite(W3CTraceContextPropagator.getInstance(), JaegerPropagator.getInstance());
             OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
             OpenTelemetrys.setPropagateWithNew(openTelemetryProperties.isPropagateWithNew());
+            OpenTelemetrys.setPropagateUnSupportedMiddleware(OpenTelemetrys.isPropagateUnSupportedMiddleware());
             OpenTelemetrys.set(sdk);
             return sdk;
         }

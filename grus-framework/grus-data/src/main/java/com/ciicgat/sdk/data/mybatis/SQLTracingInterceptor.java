@@ -12,7 +12,6 @@ import com.ciicgat.grus.performance.SlowLogger;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -47,29 +46,40 @@ public class SQLTracingInterceptor implements Interceptor {
             BoundSql boundSql = statementHandler.getBoundSql();
             sql = boundSql.getSql();
         }
-        Tracer tracer = OpenTelemetrys.getTracer();
-        Span span = tracer.spanBuilder("executeSQL").setSpanKind(SpanKind.CLIENT).setParent(Context.current()).startSpan();
-
-        try (Scope scope = span.makeCurrent()) {
-            OpenTelemetrys.configSystemTags(span);
-            span.setAttribute("db.type", "mysql");
-            span.setAttribute("component", "mysql");
-            span.setAttribute("db.statement", sql);
-
-            Object result = invocation.proceed();
-            if (result instanceof List && ((List) result).size() > 50000) {
-                String msg = String.format("too large query result size:[%d] ,sql is %s", ((List) result).size(), sql);
-                LOGGER.warn(msg);
-                Alert.send(msg);
+        Object result = null;
+        if (OpenTelemetrys.isPropagateUnSupportedMiddleware()) {
+            Tracer tracer = OpenTelemetrys.getTracer();
+            Span span = tracer.spanBuilder("executeSQL").setSpanKind(SpanKind.CLIENT).startSpan();
+            try (Scope scope = span.makeCurrent()) {
+                OpenTelemetrys.configSystemTags(span);
+                span.setAttribute("db.type", "mysql");
+                span.setAttribute("component", "mysql");
+                span.setAttribute("db.statement", sql);
+                result = invocation.proceed();
+            } catch (Throwable throwable) {
+                LOGGER.error(sql, throwable);
+                throw throwable;
+            } finally {
+                span.end();
+                SlowLogger.logEvent(Module.DB, span, sql);
             }
-            return result;
-        } catch (Throwable throwable) {
-            LOGGER.error(sql, throwable);
-            throw throwable;
-        } finally {
-            span.end();
-            SlowLogger.logEvent(Module.DB, span, sql);
+        } else {
+            long start = System.nanoTime();
+            try {
+                result = invocation.proceed();
+            } catch (Throwable throwable) {
+                LOGGER.error(sql, throwable);
+                throw throwable;
+            } finally {
+                SlowLogger.logEvent(Module.DB, System.nanoTime() - start, sql);
+            }
         }
+        if (result instanceof List && ((List) result).size() > 50000) {
+            String msg = String.format("too large query result size:[%d] ,sql is %s", ((List) result).size(), sql);
+            LOGGER.warn(msg);
+            Alert.send(msg);
+        }
+        return result;
     }
 
     @Override

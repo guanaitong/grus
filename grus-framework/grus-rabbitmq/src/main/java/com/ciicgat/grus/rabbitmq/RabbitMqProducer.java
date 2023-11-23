@@ -107,12 +107,30 @@ public class RabbitMqProducer {
             bytes = JSON.toBytes(value);
         }
         rateLimiter.acquire();
-        Tracer tracer = OpenTelemetrys.getTracer();
-        Span span = tracer.spanBuilder("producer").setSpanKind(SpanKind.PRODUCER).setParent(Context.current()).startSpan();
+        if (OpenTelemetrys.isPropagateWithNew()) {
+            Tracer tracer = OpenTelemetrys.getTracer();
+            Span span = tracer.spanBuilder("producer").setSpanKind(SpanKind.PRODUCER).startSpan();
+            try (Scope scope = span.makeCurrent()) {
+                OpenTelemetrys.configSystemTags(span);
+                span.setAttribute("component", "rabbitmq");
+                send(exchange, routingKey, value, properties, bytes);
+            } finally {
+                span.end();
+                SlowLogger.logEvent(Module.RABBITMQ, span, "send msg slow");
+            }
+        } else {
+            long start = System.nanoTime();
+            try {
+                send(exchange, routingKey, value, properties, bytes);
+            } finally {
+                SlowLogger.logEvent(Module.RABBITMQ, System.nanoTime() - start, "send msg slow");
+            }
+        }
+    }
+
+    private void send(String exchange, String routingKey, Object value, AMQP.BasicProperties properties, byte[] bytes) {
         Channel channel = null;
-        try (Scope scope = span.makeCurrent()) {
-            OpenTelemetrys.configSystemTags(span);
-            span.setAttribute("component", "rabbitmq");
+        try {
             channel = channelPool.borrowObject();
             Map<String, Object> headers = new HashMap<>();
             //生成消息id
@@ -136,8 +154,6 @@ public class RabbitMqProducer {
             RabbitMqException.handleException(e);
         } finally {
             channelPool.returnObject(channel);
-            span.end();
-            SlowLogger.logEvent(Module.RABBITMQ, span, "send msg slow");
         }
     }
 }

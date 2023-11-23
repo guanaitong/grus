@@ -40,7 +40,7 @@ public class FeignTracingInterceptor implements Interceptor {
         requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_NAME, Systems.APP_NAME);
         requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_INSTANCE, Systems.APP_INSTANCE);
         requestBuilder.addHeader(GrusServiceHttpHeader.HTTP_UA_HEADER, "Grus service client");
-        if (OpenTelemetrys.isPropagateWithNew()) {
+        if (!OpenTelemetrys.isPropagateWithNew()) {
             OpenTelemetrys.getTextMapPropagator().inject(Context.current(), requestBuilder, setter);
             long start = System.nanoTime();
             try {
@@ -62,7 +62,6 @@ public class FeignTracingInterceptor implements Interceptor {
                 String spanId = span.getSpanContext().getSpanId();
                 LOGGER.debug("downstream parentId {}", spanId);
             }
-
             span.setAttribute("http.method", originalRequest.method());
             span.setAttribute("component", "feign");
             OpenTelemetrys.getTextMapPropagator().inject(Context.current(), requestBuilder, setter);

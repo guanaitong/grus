@@ -13,7 +13,6 @@ import com.ciicgat.sdk.redis.config.RedisSetting;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,22 +62,35 @@ class TracingRedisConnection extends AbstractRedisConnection {
     }
 
     private <T> T trace(String commandName, Supplier<T> callback) {
-        Tracer tracer = OpenTelemetrys.getTracer();
-        Span span = tracer.spanBuilder("executeRedisCMD").setSpanKind(SpanKind.CLIENT).setParent(Context.current()).startSpan();
-        try (Scope scope = span.makeCurrent()) {
-            OpenTelemetrys.configSystemTags(span);
-            span.setAttribute("component", "redis");
-            span.setAttribute("db.type", "redis");
-            span.setAttribute("db.instance", instance);
-            span.setAttribute("command", commandName == null ? "unknown" : commandName);
-            return callback.get();
-        } catch (Throwable e) {
-            Alert.send("redis error:" + redisSetting.toString(), e);
-            LOGGER.error("redis error:" + redisSetting.toString(), e);
-            throw e;
-        } finally {
-            span.end();
-            SlowLogger.logEvent(Module.REDIS, span, "lettuce redis slow,cmd:" + commandName);
+        if (OpenTelemetrys.isPropagateUnSupportedMiddleware()) {
+            Tracer tracer = OpenTelemetrys.getTracer();
+            Span span = tracer.spanBuilder("executeRedisCMD").setSpanKind(SpanKind.CLIENT).startSpan();
+            try (Scope scope = span.makeCurrent()) {
+                OpenTelemetrys.configSystemTags(span);
+                span.setAttribute("component", "redis");
+                span.setAttribute("db.type", "redis");
+                span.setAttribute("db.instance", instance);
+                span.setAttribute("command", commandName == null ? "unknown" : commandName);
+                return callback.get();
+            } catch (Throwable e) {
+                Alert.send("redis error:" + redisSetting.toString(), e);
+                LOGGER.error("redis error:" + redisSetting.toString(), e);
+                throw e;
+            } finally {
+                span.end();
+                SlowLogger.logEvent(Module.REDIS, span, "lettuce redis slow,cmd:" + commandName);
+            }
+        } else {
+            long start = System.nanoTime();
+            try {
+                return callback.get();
+            } catch (Throwable e) {
+                Alert.send("redis error:" + redisSetting.toString(), e);
+                LOGGER.error("redis error:" + redisSetting.toString(), e);
+                throw e;
+            } finally {
+                SlowLogger.logEvent(Module.REDIS, System.nanoTime() - start, "lettuce redis slow,cmd:" + commandName);
+            }
         }
     }
 

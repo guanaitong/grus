@@ -20,7 +20,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class OpenTelemetrys {
     private static final AtomicBoolean STATE = new AtomicBoolean(false);
-    private static boolean propagateWithNew = true;
+    private static boolean propagateWithNew = false;
+    private static boolean propagateUnSupportedMiddleware = false;
 
     public static void setPropagateWithNew(boolean propagateWithNew) {
         OpenTelemetrys.propagateWithNew = propagateWithNew;
@@ -29,6 +30,15 @@ public class OpenTelemetrys {
     public static boolean isPropagateWithNew() {
         return propagateWithNew;
     }
+
+    public static boolean isPropagateUnSupportedMiddleware() {
+        return propagateUnSupportedMiddleware;
+    }
+
+    public static void setPropagateUnSupportedMiddleware(boolean propagateUnSupportedMiddleware) {
+        OpenTelemetrys.propagateUnSupportedMiddleware = propagateUnSupportedMiddleware;
+    }
+
 
     public static void set(OpenTelemetry openTelemetry) {
         if (STATE.get()) {

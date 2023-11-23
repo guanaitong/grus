@@ -8,9 +8,9 @@ package com.ciicgat.grus.rabbitmq;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.json.JSONException;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
-import com.ciicgat.sdk.trace.TraceUtil;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
+import com.ciicgat.sdk.trace.TraceUtil;
 import com.ciicgat.sdk.util.system.Systems;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.rabbitmq.client.AMQP;
@@ -94,47 +94,49 @@ public class GrusDefaultConsumer extends DefaultConsumer {
             TraceUtil.putMdcForTrace(span);
         }
         String msgId = properties.getMessageId();
-        try (Scope scope = span.makeCurrent()) {
-            OpenTelemetrys.configSystemTags(span);
-            final Message message = new Message(envelope.getExchange(), envelope.getRoutingKey(), this.queue, msgId, properties.getTimestamp(), body);
-            State result;
-            try {
-                result = msgProcessor.onMessage(message);
-            } catch (JSONException e) {
-                LOGGER.error("handle msg error,msg {}", message, e);
-                result = State.Abort;
-            } catch (Exception e) {
-                LOGGER.error("handle msg error,msg {}", message, e);
-                result = State.Retry;
-            }
-            if (result == State.OK) {
-                getChannel().basicAck(envelope.getDeliveryTag(), false);
-                return;
-            } else if (result == State.Abort) {
-                abort(envelope, message, body);
-                return;
-            } else if (result == State.Retry) {
-                Object key = msgId == null ? message.hashCode() : msgId;
-                int i = failedCounts.get(key, s -> new AtomicInteger()).incrementAndGet();
-                LOGGER.warn("key {} {}", key, i);
-                if (i >= maxRetryCount && envelope.isRedeliver()) {
-                    // 超过最大重试次数后，丢弃消息
-                    LOGGER.warn("exceed maxRetryCount");
-                    abort(envelope, message, body);
-                    failedCounts.invalidate(key);
-                } else {
-                    LOGGER.warn("retry msg: {}", message);
-                    getChannel().basicReject(envelope.getDeliveryTag(), true);
-                    return;
+        try (Scope ignored = context.makeCurrent()) { //将context绑定到全局ContextStorage中
+            try (Scope scope = span.makeCurrent()) {
+                OpenTelemetrys.configSystemTags(span);
+                final Message message = new Message(envelope.getExchange(), envelope.getRoutingKey(), this.queue, msgId, properties.getTimestamp(), body);
+                State result;
+                try {
+                    result = msgProcessor.onMessage(message);
+                } catch (JSONException e) {
+                    LOGGER.error("handle msg error,msg {}", message, e);
+                    result = State.Abort;
+                } catch (Exception e) {
+                    LOGGER.error("handle msg error,msg {}", message, e);
+                    result = State.Retry;
                 }
+                if (result == State.OK) {
+                    getChannel().basicAck(envelope.getDeliveryTag(), false);
+                    return;
+                } else if (result == State.Abort) {
+                    abort(envelope, message, body);
+                    return;
+                } else if (result == State.Retry) {
+                    Object key = msgId == null ? message.hashCode() : msgId;
+                    int i = failedCounts.get(key, s -> new AtomicInteger()).incrementAndGet();
+                    LOGGER.warn("key {} {}", key, i);
+                    if (i >= maxRetryCount && envelope.isRedeliver()) {
+                        // 超过最大重试次数后，丢弃消息
+                        LOGGER.warn("exceed maxRetryCount");
+                        abort(envelope, message, body);
+                        failedCounts.invalidate(key);
+                    } else {
+                        LOGGER.warn("retry msg: {}", message);
+                        getChannel().basicReject(envelope.getDeliveryTag(), true);
+                        return;
+                    }
 
-            } else {
-                LOGGER.warn("result state is null");
-                getChannel().basicAck(envelope.getDeliveryTag(), false);
+                } else {
+                    LOGGER.warn("result state is null");
+                    getChannel().basicAck(envelope.getDeliveryTag(), false);
+                }
+            } finally {
+                span.end();
+                SlowLogger.logEvent(Module.RABBITMQ, span, "handle msg slow");
             }
-        } finally {
-            span.end();
-            SlowLogger.logEvent(Module.RABBITMQ, span, "handle msg slow");
         }
     }
 

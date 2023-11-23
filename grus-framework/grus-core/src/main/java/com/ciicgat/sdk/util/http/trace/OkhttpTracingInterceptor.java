@@ -42,31 +42,33 @@ public class OkhttpTracingInterceptor implements Interceptor {
         requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_NAME, Systems.APP_NAME);
         requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_INSTANCE, Systems.APP_INSTANCE);
         requestBuilder.addHeader(GrusServiceHttpHeader.HTTP_UA_HEADER, "Grus okhttp client");
-
-        Tracer tracer = OpenTelemetrys.getTracer();
-        Span span = tracer.spanBuilder(originalRequest.method() + " " + originalRequest.url().encodedPath()).setSpanKind(SpanKind.CLIENT).startSpan();
-
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Sending request {} on {} {}", originalRequest.url(), chain.connection(), originalRequest.headers());
         }
-        try (Scope scope = span.makeCurrent()) {
-            OpenTelemetrys.configSystemTags(span);
-            span.setAttribute("component", "okhttp");
-            span.setAttribute("http.method", originalRequest.method());
-            span.setAttribute("http.url", originalRequest.url().toString());
-            response = chain.proceed(requestBuilder.build());
-        } catch (Throwable ex) {
-            throw ex;
-        } finally {
-            span.end();
-            SlowLogger.logEvent(Module.HTTP_CLIENT, span, originalRequest.toString());
-            if (LOGGER.isDebugEnabled()) {
-                if (response != null) {
-                    LOGGER.debug("Received response for {} on {}", response.request().url(), response.headers());
-                }
+        if (OpenTelemetrys.isPropagateUnSupportedMiddleware()) {
+            Tracer tracer = OpenTelemetrys.getTracer();
+            Span span = tracer.spanBuilder(originalRequest.method() + " " + originalRequest.url().encodedPath()).setSpanKind(SpanKind.CLIENT).startSpan();
+            try (Scope scope = span.makeCurrent()) {
+                OpenTelemetrys.configSystemTags(span);
+                span.setAttribute("component", "okhttp");
+                span.setAttribute("http.method", originalRequest.method());
+                span.setAttribute("http.url", originalRequest.url().toString());
+                response = chain.proceed(requestBuilder.build());
+            } finally {
+                span.end();
+                SlowLogger.logEvent(Module.HTTP_CLIENT, span, originalRequest.toString());
+            }
+        } else {
+            long start = System.nanoTime();
+            try {
+                response = chain.proceed(requestBuilder.build());
+            } finally {
+                SlowLogger.logEvent(Module.HTTP_CLIENT, System.nanoTime() - start, originalRequest.toString());
             }
         }
-
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Received response for {} on {}", response.request().url(), response.headers());
+        }
         return response;
     }
 

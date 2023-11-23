@@ -16,11 +16,24 @@ public class OpenTelemetryProperties {
     /**
      * feignService传播下游时，采用新的span
      */
-    private boolean propagateWithNew = true;
+    private boolean propagateWithNew = false;
+
+    /**
+     * 是否对redis、mysql等不支持tracing的client进行传播
+     */
+    private boolean propagateUnSupportedMiddleware = false;
     private Collector collector = new Collector();
 
     public boolean isPropagateWithNew() {
         return propagateWithNew;
+    }
+
+    public boolean isPropagateUnSupportedMiddleware() {
+        return propagateUnSupportedMiddleware;
+    }
+
+    public void setPropagateUnSupportedMiddleware(boolean propagateUnSupportedMiddleware) {
+        this.propagateUnSupportedMiddleware = propagateUnSupportedMiddleware;
     }
 
     public void setPropagateWithNew(boolean propagateWithNew) {

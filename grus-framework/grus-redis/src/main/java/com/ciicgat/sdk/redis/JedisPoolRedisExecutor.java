@@ -14,7 +14,6 @@ import com.ciicgat.sdk.redis.config.RedisSetting;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
 import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,23 +39,36 @@ class JedisPoolRedisExecutor implements RedisExecutor {
 
     @Override
     public final <T> T execute(RedisAction<T> redisAction) {
-        Tracer tracer = OpenTelemetrys.getTracer();
-        Span span = tracer.spanBuilder("executeRedisCMD").setSpanKind(SpanKind.CLIENT).setParent(Context.current()).startSpan();
-        Jedis jedis = pool.getResource();
-        try (Scope scope = span.makeCurrent()) {
-            OpenTelemetrys.configSystemTags(span);
-            span.setAttribute("component", "redis");
-            span.setAttribute("db.type", "redis");
-            span.setAttribute("db.instance", instance);
-            return redisAction.apply(jedis);
-        } catch (Throwable e) {
-            Alert.send("redis error:" + redisSetting.toString(), e);
-            LOGGER.error("redis error:" + redisSetting, e);
-            throw e;
-        } finally {
-            CloseUtils.close(jedis);
-            span.end();
-            SlowLogger.logEvent(Module.REDIS, span, redisAction.toString());
+        if (OpenTelemetrys.isPropagateUnSupportedMiddleware()) {
+            Tracer tracer = OpenTelemetrys.getTracer();
+            Span span = tracer.spanBuilder("executeRedisCMD").setSpanKind(SpanKind.CLIENT).startSpan();
+            Jedis jedis = pool.getResource();
+            try (Scope scope = span.makeCurrent()) {
+                OpenTelemetrys.configSystemTags(span);
+                span.setAttribute("component", "redis");
+                span.setAttribute("db.type", "redis");
+                span.setAttribute("db.instance", instance);
+                return redisAction.apply(jedis);
+            } catch (Throwable e) {
+                Alert.send("redis error:" + redisSetting.toString(), e);
+                LOGGER.error("redis error:" + redisSetting, e);
+                throw e;
+            } finally {
+                CloseUtils.close(jedis);
+                span.end();
+                SlowLogger.logEvent(Module.REDIS, span, redisAction.toString());
+            }
+        } else {
+            long start = System.nanoTime();
+            try (Jedis jedis = pool.getResource();) {
+                return redisAction.apply(jedis);
+            } catch (Throwable e) {
+                Alert.send("redis error:" + redisSetting.toString(), e);
+                LOGGER.error("redis error:" + redisSetting, e);
+                throw e;
+            } finally {
+                SlowLogger.logEvent(Module.REDIS, System.nanoTime() - start, redisAction.toString());
+            }
         }
     }
 
