@@ -8,12 +8,12 @@ package com.ciicgat.sdk.servlet;
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
-import com.ciicgat.sdk.trace.TraceUtil;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.GrusServiceHttpHeader;
 import com.ciicgat.grus.service.GrusServiceStatus;
+import com.ciicgat.sdk.trace.TraceUtil;
 import com.ciicgat.sdk.util.system.Systems;
 import io.micrometer.core.instrument.FunctionCounter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -61,10 +61,12 @@ public class GrusFilter implements Filter, MeterBinder {
     public GrusFilter(boolean disableOldSslProtocol) {
         this(disableOldSslProtocol, RequestIdProvider.NONE);
     }
+
     public GrusFilter(boolean disableOldSslProtocol, RequestIdProvider requestIdProvider) {
         this.disableOldSslProtocol = disableOldSslProtocol;
         this.requestIdProvider = Objects.requireNonNull(requestIdProvider);
     }
+
     @Override
     public void bindTo(MeterRegistry registry) {
         FunctionCounter.builder("grus.web.high.concurrency.event", this, GrusFilter::getHighConcurrencyEvents).baseUnit(BaseUnits.EVENTS).register(registry);
@@ -159,51 +161,46 @@ public class GrusFilter implements Filter, MeterBinder {
         } else {
             requestId = TraceUtil.getRequestIdId(context);
         }
-
         Span span =
                 tracer.spanBuilder(request.getMethod() + " " + uri).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
-
-
         request.setAttribute(SERVER_SPAN_CONTEXT, TAG_VALUE);
 
-        //将Span信息放入容器
-        if (span != Span.getInvalid()) {
-            TraceUtil.putMdcForTrace(span, requestId);
-            response.addHeader("x-trace-id", TraceUtil.getTraceId(span));
-            response.addHeader("x-span-id", TraceUtil.getSpanId(span));
-            String parentId = TraceUtil.getParentId(span);
-            if (StringUtils.isNotEmpty(parentId)) {
-                response.addHeader("x-parent-id", parentId);
+        // 两个makeCurrent的效果，就是其他地方可以随时获取当前span。同时开启子的span时，无需显示的调用setParent
+        try (Scope ignored = context.makeCurrent()) { //将context绑定到全局ContextStorage中
+            //执行应用处理
+            try (Scope scope = span.makeCurrent()) { //将span绑定到当前的context中
+                //将相关信息放入span容器
+                if (span != Span.getInvalid()) {
+                    TraceUtil.putMdcForTrace(span, requestId);
+                    response.addHeader("x-trace-id", TraceUtil.getTraceId(span));
+                    response.addHeader("x-span-id", TraceUtil.getSpanId(span));
+                    String parentId = TraceUtil.getParentId(span);
+                    if (StringUtils.isNotEmpty(parentId)) {
+                        response.addHeader("x-parent-id", parentId);
+                    }
+                }
+                OpenTelemetrys.configSystemTags(span);
+                span.setAttribute("component", "java-web-servlet");
+                span.setAttribute("http.method", request.getMethod());
+                span.setAttribute("http.scheme", request.getScheme());
+                span.setAttribute("http.target", uri);
+                filterChain.doFilter(request, response);
+
+                if (grusServiceStatus != null) {
+                    grusServiceStatus.incrementSucceeded();
+                }
+            } catch (Throwable e) {
+                if (grusServiceStatus != null) {
+                    grusServiceStatus.incrementFailed();
+                }
+                throw e;
+            } finally {
+                span.end();
+                SlowLogger.logEvent(Module.SERVLET, span, request.getRequestURI());
+                //结束清理
+                MDC.clear();
+                concurrency.decrementAndGet();
             }
-        }
-
-
-
-
-        //执行应用处理
-        try (Scope scope = span.makeCurrent()) {
-            OpenTelemetrys.configSystemTags(span);
-            span.setAttribute("component", "java-web-servlet");
-            span.setAttribute("http.method", request.getMethod());
-            span.setAttribute("http.scheme", request.getScheme());
-            span.setAttribute("http.target", uri);
-
-            filterChain.doFilter(request, response);
-
-            if (grusServiceStatus != null) {
-                grusServiceStatus.incrementSucceeded();
-            }
-        } catch (Throwable e) {
-            if (grusServiceStatus != null) {
-                grusServiceStatus.incrementFailed();
-            }
-            throw e;
-        } finally {
-            span.end();
-            SlowLogger.logEvent(Module.SERVLET, span, request.getRequestURI());
-            //结束清理
-            MDC.clear();
-            concurrency.decrementAndGet();
         }
     }
 
