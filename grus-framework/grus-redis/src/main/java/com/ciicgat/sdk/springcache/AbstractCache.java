@@ -75,7 +75,7 @@ public abstract class AbstractCache<C extends CacheConfig> implements EnhanceCac
     public RedisCacheManager getRedisCacheManager() {
         return redisCacheManager;
     }
-    
+
     public boolean isBind() {
         return bind;
     }
