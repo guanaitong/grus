@@ -13,7 +13,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "grus.opentelemetry")
 public class OpenTelemetryProperties {
 
+    /**
+     * feignService传播下游时，采用新的span
+     */
+    private boolean propagateWithNew = true;
     private Collector collector = new Collector();
+
+    public boolean isPropagateWithNew() {
+        return propagateWithNew;
+    }
+
+    public void setPropagateWithNew(boolean propagateWithNew) {
+        this.propagateWithNew = propagateWithNew;
+    }
 
     public Collector getCollector() {
         return collector;

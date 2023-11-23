@@ -40,11 +40,29 @@ public class FeignTracingInterceptor implements Interceptor {
         requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_NAME, Systems.APP_NAME);
         requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_INSTANCE, Systems.APP_INSTANCE);
         requestBuilder.addHeader(GrusServiceHttpHeader.HTTP_UA_HEADER, "Grus service client");
+        if (OpenTelemetrys.isPropagateWithNew()) {
+            OpenTelemetrys.getTextMapPropagator().inject(Context.current(), requestBuilder, setter);
+            long start = System.nanoTime();
+            try {
+                return chain.proceed(requestBuilder.build());
+            } finally {
+                SlowLogger.logEvent(Module.FEIGN, System.nanoTime() - start, originalRequest.toString());
+            }
+        }
 
+//        String rootSpanId = Span.current().getSpanContext().getSpanId();
         Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder(originalRequest.method() + " " + originalRequest.url().encodedPath()).setSpanKind(SpanKind.CLIENT).startSpan();
+
         try (Scope scope = span.makeCurrent()) {
             OpenTelemetrys.configSystemTags(span);
+            if (LOGGER.isDebugEnabled()) {
+//              这个spanId，才是下游的parent。下游的parent，并不是GrusFilter进来的spanId，即上面被注释的rootSpanId
+//              如果想要使用GrusFilter进来的spanId，那么设置propagateWithNew为true
+                String spanId = span.getSpanContext().getSpanId();
+                LOGGER.debug("downstream parentId {}", spanId);
+            }
+
             span.setAttribute("http.method", originalRequest.method());
             span.setAttribute("component", "feign");
             OpenTelemetrys.getTextMapPropagator().inject(Context.current(), requestBuilder, setter);

@@ -74,9 +74,10 @@ public class OpenTelemetryAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public OpenTelemetry openTelemetry(SdkTracerProvider sdkTracerProvider) {
+        public OpenTelemetry openTelemetry(SdkTracerProvider sdkTracerProvider, OpenTelemetryProperties openTelemetryProperties) {
             TextMapPropagator textMapPropagator = TextMapPropagator.composite(W3CTraceContextPropagator.getInstance(), JaegerPropagator.getInstance());
             OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
+            OpenTelemetrys.setPropagateWithNew(openTelemetryProperties.isPropagateWithNew());
             OpenTelemetrys.set(sdk);
             return sdk;
         }
