@@ -54,10 +54,6 @@ public class RedisCacheConfig {
             Threads.newDaemonThreadFactory("cacheRefresher", Thread.MIN_PRIORITY),
             Threads.LOGGER_REJECTEDEXECUTIONHANDLER);
 
-    /**
-     * enableLocalCache=true时，用于订阅删除key的通道名，如果不填写，默认使用应用名
-     */
-    private String channel;
 
     private RedisSetting redisSetting;
 
@@ -117,15 +113,6 @@ public class RedisCacheConfig {
 
     public RedisCacheConfig setRedisSetting(RedisSetting redisSetting) {
         this.redisSetting = redisSetting;
-        return this;
-    }
-
-    public String getChannel() {
-        return channel;
-    }
-
-    public RedisCacheConfig setChannel(String channel) {
-        this.channel = channel;
         return this;
     }
 

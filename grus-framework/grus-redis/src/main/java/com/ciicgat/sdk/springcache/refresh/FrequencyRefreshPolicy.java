@@ -7,7 +7,6 @@ package com.ciicgat.sdk.springcache.refresh;
 
 import com.ciicgat.sdk.lang.tool.Bytes;
 import com.ciicgat.sdk.springcache.AbstractCache;
-import com.ciicgat.sdk.util.system.Systems;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Scheduler;
 import org.apache.commons.lang3.ArrayUtils;
@@ -81,6 +80,7 @@ class FrequencyRefreshPolicy extends RefreshPolicy {
     }
 
     private static byte[] makeRedisCacheKey(AbstractCache<?> cache, String key) {
-        return Bytes.toBytes(Systems.APP_NAME + "_EX_" + cache.getName() + ":::" + key);
+        String prefix = cache.getRedisCacheManager().getRedisCacheConfig().getPrefix();
+        return Bytes.toBytes(prefix + "_EX_" + cache.getName() + ":::" + key);
     }
 }

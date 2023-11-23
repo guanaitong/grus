@@ -72,6 +72,10 @@ public abstract class AbstractCache<C extends CacheConfig> implements EnhanceCac
         Objects.requireNonNull(this.refreshPolicy);
     }
 
+    public RedisCacheManager getRedisCacheManager() {
+        return redisCacheManager;
+    }
+    
     public boolean isBind() {
         return bind;
     }

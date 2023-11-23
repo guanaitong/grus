@@ -9,7 +9,6 @@ import com.ciicgat.sdk.lang.tool.Bytes;
 import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
 import com.ciicgat.sdk.redis.SpringRedisConfCreator;
 import com.ciicgat.sdk.redis.config.RedisSetting;
-import com.ciicgat.sdk.util.system.Systems;
 import io.lettuce.core.ClientOptions;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
@@ -22,7 +21,6 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.Map;
@@ -39,7 +37,7 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
     private ConcurrentHashMap<String, AbstractCache<?>> redisCacheMap = new ConcurrentHashMap<>();
     private final RedisConnectionFactory redisConnectionFactory;
     private volatile LocalCacheEvictMessageListener localCacheEvictMessageListener;
-    private byte[] channel = null;
+    private final byte[] channel;
     private final String id;
     private MeterRegistry meterRegistry;
     private volatile Executor refreshExecutor;
@@ -56,6 +54,8 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
         Objects.requireNonNull(redisCacheConfig);
         this.redisConnectionFactory = SpringRedisConfCreator.newRedisConnectionFactory(redisSetting, true, ClientOptions.DisconnectedBehavior.REJECT_COMMANDS);
         this.id = new SessionIdGenerator().generateSessionId(8);
+        this.channel = Bytes.toBytes(this.redisCacheConfig.getPrefix() + "_CHANNEL");
+        LOGGER.info("this cacheManagerId is {}", this.id);
     }
 
 
@@ -82,21 +82,10 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
 
     void sendEvictMessage(String key, String name) {
         try (RedisConnection connection = redisConnectionFactory.getConnection()) {
-            connection.publish(getChannel(), new LocalCacheEvictMessage(key, name, id).toBytes());
+            connection.publish(this.channel, new LocalCacheEvictMessage(key, name, id).toBytes());
         } catch (Exception e) {
             LOGGER.error("sendEvictMessage,key:" + key + ",name:" + name, e);
         }
-    }
-
-    private byte[] getChannel() {
-        if (channel == null) {
-            if (StringUtils.hasLength(redisCacheConfig.getChannel())) {
-                channel = Bytes.toBytes("GRC-CHANNEL_".concat(redisCacheConfig.getChannel()));
-            } else {
-                channel = Bytes.toBytes("GRC-CHANNEL_".concat(Systems.APP_NAME));
-            }
-        }
-        return channel;
     }
 
 
@@ -119,7 +108,7 @@ public class RedisCacheManager implements CacheManager, MeterBinder {
             synchronized (this) {
                 if (localCacheEvictMessageListener == null) {
                     LocalCacheEvictMessageListener tempListener = new LocalCacheEvictMessageListener();
-                    redisConnectionFactory.getConnection().subscribe(tempListener, getChannel());
+                    redisConnectionFactory.getConnection().subscribe(tempListener, this.channel);
                     this.localCacheEvictMessageListener = tempListener;
                 }
             }
