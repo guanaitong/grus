@@ -46,6 +46,10 @@ public class TestTraceThreadPoolExecutor {
         GlobalOpenTelemetry.resetForTest();
         OpenTelemetrys.set(sdk);
     }
+    @Test
+    public void testRunner() {
+        TraceRunner.startSpanAndRun("test", () -> System.out.println(111));
+    }
 
 
     @Test
