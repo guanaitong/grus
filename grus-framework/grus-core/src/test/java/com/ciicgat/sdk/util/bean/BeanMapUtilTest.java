@@ -89,32 +89,70 @@ public class BeanMapUtilTest {
 
     @Test
     public void testBean2Map() throws ParseException {
-        Bean bean = new Bean();
-        bean.setApp("111");
-        bean.setNum(4);
-        bean.setDate(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"));
+        {
+            BeanCopyUtil.useJdk();
+            Bean bean = new Bean();
+            bean.setApp("111");
+            bean.setNum(4);
+            bean.setDate(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"));
 
-        Map<String, Object> beanMap = BeanMapUtil.bean2Map(bean);
-        Assertions.assertEquals(5, beanMap.size());
-        Assertions.assertEquals("111", beanMap.get("app"));
-        Assertions.assertEquals(4, beanMap.get("num"));
-        Assertions.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), beanMap.get("date"));
+            Map<String, Object> beanMap = BeanMapUtil.bean2Map(bean);
+            Assertions.assertEquals(5, beanMap.size());
+            Assertions.assertEquals("111", beanMap.get("app"));
+            Assertions.assertEquals(4, beanMap.get("num"));
+            Assertions.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), beanMap.get("date"));
 
-        System.out.println("finished");
+            System.out.println("finished");
+        }
+
+        {
+            BeanCopyUtil.useCglib();
+
+            Bean bean = new Bean();
+            bean.setApp("111");
+            bean.setNum(4);
+            bean.setDate(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"));
+
+            Map<String, Object> beanMap = BeanMapUtil.bean2Map(bean);
+
+            Assertions.assertEquals("111", beanMap.get("app"));
+            Assertions.assertEquals(4, beanMap.get("num"));
+            Assertions.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), beanMap.get("date"));
+            System.out.println("finished");
+        }
     }
+
 
     @Test
     public void testMap2Bean() throws Exception {
-        Map<String, Object> beanMap = new HashMap<>();
-        beanMap.put("app", "111");
-        beanMap.put("num", 4);
-        beanMap.put("date", DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"));
+        {
+            BeanCopyUtil.useJdk();
+            Map<String, Object> beanMap = new HashMap<>();
+            beanMap.put("app", "111");
+            beanMap.put("num", 4);
+            beanMap.put("date", DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"));
 
-        Bean bean = BeanMapUtil.map2Bean(beanMap, Bean.class);
+            Bean bean = BeanMapUtil.map2Bean(beanMap, Bean.class);
 
-        Assertions.assertEquals("111", bean.getApp());
-        Assertions.assertEquals(Integer.valueOf(4), bean.getNum());
-        Assertions.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), bean.getDate());
-        System.out.println("finished");
+            Assertions.assertEquals("111", bean.getApp());
+            Assertions.assertEquals(Integer.valueOf(4), bean.getNum());
+            Assertions.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), bean.getDate());
+            System.out.println("finished");
+        }
+
+        {
+            BeanCopyUtil.useCglib();
+            Map<String, Object> beanMap = new HashMap<>();
+            beanMap.put("app", "111");
+            beanMap.put("num", 4);
+            beanMap.put("date", DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"));
+
+            Bean bean = BeanMapUtil.map2Bean(beanMap, Bean.class);
+
+            Assertions.assertEquals("111", bean.getApp());
+            Assertions.assertEquals(Integer.valueOf(4), bean.getNum());
+            Assertions.assertEquals(DateUtils.parseDate("2019-09-09 00:00:00", "yyyy-MM-dd HH:mm:ss"), bean.getDate());
+            System.out.println("finished");
+        }
     }
 }

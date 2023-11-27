@@ -6,7 +6,8 @@
 package com.ciicgat.sdk.util.bean;
 
 import com.ciicgat.sdk.lang.convert.Pagination;
-import org.springframework.beans.BeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,14 +20,23 @@ import java.util.List;
  */
 public class BeanCopyUtil {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BeanCopyUtil.class);
+
+    static BeanCopier INSTANCE = JdkBeanCopier.INSTANCE;
+
+    public static void useCglib() {
+        INSTANCE = CglibBeanCopier.INSTANCE;
+    }
+
+    public static void useJdk() {
+        INSTANCE = JdkBeanCopier.INSTANCE;
+    }
+
     public static <T> T copy(Object src, Class<T> dstClass) {
         if (src == null) {
             return null;
         }
-
-        T dst = BeanUtils.instantiateClass(dstClass);
-        BeanUtils.copyProperties(src, dst);
-        return dst;
+        return INSTANCE.copy(src, dstClass);
     }
 
 
@@ -71,8 +81,7 @@ public class BeanCopyUtil {
         }
         List<R> dstList = new ArrayList<>();
         for (T src : srcList) {
-            R dst = BeanUtils.instantiateClass(dstClass);
-            BeanUtils.copyProperties(src, dst);
+            R dst = copy(src, dstClass);
             if (converter != null) {
                 converter.afterProcess(src, dst);
             }
