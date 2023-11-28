@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.util.Optional;
 
@@ -25,6 +27,8 @@ public class JSON {
 
     static {
         OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.registerModule(new Jdk8Module());
+        OBJECT_MAPPER.registerModule(new JavaTimeModule());
         OBJECT_MAPPER.setConfig(OBJECT_MAPPER.getDeserializationConfig().with(new StdDateFormatExtend()))
                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
