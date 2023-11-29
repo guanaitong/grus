@@ -120,6 +120,12 @@ public class BeanCopyUtilTest {
             Assertions.assertEquals("改过了", bean3.getApp());
             Assertions.assertEquals(Integer.valueOf(1), bean3.getNum());
             Assertions.assertEquals("wjj", bean3.getAttr().getName());
+
+            Bean2 bean4 = new Bean2();
+            BeanCopyUtil.copyProperties(bean1, bean4);
+            Assertions.assertEquals("支付", bean4.getApp());
+            Assertions.assertEquals(Integer.valueOf(1), bean4.getNum());
+            Assertions.assertEquals("wjj", bean4.getAttr().getName());
         }
 
         {
@@ -133,6 +139,12 @@ public class BeanCopyUtilTest {
             Assertions.assertEquals("改过了", bean3.getApp());
             Assertions.assertEquals(Integer.valueOf(1), bean3.getNum());
             Assertions.assertEquals("wjj", bean3.getAttr().getName());
+
+            Bean2 bean4 = new Bean2();
+            BeanCopyUtil.copyProperties(bean1, bean4);
+            Assertions.assertEquals("支付", bean4.getApp());
+            Assertions.assertEquals(Integer.valueOf(1), bean4.getNum());
+            Assertions.assertEquals("wjj", bean4.getAttr().getName());
         }
     }
 

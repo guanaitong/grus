@@ -21,22 +21,32 @@ class CglibBeanCopier implements com.ciicgat.sdk.util.bean.BeanCopier {
     static com.ciicgat.sdk.util.bean.BeanCopier INSTANCE = new CglibBeanCopier();
     private static final Logger LOGGER = LoggerFactory.getLogger(CglibBeanCopier.class);
 
-    private ConcurrentHashMap<String, BeanCopier> cache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, BeanCopier> cache = new ConcurrentHashMap<>();
 
     private CglibBeanCopier() {
     }
 
-    public <T> T copy(Object src, Class<T> dstClass) {
-        BeanCopier beanCopier = getCopier(src.getClass(), dstClass);
-        T dst;
+    @Override
+    public void copyProperties(Object source, Object target) {
+        BeanCopier beanCopier = getCopier(source.getClass(), target.getClass());
         try {
-            dst = dstClass.getDeclaredConstructor().newInstance();
-            beanCopier.copy(src, dst, null);
+            beanCopier.copy(source, target, null);
         } catch (Exception e) {
             LOGGER.error("BeanCopyUtil cglib copy error", e);
-            throw new RuntimeException(e);
+            throw new BeansException("cglib copy error", e);
         }
-        return dst;
+    }
+
+    public <T> T copy(Object src, Class<T> dstClass) {
+        BeanCopier beanCopier = getCopier(src.getClass(), dstClass);
+        try {
+            T dst = dstClass.getDeclaredConstructor().newInstance();
+            beanCopier.copy(src, dst, null);
+            return dst;
+        } catch (Exception e) {
+            LOGGER.error("BeanCopyUtil cglib copy error", e);
+            throw new BeansException("cglib copy error", e);
+        }
     }
 
     private BeanCopier getCopier(Class<?> srcClass, Class<?> dstClass) {
@@ -56,23 +66,27 @@ class CglibBeanCopier implements com.ciicgat.sdk.util.bean.BeanCopier {
 
     @Override
     public Map<String, Object> bean2Map(Object bean) {
-        Map<String, Object> map = new HashMap<>();
-        BeanMap beanMap = BeanMap.create(bean);
-        map.putAll(beanMap);
-        return map;
+        try {
+            Map<String, Object> map = new HashMap<>();
+            BeanMap beanMap = BeanMap.create(bean);
+            map.putAll(beanMap);
+            return map;
+        } catch (Exception e) {
+            LOGGER.error("BeanMapUtil cglib bean2Map error", e);
+            throw new BeansException("cglib bean2Map error", e);
+        }
     }
 
     @Override
     public <T> T map2Bean(Map<String, Object> map, Class<T> beanClass) {
-        T bean;
         try {
-            bean = beanClass.getDeclaredConstructor().newInstance();
+            T bean = beanClass.getDeclaredConstructor().newInstance();
             BeanMap beanMap = BeanMap.create(bean);
             beanMap.putAll(map);
+            return bean;
         } catch (Exception e) {
-            LOGGER.error("BeanMapUtil cglib copy error", e);
-            throw new RuntimeException(e);
+            LOGGER.error("BeanMapUtil cglib map2Bean error", e);
+            throw new BeansException("cglib map2Bean error", e);
         }
-        return bean;
     }
 }

@@ -22,14 +22,20 @@ public class BeanCopyUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BeanCopyUtil.class);
 
-    static BeanCopier INSTANCE = JdkBeanCopier.INSTANCE;
+    static BeanCopier INSTANCE = SpringJdkBeanCopier.INSTANCE;
 
     public static void useCglib() {
         INSTANCE = CglibBeanCopier.INSTANCE;
+        LOGGER.info("use CglibBeanCopier");
     }
 
     public static void useJdk() {
-        INSTANCE = JdkBeanCopier.INSTANCE;
+        INSTANCE = SpringJdkBeanCopier.INSTANCE;
+        LOGGER.info("use SpringJdkBeanCopier");
+    }
+
+    public static void copyProperties(Object source, Object target) {
+        INSTANCE.copyProperties(source, target);
     }
 
     public static <T> T copy(Object src, Class<T> dstClass) {
