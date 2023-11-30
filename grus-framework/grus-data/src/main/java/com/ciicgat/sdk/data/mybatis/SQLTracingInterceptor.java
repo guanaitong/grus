@@ -74,7 +74,7 @@ public class SQLTracingInterceptor implements Interceptor {
                 SlowLogger.logEvent(Module.DB, System.nanoTime() - start, sql);
             }
         }
-        if (result instanceof List && ((List) result).size() > 50000) {
+        if (result instanceof List && ((List) result).size() > 100000) {
             String msg = String.format("too large query result size:[%d] ,sql is %s", ((List) result).size(), sql);
             LOGGER.warn(msg);
             Alert.send(msg);
