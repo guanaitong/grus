@@ -96,7 +96,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
      * 数据操作时，是否校验索引存在。
      * 开启该参数后，save时，如果不存在，会自动创建索引。
      */
-    private boolean checkIndexStateOnSave = true;
+    private boolean checkIndexStateOnSave = false;
 
     private final ConcurrentMap<String, Object> indexStateCache = new ConcurrentHashMap<>();
 
