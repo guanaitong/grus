@@ -24,7 +24,7 @@ import redis.clients.jedis.JedisCluster;
  */
 class JedisClusterRedisExecutor implements RedisExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(JedisClusterRedisExecutor.class);
-
+    private final SlowLogger<String> slowLogger = new SlowLogger<>(Module.REDIS, true, v -> "");
     private final RedisSetting redisSetting;
     private final JedisCluster jedisCluster;
 
@@ -49,7 +49,7 @@ class JedisClusterRedisExecutor implements RedisExecutor {
                 throw e;
             } finally {
                 span.end();
-                SlowLogger.logEvent(Module.REDIS, span, redisAction.toString());
+                slowLogger.mayLog(span, Collections.emptyMap(), "");
             }
         } else {
             long start = System.nanoTime();
@@ -60,7 +60,7 @@ class JedisClusterRedisExecutor implements RedisExecutor {
                 LOGGER.error("redis error:" + redisSetting, e);
                 throw e;
             } finally {
-                SlowLogger.logEvent(Module.REDIS, System.nanoTime() - start, redisAction.toString());
+                slowLogger.mayLog(System.nanoTime() - start, Collections.emptyMap(), "");
             }
         }
     }
