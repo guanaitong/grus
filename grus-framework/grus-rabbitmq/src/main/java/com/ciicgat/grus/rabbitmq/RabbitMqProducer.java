@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -119,7 +118,7 @@ public class RabbitMqProducer {
                 send(exchange, routingKey, value, properties, bytes);
             } finally {
                 span.end();
-                SLOW_LOGGER.mayLog(span, Collections.emptyMap(), "");
+                SLOW_LOGGER.mayLog(span,  Map.of("exchange", exchange, "routingKey", routingKey), "");
             }
         } else {
             long start = System.nanoTime();

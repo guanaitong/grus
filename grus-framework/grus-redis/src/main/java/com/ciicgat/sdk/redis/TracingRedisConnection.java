@@ -39,6 +39,7 @@ import org.springframework.data.redis.core.types.Expiration;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 
@@ -63,6 +64,7 @@ class TracingRedisConnection extends AbstractRedisConnection {
     }
 
     private <T> T trace(String commandName, Supplier<T> callback) {
+        commandName = commandName == null ? "unknown" : commandName;
         if (OpenTelemetrys.isPropagateUnSupportedMiddleware()) {
             Tracer tracer = OpenTelemetrys.getTracer();
             Span span = tracer.spanBuilder("executeRedisCMD").setSpanKind(SpanKind.CLIENT).startSpan();
@@ -71,11 +73,11 @@ class TracingRedisConnection extends AbstractRedisConnection {
                 span.setAttribute("component", "redis");
                 span.setAttribute("db.type", "redis");
                 span.setAttribute("db.instance", instance);
-                span.setAttribute("command", commandName == null ? "unknown" : commandName);
+                span.setAttribute("command", commandName);
                 return callback.get();
             } catch (Throwable e) {
                 Alert.send("redis error:" + redisSetting.toString(), e);
-                LOGGER.error("redis error:" + redisSetting.toString(), e);
+                LOGGER.error("redis error:" + redisSetting, e);
                 throw e;
             } finally {
                 span.end();
@@ -87,10 +89,10 @@ class TracingRedisConnection extends AbstractRedisConnection {
                 return callback.get();
             } catch (Throwable e) {
                 Alert.send("redis error:" + redisSetting.toString(), e);
-                LOGGER.error("redis error:" + redisSetting.toString(), e);
+                LOGGER.error("redis error:" + redisSetting, e);
                 throw e;
             } finally {
-                SLOW_LOGGER.mayLog(System.nanoTime() - start, Collections.emptyMap(), commandName);
+                SLOW_LOGGER.mayLog(System.nanoTime() - start, Map.of("instance", this.instance, "cmd", commandName), commandName);
             }
         }
     }

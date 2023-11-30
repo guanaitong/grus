@@ -25,6 +25,7 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -33,6 +34,7 @@ import java.util.function.Consumer;
 public class TraceInterceptor implements ExchangeFilterFunction {
     private static final Logger LOGGER = LoggerFactory.getLogger(TraceInterceptor.class);
     private static final TextMapSetter<ClientRequest.Builder> setter = (carrier, key, value) -> carrier.header(key, value);
+    private static final SlowLogger<ClientRequest> SLOW_LOGGER = new SlowLogger<>(Module.FEIGN, true, request -> request.toString());
 
     @Override
     public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
@@ -55,7 +57,7 @@ public class TraceInterceptor implements ExchangeFilterFunction {
             return next.exchange(clientRequestBuilder.build());
         } finally {
             span.end();
-            SlowLogger.logEvent(Module.FEIGN, span, request.toString());
+            SLOW_LOGGER.mayLog(span, Map.of("method", request.method(), "url", request.url()), request);
         }
     }
 }

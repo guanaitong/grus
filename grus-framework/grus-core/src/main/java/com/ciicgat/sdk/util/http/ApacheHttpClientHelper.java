@@ -32,7 +32,7 @@ import java.util.Objects;
 public class ApacheHttpClientHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApacheHttpClientHelper.class);
 
-    private static final SlowLogger<HttpUriRequest> SLOW_LOGGER = new SlowLogger<>(Module.HTTP_CLIENT, true, httpUriRequest -> httpUriRequest.toString());
+    private static final SlowLogger<ClassicHttpRequest> SLOW_LOGGER = new SlowLogger<>(Module.HTTP_CLIENT, true, httpUriRequest -> httpUriRequest.toString());
 
     /**
      * HttpClient
@@ -230,7 +230,7 @@ public class ApacheHttpClientHelper {
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
-            SLOW_LOGGER.mayLog(System.nanoTime() - start, Map.of("method", httpUriRequest.getMethod(), "url", httpUriRequest.getURI()), httpUriRequest);
+            SLOW_LOGGER.mayLog(System.nanoTime() - start, Map.of("method", httpUriRequest.getMethod(), "url", httpUriRequest.getRequestUri()), httpUriRequest);
         }
     }
 

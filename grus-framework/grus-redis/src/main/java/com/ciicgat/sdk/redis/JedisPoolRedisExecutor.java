@@ -28,7 +28,7 @@ import java.util.Collections;
  */
 class JedisPoolRedisExecutor implements RedisExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(JedisPoolRedisExecutor.class);
-    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.REDIS, true, v -> "");
+    private final SlowLogger<String> slowLogger = new SlowLogger<>(Module.REDIS, true, v -> "");
     private final RedisSetting redisSetting;
     private final Pool<Jedis> pool;
 
@@ -59,7 +59,7 @@ class JedisPoolRedisExecutor implements RedisExecutor {
             } finally {
                 CloseUtils.close(jedis);
                 span.end();
-                SLOW_LOGGER.mayLog(span, Collections.emptyMap(), "");
+                slowLogger.mayLog(span, Collections.emptyMap(), "");
             }
         } else {
             long start = System.nanoTime();
@@ -70,7 +70,7 @@ class JedisPoolRedisExecutor implements RedisExecutor {
                 LOGGER.error("redis error:" + redisSetting, e);
                 throw e;
             } finally {
-                SLOW_LOGGER.mayLog(System.nanoTime() - start, Collections.emptyMap(), "");
+                slowLogger.mayLog(System.nanoTime() - start, Collections.emptyMap(), "");
             }
         }
     }
