@@ -60,7 +60,7 @@ public class SlowLogger<T> {
         String format = slowLoggerFormatter.format(value);
         SlowLog slowLog = new SlowLog();
         slowLog.setTags(tags);
-        slowLog.setCost(nanosDuration);
+        slowLog.setCost(nanosDuration / 1000_000L);
         slowLog.setModule(module.getName());
         slowLog.setLevel(latencyLevel);
         slowLog.setTs(System.currentTimeMillis());
