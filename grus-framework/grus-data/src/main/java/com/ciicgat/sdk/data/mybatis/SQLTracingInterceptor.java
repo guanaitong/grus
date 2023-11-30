@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Statement;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -37,6 +38,7 @@ import java.util.Properties;
 })
 public class SQLTracingInterceptor implements Interceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(SQLTracingInterceptor.class);
+    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.DB, true, v -> "db slow");
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -61,7 +63,7 @@ public class SQLTracingInterceptor implements Interceptor {
                 throw throwable;
             } finally {
                 span.end();
-                SlowLogger.logEvent(Module.DB, span, sql);
+                SLOW_LOGGER.mayLog(span, Map.of("sql", sql), "");
             }
         } else {
             long start = System.nanoTime();
@@ -71,7 +73,7 @@ public class SQLTracingInterceptor implements Interceptor {
                 LOGGER.error(sql, throwable);
                 throw throwable;
             } finally {
-                SlowLogger.logEvent(Module.DB, System.nanoTime() - start, sql);
+                SLOW_LOGGER.mayLog(System.nanoTime() - start, Map.of("sql", sql), "");
             }
         }
         if (result instanceof List && ((List) result).size() > 100000) {

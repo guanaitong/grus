@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.LongAdder;
@@ -51,6 +52,8 @@ public class GrusFilter implements Filter, MeterBinder {
     private static final Logger LOGGER = LoggerFactory.getLogger(GrusFilter.class);
     private static final String SERVER_SPAN_CONTEXT = GrusFilter.class.getName() + ".activeSpanContext";
     private static final Object TAG_VALUE = new Object();
+
+    private static final SlowLogger<HttpServletRequest> SLOW_LOGGER = new SlowLogger<>(Module.SERVLET, true, request -> request.getRequestURI());
     private final AtomicInteger concurrency = new AtomicInteger();
 
     private final LongAdder highConcurrencyEvents = new LongAdder();
@@ -196,7 +199,7 @@ public class GrusFilter implements Filter, MeterBinder {
                 throw e;
             } finally {
                 span.end();
-                SlowLogger.logEvent(Module.SERVLET, span, request.getRequestURI());
+                SLOW_LOGGER.mayLog(span, Map.of("method", request.getMethod(), "url", request.getRequestURI()), request);
                 //结束清理
                 MDC.clear();
                 concurrency.decrementAndGet();

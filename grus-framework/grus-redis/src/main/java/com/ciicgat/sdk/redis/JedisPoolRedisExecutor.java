@@ -20,13 +20,15 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.util.Pool;
 
+import java.util.Collections;
+
 
 /**
  * Created by August.Zhou on 2019-04-25 17:43.
  */
 class JedisPoolRedisExecutor implements RedisExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(JedisPoolRedisExecutor.class);
-    private final SlowLogger<String> slowLogger = new SlowLogger<>(Module.REDIS, true, v -> "");
+    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.REDIS, true, v -> "");
     private final RedisSetting redisSetting;
     private final Pool<Jedis> pool;
 
@@ -57,7 +59,7 @@ class JedisPoolRedisExecutor implements RedisExecutor {
             } finally {
                 CloseUtils.close(jedis);
                 span.end();
-                slowLogger.mayLog(span, Collections.emptyMap(), "");
+                SLOW_LOGGER.mayLog(span, Collections.emptyMap(), "");
             }
         } else {
             long start = System.nanoTime();
@@ -68,7 +70,7 @@ class JedisPoolRedisExecutor implements RedisExecutor {
                 LOGGER.error("redis error:" + redisSetting, e);
                 throw e;
             } finally {
-                slowLogger.mayLog(System.nanoTime() - start, Collections.emptyMap(), "");
+                SLOW_LOGGER.mayLog(System.nanoTime() - start, Collections.emptyMap(), "");
             }
         }
     }

@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Map;
 
 
 /**
@@ -32,6 +33,7 @@ public class FeignTracingInterceptor implements Interceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeignTracingInterceptor.class);
     private static final TextMapSetter<Request.Builder> setter = (carrier, key, value) -> carrier.addHeader(key, value);
 
+    private static final SlowLogger<Request> SLOW_LOGGER = new SlowLogger<>(Module.FEIGN, true, request -> request.toString());
 
     @Override
     public Response intercept(Chain chain) throws IOException {
@@ -46,7 +48,7 @@ public class FeignTracingInterceptor implements Interceptor {
             try {
                 return chain.proceed(requestBuilder.build());
             } finally {
-                SlowLogger.logEvent(Module.FEIGN, System.nanoTime() - start, originalRequest.toString());
+                SLOW_LOGGER.mayLog(System.nanoTime() - start, Map.of("method", originalRequest.method(), "url", originalRequest.url()), originalRequest);
             }
         }
 
@@ -68,7 +70,7 @@ public class FeignTracingInterceptor implements Interceptor {
             return chain.proceed(requestBuilder.build());
         } finally {
             span.end();
-            SlowLogger.logEvent(Module.FEIGN, span, originalRequest.toString());
+            SLOW_LOGGER.mayLog(span, Map.of("method", originalRequest.method(), "url", originalRequest.url()), originalRequest);
         }
     }
 

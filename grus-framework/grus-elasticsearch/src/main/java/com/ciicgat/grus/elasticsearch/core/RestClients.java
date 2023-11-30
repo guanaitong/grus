@@ -5,11 +5,7 @@
 
 package com.ciicgat.grus.elasticsearch.core;
 
-import com.ciicgat.grus.core.Module;
-import com.ciicgat.grus.performance.SlowLogger;
 import org.apache.http.HttpHost;
-import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.HttpResponseInterceptor;
 import org.elasticsearch.client.Node;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
@@ -31,18 +27,18 @@ public class RestClients {
                 LOGGER.info("failedNoe {}", node);
             }
         });
-        restClientBuilder.setHttpClientConfigCallback(httpClientBuilder -> {
-            httpClientBuilder.addInterceptorFirst((HttpRequestInterceptor) (request, context) -> context.setAttribute(SPAN_KEY, System.nanoTime()));
-            httpClientBuilder.addInterceptorFirst((HttpResponseInterceptor) (response, context) -> {
-                Object attribute = context.getAttribute(SPAN_KEY);
-                if (attribute instanceof Long) {
-                    var start = (Long) attribute;
-                    SlowLogger.logEvent(Module.ELASTICSEARCH, System.nanoTime() - start.longValue(), "es slow");
-                }
-            });
-            return httpClientBuilder;
-        });
-        restClientBuilder.setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder);
+//        restClientBuilder.setHttpClientConfigCallback(httpClientBuilder -> {
+//            httpClientBuilder.addInterceptorFirst((HttpRequestInterceptor) (request, context) -> context.setAttribute(SPAN_KEY, System.nanoTime()));
+//            httpClientBuilder.addInterceptorFirst((HttpResponseInterceptor) (response, context) -> {
+//                Object attribute = context.getAttribute(SPAN_KEY);
+//                if (attribute instanceof Long) {
+//                    var start = (Long) attribute;
+//                    SlowLogger.logEvent(Module.ELASTICSEARCH, System.nanoTime() - start.longValue(), "es slow");
+//                }
+//            });
+//            return httpClientBuilder;
+//        });
+//        restClientBuilder.setRequestConfigCallback(requestConfigBuilder -> requestConfigBuilder);
         return restClientBuilder;
     }
 

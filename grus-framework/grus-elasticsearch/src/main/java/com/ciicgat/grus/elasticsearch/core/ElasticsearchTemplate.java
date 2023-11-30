@@ -58,6 +58,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -72,6 +73,7 @@ import java.util.function.Function;
  */
 public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ElasticsearchTemplate.class);
+    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.ELASTICSEARCH, true, v -> v);
     private final RestHighLevelClient restHighLevelClient;
     private final String index;
     private final IndexSuffixType indexSuffixType;
@@ -517,7 +519,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
             readOps.increment();
             readTimeTotal.add(timeCost / 1000_000.0);
         }
-        SlowLogger.logEvent(Module.ELASTICSEARCH, timeCost, detail);
+        SLOW_LOGGER.mayLog(timeCost, Map.of("index", this.index, "w", isWrite), detail);
     }
 
     private int getReadConcurrency() {

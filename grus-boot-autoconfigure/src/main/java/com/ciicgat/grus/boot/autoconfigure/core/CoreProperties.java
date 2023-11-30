@@ -6,7 +6,6 @@
 package com.ciicgat.grus.boot.autoconfigure.core;
 
 import com.ciicgat.grus.alert.Alert;
-import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.sdk.util.frigate.GroupBot;
 import com.ciicgat.sdk.util.system.Systems;
 import jakarta.annotation.PostConstruct;
@@ -29,16 +28,6 @@ public class CoreProperties {
     @NotNull
     private String groupBotKey;
 
-    /**
-     * true时，会打印慢日志
-     */
-    private boolean printSlowLog = true;
-
-
-    /**
-     * true时，会发送慢日志
-     */
-    private boolean sendSlowLog = true;
 
     private boolean metricBusinessException = true;
 
@@ -46,16 +35,10 @@ public class CoreProperties {
 
     @PostConstruct
     private void init() {
-        if (!printSlowLog) {
-            SlowLogger.closePrintSlowLog();
-        }
-        if (!sendSlowLog) {
-            SlowLogger.closeSendSlowLog();
-        }
         if (Objects.nonNull(groupBotKey)) {
             GroupBot.GLOBAL_GROUP_KEY = groupBotKey;
         }
-        Alert.send(String.format("应用（%s）-（%s）正在启动", Systems.APP_NAME, Systems.APP_INSTANCE));
+        Alert.send(String.format("应用实例（%s）正在启动", Systems.APP_NAME, Systems.APP_INSTANCE));
     }
 
     public String getGroupBotKey() {
@@ -64,22 +47,6 @@ public class CoreProperties {
 
     public void setGroupBotKey(String groupBotKey) {
         this.groupBotKey = groupBotKey;
-    }
-
-    public boolean isPrintSlowLog() {
-        return printSlowLog;
-    }
-
-    public void setPrintSlowLog(boolean printSlowLog) {
-        this.printSlowLog = printSlowLog;
-    }
-
-    public boolean isSendSlowLog() {
-        return sendSlowLog;
-    }
-
-    public void setSendSlowLog(boolean sendSlowLog) {
-        this.sendSlowLog = sendSlowLog;
     }
 
     public boolean isMetricBusinessException() {

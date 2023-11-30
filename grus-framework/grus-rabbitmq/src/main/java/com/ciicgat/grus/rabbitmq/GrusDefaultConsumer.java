@@ -36,7 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created by August.Zhou on 2019-04-25 19:12.
  */
 public class GrusDefaultConsumer extends DefaultConsumer {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(GrusDefaultConsumer.class);
     static final TextMapGetter<Map<String, Object>> getter = new TextMapGetter<>() {
         @Override
         public Iterable<String> keys(Map<String, Object> basicProperties) {
@@ -55,7 +55,9 @@ public class GrusDefaultConsumer extends DefaultConsumer {
             return "";
         }
     };
-    private static final Logger LOGGER = LoggerFactory.getLogger(GrusDefaultConsumer.class);
+
+
+    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.RABBITMQ, true, v -> "handle msg slow");
 
     private final String queue;
     private final AtomicBoolean isRunning;
@@ -135,7 +137,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
                 }
             } finally {
                 span.end();
-                SlowLogger.logEvent(Module.RABBITMQ, span, "handle msg slow");
+                SLOW_LOGGER.mayLog(span, Map.of("queue", queue), "");
             }
         }
     }

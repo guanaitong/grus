@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +40,8 @@ public class RabbitMqProducer {
     private static final Logger LOGGER = LoggerFactory.getLogger(RabbitMqProducer.class);
     private static final TextMapSetter<Map<String, Object>> setter = (carrier, key, value) -> carrier.put(key, value);
     private static final SessionIdGenerator SESSION_ID_GENERATOR = new SessionIdGenerator();
+
+    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.RABBITMQ, true, v -> "send msg slow");
 
     private final ChannelPool channelPool;
 
@@ -116,14 +119,14 @@ public class RabbitMqProducer {
                 send(exchange, routingKey, value, properties, bytes);
             } finally {
                 span.end();
-                SlowLogger.logEvent(Module.RABBITMQ, span, "send msg slow");
+                SLOW_LOGGER.mayLog(span, Collections.emptyMap(), "");
             }
         } else {
             long start = System.nanoTime();
             try {
                 send(exchange, routingKey, value, properties, bytes);
             } finally {
-                SlowLogger.logEvent(Module.RABBITMQ, System.nanoTime() - start, "send msg slow");
+                SLOW_LOGGER.mayLog(System.nanoTime() - start, Map.of("exchange", exchange, "routingKey", routingKey), "");
             }
         }
     }

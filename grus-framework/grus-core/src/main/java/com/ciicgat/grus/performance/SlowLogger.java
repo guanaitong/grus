@@ -9,74 +9,74 @@ import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.LatencyConfig;
 import com.ciicgat.grus.core.LatencyLevel;
 import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.json.JSON;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Scheduler;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
- * Created by August.Zhou on 2019-06-26 11:19.
+ * Created by August.Zhou on 2023/11/30 11:28
  */
-public class SlowLogger {
-
+public class SlowLogger<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SlowLogger.class);
+    private final Module module;
 
-    private static boolean printSlowLog = true;
+    private final LatencyConfig latencyConfig;
 
-    private static boolean sendSlowLog = true;
+    private final boolean sendSlowLog;
 
-    private static final String FORMAT = "%s slow,level [%s],cost [%d] millis,detail-> %s";
+    private final SlowLoggerFormatter<T> slowLoggerFormatter;
 
-    private static SlowLogFilter slowLogFilter = SlowLogFilter.DEFAULT;
+    private final Cache<Integer, AtomicInteger> metricsCache = Caffeine.newBuilder().scheduler(Scheduler.systemScheduler()).expireAfterWrite(1, TimeUnit.MINUTES).build();
 
-    private SlowLogger() {
+    public SlowLogger(Module module, boolean sendSlowLog, SlowLoggerFormatter<T> slowLoggerFormatter) {
+        this.module = Objects.requireNonNull(module);
+        this.sendSlowLog = sendSlowLog;
+        this.slowLoggerFormatter = Objects.requireNonNull(slowLoggerFormatter);
+        this.latencyConfig = LatencyConfig.getModuleConfig(module);
     }
 
-    public static void closePrintSlowLog() {
-        SlowLogger.printSlowLog = false;
-    }
-
-    public static void setPrintSlowLog(boolean printSlowLog) {
-        SlowLogger.printSlowLog = printSlowLog;
-    }
-
-    public static void closeSendSlowLog() {
-        SlowLogger.sendSlowLog = false;
-    }
-
-    public static void setSendSlowLog(boolean sendSlowLog) {
-        SlowLogger.sendSlowLog = sendSlowLog;
-    }
-
-    public static void setSlowLogFilter(SlowLogFilter slowLogFilter) {
-        SlowLogger.slowLogFilter = slowLogFilter;
-    }
-
-    public static boolean logEvent(Module module, Span span, String detail) {
+    public void mayLog(Span span, Map<String, Object> tags, T value) {
         if (span instanceof ReadWriteSpan) {
             var readWriteSpan = (ReadWriteSpan) span;
-            return SlowLogger.logEvent(module, readWriteSpan.getLatencyNanos(), detail);
+            mayLog(readWriteSpan.getLatencyNanos(), tags, value);
         }
-        return false;
     }
 
-    public static boolean logEvent(Module module, long nanosDuration, String detail) {
-        LatencyConfig latencyConfig = LatencyConfig.getModuleConfig(module);
+    public void mayLog(long nanosDuration, Map<String, Object> tags, T value) {
         LatencyLevel latencyLevel = latencyConfig.getLevel(nanosDuration);
-        if (latencyLevel == LatencyLevel.SLOW) {
-            String msg = String.format(FORMAT, module.getName(), latencyLevel.name(), nanosDuration / 1000_000L, detail);
-            if (printSlowLog) {
-                LOGGER.warn(msg);
-            }
-            if (sendSlowLog && slowLogFilter.accept(module, nanosDuration, detail)) {
-                Alert.send(msg);
-            }
-            return true;
-        } else if (latencyLevel == LatencyLevel.MEDIUM) {
-            String msg = String.format(FORMAT, module.getName(), latencyLevel.name(), nanosDuration / 1000_000L, detail);
-            LOGGER.warn(msg);
+        if (latencyLevel == LatencyLevel.FAST) {
+            return;
         }
-        return false;
+        String format = slowLoggerFormatter.format(value);
+        SlowLog slowLog = new SlowLog();
+        slowLog.setTags(tags);
+        slowLog.setCost(nanosDuration);
+        slowLog.setModule(module.getName());
+        slowLog.setLevel(latencyLevel);
+        slowLog.setTs(System.currentTimeMillis());
+        slowLog.setDetail(format);
+
+        if (latencyLevel == LatencyLevel.SLOW) {
+            int t = metricsCache.get(tags.hashCode(), integer -> new AtomicInteger()).incrementAndGet();
+            slowLog.setCountLastMinute(t);
+            String log = JSON.toJSONString(slowLog);
+            LOGGER.warn(log);
+            if (sendSlowLog && t > latencyConfig.getSendSlowLogThreshold()) {
+                Alert.send(log);
+            }
+        } else {
+            LOGGER.warn(JSON.toJSONString(slowLog));
+        }
     }
 
 }

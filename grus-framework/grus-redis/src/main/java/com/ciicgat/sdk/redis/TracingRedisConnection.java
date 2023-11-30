@@ -37,6 +37,7 @@ import org.springframework.data.redis.connection.RedisZSetCommands;
 import org.springframework.data.redis.connection.Subscription;
 import org.springframework.data.redis.core.types.Expiration;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -49,7 +50,7 @@ class TracingRedisConnection extends AbstractRedisConnection {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TracingRedisConnection.class);
 
-
+    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.REDIS, true, cmd -> "cmd:" + cmd);
     private final RedisConnection redisConnection;
     private final RedisSetting redisSetting;
     private final String instance;
@@ -78,7 +79,7 @@ class TracingRedisConnection extends AbstractRedisConnection {
                 throw e;
             } finally {
                 span.end();
-                SlowLogger.logEvent(Module.REDIS, span, "lettuce redis slow,cmd:" + commandName);
+                SLOW_LOGGER.mayLog(span, Collections.emptyMap(), commandName);
             }
         } else {
             long start = System.nanoTime();
@@ -89,7 +90,7 @@ class TracingRedisConnection extends AbstractRedisConnection {
                 LOGGER.error("redis error:" + redisSetting.toString(), e);
                 throw e;
             } finally {
-                SlowLogger.logEvent(Module.REDIS, System.nanoTime() - start, "lettuce redis slow,cmd:" + commandName);
+                SLOW_LOGGER.mayLog(System.nanoTime() - start, Collections.emptyMap(), commandName);
             }
         }
     }

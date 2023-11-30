@@ -11,6 +11,9 @@ import com.ciicgat.grus.core.Module;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by August.Zhou on 2019-06-26 13:54.
  */
@@ -19,13 +22,14 @@ public class SlowMessageLoggerTest {
     @Test
     public void test() {
         Module module = Module.HTTP_CLIENT;
-        Assertions.assertFalse(SlowLogger.logEvent(module, 1_000_000L, "xxxx"));
-        Assertions.assertFalse(SlowLogger.logEvent(module, 50_000_000L, "xxxx"));
-        Assertions.assertFalse(SlowLogger.logEvent(module, 60_000_000L, "xxxx"));
-        Assertions.assertFalse(SlowLogger.logEvent(module, 300_000_000L, "xxxx"));
-        Assertions.assertFalse(SlowLogger.logEvent(module, 350_000_000L, "xxxx"));
-        Assertions.assertTrue(SlowLogger.logEvent(module, 2500_000_000L, "xxxx"));
-        Assertions.assertTrue(SlowLogger.logEvent(module, 3500_000_000L, "xxxx"));
+        SlowLogger<String> slowLogger = new SlowLogger<>(module, true, value -> value);
+        slowLogger.mayLog(1_000_000L, Map.of("1", 2), "xxxx");
+        slowLogger.mayLog(50_000_000L, new HashMap<>(), "xxxx");
+        slowLogger.mayLog(60_000_000L, Map.of("1", 2), "xxxx");
+        slowLogger.mayLog(300_000_000L, Map.of("1", 2), "xxxx");
+        slowLogger.mayLog(350_000_000L, Map.of("1", 2), "xxxx");
+        slowLogger.mayLog(2500_000_000L, Map.of("1", 2), "xxxx");
+        slowLogger.mayLog(3500_000_000L, Map.of("1", 2), "xxxx");
     }
 
 
