@@ -38,7 +38,7 @@ public class CoreProperties {
         if (Objects.nonNull(groupBotKey)) {
             GroupBot.GLOBAL_GROUP_KEY = groupBotKey;
         }
-        Alert.send(String.format("应用实例（%s）正在启动", Systems.APP_NAME, Systems.APP_INSTANCE));
+        Alert.send(String.format("应用实例（%s）正在启动", Systems.APP_INSTANCE));
     }
 
     public String getGroupBotKey() {
