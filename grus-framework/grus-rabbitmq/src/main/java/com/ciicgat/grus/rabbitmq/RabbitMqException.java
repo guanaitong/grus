@@ -5,6 +5,8 @@
 
 package com.ciicgat.grus.rabbitmq;
 
+import java.io.IOException;
+
 /**
  * Created by August.Zhou on 2022/7/2 20:02
  */
@@ -25,12 +27,22 @@ public class RabbitMqException extends RuntimeException {
         super(cause);
     }
 
-    public static void handleException(Exception e) {
-        if (e instanceof RuntimeException) {
-            throw (RuntimeException) e;
-        } else {
-            throw new RabbitMqException(e);
+    public static RabbitMqException convert(String message, IOException e) {
+        if (e.getCause() != null) {
+            return new RabbitMqException(message, e.getCause());
         }
+        return new RabbitMqException(message, e);
+    }
+
+    public static void handleException(Exception e) {
+        if (e instanceof IOException) {
+            if (e.getCause() != null) {
+                throw new RabbitMqException(e.getCause());
+            }
+        } else if (e instanceof RuntimeException) {
+            throw (RuntimeException) e;
+        }
+        throw new RabbitMqException(e);
     }
 
 }

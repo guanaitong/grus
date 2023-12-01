@@ -5,12 +5,20 @@
 
 package com.ciicgat.grus.rabbitmq;
 
+import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
+import com.ciicgat.sdk.lang.threads.Threads;
+import com.ciicgat.sdk.util.frigate.FrigateNotifier;
+import com.ciicgat.sdk.util.frigate.NotifyChannel;
+import com.ciicgat.sdk.util.system.WorkRegion;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Scheduler;
+import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.Method;
+import com.rabbitmq.client.ShutdownSignalException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,18 +99,62 @@ public class RabbitMqConsumer implements AutoCloseable {
      */
     public synchronized void consume(String queue, MsgProcessor msgProcessor) {
         if (queues.containsKey(queue)) {
-            throw new IllegalArgumentException("queue existed");
+            throw new IllegalArgumentException("queue has been registered");
         }
         queues.put(queue, msgProcessor);
         Objects.requireNonNull(queue);
         Objects.requireNonNull(msgProcessor);
-        for (Channel channel : channelList) {
-            try {
-                channel.basicConsume(queue, false, new GrusDefaultConsumer(channel, queue, msgProcessor, failedCounts, isRunning, maxRetry, fallBack));
-            } catch (IOException e) {
-                throw new RabbitMqException(String.format("queue[%s] consume failed", queue), e);
+        boolean shouldRetry = false;
+        try {
+            registerToAllChannel(queue, msgProcessor);
+        } catch (IOException e) {
+            // 在生产环境，如果因为queue不存在，不再抛出异常
+            // 开启一个异步线程，每五分钟尝试重新注册msgProcessor
+            if (WorkRegion.getCurrentWorkRegion().isProduct() && isQueue404Reason(e)) {
+                shouldRetry = true;
+                LOGGER.error("register msgProcessor error,queue[{}] not found", queue);
+                FrigateNotifier.sendMessageByAppName(NotifyChannel.SMS, Module.RABBITMQ, String.format("生产环境队列[%s]不存在,无法注册消息处理器，请及时处理", queue), null);
+            } else {
+                throw RabbitMqException.convert(String.format("queue[%s] register msgProcessor failed", queue), e);
             }
         }
+        if (shouldRetry) {
+            startAsyncRetryTask(queue, msgProcessor);
+        }
+    }
+
+    private void registerToAllChannel(String queue, MsgProcessor msgProcessor) throws IOException {
+        for (Channel channel : channelList) {
+            channel.basicConsume(queue, false, new GrusDefaultConsumer(channel, queue, msgProcessor, failedCounts, isRunning, maxRetry, fallBack));
+        }
+    }
+
+    private void startAsyncRetryTask(String queue, MsgProcessor msgProcessor) {
+        Thread thread = Threads.newThread(() -> {
+            while (true) {
+                Threads.sleepSeconds(300);
+                try {
+                    registerToAllChannel(queue, msgProcessor);
+                    return;
+                } catch (IOException e) {
+                    LOGGER.error("retry to register msgProcessor error,queue[{}]", queue, e);
+                    FrigateNotifier.sendMessageByAppName(NotifyChannel.SMS, Module.RABBITMQ, String.format("生产环境队列[%s]不存在,无法注册消息处理器，请及时处理", queue), null);
+                }
+            }
+        }, "async-register-" + queue, Thread.MIN_PRIORITY);
+        thread.start();
+    }
+
+    private static boolean isQueue404Reason(IOException e) {
+        Throwable cause = e.getCause();
+        if (cause instanceof ShutdownSignalException) {
+            Method reason = ((ShutdownSignalException) cause).getReason();
+            if (reason instanceof AMQP.Channel.Close) {
+                int replyCode = ((AMQP.Channel.Close) reason).getReplyCode();
+                return replyCode == 404;
+            }
+        }
+        return false;
     }
 
     @Override
