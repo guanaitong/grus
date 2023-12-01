@@ -13,6 +13,8 @@ import io.lettuce.core.TimeoutOptions;
 import io.lettuce.core.cluster.ClusterClientOptions;
 import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConfiguration;
@@ -35,6 +37,7 @@ import static com.ciicgat.sdk.redis.config.RedisConstants.DEFAULT_MAX_ATTEMPTS;
  * @date 2020/3/6 4:58 PM
  */
 public class SpringRedisConfCreator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpringRedisConfCreator.class);
 
     private SpringRedisConfCreator() {
     }
@@ -116,6 +119,8 @@ public class SpringRedisConfCreator {
     private static RedisConfiguration newRedisConfiguration(RedisSetting redisSetting) {
         String password = redisSetting.getFinalPassword();
         if (redisSetting.getType() == RedisSetting.TYPE_STANDALONE) {
+            LOGGER.warn("!!!YOU ARE USE STANDALONE REDIS,THIS WILL BE FORBIDDEN A FEW MONTHS LATER!!!");
+            LOGGER.warn("!!!您正在使用单点的redis，几个月后会禁止该行为，请及时迁移!!!");
             RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
             RedisSetting.StandaloneConfig standalone = redisSetting.getStandalone();
             redisConfiguration.setHostName(standalone.getHost());
@@ -182,6 +187,8 @@ public class SpringRedisConfCreator {
         setPool(redisProperties.getLettuce().getPool(), redisSetting);
         setPool(redisProperties.getJedis().getPool(), redisSetting);
         if (redisSetting.getType() == RedisSetting.TYPE_STANDALONE) {
+            LOGGER.warn("!!!YOU ARE USE STANDALONE REDIS,THIS WILL BE FORBIDDEN A FEW MONTHS LATER!!!");
+            LOGGER.warn("!!!您正在使用单点的redis，几个月后会禁止该行为，请及时迁移!!!");
             redisProperties.setDatabase(redisSetting.getDb());
             RedisSetting.StandaloneConfig standalone = redisSetting.getStandalone();
             redisProperties.setHost(standalone.getHost());
