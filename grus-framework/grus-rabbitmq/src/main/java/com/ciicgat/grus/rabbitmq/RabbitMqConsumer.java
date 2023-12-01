@@ -112,7 +112,7 @@ public class RabbitMqConsumer implements AutoCloseable {
             // 开启一个异步线程，每五分钟尝试重新注册msgProcessor
             if (WorkRegion.getCurrentWorkRegion().isProduct() && isQueue404Reason(e)) {
                 shouldRetry = true;
-                LOGGER.error("register msgProcessor error,queue[{}] not found", queue);
+                LOGGER.error("register msgProcessor error,queue[{}] not found,", queue, e);
                 FrigateNotifier.sendMessageByAppName(NotifyChannel.SMS, Module.RABBITMQ, String.format("生产环境队列[%s]不存在,无法注册消息处理器，请及时处理", queue), null);
             } else {
                 throw RabbitMqException.convert(String.format("queue[%s] register msgProcessor failed", queue), e);
@@ -137,7 +137,7 @@ public class RabbitMqConsumer implements AutoCloseable {
                     registerToAllChannel(queue, msgProcessor);
                     return;
                 } catch (IOException e) {
-                    LOGGER.error("retry to register msgProcessor error,queue[{}]", queue, e);
+                    LOGGER.error("register msgProcessor error,queue[{}] not found,", queue, e);
                     FrigateNotifier.sendMessageByAppName(NotifyChannel.SMS, Module.RABBITMQ, String.format("生产环境队列[%s]不存在,无法注册消息处理器，请及时处理", queue), null);
                 }
             }
