@@ -17,7 +17,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.BaseUnits;
 import io.micrometer.core.instrument.binder.MeterBinder;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
 import org.elasticsearch.ElasticsearchStatusException;
@@ -53,8 +52,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -104,7 +101,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
 
     private final RateLimiter saveRateLimiter = RateLimiter.create(50);
 
-    private final RateLimiter readRateLimiter = RateLimiter.create(300);
+    private final RateLimiter searchRateLimiter = RateLimiter.create(300);
 
     public ElasticsearchTemplate(RestHighLevelClient restHighLevelClient, Class<T> clazz) {
         this(restHighLevelClient, clazz, new DefaultEntityMapper<>());
@@ -127,8 +124,8 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
         return this;
     }
 
-    public ElasticsearchTemplate<T> setReadQps(double readQps) {
-        readRateLimiter.setRate(readQps);
+    public ElasticsearchTemplate<T> setSearchQps(double readQps) {
+        searchRateLimiter.setRate(readQps);
         return this;
     }
 
@@ -198,7 +195,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
             IndicesClient indicesClient = restHighLevelClient.indices();
             return indicesClient.exists(getIndexRequest, options);
         } catch (Exception e) {
-            throw new EsDataException(e);
+            throw EsDataException.convert(e);
         }
     }
 
@@ -212,8 +209,6 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
     }
 
     public boolean createIndex(String index) {
-        writeConcurrency.incrementAndGet();
-        long startTime = System.nanoTime();
         IndicesClient indices = restHighLevelClient.indices();
         try {
             if (!existIndex(index)) {
@@ -233,10 +228,10 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
                     }
                     createIndexRequest.settings(settings);
                 } else {
-                    createIndexRequest.settings(getFileContent(document.settingPath()), XContentType.JSON);
+                    createIndexRequest.settings(Util.getFileContent(document.settingPath()), XContentType.JSON);
                 }
                 //设置mapping
-                createIndexRequest.mapping(getFileContent(document.mappingPath()), XContentType.JSON);
+                createIndexRequest.mapping(Util.getFileContent(document.mappingPath()), XContentType.JSON);
                 CreateIndexResponse createIndexResponse = indices.create(createIndexRequest, options);
                 if (!createIndexResponse.isAcknowledged()) {
                     LOGGER.error("创建索引[{}]发生异常", index);
@@ -254,24 +249,9 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
                     return false;
                 }
             }
-            throw new EsDataException(e);
+            throw EsDataException.convert(e);
         } catch (Exception e) {
-            throw new EsDataException(e);
-        } finally {
-            writeConcurrency.decrementAndGet();
-            time(startTime, true, "create index " + index);
-        }
-    }
-
-    private static String getFileContent(final String filePath) {
-        String file = filePath;
-        if (!file.startsWith("/")) {
-            file = "/" + file;
-        }
-        try (InputStream in = ElasticsearchTemplate.class.getResourceAsStream(file)) {
-            return IOUtils.toString(in, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new EsDataException(e);
+            throw EsDataException.convert(e);
         }
     }
 
@@ -299,7 +279,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
             UpdateResponse updateResponse = restHighLevelClient.update(updateRequest, options);
             return updateResponse.getResult() == DocWriteResponse.Result.UPDATED ? 1 : 0;
         } catch (Exception e) {
-            throw new EsDataException(e);
+            throw EsDataException.convert(e);
         } finally {
             writeConcurrency.decrementAndGet();
             time(startTime, true, "update one value");
@@ -320,9 +300,11 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
                 .source(entityMapper.mapToString(value), XContentType.JSON)
                 .setRefreshPolicy(sync ? WriteRequest.RefreshPolicy.WAIT_UNTIL : WriteRequest.RefreshPolicy.NONE)
                 .opType(DocWriteRequest.OpType.INDEX);
-        String pipeline = value.getPipelineSupplier().get();
-        if (StringUtils.isNotEmpty(pipeline)) {
-            request.setPipeline(pipeline);
+        if (value.getPipelineSupplier() != null) {
+            String pipeline = value.getPipelineSupplier().get();
+            if (StringUtils.isNotEmpty(pipeline)) {
+                request.setPipeline(pipeline);
+            }
         }
         try {
             acquireSavePermits(1);
@@ -330,7 +312,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
             int status = indexResponse.status().getStatus();
             return (status >= 200 && status < 300) ? 1 : 0;
         } catch (Exception e) {
-            throw new EsDataException(e);
+            throw EsDataException.convert(e);
         } finally {
             writeConcurrency.decrementAndGet();
             time(startTime, true, "save one value");
@@ -383,10 +365,23 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
             }
             return dataList.size() - failedCount;
         } catch (IOException e) {
-            throw new EsDataException(e);
+            throw EsDataException.convert(e);
         } finally {
             writeConcurrency.decrementAndGet();
             time(startTime, true, "save list value");
+        }
+    }
+
+    private void acquireSavePermits(int permits) {
+        long acquireStartTime = System.currentTimeMillis();
+        double rate = saveRateLimiter.getRate();
+        if (permits >= rate) {
+            throw new EsDataException(String.format("permits[%d] is larger than rate[%f],this will block acquire method", permits, rate));
+        }
+        saveRateLimiter.acquire(permits);
+        long acquireCostTime = System.currentTimeMillis() - acquireStartTime;
+        if (acquireCostTime > 2_000) {
+            LOGGER.warn("saveRateLimiter acquire slow, permits = {}, cost {} mills", permits, acquireCostTime);
         }
     }
 
@@ -413,8 +408,8 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
             DeleteRequest deleteRequest = new DeleteRequest(index, id);
             DeleteResponse deleteResponse = restHighLevelClient.delete(deleteRequest, options);
             return deleteResponse.status() == RestStatus.OK ? 1 : 0;
-        } catch (IOException e) {
-            throw new EsDataException(e);
+        } catch (Exception e) {
+            throw EsDataException.convert(e);
         } finally {
             writeConcurrency.decrementAndGet();
             time(startTime, true, "delete one value");
@@ -438,45 +433,33 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
                 object.setDocIndex(getResponse.getIndex());
                 return object;
             }
-        } catch (IOException e) {
-            throw new EsDataException(e);
+            return null;
+        } catch (Exception e) {
+            throw EsDataException.convert(e);
         } finally {
             readConcurrency.decrementAndGet();
             time(startTime, false, "get one value");
         }
-        return null;
     }
 
     private SearchResponse search0(SearchRequest searchRequest) {
-        boolean s = readRateLimiter.tryAcquire(1, 1, TimeUnit.SECONDS);
+        boolean s = searchRateLimiter.tryAcquire(1, 1, TimeUnit.SECONDS);
         if (s) {
             long startTime = System.nanoTime();
             try {
                 readConcurrency.incrementAndGet();
                 return restHighLevelClient.search(searchRequest, options);
-            } catch (IOException e) {
-                throw new EsDataException(e);
+            } catch (Exception e) {
+                throw EsDataException.convert(e);
             } finally {
                 readConcurrency.decrementAndGet();
                 time(startTime, false, "search value");
             }
         } else {
-            throw new EsDataException(String.format("search qps is over limit[%f],aborted search after 1 second wait", readRateLimiter.getRate()));
+            throw new EsDataException(String.format("search qps is over limit[%f],aborted search after 1 second wait", searchRateLimiter.getRate()));
         }
     }
 
-    private void acquireSavePermits(int permits) {
-        long acquireStartTime = System.currentTimeMillis();
-        double rate = saveRateLimiter.getRate();
-        if (permits >= rate) {
-            throw new EsDataException(String.format("permits[%d] is larger than rate[%f],this will block acquire method", permits, rate));
-        }
-        saveRateLimiter.acquire(permits);
-        long acquireCostTime = System.currentTimeMillis() - acquireStartTime;
-        if (acquireCostTime > 2_000) {
-            LOGGER.warn("saveRateLimiter acquire slow, permits = {}, cost {} mills", permits, acquireCostTime);
-        }
-    }
 
     public Pagination<T> parseSearchResponse(SearchResponse searchResponse) {
         SearchHits searchHits = searchResponse.getHits();
@@ -510,7 +493,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
         return indexSuffixType;
     }
 
-    private void time(long startTime, boolean isWrite, String detail) {
+    private void time(long startTime, boolean isWrite, String action) {
         long timeCost = (System.nanoTime() - startTime);
         if (isWrite) {
             writeOps.increment();
@@ -519,7 +502,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
             readOps.increment();
             readTimeTotal.add(timeCost / 1000_000.0);
         }
-        SLOW_LOGGER.mayLog(timeCost, Map.of("index", this.index, "w", isWrite), detail);
+        SLOW_LOGGER.mayLog(timeCost, Map.of("index", this.index, "w", isWrite, "cmd", action), "");
     }
 
     private int getReadConcurrency() {
