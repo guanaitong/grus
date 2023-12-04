@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SlowLogger<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SlowLogger.class);
-    private final Module module;
+    private final String module;
 
     private final LatencyConfig latencyConfig;
 
@@ -39,6 +39,10 @@ public class SlowLogger<T> {
     private final Cache<Integer, AtomicInteger> metricsCache = Caffeine.newBuilder().scheduler(Scheduler.systemScheduler()).expireAfterWrite(1, TimeUnit.MINUTES).build();
 
     public SlowLogger(Module module, boolean sendSlowLog, SlowLoggerFormatter<T> slowLoggerFormatter) {
+        this(module.getName(), sendSlowLog, slowLoggerFormatter);
+    }
+
+    public SlowLogger(String module, boolean sendSlowLog, SlowLoggerFormatter<T> slowLoggerFormatter) {
         this.module = Objects.requireNonNull(module);
         this.sendSlowLog = sendSlowLog;
         this.slowLoggerFormatter = Objects.requireNonNull(slowLoggerFormatter);
@@ -61,7 +65,7 @@ public class SlowLogger<T> {
         SlowLog slowLog = new SlowLog();
         slowLog.setTags(tags);
         slowLog.setCost(nanosDuration / 1000_000L);
-        slowLog.setModule(module.getName());
+        slowLog.setModule(module);
         slowLog.setLevel(latencyLevel);
         slowLog.setTs(System.currentTimeMillis());
         slowLog.setDetail(format);

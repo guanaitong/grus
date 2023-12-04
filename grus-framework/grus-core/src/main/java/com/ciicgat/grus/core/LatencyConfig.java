@@ -76,7 +76,7 @@ public class LatencyConfig {
 
     private static final LatencyConfig DEFAULT = new LatencyConfig(200_000_000L, 2000_000_000L, 3);
 
-    public static LatencyConfig getModuleConfig(Module module) {
+    public static LatencyConfig getModuleConfig(String module) {
         Map<String, LatencyConfig> configMap = GlobalGconfConfig.getConfig().getBean("latency-config.json", s -> {
             try {
                 return JSON.parse(s, new TypeReference<>() {
@@ -85,7 +85,7 @@ public class LatencyConfig {
                 return Collections.emptyMap();
             }
         });
-        return configMap == null ? DEFAULT : configMap.getOrDefault(module.getName(), DEFAULT);
+        return configMap == null ? DEFAULT : configMap.getOrDefault(module, DEFAULT);
     }
 
     public LatencyLevel getLevel(final long nanosDuration) {

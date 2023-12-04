@@ -43,6 +43,6 @@ public class SlowMessageLoggerTest {
     }
 
     private static LatencyLevel getLatencyLevel(final long nanosDuration) {
-        return LatencyConfig.getModuleConfig(Module.HTTP_CLIENT).getLevel(nanosDuration);
+        return LatencyConfig.getModuleConfig("httpclient").getLevel(nanosDuration);
     }
 }

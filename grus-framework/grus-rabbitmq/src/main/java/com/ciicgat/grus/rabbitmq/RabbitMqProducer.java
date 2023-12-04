@@ -40,7 +40,7 @@ public class RabbitMqProducer {
     private static final TextMapSetter<Map<String, Object>> setter = (carrier, key, value) -> carrier.put(key, value);
     private static final SessionIdGenerator SESSION_ID_GENERATOR = new SessionIdGenerator();
 
-    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.RABBITMQ, true, v -> "send msg slow");
+    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.RABBITMQ.getName() + "-producer", true, v -> "send msg slow");
 
     private final ChannelPool channelPool;
 
@@ -118,7 +118,7 @@ public class RabbitMqProducer {
                 send(exchange, routingKey, value, properties, bytes);
             } finally {
                 span.end();
-                SLOW_LOGGER.mayLog(span,  Map.of("exchange", exchange, "routingKey", routingKey), "");
+                SLOW_LOGGER.mayLog(span, Map.of("exchange", exchange, "routingKey", routingKey), "");
             }
         } else {
             long start = System.nanoTime();
