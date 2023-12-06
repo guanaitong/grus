@@ -8,6 +8,7 @@ package com.ciicgat.boot.validator;
 import com.google.common.primitives.Primitives;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -34,6 +35,7 @@ public abstract class ObjectValidator {
                 || clazz == String.class
                 || clazz == Character.class
                 || clazz == BigDecimal.class
+                || clazz == Date.class
                 || Primitives.allPrimitiveTypes().contains(clazz)
                 || Primitives.allWrapperTypes().contains(clazz);
     }

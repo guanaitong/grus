@@ -5,6 +5,9 @@
 
 package com.ciicgat.boot.validator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -15,6 +18,7 @@ import java.util.Map;
  */
 public class NestedObjectValidator extends ObjectValidator {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NestedObjectValidator.class);
     private Map<Field, ObjectValidator> fieldObjectValidatorMap;
 
 
@@ -58,7 +62,13 @@ public class NestedObjectValidator extends ObjectValidator {
             if (Modifier.isStatic(field.getModifiers())) {
                 continue;
             }
-            field.setAccessible(true);
+            try {
+                field.setAccessible(true);
+            } catch (Exception e) {
+                LOGGER.warn("setAccessible failed", e);
+                continue;
+            }
+
             Class<?> fieldDeclaringClass = field.getType();
             ObjectValidator objectValidator = SimpleObjectValidator.build(field.getName(), fieldDeclaringClass, field.getAnnotations());
             if (objectValidator == NoopObjectValidator.INSTANCE) {
