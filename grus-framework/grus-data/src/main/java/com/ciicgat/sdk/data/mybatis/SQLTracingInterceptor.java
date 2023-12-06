@@ -38,7 +38,7 @@ import java.util.Properties;
 })
 public class SQLTracingInterceptor implements Interceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(SQLTracingInterceptor.class);
-    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.DB, true, v -> "db slow");
+    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.DB, v -> "db slow");
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {

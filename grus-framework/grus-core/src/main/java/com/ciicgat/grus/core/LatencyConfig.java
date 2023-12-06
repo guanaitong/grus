@@ -74,7 +74,7 @@ public class LatencyConfig {
         return result;
     }
 
-    private static final LatencyConfig DEFAULT = new LatencyConfig(200_000_000L, 2000_000_000L, 3);
+    private static final LatencyConfig DEFAULT = new LatencyConfig(200_000_000L, 2000_000_000L, 5);
 
     public static LatencyConfig getModuleConfig(String module) {
         Map<String, LatencyConfig> configMap = GlobalGconfConfig.getConfig().getBean("latency-config.json", s -> {

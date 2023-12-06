@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,25 +29,37 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class SlowLogger<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(SlowLogger.class);
+
+    private static final Map<String, SlowLogger<?>> SLOW_LOGGER_MAP = new ConcurrentHashMap<>();
+
     private final String module;
 
     private final LatencyConfig latencyConfig;
 
-    private final boolean sendSlowLog;
 
     private final SlowLoggerFormatter<T> slowLoggerFormatter;
 
     private final Cache<Integer, AtomicInteger> metricsCache = Caffeine.newBuilder().scheduler(Scheduler.systemScheduler()).expireAfterWrite(1, TimeUnit.MINUTES).build();
 
-    public SlowLogger(Module module, boolean sendSlowLog, SlowLoggerFormatter<T> slowLoggerFormatter) {
-        this(module.getName(), sendSlowLog, slowLoggerFormatter);
+    private SlowLoggerFilter slowLoggerFilter = SlowLoggerFilter.ALL;
+
+    public SlowLogger(Module module, SlowLoggerFormatter<T> slowLoggerFormatter) {
+        this(module.getName(), slowLoggerFormatter);
     }
 
-    public SlowLogger(String module, boolean sendSlowLog, SlowLoggerFormatter<T> slowLoggerFormatter) {
+    public SlowLogger(String module, SlowLoggerFormatter<T> slowLoggerFormatter) {
         this.module = Objects.requireNonNull(module);
-        this.sendSlowLog = sendSlowLog;
         this.slowLoggerFormatter = Objects.requireNonNull(slowLoggerFormatter);
         this.latencyConfig = LatencyConfig.getModuleConfig(module);
+        SLOW_LOGGER_MAP.put(module, this);
+    }
+
+    public static SlowLogger<?> getSlowLogger(String module) {
+        return SLOW_LOGGER_MAP.get(module);
+    }
+
+    public void setSlowLoggerFilter(SlowLoggerFilter slowLoggerFilter) {
+        this.slowLoggerFilter = Objects.requireNonNull(slowLoggerFilter);
     }
 
     public void mayLog(Span span, Map<String, Object> tags, T value) {
@@ -75,7 +88,7 @@ public class SlowLogger<T> {
             slowLog.setCountLastMinute(t);
             String log = JSON.toJSONString(slowLog);
             LOGGER.warn(log);
-            if (sendSlowLog && t > latencyConfig.getSendSlowLogThreshold()) {
+            if (slowLoggerFilter.accept(slowLog) && t > latencyConfig.getSendSlowLogThreshold()) {
                 Alert.send(log);
             }
         } else {

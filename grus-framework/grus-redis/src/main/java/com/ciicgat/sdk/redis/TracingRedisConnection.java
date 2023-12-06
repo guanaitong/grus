@@ -51,7 +51,7 @@ class TracingRedisConnection extends AbstractRedisConnection {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TracingRedisConnection.class);
 
-    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.REDIS, true, cmd -> "cmd:" + cmd);
+    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.REDIS, cmd -> "cmd:" + cmd);
     private final RedisConnection redisConnection;
     private final RedisSetting redisSetting;
     private final String instance;

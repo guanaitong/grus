@@ -22,7 +22,7 @@ public class SlowMessageLoggerTest {
     @Test
     public void test() {
         Module module = Module.HTTP_CLIENT;
-        SlowLogger<String> slowLogger = new SlowLogger<>(module, true, value -> value);
+        SlowLogger<String> slowLogger = new SlowLogger<>(module, value -> value);
         slowLogger.mayLog(1_000_000L, Map.of("1", 2), "xxxx");
         slowLogger.mayLog(50_000_000L, new HashMap<>(), "xxxx");
         slowLogger.mayLog(60_000_000L, Map.of("1", 2), "xxxx");

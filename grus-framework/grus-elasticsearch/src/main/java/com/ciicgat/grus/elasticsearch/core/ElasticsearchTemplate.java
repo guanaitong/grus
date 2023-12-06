@@ -70,7 +70,7 @@ import java.util.function.Function;
  */
 public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ElasticsearchTemplate.class);
-    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.ELASTICSEARCH, true, v -> v);
+    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.ELASTICSEARCH, v -> v);
     private final RestHighLevelClient restHighLevelClient;
     private final String index;
     private final IndexSuffixType indexSuffixType;

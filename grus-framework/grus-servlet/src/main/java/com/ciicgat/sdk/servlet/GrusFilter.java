@@ -53,7 +53,7 @@ public class GrusFilter implements Filter, MeterBinder {
     private static final String SERVER_SPAN_CONTEXT = GrusFilter.class.getName() + ".activeSpanContext";
     private static final Object TAG_VALUE = new Object();
 
-    private static final SlowLogger<HttpServletRequest> SLOW_LOGGER = new SlowLogger<>(Module.SERVLET, true, request -> request.getRequestURI());
+    private static final SlowLogger<HttpServletRequest> SLOW_LOGGER = new SlowLogger<>(Module.SERVLET, request -> request.getRequestURI());
     private final AtomicInteger concurrency = new AtomicInteger();
 
     private final LongAdder highConcurrencyEvents = new LongAdder();

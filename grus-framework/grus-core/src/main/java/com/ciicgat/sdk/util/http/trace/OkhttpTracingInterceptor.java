@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class OkhttpTracingInterceptor implements Interceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(OkhttpTracingInterceptor.class);
-    private static final SlowLogger<Request> SLOW_LOGGER = new SlowLogger<>(Module.HTTP_CLIENT, true, request -> request.toString());
+    private static final SlowLogger<Request> SLOW_LOGGER = new SlowLogger<>(Module.HTTP_CLIENT, request -> request.toString());
 
     @Override
     public Response intercept(Chain chain) throws IOException {

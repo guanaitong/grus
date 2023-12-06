@@ -32,7 +32,7 @@ import java.util.Objects;
 public class ApacheHttpClientHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApacheHttpClientHelper.class);
 
-    private static final SlowLogger<ClassicHttpRequest> SLOW_LOGGER = new SlowLogger<>(Module.HTTP_CLIENT, true, httpUriRequest -> httpUriRequest.toString());
+    private static final SlowLogger<ClassicHttpRequest> SLOW_LOGGER = new SlowLogger<>(Module.HTTP_CLIENT, httpUriRequest -> httpUriRequest.toString());
 
     /**
      * HttpClient

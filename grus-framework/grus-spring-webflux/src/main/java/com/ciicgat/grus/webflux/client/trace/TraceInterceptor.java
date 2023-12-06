@@ -34,7 +34,7 @@ import java.util.function.Consumer;
 public class TraceInterceptor implements ExchangeFilterFunction {
     private static final Logger LOGGER = LoggerFactory.getLogger(TraceInterceptor.class);
     private static final TextMapSetter<ClientRequest.Builder> setter = (carrier, key, value) -> carrier.header(key, value);
-    private static final SlowLogger<ClientRequest> SLOW_LOGGER = new SlowLogger<>(Module.FEIGN, true, request -> request.toString());
+    private static final SlowLogger<ClientRequest> SLOW_LOGGER = new SlowLogger<>(Module.FEIGN, request -> request.toString());
 
     @Override
     public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {

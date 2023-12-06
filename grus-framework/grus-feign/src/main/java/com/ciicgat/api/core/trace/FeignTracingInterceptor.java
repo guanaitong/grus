@@ -33,7 +33,7 @@ public class FeignTracingInterceptor implements Interceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeignTracingInterceptor.class);
     private static final TextMapSetter<Request.Builder> setter = (carrier, key, value) -> carrier.addHeader(key, value);
 
-    private static final SlowLogger<Request> SLOW_LOGGER = new SlowLogger<>(Module.FEIGN, true, request -> request.toString());
+    private static final SlowLogger<Request> SLOW_LOGGER = new SlowLogger<>(Module.FEIGN, request -> request.toString());
 
     @Override
     public Response intercept(Chain chain) throws IOException {

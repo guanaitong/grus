@@ -26,7 +26,7 @@ import java.util.Collections;
  */
 class JedisClusterRedisExecutor implements RedisExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(JedisClusterRedisExecutor.class);
-    private final SlowLogger<String> slowLogger = new SlowLogger<>(Module.REDIS, true, v -> "");
+    private final SlowLogger<String> slowLogger = new SlowLogger<>(Module.REDIS, v -> "");
     private final RedisSetting redisSetting;
     private final JedisCluster jedisCluster;
 
