@@ -10,6 +10,7 @@ import com.ciicgat.grus.elasticsearch.annotations.Document;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.sdk.lang.convert.Pagination;
 import com.ciicgat.sdk.util.system.WorkRegion;
+import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.RateLimiter;
 import io.micrometer.core.instrument.FunctionTimer;
 import io.micrometer.core.instrument.Gauge;
@@ -307,7 +308,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
             }
         }
         try {
-            acquireSavePermits(1);
+            acquireSavePermits();
             IndexResponse indexResponse = restHighLevelClient.index(request, options);
             int status = indexResponse.status().getStatus();
             return (status >= 200 && status < 300) ? 1 : 0;
@@ -327,7 +328,16 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
         if (dataList.size() == 1) {
             return save(dataList.get(0), sync);
         }
+        // ES官方建议一个bulkRequest不要超过5MB，根据测算，大概1000条左右
+        List<List<T>> lists = Lists.partition(dataList, 1024);
+        int i = 0;
+        for (List<T> list : lists) {
+            i = i + saveOneBatch(list, sync);
+        }
+        return i;
+    }
 
+    private int saveOneBatch(List<T> dataList, boolean sync) {
         writeConcurrency.incrementAndGet();
         long startTime = System.nanoTime();
         BulkRequest bulkRequest = new BulkRequest();
@@ -348,7 +358,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
             bulkRequest.add(request);
         }
         try {
-            acquireSavePermits(dataList.size());
+            acquireSavePermits();
             BulkResponse bulkResponse = restHighLevelClient.bulk(bulkRequest, options);
             if (bulkResponse.status() != RestStatus.OK) {
                 return 0;
@@ -372,16 +382,12 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
         }
     }
 
-    private void acquireSavePermits(int permits) {
+    private void acquireSavePermits() {
         long acquireStartTime = System.currentTimeMillis();
-        double rate = saveRateLimiter.getRate();
-        if (permits >= rate) {
-            throw new EsDataException(String.format("permits[%d] is larger than rate[%f],this will block acquire method", permits, rate));
-        }
-        saveRateLimiter.acquire(permits);
+        saveRateLimiter.acquire();
         long acquireCostTime = System.currentTimeMillis() - acquireStartTime;
         if (acquireCostTime > 2_000) {
-            LOGGER.warn("saveRateLimiter acquire slow, permits = {}, cost {} mills", permits, acquireCostTime);
+            LOGGER.warn("saveRateLimiter acquire slow, cost {} mills", acquireCostTime);
         }
     }
 
