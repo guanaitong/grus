@@ -38,21 +38,29 @@ public class TraceInterceptor implements ExchangeFilterFunction {
 
     @Override
     public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
+        ClientRequest.Builder clientRequestBuilder = ClientRequest.from(request).headers(httpHeaders -> {
+            httpHeaders.add(GrusServiceHttpHeader.REQ_APP_NAME, Systems.APP_NAME);
+            httpHeaders.add(GrusServiceHttpHeader.REQ_APP_INSTANCE, Systems.APP_INSTANCE);
+            httpHeaders.add(GrusServiceHttpHeader.HTTP_UA_HEADER, "Grus spring service client");
+        });
+
         Tracer tracer = OpenTelemetrys.getTracer();
+        if (!OpenTelemetrys.isPropagateWithNew()) {
+            OpenTelemetrys.getTextMapPropagator().inject(Context.current(), clientRequestBuilder, setter);
+            long start = System.nanoTime();
+            try {
+                return next.exchange(clientRequestBuilder.build());
+            } finally {
+                SLOW_LOGGER.mayLog(System.nanoTime() - start, Map.of("method", request.method(), "url", request.url()), request);
+            }
+        }
         Span span = tracer.spanBuilder(request.method() + " " + request.url().getPath()).setSpanKind(SpanKind.CLIENT).startSpan();
         try (Scope scope = span.makeCurrent()) {
             OpenTelemetrys.configSystemTags(span);
             span.setAttribute("http.method", request.method().toString());
             span.setAttribute("component", "feign");
 
-            ClientRequest.Builder clientRequestBuilder = ClientRequest.from(request).headers(new Consumer<HttpHeaders>() {
-                @Override
-                public void accept(HttpHeaders httpHeaders) {
-                    httpHeaders.add(GrusServiceHttpHeader.REQ_APP_NAME, Systems.APP_NAME);
-                    httpHeaders.add(GrusServiceHttpHeader.REQ_APP_INSTANCE, Systems.APP_INSTANCE);
-                    httpHeaders.add(GrusServiceHttpHeader.HTTP_UA_HEADER, "Grus spring service client");
-                }
-            });
+
             OpenTelemetrys.getTextMapPropagator().inject(Context.current(), clientRequestBuilder, setter);
             return next.exchange(clientRequestBuilder.build());
         } finally {
