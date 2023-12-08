@@ -57,7 +57,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
     };
 
 
-    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.RABBITMQ + "-consumer", v -> "handle msg slow");
+    private static final SlowLogger<String> SLOW_LOGGER = new SlowLogger<>(Module.RABBITMQ.getName() + "-consumer", v -> "handle msg slow");
 
     private final String queue;
     private final AtomicBoolean isRunning;
