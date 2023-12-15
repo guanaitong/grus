@@ -7,15 +7,17 @@ package com.ciicgat.sdk.cache;
 
 import com.ciicgat.sdk.lang.exception.CacheDataException;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 public class TestSecondaryCache {
     @Mock
     private LocalCache cache;
@@ -23,7 +25,7 @@ public class TestSecondaryCache {
     private SecondaryCache secondaryCache;
 
 
-    @Before
+    @BeforeEach
     public void setup() {
         secondaryCache = new SecondaryCache(cache);
     }
@@ -78,7 +80,7 @@ public class TestSecondaryCache {
         Assert.assertSame(person, person1);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testGet_miss_Cache_withException() throws RuntimeException {
         final Person person = new Person();
         person.setId(1);
@@ -88,17 +90,22 @@ public class TestSecondaryCache {
         String key = makeKey();
         Mockito.when(cache.getValue(key)).thenReturn(null);
 
-        Person person1 = secondaryCache.get(key, (id) -> {
-            Person person3 = new Person();
-            person3.setId(2);
-            person3.setMemberId(4);
-            person3.setName("huxuan2");
-            return person3;
-        }, () -> {
-            throw new RuntimeException("DB error");
-        });
 
-        Assert.assertSame(person, person1);
+        Assertions.assertThrows(RuntimeException.class, new Executable() {
+            @Override
+            public void execute() throws Throwable {
+
+                Person person1 = secondaryCache.get(key, (id) -> {
+                    Person person3 = new Person();
+                    person3.setId(2);
+                    person3.setMemberId(4);
+                    person3.setName("huxuan2");
+                    return person3;
+                }, () -> {
+                    throw new RuntimeException("DB error");
+                });
+            }
+        });
     }
 
     @Test
