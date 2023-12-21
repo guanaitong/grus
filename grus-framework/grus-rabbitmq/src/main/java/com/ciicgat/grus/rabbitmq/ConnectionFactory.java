@@ -66,7 +66,7 @@ public class ConnectionFactory {
         factory.setClientProperties(defaultClientProperties);
         factory.setAutomaticRecoveryEnabled(true);
         factory.setExceptionHandler(new AlertExceptionHandler());
-        
+
         //这边只是new了，只要不调用execute(Runnable command)方法就不会创建新线程池
         ExecutorService threadPoolExecutor = new ThreadPoolExecutor(parallel, parallel, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), Threads.newThreadFactory("Grus-MQ", Thread.NORM_PRIORITY, false));
         Connection connection = null;
