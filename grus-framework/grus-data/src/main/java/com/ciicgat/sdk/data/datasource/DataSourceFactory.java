@@ -134,7 +134,11 @@ public class DataSourceFactory {
             mxParams = Collections.emptyMap();
         }
         hikariConfigMXBean.setMaximumPoolSize(getInt(mxParams, "maximumPoolSize", 30));
-        hikariConfigMXBean.setMinimumIdle(getInt(mxParams, "minimumIdle", 1));
+        var minIdle = getInt(mxParams, "minimumIdle", 1);
+        if (WorkRegion.getCurrentWorkRegion().isPrepare()){
+            minIdle = 1;
+        }
+        hikariConfigMXBean.setMinimumIdle(minIdle);
         hikariConfigMXBean.setConnectionTimeout(getLong(mxParams, "connectionTimeout", 3_000L));
         hikariConfigMXBean.setIdleTimeout(getLong(mxParams, "idleTimeout", 30_000L));
         hikariConfigMXBean.setMaxLifetime(getLong(mxParams, "maxLifetime", 300_000L));
