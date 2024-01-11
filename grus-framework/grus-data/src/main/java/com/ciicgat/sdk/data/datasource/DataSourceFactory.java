@@ -135,7 +135,7 @@ public class DataSourceFactory {
         }
         hikariConfigMXBean.setMaximumPoolSize(getInt(mxParams, "maximumPoolSize", 30));
         var minIdle = getInt(mxParams, "minimumIdle", 1);
-        if (WorkRegion.getCurrentWorkRegion().isPrepare()){
+        if (WorkRegion.getCurrentWorkRegion().isPrepare()) {
             minIdle = 1;
         }
         hikariConfigMXBean.setMinimumIdle(minIdle);
