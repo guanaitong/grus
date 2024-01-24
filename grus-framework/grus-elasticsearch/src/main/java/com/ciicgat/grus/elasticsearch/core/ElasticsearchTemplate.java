@@ -278,7 +278,7 @@ public class ElasticsearchTemplate<T extends IndexAble> implements MeterBinder {
 
         try {
             UpdateResponse updateResponse = restHighLevelClient.update(updateRequest, options);
-            return updateResponse.getResult() == DocWriteResponse.Result.UPDATED ? 1 : 0;
+            return (updateResponse.getResult() == DocWriteResponse.Result.UPDATED || updateResponse.getResult() == DocWriteResponse.Result.NOOP) ? 1 : 0;
         } catch (Exception e) {
             throw EsDataException.convert(e);
         } finally {
