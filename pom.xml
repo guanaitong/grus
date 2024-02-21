@@ -74,7 +74,7 @@
         <java.version>17</java.version>
         <resource.delimiter>@</resource.delimiter>
         <spring-boot.version>3.2.2</spring-boot.version>
-        <spring-boot-admin.version>3.2.0</spring-boot-admin.version>
+        <spring-boot-admin.version>3.2.2</spring-boot-admin.version>
         <gconf.version>1.0.3</gconf.version>
         <elasticsearch.version>7.3.1</elasticsearch.version>
         <springdoc.version>2.2.0</springdoc.version>
