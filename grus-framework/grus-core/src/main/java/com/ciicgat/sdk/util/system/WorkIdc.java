@@ -9,29 +9,19 @@ package com.ciicgat.sdk.util.system;
  * Created by August.Zhou on 2017/12/14 9:49.
  */
 public enum WorkIdc {
-    OFC, SH, ALI;
+    OFC, SH, ALI, LYRA;
 
-    private final String innerDomainSuffix;
+    private final String name;
 
     WorkIdc() {
-        this.innerDomainSuffix = this.name().toLowerCase();
-    }
-
-    static WorkIdc getWorkIdc(String name) {
-        if (name == null || name.isBlank()) {
-            return WorkIdc.OFC;
-        }
-        name = name.toLowerCase();
-        for (WorkIdc workIdc : WorkIdc.values()) {
-            if (workIdc.name().toLowerCase().equals(name)) {
-                return workIdc;
-            }
-        }
-        return WorkIdc.OFC;
+        this.name = this.name().toLowerCase();
     }
 
     public final String getInnerDomainSuffix() {
-        return innerDomainSuffix;
+        return name;
     }
 
+    public final String getName() {
+        return name;
+    }
 }

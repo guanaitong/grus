@@ -20,7 +20,6 @@ public interface GrusConstants {
 
     String GRUS_RUNTIME_MANAGER_BEAN_ID = "grusRuntimeManager";
 
-    String WORK_ENV = "WORK_ENV";
+    String WORK_REGION = "WORK_REGION";
 
-    String WORK_IDC = "WORK_IDC";
 }

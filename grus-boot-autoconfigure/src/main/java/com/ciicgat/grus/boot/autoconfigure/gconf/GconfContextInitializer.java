@@ -44,7 +44,7 @@ public class GconfContextInitializer implements ApplicationContextInitializer<Co
         var environment = applicationContext.getEnvironment();
 
         // 本地配置加载逻辑
-        if (System.getenv(GrusConstants.WORK_ENV) == null && System.getenv(GrusConstants.WORK_IDC) == null) {
+        if (System.getenv(GrusConstants.WORK_REGION) == null) {
             ClassPathResource classPathResource = new ClassPathResource(LOCAL_PROPERTIES_NAME);
             if (classPathResource.exists()) {
                 try (InputStream is = classPathResource.getInputStream()) {
