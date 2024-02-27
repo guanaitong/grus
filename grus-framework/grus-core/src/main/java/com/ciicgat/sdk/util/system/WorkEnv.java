@@ -23,19 +23,6 @@ public enum WorkEnv {
         this.name = name;
     }
 
-    static WorkEnv getWorkEnv(String name) {
-        if (name == null || name.isBlank()) {
-            return WorkEnv.DEVELOP;
-        }
-        name = name.toLowerCase();
-        for (WorkEnv workEnv : WorkEnv.values()) {
-            if (workEnv.name.toLowerCase().equals(name)) {
-                return workEnv;
-            }
-        }
-        return WorkEnv.DEVELOP;
-    }
-
     public final String getInnerDomainSuffix() {
         return innerDomainSuffix;
     }

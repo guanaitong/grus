@@ -39,9 +39,9 @@ public class Systems {
 
     public static final String HOST_IP;
 
-    public static final String WORK_ENV = System.getenv("WORK_ENV") == null ? "dev" : System.getenv("WORK_ENV");
+    public static final String WORK_ENV = WorkRegion.getCurrentWorkRegion().getWorkEnv().getName();
 
-    public static final String WORK_IDC = System.getenv("WORK_IDC") == null ? "ofc" : System.getenv("WORK_IDC");
+    public static final String WORK_IDC = WorkRegion.getCurrentWorkRegion().getWorkIdc().getName();
 
     public static final String CLIENT_ID;
 

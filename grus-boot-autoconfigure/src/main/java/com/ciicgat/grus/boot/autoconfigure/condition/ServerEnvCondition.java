@@ -29,7 +29,7 @@ public class ServerEnvCondition extends SpringBootCondition {
         if (System.getenv("KUBERNETES_SERVICE_HOST") != null) {
             return ConditionOutcome.match();
         }
-        if (System.getenv(GrusConstants.WORK_ENV) != null && System.getenv(GrusConstants.WORK_IDC) != null) {
+        if (System.getenv(GrusConstants.WORK_REGION) != null) {
             return ConditionOutcome.match();
         }
 
