@@ -5,8 +5,6 @@
 
 package com.ciicgat.grus.service.naming;
 
-import com.ciicgat.sdk.util.system.WorkEnv;
-import com.ciicgat.sdk.util.system.WorkIdc;
 import com.ciicgat.sdk.util.system.WorkRegion;
 
 import java.net.InetAddress;
@@ -21,20 +19,25 @@ public class DomainRuleNamingService implements NamingService {
     public String resolve(String serviceName) {
         WorkRegion workRegion = WorkRegion.getCurrentWorkRegion();
 
-        if (workRegion.isProduct() && workRegion.getWorkIdc() == WorkIdc.ALI) {
-            //如果是阿里云的，那么优先探测阿里云本地的服务是否通，不通时，采用上海IDC的服务
-            String aliServiceDomain = serviceName + "." + workRegion.getServiceDomainSuffix();
-            try {
-                InetAddress[] value = InetAddress.getAllByName(aliServiceDomain);
-                if (value == null || value.length == 0) {
-                    return HTTP_PROTOCOL_PREFIX + serviceName + ".services." + WorkEnv.PRODUCT.getInnerDomainSuffix() + "." + WorkIdc.SH.getInnerDomainSuffix();
-                }
-            } catch (UnknownHostException e) {
-                return HTTP_PROTOCOL_PREFIX + serviceName + ".services." + WorkEnv.PRODUCT.getInnerDomainSuffix() + "." + WorkIdc.SH.getInnerDomainSuffix();
+        if (workRegion == WorkRegion.STAGE_LYRA || workRegion == WorkRegion.PROD_LYRA) {
+            //如果是lyra阿里云的，那么优先探测lyra阿里云本地的服务是否通，不通时，采用上海IDC的服务
+            String serviceDomain = serviceName + "." + workRegion.getServiceDomainSuffix();
+            if (isValid(serviceDomain)) {
+                return HTTP_PROTOCOL_PREFIX + serviceDomain;
+            } else {
+                return HTTP_PROTOCOL_PREFIX + serviceName + "." + WorkRegion.PROD_SH.getServiceDomainSuffix();
             }
-            return HTTP_PROTOCOL_PREFIX + aliServiceDomain;
         }
         return HTTP_PROTOCOL_PREFIX + serviceName + "." + workRegion.getServiceDomainSuffix();
 
+    }
+
+    private static boolean isValid(String domain) {
+        try {
+            InetAddress[] value = InetAddress.getAllByName(domain);
+            return value != null && value.length != 0;
+        } catch (UnknownHostException e) {
+            return false;
+        }
     }
 }
