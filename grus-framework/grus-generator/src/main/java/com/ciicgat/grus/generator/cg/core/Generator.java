@@ -16,7 +16,7 @@ public interface Generator {
     /**
      * 生成
      *
-     * @param context 上下文
+     * @param context        上下文
      * @param generatorChain 生成器链
      */
     void generate(GeneratorContext context, GeneratorChain generatorChain);

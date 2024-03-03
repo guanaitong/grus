@@ -23,6 +23,9 @@ public class TestUtil {
             try {
                 MockWebServer mockWebServer = new MockWebServer();
                 int port = new Random().nextInt(20000);
+                if (port <= 1024) {
+                    continue;
+                }
                 mockWebServer.start(port);
                 EndPointConfigs.addEndPointConfig(appName, "http://127.0.0.1:" + port);
                 return Pair.of(supplier.get(), mockWebServer);

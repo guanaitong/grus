@@ -9,22 +9,19 @@ import com.alibaba.csp.sentinel.Entry;
 import com.alibaba.csp.sentinel.EntryType;
 import com.alibaba.csp.sentinel.SphU;
 import com.alibaba.csp.sentinel.Tracer;
-import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.ciicgat.api.core.annotation.ApiCache;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.logger.LogExclude;
 import com.ciicgat.grus.logger.LogUtil;
-import com.ciicgat.grus.performance.MaxConcurrency;
-import com.ciicgat.grus.performance.SentinelProperties;
+import com.ciicgat.grus.sentinel.Resources;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeConfig;
 import com.ciicgat.grus.service.GrusService;
 import com.ciicgat.grus.service.GrusServiceStatus;
-import com.ciicgat.sdk.gconf.GlobalGconfConfig;
+import com.ciicgat.grus.service.Services;
 import com.ciicgat.sdk.lang.convert.ErrorCode;
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
-import com.ciicgat.sdk.util.system.Systems;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.google.common.annotations.VisibleForTesting;
 import feign.InvocationHandlerFactory;
@@ -71,8 +68,6 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
     private final boolean logReq;
 
     private final boolean logResp;
-    private final int globalMaxConcurrency = GlobalGconfConfig.getConfig().getBean("sentinel.properties",
-            SentinelProperties.class).getClientMaxConcurrency();
 
 
     GInvocationHandlerFactory(GrusServiceStatus grusServiceStatus,
@@ -116,8 +111,9 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
             checkNotNull(dispatcher, "dispatch for %s", target);
             for (Map.Entry<Method, MethodHandler> entry : dispatcher.entrySet()) {
                 Method method = entry.getKey();
-                LogExclude logExclude = method.getAnnotation(LogExclude.class);
-                MethodMeta methodMeta = new MethodMeta(method, entry.getValue(), getApiCache(method),
+                LogExclude logExclude = Services.getLogExclude(method);
+                String resourceName = Resources.buildMethodResource(serviceName, method);
+                MethodMeta methodMeta = new MethodMeta(method, entry.getValue(), getApiCache(method), resourceName,
                         logReq && LogUtil.checkPrintReq(logExclude),
                         logResp && LogUtil.checkPrintResp(logExclude),
                         ignoreErrorMethods.contains(method.getName()));
@@ -156,20 +152,6 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 return methodMeta.getMethodHandler().invoke(args);
             }
             try {
-                int maxConcurrency = globalMaxConcurrency;
-                MaxConcurrency maxConcurrencyAnnotation = method.getAnnotation(MaxConcurrency.class);
-                if (maxConcurrencyAnnotation != null) {
-                    maxConcurrency = maxConcurrencyAnnotation.value();
-                }
-                if (methodMeta.incrementAndGet() > maxConcurrency) {
-                    LOGGER.error("{} 响应过慢，超过最大并发数上限，为了保护其他接口，直接拒绝该方法后续请求！！！", method);
-                    if (methodMeta.isIgnoreError()) {
-                        return methodMeta.getDefaultReturnValue();
-                    } else {
-                        throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, null,
-                                HTTP_STATUS_TOO_MANY_REQUESTS);
-                    }
-                }
                 if (methodMeta.isLogReq()) {
                     LOGGER.info("FEIGN_REQ METHOD: {} PARAM: {}", getPrintMethod(method), args == null ? "" :
                             LogUtil.truncate(JSON.toJSONString(args)));
@@ -204,34 +186,16 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 }
                 Object fallback = fallbackFactory.create(throwable);
                 return method.invoke(fallback, args);
-            } finally {
-                methodMeta.decrementAndGet();
             }
-
         }
 
         private Object invokeWithoutCache(MethodMeta methodMeta, Object[] args) throws Throwable {
             Method method = methodMeta.getMethod();
-            // 拼装资源
-            StringBuilder resourceNameBuilder = new StringBuilder(serviceName)
-                    .append(".")
-                    .append(method.getDeclaringClass().getSimpleName())
-                    .append(".")
-                    .append(method.getName());
-            String resourceName = resourceNameBuilder.toString();
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.info("resourceName: {}", resourceName);
-            }
+            String resourceName = methodMeta.getResourceName();
             // sentinel处理
-            Entry entry = null;
-            try {
+            try (Entry ignored = SphU.entry(resourceName, EntryType.OUT, 1)) {
                 // 注入调用方appName，需要在SphU.entry方法之前执行才生效，并且需要放到try代码块，故无法使用try resources写法
-                ContextUtil.enter(resourceName, Systems.APP_NAME);
-                entry = SphU.entry(resourceName, EntryType.OUT, 1);
                 return methodMeta.getMethodHandler().invoke(args);
-            } catch (BlockException e) {
-                LOGGER.error("SENTINEL BLOCKED ", e);
-                throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, null, HTTP_STATUS_TOO_MANY_REQUESTS);
             } catch (Throwable ex) {
                 if (BlockException.isBlockException(ex)) {
                     LOGGER.error("SENTINEL BLOCKED WITH MSG ", ex);
@@ -243,12 +207,6 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 // 降级跟踪必备代码
                 Tracer.trace(ex);
                 throw ex;
-            } finally {
-                // 推出资源
-                if (entry != null) {
-                    entry.exit(1);
-                }
-                ContextUtil.exit();
             }
         }
 

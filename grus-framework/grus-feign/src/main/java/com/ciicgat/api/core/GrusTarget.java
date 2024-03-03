@@ -32,6 +32,18 @@ class GrusTarget<T> implements Target<T> {
         LOGGER.info("create service instance of {},  serviceName {}, baseUrl {}", serviceClazz, serviceName, url);
     }
 
+    private static String buildTargetUrl(String hostUrl, String urlPathPrefix) {
+        if (!urlPathPrefix.isEmpty()) {
+            if (hostUrl.endsWith("/") || urlPathPrefix.startsWith("/")) {
+                return hostUrl + urlPathPrefix;
+            } else {
+                return hostUrl + "/" + urlPathPrefix;
+            }
+        }
+        return hostUrl;
+    }
+
+
     @Override
     public Class<T> type() {
         return type;

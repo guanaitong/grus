@@ -63,6 +63,10 @@ public enum WorkRegion {
         return WorkRegion.DEV_OFC;
     }
 
+    public final String getName() {
+        return region;
+    }
+
     public final String getRegion() {
         return region;
     }

@@ -30,7 +30,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by August.Zhou on 2022/10/20 14:05
@@ -38,7 +37,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 class MethodMeta {
     private final InvocationHandlerFactory.MethodHandler methodHandler;
     private final ApiCache apiCache;
-    private final AtomicInteger current = new AtomicInteger();
 
     private final boolean isDefault;
 
@@ -53,7 +51,9 @@ class MethodMeta {
     private final Object defaultReturnValue;
     private volatile Cache<String, Object> cache = null;
 
-    MethodMeta(Method method, InvocationHandlerFactory.MethodHandler methodHandler, ApiCache apiCache, boolean logReq, boolean logResp, boolean ignoreErrorInclude) {
+    private final String resourceName;
+
+    MethodMeta(Method method, InvocationHandlerFactory.MethodHandler methodHandler, ApiCache apiCache, String resourceName, boolean logReq, boolean logResp, boolean ignoreErrorInclude) {
         this.method = method;
         this.methodHandler = methodHandler;
         this.apiCache = apiCache;
@@ -62,6 +62,7 @@ class MethodMeta {
         this.logReq = logReq;
         this.logResp = logResp;
         this.defaultReturnValue = defaultReturnValue(method);
+        this.resourceName = resourceName;
     }
 
     private static boolean isIgnoreError(Method method) {
@@ -119,14 +120,6 @@ class MethodMeta {
         return apiCache;
     }
 
-    public int incrementAndGet() {
-        return current.incrementAndGet();
-    }
-
-    public int decrementAndGet() {
-        return current.decrementAndGet();
-    }
-
     public boolean isIgnoreError() {
         return ignoreError;
     }
@@ -165,5 +158,9 @@ class MethodMeta {
 
     public Method getMethod() {
         return method;
+    }
+
+    public String getResourceName() {
+        return resourceName;
     }
 }

@@ -14,6 +14,6 @@ public class TestConnection {
 
 
     public static Connection getConnection() {
-        return ConnectionFactory.newConnectionFromCache("mq.servers.dev.ofc:5672",  "mq_mgr", "gYul86Ci7BNcHfhxG36aMa3E3g0=", "/", 4);
+        return ConnectionFactory.newConnectionFromCache("mq.servers.dev.ofc:5672", "mq_mgr", "gYul86Ci7BNcHfhxG36aMa3E3g0=", "/", 4);
     }
 }

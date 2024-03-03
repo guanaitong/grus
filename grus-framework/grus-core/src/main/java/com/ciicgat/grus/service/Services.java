@@ -7,7 +7,10 @@ package com.ciicgat.grus.service;
 
 import com.ciicgat.api.core.annotation.ApiSecurity;
 import com.ciicgat.api.core.annotation.ServiceName;
+import com.ciicgat.grus.logger.LogExclude;
 import com.ciicgat.sdk.util.system.Systems;
+
+import java.lang.reflect.Method;
 
 /**
  * Created by August.Zhou on 2023/10/31 14:56
@@ -27,6 +30,7 @@ public class Services {
         throw new RuntimeException("cannot find the appName");
     }
 
+
     public static boolean isSecure(Class<?> serviceClazz) {
         if (Systems.IN_K8S) {
             ApiSecurity annotation = serviceClazz.getAnnotation(ApiSecurity.class);
@@ -37,5 +41,13 @@ public class Services {
             return annotation != null;
         }
         return false;
+    }
+
+    public static LogExclude getLogExclude(Method method) {
+        LogExclude logExclude = method.getAnnotation(LogExclude.class);
+        if (logExclude != null) {
+            return logExclude;
+        }
+        return method.getDeclaringClass().getAnnotation(LogExclude.class);
     }
 }

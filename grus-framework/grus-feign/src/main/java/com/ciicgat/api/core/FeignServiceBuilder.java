@@ -8,6 +8,8 @@ package com.ciicgat.api.core;
 import com.ciicgat.api.core.annotation.ServiceName;
 import com.ciicgat.api.core.contants.TimeOutConstants;
 import com.ciicgat.api.core.form.FormEncoder;
+import com.ciicgat.grus.sentinel.RuleOptions;
+import com.ciicgat.grus.sentinel.ServiceRuleManager;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.GrusServiceStatus;
@@ -32,8 +34,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
@@ -72,12 +78,22 @@ public class FeignServiceBuilder {
     private NamingService namingService = NamingService.DEFAULT;
     private FallbackFactory<?> fallbackFactory;
 
-    private List<String> ignoreErrorMethods = new ArrayList<>();
-    private List<RequestInterceptor> requestInterceptors = new ArrayList<>();
+    private final List<String> ignoreErrorMethods = new ArrayList<>();
+    private final List<RequestInterceptor> requestInterceptors = new ArrayList<>();
     private Interceptor interceptor;
     private boolean logReq;
 
     private boolean logResp;
+
+    /**
+     * 类级别的限流降级规则
+     */
+    private Set<RuleOptions<?>> classRules;
+
+    /**
+     * 方法级别的限流规则
+     */
+    private final Map<String, Set<RuleOptions<?>>> methodRules = new HashMap<>();
 
     public FeignServiceBuilder serviceClazz(Class<?> serviceClazz) {
         this.serviceClazz = serviceClazz;
@@ -110,14 +126,22 @@ public class FeignServiceBuilder {
     }
 
     public FeignServiceBuilder addIgnoreErrorMethods(String... ignoreErrorMethods) {
-        for (String ignoreErrorMethod : ignoreErrorMethods) {
-            this.ignoreErrorMethods.add(ignoreErrorMethod);
-        }
+        this.ignoreErrorMethods.addAll(Arrays.asList(ignoreErrorMethods));
         return this;
     }
 
     public FeignServiceBuilder fallbackFactory(FallbackFactory<?> fallbackFactory) {
         this.fallbackFactory = fallbackFactory;
+        return this;
+    }
+
+    public FeignServiceBuilder classRules(Set<RuleOptions<?>> classRules) {
+        this.classRules = classRules;
+        return this;
+    }
+
+    public FeignServiceBuilder addMethodRule(String method, Set<RuleOptions<?>> rules) {
+        this.methodRules.put(method, rules);
         return this;
     }
 
@@ -162,7 +186,7 @@ public class FeignServiceBuilder {
         if (!fromCache) {
             return (T) create();
         }
-        ServiceCacheKey serviceCacheKey = new ServiceCacheKey(serviceClazz, cacheOptions, options, logReq, logResp, ignoreErrorMethods);
+        ServiceCacheKey serviceCacheKey = new ServiceCacheKey(serviceClazz, cacheOptions, options, logReq, logResp, ignoreErrorMethods, classRules, methodRules);
         Object serviceInstance = SERVICE_CACHE.get(serviceCacheKey);
         if (serviceInstance != null) {
             return (T) serviceInstance;
@@ -185,11 +209,9 @@ public class FeignServiceBuilder {
         if (retryer == null) {
             retryer = new ConfigRetryer();
         }
-        ServiceName serviceName = Services.getServiceName(this.serviceClazz);
+        ServiceName serviceName = Services.getServiceName(serviceClazz);
 
         Objects.requireNonNull(serviceName.value(), "serviceName cannot be null");
-
-
         if (client == null) {
             OkHttpClient okHttpClient = FeignHttpClient.getOkHttpClient();
             if (interceptor != null) {
@@ -197,6 +219,8 @@ public class FeignServiceBuilder {
             }
             client = new OkHttpClientWrapper(okHttpClient);
         }
+
+        ServiceRuleManager.registerRule(serviceClazz, classRules, methodRules);
 
         GrusRuntimeManager grusRuntimeManager = GrusFramework.getGrusRuntimeManager();
 
@@ -217,7 +241,6 @@ public class FeignServiceBuilder {
                     .client(client)
                     .retryer(retryer)//默认不retry
                     .target(new GrusTarget(serviceClazz, serviceName, namingService));
-//                .target(serviceClazz, baseUrl);
 
             return (T) serviceInstance;
         } catch (RuntimeException ex) {

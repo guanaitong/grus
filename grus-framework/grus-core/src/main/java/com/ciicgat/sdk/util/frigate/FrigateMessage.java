@@ -6,6 +6,7 @@
 package com.ciicgat.sdk.util.frigate;
 
 import com.ciicgat.sdk.util.system.Systems;
+import com.ciicgat.sdk.util.system.WorkRegion;
 import io.opentelemetry.api.trace.Span;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
@@ -50,8 +51,7 @@ public class FrigateMessage {
     private String hostIp;
     private String appName;
     private String appInstance;
-    private String workEnv;
-    private String workIdc;
+    private String worRegion;
     /**
      * 发送时间
      */
@@ -125,20 +125,12 @@ public class FrigateMessage {
         this.appInstance = appInstance;
     }
 
-    public String getWorkEnv() {
-        return workEnv;
+    public String getWorRegion() {
+        return worRegion;
     }
 
-    public void setWorkEnv(String workEnv) {
-        this.workEnv = workEnv;
-    }
-
-    public String getWorkIdc() {
-        return workIdc;
-    }
-
-    public void setWorkIdc(String workIdc) {
-        this.workIdc = workIdc;
+    public void setWorRegion(String worRegion) {
+        this.worRegion = worRegion;
     }
 
     public long getTime() {
@@ -183,8 +175,7 @@ public class FrigateMessage {
         frigateMessage.setAppName(Systems.APP_NAME);
         frigateMessage.setAppInstance(Systems.APP_INSTANCE);
         frigateMessage.setHostIp(Systems.HOST_IP);
-        frigateMessage.setWorkEnv(Systems.WORK_ENV);
-        frigateMessage.setWorkIdc(Systems.WORK_IDC);
+        frigateMessage.setWorRegion(WorkRegion.getCurrentWorkRegion().getRegion());
         frigateMessage.setTime(System.currentTimeMillis());
         Span span = Span.current();
         if (span != Span.getInvalid()) {
@@ -202,7 +193,7 @@ public class FrigateMessage {
     private List<FormatUtil.Element> toElements() {
         List<FormatUtil.Element> elements = new ArrayList<>();
         elements.add(new FormatUtil.Element("APP", this.getAppInstance()));
-        elements.add(new FormatUtil.Element("ENV", this.getWorkEnv()));
+        elements.add(new FormatUtil.Element("ENV", this.getWorRegion()));
         elements.add(new FormatUtil.Element("HOST", this.getHostIp()));
         elements.add(new FormatUtil.Element("TRACE", this.getTraceId()));
         elements.add(new FormatUtil.Element("TIME", DateFormatUtils.format(this.getTime(), "yyyy-MM-dd HH:mm:ss")));

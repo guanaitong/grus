@@ -7,7 +7,7 @@ package com.ciicgat.api.core.service;
 
 import com.ciicgat.api.core.annotation.ServiceName;
 import com.ciicgat.api.core.model.TestBean;
-import com.ciicgat.grus.performance.MaxConcurrency;
+import com.ciicgat.grus.sentinel.annotation.SimpleFlowRule;
 import feign.RequestLine;
 
 /**
@@ -17,6 +17,6 @@ import feign.RequestLine;
 public interface FallbackService {
 
     @RequestLine("GET /getWithOutFallback")
-    @MaxConcurrency(0)
+    @SimpleFlowRule(0)
     TestBean getWithOutFallback();
 }

@@ -19,6 +19,7 @@ public class HMACSHA256 {
 
     /**
      * sha256_HMAC加密
+     *
      * @param secret  秘钥
      * @param message 消息
      * @return 加密后字符串

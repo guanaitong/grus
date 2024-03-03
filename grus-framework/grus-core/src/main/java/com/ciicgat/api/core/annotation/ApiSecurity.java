@@ -13,7 +13,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- *  用来标注接口是否需要走https
+ * 用来标注接口是否需要走https
  * Created by August.Zhou on 2024/4/3 14:19
  */
 @Retention(RUNTIME)

@@ -5,11 +5,11 @@
 
 package com.ciicgat.sdk.servlet;
 
-import com.ciicgat.grus.performance.MaxConcurrency;
-import com.ciicgat.grus.performance.SentinelProperties;
-import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import com.alibaba.csp.sentinel.slots.block.RuleConstant;
+import com.ciicgat.grus.sentinel.SentinelDefaultConfig;
+import com.ciicgat.grus.sentinel.annotation.SimpleFlowRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class HandlerCurrencyLimitInterceptor implements HandlerInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(HandlerCurrencyLimitInterceptor.class);
     private final ConcurrentMap<Method, AtomicInteger> concurrentMap = new ConcurrentHashMap<>();
+    private final SentinelDefaultConfig sentinelDefaultConfig = SentinelDefaultConfig.getInstance();
 
-    private final int globalMaxConcurrency = GlobalGconfConfig.getConfig().getBean("sentinel.properties", SentinelProperties.class).getWebMaxConcurrency();
 
     public HandlerCurrencyLimitInterceptor() {
     }
@@ -53,10 +53,10 @@ public class HandlerCurrencyLimitInterceptor implements HandlerInterceptor {
                 atomicInteger = newAtomicInteger;
             }
         }
-        int maxConcurrency = globalMaxConcurrency;
-        MaxConcurrency maxConcurrencyAnnotation = method.getAnnotation(MaxConcurrency.class);
-        if (maxConcurrencyAnnotation != null) {
-            maxConcurrency = maxConcurrencyAnnotation.value();
+        int maxConcurrency = sentinelDefaultConfig.getWebMaxConcurrency();
+        SimpleFlowRule simpleFlowRuleAnnotation = method.getAnnotation(SimpleFlowRule.class);
+        if (simpleFlowRuleAnnotation != null && simpleFlowRuleAnnotation.grade() == RuleConstant.FLOW_GRADE_THREAD) {
+            maxConcurrency = simpleFlowRuleAnnotation.value();
         }
         if (atomicInteger.incrementAndGet() > maxConcurrency) {
             LOGGER.error("{} 响应过慢，超过最大并发数上限，为了保护其他接口，直接拒绝该方法后续请求！！！", method);

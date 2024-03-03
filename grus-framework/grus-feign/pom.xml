@@ -29,10 +29,6 @@
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-slf4j</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.alibaba.csp</groupId>
-            <artifactId>sentinel-core</artifactId>
-        </dependency>
         <!-- for test -->
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>

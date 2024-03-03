@@ -38,7 +38,7 @@ public class FeignServiceFactory {
 
 
     public static void removeCache(final Class<?> serviceClazz) {
-        FeignServiceBuilder.SERVICE_CACHE.remove(new ServiceCacheKey(serviceClazz, null, null, false, false, Collections.emptyList()));
+        FeignServiceBuilder.SERVICE_CACHE.remove(new ServiceCacheKey(serviceClazz, null, null, false, false, Collections.emptyList(), null, null));
     }
 
     public static <T> T newInstance(final Class<T> serviceClazz) {
