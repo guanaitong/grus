@@ -188,6 +188,11 @@
                 <groupId>com.ciicgat.grus.boot</groupId>
                 <version>${revision}</version>
             </dependency>
+            <dependency>
+                <artifactId>grus-boot-starter-kafka-log</artifactId>
+                <groupId>com.ciicgat.grus.boot</groupId>
+                <version>${revision}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
