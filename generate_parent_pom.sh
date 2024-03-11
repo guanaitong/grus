@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #
-# Copyright 2007-2023, CIIC Guanaitong, Co., Ltd.
+# Copyright 2007-2024, CIIC Guanaitong, Co., Ltd.
 # All rights reserved.
 #
 
