@@ -11,7 +11,6 @@ import com.ciicgat.grus.language.LanguageConstant;
 import com.ciicgat.sdk.gconf.ConfigCollection;
 import com.ciicgat.sdk.gconf.ConfigCollectionFactory;
 import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
-import com.ciicgat.sdk.util.http.CacheDnsResolver;
 import com.ciicgat.sdk.util.http.SSL;
 import com.ciicgat.sdk.util.http.metrics.DelegateEventListener;
 import okhttp3.ConnectionPool;
@@ -61,7 +60,7 @@ class FeignHttpClient {
                 .Builder()
                 .eventListener(DelegateEventListener.getForFeignInstance())
                 .dispatcher(dispatcher)
-                .dns(CacheDnsResolver.INSTANCE)
+                .dns(FeignCacheDnsResolver.INSTANCE)
                 .followRedirects(false)
                 .followSslRedirects(false)
                 .connectTimeout(DEFAULT_CONNECT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
