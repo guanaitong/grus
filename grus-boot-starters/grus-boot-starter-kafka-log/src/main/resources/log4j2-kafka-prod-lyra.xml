@@ -41,6 +41,8 @@
                 <ThresholdFilter level="${sys:CONSOLE_LOG_THRESHOLD:-TRACE}"/>
             </Filters>
             <Property name="bootstrap.servers">10.131.1.26:9092,10.131.1.27:9092,10.131.1.28:9092</Property>
+            <Property name="max.block.ms">10000</Property>
+            <Property name="request.timeout.ms">10000</Property>
         </Kafka>
     </Appenders>
     <Loggers>
