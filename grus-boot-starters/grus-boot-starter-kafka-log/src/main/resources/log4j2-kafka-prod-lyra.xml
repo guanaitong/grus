@@ -35,6 +35,7 @@
                 <KeyValuePair key="appInstance" value="$${env:HOSTNAME}"/>
                 <KeyValuePair key="javaVersion" value="${java:runtime}"/>
                 <KeyValuePair key="os" value="${java:os}"/>
+                <KeyValuePair key="topic" value="gat-java-application-stream-log"/>
             </JsonLayout>
             <Filters>
                 <ThresholdFilter level="${sys:CONSOLE_LOG_THRESHOLD:-TRACE}"/>
