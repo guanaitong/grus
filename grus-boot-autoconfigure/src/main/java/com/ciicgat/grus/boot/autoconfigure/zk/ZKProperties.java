@@ -18,6 +18,11 @@ import org.springframework.util.StringUtils;
 @ConfigurationProperties(prefix = "grus.zk")
 public class ZKProperties {
     /**
+     * 是否启用zk
+     */
+    private boolean enabled;
+
+    /**
      * 连接Zookeeper服务器的列表.
      * 一般不用填写。默认去gconf统一配置的地方加载
      * 包括IP地址和端口号.
@@ -34,6 +39,13 @@ public class ZKProperties {
         }
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     public String getServerLists() {
         return serverLists;

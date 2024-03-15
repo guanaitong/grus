@@ -5,7 +5,9 @@
 
 package com.ciicgat.grus.lock;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * @Auther: Jiaju Wei
@@ -13,9 +15,32 @@ import java.util.concurrent.TimeUnit;
  * @Description: 分布式锁接口
  */
 public interface DistLock {
-    void acquire();
+    /**
+     * 会一直尝试获取锁，直到获取为止。这个过程是阻塞行为。
+     *
+     * @param lockKey
+     * @param runnable
+     */
+    void execute(String lockKey, Runnable runnable);
 
-    boolean tryAcquire(long time, TimeUnit unit);
+    default <T> T execute(String lockKey, Supplier<T> supplier) {
+        RunnableSupplier<T> runnableSupplier = new RunnableSupplier<T>(supplier);
+        execute(lockKey, runnableSupplier);
+        return runnableSupplier.value();
+    }
 
-    void release();
+    /**
+     * 给定时间内获取锁，如果获取成功，会执行runnable。如果执行了runnable，那么会返回true
+     *
+     * @param lockKey
+     * @param runnable
+     * @param time
+     * @param unit
+     * @return
+     */
+    boolean tryExecute(String lockKey, long time, TimeUnit unit, Runnable runnable);
+
+    default boolean tryExecute(String lockKey, Duration duration, Runnable runnable) {
+        return tryExecute(lockKey, duration.toNanos(), TimeUnit.NANOSECONDS, runnable);
+    }
 }

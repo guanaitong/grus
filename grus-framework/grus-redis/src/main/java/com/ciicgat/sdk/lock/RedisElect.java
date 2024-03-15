@@ -3,11 +3,10 @@
  * All rights reserved.
  */
 
-package com.ciicgat.sdk.redis.lock;
+package com.ciicgat.sdk.lock;
 
 import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.redis.RedisExecutor;
-import com.ciicgat.sdk.util.system.Systems;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.params.SetParams;
@@ -25,11 +24,8 @@ public class RedisElect {
     private final RedisExecutor redisExecutor;
     private volatile boolean isMaster = false;
     private volatile boolean isRunning = false;
-    private String key;
+    private final String key;
 
-    public RedisElect() {
-        this(HARedis.getRedisExecutor(), Systems.APP_NAME);
-    }
 
     public RedisElect(RedisExecutor redisExecutor, String key) {
         this.redisExecutor = Objects.requireNonNull(redisExecutor);

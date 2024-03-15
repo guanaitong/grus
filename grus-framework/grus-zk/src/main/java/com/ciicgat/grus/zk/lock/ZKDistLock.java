@@ -7,12 +7,16 @@ package com.ciicgat.grus.zk.lock;
 
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.lock.DistLock;
+import com.ciicgat.grus.zk.ZKConstants;
 import com.ciicgat.sdk.lang.exception.ZKRuntimeException;
+import com.ciicgat.sdk.util.system.Systems;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+import org.apache.curator.utils.ZKPaths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -21,22 +25,21 @@ import java.util.concurrent.TimeUnit;
  * @Description: 使用Curator封装的ZK分布式锁
  * http://zookeeper.apache.org/doc/r3.4.9/recipes.html
  */
-class ZKDistLock implements DistLock {
+public class ZKDistLock implements DistLock {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ZKDistLock.class);
 
-    private CuratorFramework curator;
-    private InterProcessMutex mutex;
-    private String lockPath;
+    private final CuratorFramework curator;
 
-    ZKDistLock(CuratorFramework curator, String lockPath) {
+    public ZKDistLock(CuratorFramework curator) {
         this.curator = curator;
-        this.lockPath = lockPath;
-        this.mutex = new InterProcessMutex(curator, lockPath);
     }
 
     @Override
-    public void acquire() {
+    public void execute(String lockKey, Runnable runnable) {
+        Objects.requireNonNull(lockKey);
+        String lockPath = ZKPaths.makePath(ZKConstants.LOCK_PATH, Systems.APP_NAME, lockKey);
+        InterProcessMutex mutex = new InterProcessMutex(curator, lockPath);
         try {
             mutex.acquire();
         } catch (Exception e) {
@@ -44,21 +47,38 @@ class ZKDistLock implements DistLock {
             Alert.send("ZK锁连接异常", e);
             throw new ZKRuntimeException(e);
         }
+        try {
+            runnable.run();
+        } finally {
+            release(mutex, lockPath);
+        }
     }
 
     @Override
-    public boolean tryAcquire(long time, TimeUnit unit) {
+    public boolean tryExecute(String lockKey, long time, TimeUnit unit, Runnable runnable) {
+        Objects.requireNonNull(lockKey);
+        String lockPath = ZKPaths.makePath(ZKConstants.LOCK_PATH, Systems.APP_NAME, lockKey);
+        InterProcessMutex mutex = new InterProcessMutex(curator, lockPath);
+        boolean acquireResult;
         try {
-            return mutex.acquire(time, unit);
+            acquireResult = mutex.acquire(time, unit);
         } catch (Exception e) {
             LOGGER.error("ZK_LOCK_ERR", e);
             Alert.send("ZK锁连接异常", e);
             throw new ZKRuntimeException(e);
         }
+        if (!acquireResult) {
+            return false;
+        }
+        try {
+            runnable.run();
+            return true;
+        } finally {
+            release(mutex, lockPath);
+        }
     }
 
-    @Override
-    public void release() {
+    private void release(InterProcessMutex mutex, String lockPath) {
         try {
             mutex.release();
             // ZK版本暂不支持Container节点的新特性，需要手动删除父节点，会有小概率的删除失败

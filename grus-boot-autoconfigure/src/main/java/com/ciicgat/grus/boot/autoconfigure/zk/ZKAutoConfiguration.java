@@ -5,15 +5,12 @@
 
 package com.ciicgat.grus.boot.autoconfigure.zk;
 
-import com.ciicgat.grus.boot.autoconfigure.core.IdGenProperties;
 import com.ciicgat.grus.boot.autoconfigure.gconf.GconfAutoConfiguration;
-import com.ciicgat.grus.idgen.IdGenerator;
-import com.ciicgat.grus.idgen.SnowflakeIdGenerator;
 import com.ciicgat.grus.idgen.WorkIdHolder;
-import com.ciicgat.grus.lock.DistLockFactory;
+import com.ciicgat.grus.lock.DistLock;
 import com.ciicgat.grus.zk.ZKUtils;
 import com.ciicgat.grus.zk.idgen.ZKWorkIdHolder;
-import com.ciicgat.grus.zk.lock.ZKDistLockFactory;
+import com.ciicgat.grus.zk.lock.ZKDistLock;
 import com.ciicgat.sdk.util.system.Systems;
 import org.apache.curator.framework.CuratorFramework;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -31,10 +28,10 @@ import java.util.Objects;
  * @Date: 2019/12/26 17:17
  * @Description:
  */
-@EnableConfigurationProperties({ZKProperties.class, IdGenProperties.class})
+@EnableConfigurationProperties({ZKProperties.class})
 @ConditionalOnClass({ZKUtils.class})
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnProperty(prefix = "grus.zk", value = "enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = "grus.zk", value = "enabled", havingValue = "true", matchIfMissing = false)
 @AutoConfigureAfter({GconfAutoConfiguration.class})
 public class ZKAutoConfiguration {
 
@@ -52,15 +49,9 @@ public class ZKAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(name = "idGenerator")
-    public IdGenerator idGenerator(WorkIdHolder workIdHolder, IdGenProperties idGenProperties) {
-        return new SnowflakeIdGenerator(workIdHolder, idGenProperties.getDateFormat());
-    }
-
-    @Bean
-    @ConditionalOnMissingBean(name = "distLockFactory")
-    public DistLockFactory distLockFactory(CuratorFramework curatorFramework) {
-        return new ZKDistLockFactory(curatorFramework, Systems.APP_NAME);
+    @ConditionalOnMissingBean(name = "distLock")
+    public DistLock distLock(CuratorFramework curatorFramework) {
+        return new ZKDistLock(curatorFramework);
     }
 
 }

@@ -28,7 +28,7 @@ public class ZKWorkIdHolder implements WorkIdHolder {
     private static final Logger LOGGER = LoggerFactory.getLogger(ZKWorkIdHolder.class);
     private static final long HIS_NUM = 10;
 
-    private long workValue;
+    private final long workValue;
 
     public ZKWorkIdHolder(String connectString, String appName) {
         this(ZKUtils.init(connectString), appName);

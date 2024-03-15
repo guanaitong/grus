@@ -5,6 +5,7 @@
 
 package com.ciicgat.grus.zk.idgen;
 
+import com.ciicgat.grus.idgen.WorkIdHolder;
 import com.ciicgat.grus.zk.TestZkConfig;
 import com.ciicgat.grus.zk.ZKUtils;
 import org.apache.curator.framework.CuratorFramework;
@@ -23,11 +24,12 @@ public class ZKWorkIdHolderTest {
     @Test
     public void testFetchId() throws Exception {
         CuratorFramework curatorFramework = ZKUtils.init(TestZkConfig.ZK);
+
         Set<Long> ids = new HashSet<>();
         var n = 100;
         for (int i = 0; i < n; i++) {
-            ZKWorkIdHolder zkWorkIdHolder = new ZKWorkIdHolder(curatorFramework, "payment");
-            long workId = zkWorkIdHolder.getId();
+            WorkIdHolder workIdHolder = new ZKWorkIdHolder(curatorFramework, "payment");
+            long workId = workIdHolder.getId();
             ids.add(workId);
         }
         Assertions.assertEquals(n, ids.size());

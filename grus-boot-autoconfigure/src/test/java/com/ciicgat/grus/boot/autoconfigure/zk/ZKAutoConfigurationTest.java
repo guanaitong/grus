@@ -6,6 +6,7 @@
 package com.ciicgat.grus.boot.autoconfigure.zk;
 
 import com.ciicgat.grus.idgen.WorkIdHolder;
+import com.ciicgat.grus.zk.lock.ZKDistLock;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
@@ -22,10 +23,13 @@ class ZKAutoConfigurationTest {
     @Test
     void workIdHolder() {
         this.contextRunner
-                .withPropertyValues(TEST_APP_PAIRS)
+                .withPropertyValues(TEST_APP_PAIRS, "grus.zk.enabled=true")
                 .run(context -> {
                     Object workIdHolder = context.getBean("workIdHolder");
                     assertThat(workIdHolder).isInstanceOf(WorkIdHolder.class);
+
+                    Object distLock = context.getBean("distLock");
+                    assertThat(distLock).isInstanceOf(ZKDistLock.class);
                 });
     }
 }
