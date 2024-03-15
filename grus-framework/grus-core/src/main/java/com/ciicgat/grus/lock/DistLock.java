@@ -5,8 +5,6 @@
 
 package com.ciicgat.grus.lock;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -43,13 +41,13 @@ public interface DistLock {
     boolean tryExecute(String lockKey, long time, TimeUnit unit, Runnable runnable);
 
 
-    default <T> Pair<Boolean, T> tryExecute(String lockKey, Duration duration, Supplier<T> supplier) {
-        RunnableSupplier<T> runnableSupplier = new RunnableSupplier<T>(supplier);
+    default <T> Result<T> tryExecute(String lockKey, Duration duration, Supplier<T> supplier) {
+        RunnableSupplier<T> runnableSupplier = new RunnableSupplier<>(supplier);
         boolean r = tryExecute(lockKey, duration, runnableSupplier);
         if (r) {
-            return Pair.of(true, runnableSupplier.value());
+            return new Result<>(true, runnableSupplier.value());
         } else {
-            return Pair.of(false, null);
+            return new Result<>(false, null);
         }
     }
 
