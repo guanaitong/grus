@@ -86,18 +86,7 @@ public class RedisLock implements DistLock {
 
     @Override
     public boolean tryExecuteOnce(String lockKey, Runnable runnable) {
-        Objects.requireNonNull(lockKey);
-        String redisKey = "LOCK_" + Systems.APP_NAME + "__" + lockKey;
-        String v = tryAcquire(redisKey, -1, TimeUnit.MILLISECONDS);
-        if (StringUtils.isEmpty(v)) {
-            return false;
-        }
-        try {
-            runnable.run();
-        } finally {
-            unlock(redisKey, v);
-        }
-        return true;
+        return tryExecute(lockKey, -1, TimeUnit.MILLISECONDS, runnable);
     }
 
     @Override
