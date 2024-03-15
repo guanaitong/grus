@@ -53,7 +53,9 @@ public class RedisLock implements DistLock {
         if (lock(redisKey, redisValue)) {
             return redisValue;
         }
-        if (timeout == 0) { //无超时
+        if (timeout == -1) {
+            return null;
+        } else if (timeout == 0) { //无超时
             while (true) {
                 Threads.sleep(100);
                 if (lock(redisKey, redisValue)) {
@@ -77,17 +79,25 @@ public class RedisLock implements DistLock {
         }
     }
 
-
-    /**
-     * 推荐使用该方法，把锁的逻辑给封装掉了
-     *
-     * @param lockKey
-     * @param runnable
-     * @return 返回true表示获取了锁且runnable执行了
-     */
     @Override
     public void execute(final String lockKey, Runnable runnable) {
         tryExecute(lockKey, 0, TimeUnit.MILLISECONDS, runnable);
+    }
+
+    @Override
+    public boolean tryExecuteOnce(String lockKey, Runnable runnable) {
+        Objects.requireNonNull(lockKey);
+        String redisKey = "LOCK_" + Systems.APP_NAME + "__" + lockKey;
+        String v = tryAcquire(redisKey, -1, TimeUnit.MILLISECONDS);
+        if (StringUtils.isEmpty(v)) {
+            return false;
+        }
+        try {
+            runnable.run();
+        } finally {
+            unlock(redisKey, v);
+        }
+        return true;
     }
 
     @Override

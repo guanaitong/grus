@@ -54,6 +54,13 @@ public class ZKDistLock implements DistLock {
         }
     }
 
+    // 基于zk的实现，无法精准实现once语意
+    // 默认采用1s钟较低的延迟，实现类似的效果
+    @Override
+    public boolean tryExecuteOnce(String lockKey, Runnable runnable) {
+        return tryExecute(lockKey, 3, TimeUnit.SECONDS, runnable);
+    }
+
     @Override
     public boolean tryExecute(String lockKey, long time, TimeUnit unit, Runnable runnable) {
         Objects.requireNonNull(lockKey);
@@ -68,6 +75,7 @@ public class ZKDistLock implements DistLock {
             throw new ZKRuntimeException(e);
         }
         if (!acquireResult) {
+            LOGGER.warn("tryAcquire lock failed for key {} after {} ms", lockKey, unit.toMillis(time));
             return false;
         }
         try {
