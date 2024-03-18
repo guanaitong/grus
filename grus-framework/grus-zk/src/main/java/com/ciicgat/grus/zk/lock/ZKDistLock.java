@@ -89,8 +89,8 @@ public class ZKDistLock implements DistLock {
     private void release(InterProcessMutex mutex, String lockPath) {
         try {
             mutex.release();
-            // ZK版本暂不支持Container节点的新特性，需要手动删除父节点，会有小概率的删除失败
-            curator.delete().inBackground().forPath(lockPath);
+            // 原来ZK版本暂不支持Container节点的新特性，需要手动删除父节点，会有小概率的删除失败
+//            curator.delete().inBackground().forPath(lockPath);
         } catch (Exception e) {
             LOGGER.warn("ZK_UNLOCK_ERR", e);
         }
