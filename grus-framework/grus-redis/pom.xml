@@ -89,11 +89,6 @@
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-extension-trace-propagators</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
 </project>

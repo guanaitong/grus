@@ -11,7 +11,6 @@ import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.context.propagation.TextMapPropagator;
-import io.opentelemetry.extension.trace.propagation.JaegerPropagator;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,7 +41,7 @@ public class GrusFilterTest {
     @BeforeAll
     public static void registerTracer() {
         SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder().build();
-        TextMapPropagator textMapPropagator = TextMapPropagator.composite(W3CTraceContextPropagator.getInstance(), JaegerPropagator.getInstance());
+        TextMapPropagator textMapPropagator = W3CTraceContextPropagator.getInstance();
 
         OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
 
@@ -79,19 +78,19 @@ public class GrusFilterTest {
         MockHttpServletResponse httpResp = mockMvc.perform(post).andReturn().getResponse();
         Assertions.assertEquals(HttpStatus.OK.value(), httpResp.getStatus());
         Assertions.assertTrue(!httpResp.getHeader("x-trace-id").isEmpty());
-        String firstRequestTraceId = httpResp.getHeader("uber-trace-id");
-        Assertions.assertTrue(!firstRequestTraceId.isEmpty());
+//        String firstRequestTraceId = httpResp.getHeader("uber-trace-id");
+//        Assertions.assertTrue(!firstRequestTraceId.isEmpty());
 
-        String firstRequestTraceId2 = httpResp.getHeader("traceparent");
-        Assertions.assertTrue(!firstRequestTraceId2.isEmpty());
+        String traceparent = httpResp.getHeader("traceparent");
+        Assertions.assertTrue(!traceparent.isEmpty());
 //        Assertions.assertEquals(firstRequestTraceId, firstRequestTraceId2);
-        System.out.println(firstRequestTraceId);
+//        System.out.println(firstRequestTraceId);
         Assertions.assertTrue(StringUtils.hasLength(httpResp.getHeader("x-trace-id")));
         Assertions.assertTrue(StringUtils.hasLength(httpResp.getHeader("x-span-id")));
         Assertions.assertFalse(StringUtils.hasLength(httpResp.getHeader("x-parent-id")));
 
 
-        MockHttpServletRequestBuilder post1 = MockMvcRequestBuilders.post("/test?abc=1").params(params).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).header("uber-trace-id", firstRequestTraceId)//把uber-trace-id作为链追踪下去
+        MockHttpServletRequestBuilder post1 = MockMvcRequestBuilders.post("/test?abc=1").params(params).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).header("traceparent", traceparent)
                 .accept(MediaType.APPLICATION_JSON);
         MockHttpServletResponse httpResp1 = mockMvc.perform(post1).andReturn().getResponse();
 

@@ -15,7 +15,6 @@ import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.context.propagation.TextMapPropagator;
-import io.opentelemetry.extension.trace.propagation.JaegerPropagator;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import org.slf4j.Logger;
@@ -30,7 +29,7 @@ public class TestReceiver {
 
     public static void main(String[] args) throws Exception {
         SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder().build();
-        TextMapPropagator textMapPropagator = TextMapPropagator.composite(W3CTraceContextPropagator.getInstance(), JaegerPropagator.getInstance());
+        TextMapPropagator textMapPropagator = W3CTraceContextPropagator.getInstance();
         OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
         OpenTelemetrys.set(sdk);
 //        ExchangeNameInfo exchangeNameInfo = new ExchangeNameInfo();

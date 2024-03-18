@@ -12,7 +12,6 @@ import com.ciicgat.grus.rabbitmq.TestConnection;
 import io.opentelemetry.api.trace.propagation.W3CTraceContextPropagator;
 import io.opentelemetry.context.propagation.ContextPropagators;
 import io.opentelemetry.context.propagation.TextMapPropagator;
-import io.opentelemetry.extension.trace.propagation.JaegerPropagator;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 
@@ -24,7 +23,7 @@ public class TestDispatcher {
 
     public static void main(String[] args) {
         SdkTracerProvider sdkTracerProvider = SdkTracerProvider.builder().build();
-        TextMapPropagator textMapPropagator = TextMapPropagator.composite(W3CTraceContextPropagator.getInstance(), JaegerPropagator.getInstance());
+        TextMapPropagator textMapPropagator = W3CTraceContextPropagator.getInstance();
         OpenTelemetrySdk sdk = OpenTelemetrySdk.builder().setTracerProvider(sdkTracerProvider).setPropagators(ContextPropagators.create(textMapPropagator)).build();
         OpenTelemetrys.set(sdk);
 
