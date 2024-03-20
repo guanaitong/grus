@@ -5,7 +5,7 @@
 
 package com.ciicgat.api.core;
 
-import com.ciicgat.api.core.kubernetes.KubernetesClientConfig;
+import com.ciicgat.api.core.config.ServiceConnectConfig;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import feign.Client;
 import okhttp3.Headers;
@@ -171,7 +171,7 @@ public final class OkHttpClientWrapper implements Client {
         Collection<String> values = headers.get(K8S_TARGET_TAG);
         boolean isK8sService = !CollectionUtils.isEmpty(values);
         if (isK8sService) {
-            long globalMaxConnectTimeout = KubernetesClientConfig.getConfig().getConnectTimeout();
+            long globalMaxConnectTimeout = ServiceConnectConfig.getConfig().getConnectTimeout();
             if (connectTimeoutMillis > globalMaxConnectTimeout) {
                 connectTimeoutMillis = globalMaxConnectTimeout;
             }

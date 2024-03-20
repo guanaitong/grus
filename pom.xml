@@ -91,7 +91,6 @@
         <zookeeper.version>3.6.3</zookeeper.version>
         <poi.version>5.2.4</poi.version>
         <sentinel.version>1.8.7</sentinel.version>
-        <kubernetes-java-client.version>17.0.2</kubernetes-java-client.version>
         <dubbo.version>2.7.3</dubbo.version>
         <jacoco.skip>true</jacoco.skip>
         <gpg.skip>true</gpg.skip>

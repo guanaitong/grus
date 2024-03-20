@@ -5,7 +5,7 @@
 
 package com.ciicgat.api.core;
 
-import com.ciicgat.api.core.kubernetes.KubernetesClientConfig;
+import com.ciicgat.api.core.config.ServiceConnectConfig;
 import feign.RetryableException;
 import feign.Retryer;
 import org.slf4j.Logger;
@@ -26,7 +26,7 @@ public class ConfigRetryer extends Retryer.Default {
 
     @Override
     public void continueOrPropagate(RetryableException e) {
-        final KubernetesClientConfig config = KubernetesClientConfig.getConfig();
+        final ServiceConnectConfig config = ServiceConnectConfig.getConfig();
         if (config.couldRetry(e.getCause())) {
             LOGGER.warn("feign retry", e);
 //            Alert.send("feign retry for error: " + e.getMessage(), e.getCause());

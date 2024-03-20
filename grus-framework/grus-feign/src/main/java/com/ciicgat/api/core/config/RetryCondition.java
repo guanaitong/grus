@@ -3,7 +3,7 @@
  * All rights reserved.
  */
 
-package com.ciicgat.api.core.kubernetes;
+package com.ciicgat.api.core.config;
 
 import java.util.List;
 

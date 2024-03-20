@@ -5,7 +5,7 @@
 
 package com.ciicgat.api.core;
 
-import com.ciicgat.api.core.kubernetes.KubernetesClientConfig;
+import com.ciicgat.api.core.config.ServiceConnectConfig;
 import com.ciicgat.api.core.service.RetryService;
 import feign.RetryableException;
 import okhttp3.mockwebserver.MockResponse;
@@ -57,7 +57,7 @@ public class TestRetry {
             Assertions.fail();
         } catch (Exception e) {
             Assertions.assertTrue(e instanceof RetryableException);
-            final KubernetesClientConfig config = KubernetesClientConfig.getConfig();
+            final ServiceConnectConfig config = ServiceConnectConfig.getConfig();
             Assertions.assertFalse(config.couldRetry(e.getCause()));
         }
 
@@ -70,7 +70,7 @@ public class TestRetry {
             Assertions.fail();
         } catch (Exception e) {
             Assertions.assertTrue(e instanceof RetryableException);
-            final KubernetesClientConfig config = KubernetesClientConfig.getConfig();
+            final ServiceConnectConfig config = ServiceConnectConfig.getConfig();
             Assertions.assertTrue(config.couldRetry(e.getCause()));
         }
     }

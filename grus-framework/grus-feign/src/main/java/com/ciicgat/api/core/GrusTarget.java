@@ -6,7 +6,6 @@
 package com.ciicgat.api.core;
 
 import com.ciicgat.api.core.annotation.ServiceName;
-import com.ciicgat.grus.service.naming.K8sNamingService;
 import com.ciicgat.grus.service.naming.NamingService;
 import feign.Request;
 import feign.RequestTemplate;
@@ -23,7 +22,6 @@ class GrusTarget<T> implements Target<T> {
     private final Class<T> type;
     private final String name;
     private final String url;
-    private final boolean isK8sService;
 
 
     GrusTarget(Class<T> serviceClazz, ServiceName serviceName, NamingService namingService) {
@@ -31,10 +29,6 @@ class GrusTarget<T> implements Target<T> {
         this.name = serviceName.value();
         this.url = namingService.resolveBaseUrl(serviceName);
         LOGGER.info("create service instance of {},  serviceName {}, baseUrl {}", serviceClazz, serviceName, url);
-        isK8sService = K8sNamingService.isK8sService(name);
-        if (isK8sService) {
-            ServiceDiscoveryClientUtil.tryInitClient(name);
-        }
     }
 
     @Override
@@ -56,9 +50,6 @@ class GrusTarget<T> implements Target<T> {
     /* no authentication or other special activity. just insert the url. */
     @Override
     public Request apply(RequestTemplate input) {
-        if (isK8sService) {
-            input.header(FeignHttpClient.K8S_TARGET_TAG, name);
-        }
         input.target(url);
         return input.request();
     }
