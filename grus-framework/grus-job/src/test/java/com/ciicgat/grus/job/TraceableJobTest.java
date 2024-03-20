@@ -74,7 +74,7 @@ public class TraceableJobTest implements SimpleJob {
     @Test
     public void test() throws InterruptedException {
         logger.info("test");
-        ZookeeperRegistryCenter zookeeperRegistryCenter = new ZookeeperRegistryCenter(new ZookeeperConfiguration("app-zk.servers.dev.ofc", "test-" + Runtime.version().feature()));
+        ZookeeperRegistryCenter zookeeperRegistryCenter = new ZookeeperRegistryCenter(new ZookeeperConfiguration("10.101.11.116:2181,10.101.11.186:2181,10.101.11.94:2181", "test-" + Runtime.version().feature()));
         zookeeperRegistryCenter.init();
 
         TraceableJobTest simpleJob = new TraceableJobTest();

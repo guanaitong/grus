@@ -18,7 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-        properties = {"spring.application.name=grus-demo", "grus.idgen.dateFormat=yyMMdd", "grus.zk.serverLists=app-zk.servers.dev.ofc:2181", "grus.zk.namespace=grus-test-job"})
+        properties = {"spring.application.name=grus-demo", "grus.idgen.dateFormat=yyMMdd", "grus.zk.serverLists=10.101.11.116:2181,10.101.11.186:2181,10.101.11.94:2181", "grus.zk.namespace=grus-test-job"})
 public class ZKConfigurationTests {
 
     @Autowired

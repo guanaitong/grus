@@ -77,13 +77,8 @@ public class RedisLockTest {
 
         countDownLatch.await();
 
-        boolean r = redisLock.tryExecute(key, 3, TimeUnit.SECONDS, new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        });
-        Assertions.assertEquals(false, r);
+        boolean r = redisLock.tryExecute(key, 3, TimeUnit.SECONDS, () -> {});
+        Assertions.assertFalse(r);
     }
 
 }

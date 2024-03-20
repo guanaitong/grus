@@ -10,5 +10,5 @@ package com.ciicgat.grus.zk;
  * @Date: 2021/7/7 18:42
  */
 public interface TestZkConfig {
-    String ZK = "app-zk.servers.dev.ofc";
+    String ZK = "10.101.11.116:2181,10.101.11.186:2181,10.101.11.94:2181";
 }

@@ -18,7 +18,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
         classes = JobApplication.class,
-        properties = {"spring.application.name=grus-demo", "grus.gconf.appId=grus-demo", "grus.zk.serverLists=app-zk.servers.dev.ofc:2181", "grus.job.namespace=grus-test-job"})
+        properties = {"spring.application.name=grus-demo", "grus.gconf.appId=grus-demo", "grus.zk.serverLists=10.101.11.116:2181,10.101.11.186:2181,10.101.11.94:2181", "grus.job.namespace=grus-test-job"})
 public class JobAutoConfigurationTests {
 
 
