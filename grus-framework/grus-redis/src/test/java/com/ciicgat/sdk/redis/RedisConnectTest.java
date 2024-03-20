@@ -36,6 +36,10 @@ import java.util.function.Function;
 public class RedisConnectTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(RedisConnectTest.class);
 
+    static {
+        StandaloneChecker.enableCheck = false;
+    }
+
     @Test
     public void testStandalone() {
         ConfigCollection configCollection = RemoteConfigCollectionFactoryBuilder.getInstance().getConfigCollection("grus-demo");

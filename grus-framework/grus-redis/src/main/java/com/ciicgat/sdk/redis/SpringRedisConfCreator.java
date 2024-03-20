@@ -119,8 +119,7 @@ public class SpringRedisConfCreator {
     private static RedisConfiguration newRedisConfiguration(RedisSetting redisSetting) {
         String password = redisSetting.getFinalPassword();
         if (redisSetting.getType() == RedisSetting.TYPE_STANDALONE) {
-            LOGGER.warn("!!!YOU ARE USE STANDALONE REDIS,THIS WILL BE FORBIDDEN A FEW MONTHS LATER!!!");
-            LOGGER.warn("!!!您正在使用单点的redis，几个月后会禁止该行为，请及时迁移!!!");
+            StandaloneChecker.check();
             RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
             RedisSetting.StandaloneConfig standalone = redisSetting.getStandalone();
             redisConfiguration.setHostName(standalone.getHost());
@@ -187,8 +186,7 @@ public class SpringRedisConfCreator {
         setPool(redisProperties.getLettuce().getPool(), redisSetting);
         setPool(redisProperties.getJedis().getPool(), redisSetting);
         if (redisSetting.getType() == RedisSetting.TYPE_STANDALONE) {
-            LOGGER.warn("!!!YOU ARE USE STANDALONE REDIS,THIS WILL BE FORBIDDEN A FEW MONTHS LATER!!!");
-            LOGGER.warn("!!!您正在使用单点的redis，几个月后会禁止该行为，请及时迁移!!!");
+            StandaloneChecker.check();
             redisProperties.setDatabase(redisSetting.getDb());
             RedisSetting.StandaloneConfig standalone = redisSetting.getStandalone();
             redisProperties.setHost(standalone.getHost());

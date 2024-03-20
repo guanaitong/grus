@@ -60,8 +60,7 @@ public class RedisExecutorBuilder {
 
     public Pool<Jedis> newPool() {
         if (setting.getType() == RedisSetting.TYPE_STANDALONE) {
-            LOGGER.warn("!!!YOU ARE USE STANDALONE REDIS,THIS WILL BE FORBIDDEN A FEW MONTHS LATER!!!");
-            LOGGER.warn("!!!您正在使用单点的redis，几个月后会禁止该行为，请及时迁移!!!");
+            StandaloneChecker.check();
             return newJedisPool();
         } else if (setting.getType() == RedisSetting.TYPE_SENTINEL) {
             return newJedisSentinelPool();
