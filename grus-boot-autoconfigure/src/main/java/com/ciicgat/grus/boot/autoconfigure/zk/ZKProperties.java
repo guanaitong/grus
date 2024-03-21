@@ -6,9 +6,12 @@
 package com.ciicgat.grus.boot.autoconfigure.zk;
 
 import com.ciicgat.sdk.gconf.GlobalGconfConfig;
+import com.ciicgat.sdk.util.system.WorkRegion;
 import jakarta.annotation.PostConstruct;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.StringUtils;
+
+import java.util.Properties;
 
 /**
  * @Auther: Jiaju Wei
@@ -35,7 +38,12 @@ public class ZKProperties {
     @PostConstruct
     private void init() {
         if (!StringUtils.hasLength(serverLists)) {
-            serverLists = GlobalGconfConfig.getConfig().getProperties("address.properties").getProperty("zkServerLists");
+            Properties properties = GlobalGconfConfig.getConfig().getProperties("address.properties");
+            if (WorkRegion.getCurrentWorkRegion() == WorkRegion.STAGE_LYRA) {
+                serverLists = properties.getProperty("stage_zkServerLists");
+            } else {
+                serverLists = properties.getProperty("zkServerLists");
+            }
         }
     }
 
