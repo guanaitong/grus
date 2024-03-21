@@ -5,6 +5,7 @@
 
 package com.ciicgat.api.core;
 
+import com.ciicgat.sdk.gconf.GlobalGconfConfig;
 import com.ciicgat.sdk.util.system.WorkRegion;
 import okhttp3.Dns;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +16,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -61,9 +63,11 @@ public class FeignCacheDnsResolver implements Dns {
         } catch (UnknownHostException e) {
             WorkRegion currentWorkRegion = WorkRegion.getCurrentWorkRegion();
             if (currentWorkRegion == WorkRegion.STAGE_LYRA && host.endsWith(currentWorkRegion.getServiceDomainSuffix())) {
-                return InetAddress.getAllByName("10.129.1.204");
+                Properties properties = GlobalGconfConfig.getConfig().getProperties("address.properties");
+                return InetAddress.getAllByName(properties.getProperty("shanghai_internal_gateway_ip_stage"));
             } else if (currentWorkRegion == WorkRegion.PROD_LYRA && host.endsWith(currentWorkRegion.getServiceDomainSuffix())) {
-                return InetAddress.getAllByName("10.129.4.204");
+                Properties properties = GlobalGconfConfig.getConfig().getProperties("address.properties");
+                return InetAddress.getAllByName(properties.getProperty("shanghai_internal_gateway_ip_prod"));
             }
             throw e;
         }
