@@ -31,14 +31,21 @@ public class ZKDistLock implements DistLock {
 
     private final CuratorFramework curator;
 
+    private final String prefix;
+
     public ZKDistLock(CuratorFramework curator) {
+        this(curator, ZKPaths.makePath(ZKConstants.LOCK_PATH, Systems.APP_NAME));
+    }
+
+    public ZKDistLock(CuratorFramework curator, String prefix) {
         this.curator = curator;
+        this.prefix = prefix;
     }
 
     @Override
     public void execute(String lockKey, Runnable runnable) {
         Objects.requireNonNull(lockKey);
-        String lockPath = ZKPaths.makePath(ZKConstants.LOCK_PATH, Systems.APP_NAME, lockKey);
+        String lockPath = ZKPaths.makePath(prefix, lockKey);
         InterProcessMutex mutex = new InterProcessMutex(curator, lockPath);
         try {
             mutex.acquire();
@@ -50,7 +57,7 @@ public class ZKDistLock implements DistLock {
         try {
             runnable.run();
         } finally {
-            release(mutex, lockPath);
+            release(mutex);
         }
     }
 
@@ -64,7 +71,7 @@ public class ZKDistLock implements DistLock {
     @Override
     public boolean tryExecute(String lockKey, long time, TimeUnit unit, Runnable runnable) {
         Objects.requireNonNull(lockKey);
-        String lockPath = ZKPaths.makePath(ZKConstants.LOCK_PATH, Systems.APP_NAME, lockKey);
+        String lockPath = ZKPaths.makePath(prefix, lockKey);
         InterProcessMutex mutex = new InterProcessMutex(curator, lockPath);
         boolean acquireResult;
         try {
@@ -82,11 +89,11 @@ public class ZKDistLock implements DistLock {
             runnable.run();
             return true;
         } finally {
-            release(mutex, lockPath);
+            release(mutex);
         }
     }
 
-    private void release(InterProcessMutex mutex, String lockPath) {
+    private void release(InterProcessMutex mutex) {
         try {
             mutex.release();
             // 原来ZK版本暂不支持Container节点的新特性，需要手动删除父节点，会有小概率的删除失败

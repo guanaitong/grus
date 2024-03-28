@@ -34,10 +34,16 @@ public class RedisLock implements DistLock {
     private static final String LOCK_SUCCESS = "OK";
     private final SessionIdGenerator sessionIdGenerator = new SessionIdGenerator();
     private final RedisExecutor redisExecutor;
+    private final String prefix;
 
 
     public RedisLock(RedisExecutor redisExecutor) {
+        this(redisExecutor, "LOCK_" + Systems.APP_NAME + "__");
+    }
+
+    public RedisLock(RedisExecutor redisExecutor, String prefix) {
         this.redisExecutor = redisExecutor;
+        this.prefix = prefix;
     }
 
     /**
@@ -92,7 +98,7 @@ public class RedisLock implements DistLock {
     @Override
     public boolean tryExecute(String lockKey, long time, TimeUnit unit, Runnable runnable) {
         Objects.requireNonNull(lockKey);
-        String redisKey = "LOCK_" + Systems.APP_NAME + "__" + lockKey;
+        String redisKey = prefix + lockKey;
         String v = tryAcquire(redisKey, time, unit);
         if (StringUtils.isEmpty(v)) {
             return false;
