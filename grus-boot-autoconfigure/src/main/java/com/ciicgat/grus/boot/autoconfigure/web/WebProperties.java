@@ -32,6 +32,11 @@ public class WebProperties {
      */
     private boolean printBusinessErrorStack = false;
 
+    /**
+     * http2配置
+     */
+    private Http2 http2 = new Http2();
+
 
 
     public int getErrorCodePrefix() {
@@ -66,4 +71,40 @@ public class WebProperties {
         this.disableOldSslProtocol = disableOldSslProtocol;
     }
 
+    public Http2 getHttp2() {
+        return http2;
+    }
+
+    public void setHttp2(Http2 http2) {
+        this.http2 = http2;
+    }
+
+    public static class Http2 {
+        /**
+         * 是否启用http2
+         */
+        private boolean enabled;
+
+        /**
+         * http2端口号
+         */
+        private int port = 8443;
+
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public void setPort(int port) {
+            this.port = port;
+        }
+    }
 }

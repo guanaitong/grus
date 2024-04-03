@@ -5,6 +5,7 @@
 
 package com.ciicgat.grus.boot.autoconfigure.web;
 
+import com.ciicgat.grus.boot.autoconfigure.web.http2.Http2WebServerFactoryCustomizer;
 import com.ciicgat.grus.boot.autoconfigure.web.live.DefaultGrusHealthChecker;
 import com.ciicgat.grus.boot.autoconfigure.web.live.GrusHealthCheckController;
 import com.ciicgat.grus.boot.autoconfigure.web.live.GrusHealthChecker;
@@ -13,6 +14,7 @@ import com.ciicgat.sdk.servlet.HandlerCurrencyLimitInterceptor;
 import com.ciicgat.sdk.servlet.RequestIdProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -66,6 +68,17 @@ public class GrusWebAutoConfiguration {
     @ConditionalOnMissingBean
     public HandlerCurrencyLimitInterceptor handlerCurrencyLimitInterceptor() {
         return new HandlerCurrencyLimitInterceptor();
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(name = "grus.web.http2.enable", havingValue = "true")
+    public static class Http2AutoConfiguration {
+
+        @Bean
+        @ConditionalOnMissingBean
+        Http2WebServerFactoryCustomizer http2WebServerFactoryCustomizer(WebProperties webProperties) {
+            return new Http2WebServerFactoryCustomizer(webProperties.getHttp2());
+        }
     }
 
 }

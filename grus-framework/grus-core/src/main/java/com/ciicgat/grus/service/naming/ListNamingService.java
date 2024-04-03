@@ -22,9 +22,9 @@ public class ListNamingService implements NamingService {
     }
 
     @Override
-    public String resolve(String serviceName) {
+    public String resolve(String serviceName, boolean secure) {
         for (NamingService namingService : namingServices) {
-            String target = namingService.resolve(serviceName);
+            String target = namingService.resolve(serviceName, secure);
             if (target != null && !target.isEmpty()) {
                 return target;
             }

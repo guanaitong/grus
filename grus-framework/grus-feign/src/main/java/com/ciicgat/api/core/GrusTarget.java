@@ -5,8 +5,10 @@
 
 package com.ciicgat.api.core;
 
+import com.ciicgat.api.core.annotation.ApiSecurity;
 import com.ciicgat.api.core.annotation.ServiceName;
 import com.ciicgat.grus.service.naming.NamingService;
+import com.ciicgat.sdk.util.system.Systems;
 import feign.Request;
 import feign.RequestTemplate;
 import feign.Target;
@@ -27,9 +29,33 @@ class GrusTarget<T> implements Target<T> {
     GrusTarget(Class<T> serviceClazz, ServiceName serviceName, NamingService namingService) {
         this.type = serviceClazz;
         this.name = serviceName.value();
-        this.url = namingService.resolveBaseUrl(serviceName);
+        this.url = buildTargetUrl(namingService.resolve(serviceName.value(), isSecure(serviceClazz)), serviceName.urlPathPrefix());
         LOGGER.info("create service instance of {},  serviceName {}, baseUrl {}", serviceClazz, serviceName, url);
     }
+
+    private static boolean isSecure(Class<?> serviceClazz) {
+        if (Systems.IN_K8S) {
+            ApiSecurity annotation = serviceClazz.getAnnotation(ApiSecurity.class);
+            if (annotation != null) {
+                return true;
+            }
+            annotation = serviceClazz.getPackage().getAnnotation(ApiSecurity.class);
+            return annotation != null;
+        }
+        return false;
+    }
+
+    private static String buildTargetUrl(String hostUrl, String urlPathPrefix) {
+        if (!urlPathPrefix.isEmpty()) {
+            if (hostUrl.endsWith("/") || urlPathPrefix.startsWith("/")) {
+                return hostUrl + urlPathPrefix;
+            } else {
+                return hostUrl + "/" + urlPathPrefix;
+            }
+        }
+        return hostUrl;
+    }
+
 
     @Override
     public Class<T> type() {

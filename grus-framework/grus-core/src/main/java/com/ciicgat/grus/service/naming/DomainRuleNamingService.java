@@ -16,7 +16,7 @@ import java.net.UnknownHostException;
 public class DomainRuleNamingService implements NamingService {
 
     @Override
-    public String resolve(String serviceName) {
+    public String resolve(String serviceName, boolean secure) {
         WorkRegion workRegion = WorkRegion.getCurrentWorkRegion();
 
         if (workRegion == WorkRegion.STAGE_LYRA || workRegion == WorkRegion.PROD_LYRA) {

@@ -16,7 +16,7 @@ public class GconfEndPointNamingService implements NamingService {
 
 
     @Override
-    public String resolve(String serviceName) {
+    public String resolve(String serviceName, boolean secure) {
         Properties properties = GlobalGconfConfig.getConfig().getProperties("service_address.properties");
         if (properties == null) {
             return null;

@@ -46,9 +46,13 @@ public class K8sNamingService implements NamingService {
     }
 
     @Override
-    public String resolve(String serviceName) {
+    public String resolve(String serviceName, boolean secure) {
         if (isK8sService(serviceName)) {
-            return HTTP_PROTOCOL_PREFIX + serviceName;
+            if (secure) {
+                return HTTPS_PROTOCOL_PREFIX + serviceName;
+            } else {
+                return HTTP_PROTOCOL_PREFIX + serviceName;
+            }
         }
         return null;
     }

@@ -16,13 +16,25 @@ public interface NamingService {
 
     String HTTP_PROTOCOL_PREFIX = "http://";
 
+    String HTTPS_PROTOCOL_PREFIX = "https://";
+
     /**
      * 通过应用名称解析出应用域名
      *
      * @param serviceName-> userdoor
      * @return http://userdoor或者http://userdoor.services.dev.ofc
      */
-    String resolve(String serviceName);
+    default String resolve(String serviceName) {
+        return resolve(serviceName, false);
+    }
+
+    /**
+     * 如果secure为true，则返回https协议的域名
+     * @param serviceName
+     * @param secure
+     * @return
+     */
+    String resolve(String serviceName, boolean secure);
 
     default String resolveBaseUrl(ServiceName serviceName) {
         String hostUrl = resolve(serviceName.value());

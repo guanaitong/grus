@@ -17,7 +17,7 @@ public class LocalNamingService implements NamingService {
     private static final ConcurrentMap<String, String> CUSTOM_END_POINT_CONFIGS = new ConcurrentHashMap<>();
 
     @Override
-    public String resolve(String serviceName) {
+    public String resolve(String serviceName, boolean secure) {
         return CUSTOM_END_POINT_CONFIGS.get(serviceName);
     }
 
