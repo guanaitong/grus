@@ -7,7 +7,7 @@ package com.ciicgat.grus.service.naming;
 
 import com.ciicgat.api.core.EndPointConfigs;
 import com.ciicgat.api.core.annotation.ServiceName;
-import com.ciicgat.grus.service.ServiceNames;
+import com.ciicgat.grus.service.Services;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,12 +20,12 @@ class NamingServiceTest {
     @Test
     void resolveBaseUrl() {
         NamingService namingService = NamingService.DEFAULT;
-        ServiceName serviceName = ServiceNames.getServiceName(TestService.class);
-        String s = namingService.resolveBaseUrl(serviceName);
+        ServiceName serviceName = Services.getServiceName(TestService.class);
+        String s = namingService.resolveBaseUrl(serviceName, false);
         assertEquals("http://test-1.services.dev.ofc", s);
 
         EndPointConfigs.addEndPointConfig("test-1", "http://xxxx");
-        String s2 = namingService.resolveBaseUrl(serviceName);
+        String s2 = namingService.resolveBaseUrl(serviceName, false);
         assertEquals("http://xxxx", s2);
 
     }

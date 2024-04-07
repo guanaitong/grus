@@ -6,7 +6,7 @@
 package com.ciicgat.grus.webflux.client;
 
 import com.ciicgat.api.core.annotation.ServiceName;
-import com.ciicgat.grus.service.ServiceNames;
+import com.ciicgat.grus.service.Services;
 import com.ciicgat.grus.service.naming.NamingService;
 import com.ciicgat.grus.webflux.client.trace.TraceInterceptor;
 import org.slf4j.Logger;
@@ -88,20 +88,20 @@ public class SpringServiceBuilder {
 
     @SuppressWarnings("unchecked")
     private <T> T create() {
-        ServiceName serviceName = ServiceNames.getServiceName(this.serviceClazz);
+        ServiceName serviceName = Services.getServiceName(this.serviceClazz);
 
         WebClient client = WEB_CLIENT_CACHE.compute(serviceName.value(), (s, webClient) -> {
-            String baseUrl = namingService.resolveBaseUrl(serviceName);
+            String baseUrl = namingService.resolveBaseUrl(serviceName, Services.isSecure(this.serviceClazz));
             return WebClient.builder().baseUrl(baseUrl)
 //                .defaultStatusHandler()
                     .filter(new TraceInterceptor())
 //                .codecs(t->t.customCodecs().registerWithDefaultConfig())
                     .build();
         });
-
+        WebClientAdapter webClientAdapter = WebClientAdapter.create(client);
+        webClientAdapter.setBlockTimeout(this.blockTimeout);
         HttpServiceProxyFactory httpServiceProxyFactory = HttpServiceProxyFactory
-                .builder(WebClientAdapter.forClient(client))
-                .blockTimeout(this.blockTimeout)
+                .builderFor(webClientAdapter)
 //                .customArgumentResolver()
                 .build();
         return (T) httpServiceProxyFactory.createClient(this.serviceClazz);

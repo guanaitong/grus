@@ -11,7 +11,7 @@ import com.ciicgat.api.core.form.FormEncoder;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.GrusServiceStatus;
-import com.ciicgat.grus.service.ServiceNames;
+import com.ciicgat.grus.service.Services;
 import com.ciicgat.grus.service.naming.NamingService;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -185,7 +185,7 @@ public class FeignServiceBuilder {
         if (retryer == null) {
             retryer = new ConfigRetryer();
         }
-        ServiceName serviceName = ServiceNames.getServiceName(this.serviceClazz);
+        ServiceName serviceName = Services.getServiceName(this.serviceClazz);
 
         Objects.requireNonNull(serviceName.value(), "serviceName cannot be null");
 
@@ -225,8 +225,6 @@ public class FeignServiceBuilder {
             throw ex;
         }
     }
-
-
 
 
 }

@@ -30,14 +30,15 @@ public interface NamingService {
 
     /**
      * 如果secure为true，则返回https协议的域名
+     *
      * @param serviceName
      * @param secure
      * @return
      */
     String resolve(String serviceName, boolean secure);
 
-    default String resolveBaseUrl(ServiceName serviceName) {
-        String hostUrl = resolve(serviceName.value());
+    default String resolveBaseUrl(ServiceName serviceName, boolean secure) {
+        String hostUrl = resolve(serviceName.value(), secure);
         String urlPathPrefix = serviceName.urlPathPrefix();
         if (!urlPathPrefix.isEmpty()) {
             if (hostUrl.endsWith("/") || urlPathPrefix.startsWith("/")) {

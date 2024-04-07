@@ -5,12 +5,14 @@
 
 package com.ciicgat.grus.service;
 
+import com.ciicgat.api.core.annotation.ApiSecurity;
 import com.ciicgat.api.core.annotation.ServiceName;
+import com.ciicgat.sdk.util.system.Systems;
 
 /**
  * Created by August.Zhou on 2023/10/31 14:56
  */
-public class ServiceNames {
+public class Services {
 
     public static ServiceName getServiceName(Class<?> serviceType) {
         ServiceName serviceEndPoint = serviceType.getAnnotation(ServiceName.class);
@@ -23,5 +25,17 @@ public class ServiceNames {
         }
 
         throw new RuntimeException("cannot find the appName");
+    }
+
+    public static boolean isSecure(Class<?> serviceClazz) {
+        if (Systems.IN_K8S) {
+            ApiSecurity annotation = serviceClazz.getAnnotation(ApiSecurity.class);
+            if (annotation != null) {
+                return true;
+            }
+            annotation = serviceClazz.getPackage().getAnnotation(ApiSecurity.class);
+            return annotation != null;
+        }
+        return false;
     }
 }
