@@ -62,7 +62,7 @@ class FeignHttpClient {
                 .dispatcher(dispatcher)
                 .dns(FeignCacheDnsResolver.INSTANCE)
                 .followRedirects(false)
-                .followSslRedirects(true)
+                .followSslRedirects(false)
                 .connectTimeout(DEFAULT_CONNECT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
                 .connectionPool(new ConnectionPool(maxTotalConnections, timeToLive, TimeUnit.SECONDS))
                 .readTimeout(DEFAULT_READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)

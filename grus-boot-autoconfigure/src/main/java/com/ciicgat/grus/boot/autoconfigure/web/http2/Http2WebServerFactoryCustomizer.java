@@ -57,21 +57,23 @@ public class Http2WebServerFactoryCustomizer implements WebServerFactoryCustomiz
                 throw new RuntimeException(e);
             }
         }
-        String trustStoreFile = null;
-        try {
-            trustStoreFile = ResourceUtils.getURL("classpath:truststore.p12").toString();
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
         certConfig.setCertificateKeystoreFile(certificateKeystoreFile);
         certConfig.setCertificateKeystorePassword(passwd);
         sslConfig.addCertificate(certConfig);
 
-        // client auth
-        sslConfig.setTruststoreFile(trustStoreFile);
-        sslConfig.setTruststorePassword(passwd);
-        sslConfig.setTruststoreType("PKCS12");
-        sslConfig.setCertificateVerification("required");
+        if (http2.isClientAuth()) {
+            // client auth
+            String trustStoreFile = null;
+            try {
+                trustStoreFile = ResourceUtils.getURL("classpath:truststore.p12").toString();
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            sslConfig.setTruststoreFile(trustStoreFile);
+            sslConfig.setTruststorePassword(passwd);
+            sslConfig.setTruststoreType("PKCS12");
+            sslConfig.setCertificateVerification("required");
+        }
         connector.addSslHostConfig(sslConfig);
 
         connector.addUpgradeProtocol(new Http2Protocol());

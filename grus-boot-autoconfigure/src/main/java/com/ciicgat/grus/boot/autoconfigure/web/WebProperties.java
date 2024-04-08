@@ -86,6 +86,11 @@ public class WebProperties {
         private boolean enabled;
 
         /**
+         * 是否启用clientAuth，即mtls
+         */
+        private boolean clientAuth = true;
+
+        /**
          * http2端口号
          */
         private int port = 8443;
@@ -105,6 +110,14 @@ public class WebProperties {
 
         public void setPort(int port) {
             this.port = port;
+        }
+
+        public boolean isClientAuth() {
+            return clientAuth;
+        }
+
+        public void setClientAuth(boolean clientAuth) {
+            this.clientAuth = clientAuth;
         }
     }
 }
