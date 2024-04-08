@@ -60,7 +60,7 @@ public class RedisExecutorBuilder {
 
     public Pool<Jedis> newPool() {
         if (setting.getType() == RedisSetting.TYPE_STANDALONE) {
-            StandaloneChecker.check();
+            StandaloneChecker.check(setting);
             return newJedisPool();
         } else if (setting.getType() == RedisSetting.TYPE_SENTINEL) {
             return newJedisSentinelPool();

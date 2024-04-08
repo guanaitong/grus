@@ -23,8 +23,8 @@ class RedisWorkIdHolderTest {
 
     @Test
     void getId() {
-        ConfigCollection configCollection = RemoteConfigCollectionFactoryBuilder.getInstance().getConfigCollection("for-test-java");
-        RedisSetting redisSetting = configCollection.getBean("redis-config.json", RedisSetting.class);
+        ConfigCollection configCollection = RemoteConfigCollectionFactoryBuilder.getInstance().getConfigCollection("grus-test");
+        RedisSetting redisSetting = configCollection.getBean("redis-config-test.json", RedisSetting.class);
         WorkIdHolder workIdHolder = new RedisWorkIdHolder(redisSetting.newRedisExecutor());
         Set<Long> ids = new HashSet<>();
         var n = 100;

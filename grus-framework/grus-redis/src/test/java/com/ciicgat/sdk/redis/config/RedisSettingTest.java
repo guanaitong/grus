@@ -65,13 +65,9 @@ public class RedisSettingTest {
         //Expected :null
         //Actual   :LKmaqJy22KQf
 
-        ConfigCollection configCollection = RemoteConfigCollectionFactoryBuilder.getInstance().getConfigCollection("for-test-java");
-        String config = configCollection.getConfig("redis-config.json");
-        System.out.println("config = " + config);
-        RedisSetting redisSetting = configCollection.getBean("redis-config.json", RedisSetting.class);
-//        Assertions.assertEquals(redisSetting.getPassword(), "LKmaqJy22KQf");
-        Assertions.assertNotEquals(redisSetting.getPassword(), "LKmaqJy22KQf");
-
+        ConfigCollection configCollection = RemoteConfigCollectionFactoryBuilder.getInstance().getConfigCollection("grus-test");
+        RedisSetting redisSetting = configCollection.getBean("redis-config-test.json", RedisSetting.class);
+        Assertions.assertEquals("8f8410840b92", redisSetting.getFinalPassword());
     }
 
 }

@@ -119,7 +119,7 @@ public class SpringRedisConfCreator {
     private static RedisConfiguration newRedisConfiguration(RedisSetting redisSetting) {
         String password = redisSetting.getFinalPassword();
         if (redisSetting.getType() == RedisSetting.TYPE_STANDALONE) {
-            StandaloneChecker.check();
+            StandaloneChecker.check(redisSetting);
             RedisStandaloneConfiguration redisConfiguration = new RedisStandaloneConfiguration();
             RedisSetting.StandaloneConfig standalone = redisSetting.getStandalone();
             redisConfiguration.setHostName(standalone.getHost());
@@ -186,7 +186,7 @@ public class SpringRedisConfCreator {
         setPool(redisProperties.getLettuce().getPool(), redisSetting);
         setPool(redisProperties.getJedis().getPool(), redisSetting);
         if (redisSetting.getType() == RedisSetting.TYPE_STANDALONE) {
-            StandaloneChecker.check();
+            StandaloneChecker.check(redisSetting);
             redisProperties.setDatabase(redisSetting.getDb());
             RedisSetting.StandaloneConfig standalone = redisSetting.getStandalone();
             redisProperties.setHost(standalone.getHost());

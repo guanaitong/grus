@@ -25,8 +25,8 @@ import java.util.concurrent.atomic.LongAdder;
 public class RedisLockTest {
     @Test
     public void test() throws InterruptedException {
-        ConfigCollection configCollection = RemoteConfigCollectionFactoryBuilder.getInstance().getConfigCollection("for-test-java");
-        RedisSetting redisSetting = configCollection.getBean("redis-config.json", RedisSetting.class);
+        ConfigCollection configCollection = RemoteConfigCollectionFactoryBuilder.getInstance().getConfigCollection("grus-test");
+        RedisSetting redisSetting = configCollection.getBean("redis-config-test.json", RedisSetting.class);
         DistLock redisLock = new RedisLock(redisSetting.newRedisExecutor());
         LongAdder longAdder = new LongAdder();
         SessionIdGenerator sessionIdGenerator = new SessionIdGenerator();
@@ -58,8 +58,8 @@ public class RedisLockTest {
 
     @Test
     public void testTimeout() throws InterruptedException {
-        ConfigCollection configCollection = RemoteConfigCollectionFactoryBuilder.getInstance().getConfigCollection("for-test-java");
-        RedisSetting redisSetting = configCollection.getBean("redis-config.json", RedisSetting.class);
+        ConfigCollection configCollection = RemoteConfigCollectionFactoryBuilder.getInstance().getConfigCollection("grus-test");
+        RedisSetting redisSetting = configCollection.getBean("redis-config-test.json", RedisSetting.class);
         DistLock redisLock = new RedisLock(redisSetting.newRedisExecutor());
         SessionIdGenerator sessionIdGenerator = new SessionIdGenerator();
         String key = sessionIdGenerator.generateSessionId();
