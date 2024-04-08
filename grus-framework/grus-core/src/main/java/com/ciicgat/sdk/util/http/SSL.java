@@ -5,13 +5,14 @@
 
 package com.ciicgat.sdk.util.http;
 
+import com.ciicgat.sdk.gconf.clientauth.ClientAuth;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
-import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -97,9 +98,10 @@ public class SSL {
         return (X509TrustManager) trustManagers[0];
     }
 
-    private static SSLSocketFactory systemDefaultSslSocketFactory(X509TrustManager trustManager) throws NoSuchAlgorithmException, KeyManagementException {
+    private static SSLSocketFactory systemDefaultSslSocketFactory(X509TrustManager trustManager) throws Exception {
         SSLContext sslContext = SSLContext.getInstance("TLSv1.3");
-        sslContext.init(null, new TrustManager[]{trustManager}, null);
+//        sslContext.init(null, new TrustManager[]{trustManager}, null);
+        sslContext.init(ClientAuth.getKeyManagerFactory().getKeyManagers(), new TrustManager[]{trustManager}, null);
         return sslContext.getSocketFactory();
     }
 }
