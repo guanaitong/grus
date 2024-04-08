@@ -37,7 +37,7 @@ visualize-coverage:
     - python /opt/cover2cover.py grus-boot-autoconfigure/target/site/jacoco-aggregate/jacoco.xml $jacoco_paths > grus-boot-autoconfigure/target/site/jacoco-aggregate/coverage.xml
   needs: [ "unit-test-java21" ]
   dependencies:
-    - unit-test-java17
+    - unit-test-java21
   artifacts:
     reports:
       coverage_report:
