@@ -60,7 +60,7 @@ public class FeignCacheDnsResolver implements Dns {
     }
 
     private InetAddress[] getAllByName(String host) throws UnknownHostException {
-        if (isLyra && host.endsWith(WorkRegion.PROD_LYRA.getServiceDomainSuffix())) {
+        if (isLyra && host.endsWith(WorkRegion.PROD_SH.getServiceDomainSuffix())) {
             Properties properties = GlobalGconfConfig.getConfig().getProperties("address.properties");
             String key;
             if (WorkRegion.getCurrentWorkRegion() == WorkRegion.STAGE_LYRA) {
