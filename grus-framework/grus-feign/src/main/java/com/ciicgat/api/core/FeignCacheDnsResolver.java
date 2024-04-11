@@ -62,10 +62,10 @@ public class FeignCacheDnsResolver implements Dns {
             return InetAddress.getAllByName(host);
         } catch (UnknownHostException e) {
             WorkRegion currentWorkRegion = WorkRegion.getCurrentWorkRegion();
-            if (currentWorkRegion == WorkRegion.STAGE_LYRA && host.endsWith(currentWorkRegion.getServiceDomainSuffix())) {
+            if (currentWorkRegion == WorkRegion.STAGE_LYRA && host.endsWith(WorkRegion.STAGE_LYRA.getServiceDomainSuffix())) {
                 Properties properties = GlobalGconfConfig.getConfig().getProperties("address.properties");
                 return InetAddress.getAllByName(properties.getProperty("shanghai_internal_gateway_ip_stage"));
-            } else if (currentWorkRegion == WorkRegion.PROD_LYRA && host.endsWith(currentWorkRegion.getServiceDomainSuffix())) {
+            } else if (currentWorkRegion == WorkRegion.PROD_LYRA && host.endsWith(WorkRegion.PROD_LYRA.getServiceDomainSuffix())) {
                 Properties properties = GlobalGconfConfig.getConfig().getProperties("address.properties");
                 return InetAddress.getAllByName(properties.getProperty("shanghai_internal_gateway_ip_prod"));
             }
