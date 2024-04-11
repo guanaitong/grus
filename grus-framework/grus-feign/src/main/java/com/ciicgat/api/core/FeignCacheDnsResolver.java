@@ -28,9 +28,11 @@ public class FeignCacheDnsResolver implements Dns {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeignCacheDnsResolver.class);
     public static final FeignCacheDnsResolver INSTANCE = new FeignCacheDnsResolver();
     private ConcurrentMap<String, List<InetAddress>> dnsMap = new ConcurrentHashMap<>();
+    private final boolean isLyra;
 
 
     private FeignCacheDnsResolver() {
+        isLyra = WorkRegion.getCurrentWorkRegion() == WorkRegion.STAGE_LYRA || WorkRegion.getCurrentWorkRegion() == WorkRegion.PROD_LYRA;
     }
 
     @NotNull
@@ -57,19 +59,17 @@ public class FeignCacheDnsResolver implements Dns {
         }
     }
 
-    private static InetAddress[] getAllByName(String host) throws UnknownHostException {
-        try {
-            return InetAddress.getAllByName(host);
-        } catch (UnknownHostException e) {
-            WorkRegion currentWorkRegion = WorkRegion.getCurrentWorkRegion();
-            if (currentWorkRegion == WorkRegion.STAGE_LYRA && host.endsWith(WorkRegion.STAGE_LYRA.getServiceDomainSuffix())) {
-                Properties properties = GlobalGconfConfig.getConfig().getProperties("address.properties");
-                return InetAddress.getAllByName(properties.getProperty("shanghai_internal_gateway_ip_stage"));
-            } else if (currentWorkRegion == WorkRegion.PROD_LYRA && host.endsWith(WorkRegion.PROD_LYRA.getServiceDomainSuffix())) {
-                Properties properties = GlobalGconfConfig.getConfig().getProperties("address.properties");
-                return InetAddress.getAllByName(properties.getProperty("shanghai_internal_gateway_ip_prod"));
+    private InetAddress[] getAllByName(String host) throws UnknownHostException {
+        if (isLyra && host.endsWith(WorkRegion.PROD_LYRA.getServiceDomainSuffix())) {
+            Properties properties = GlobalGconfConfig.getConfig().getProperties("address.properties");
+            String key;
+            if (WorkRegion.getCurrentWorkRegion() == WorkRegion.STAGE_LYRA) {
+                key = "shanghai_internal_gateway_ip_stage";
+            } else {
+                key = "shanghai_internal_gateway_ip_prod";
             }
-            throw e;
+            return InetAddress.getAllByName(properties.getProperty(key));
         }
+        return InetAddress.getAllByName(host);
     }
 }
