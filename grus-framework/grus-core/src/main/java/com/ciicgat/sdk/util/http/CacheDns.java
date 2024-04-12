@@ -54,7 +54,6 @@ class CacheDns {
     }
 
     private InetAddress[] getAllByName(String host) throws UnknownHostException {
-        LOGGER.info("isLyra {},host {},currentRegion {}", isLyra, host, WorkRegion.getCurrentWorkRegion());
         if (isLyra && host.endsWith(WorkRegion.PROD_SH.getServiceDomainSuffix())) {
             Properties properties = GlobalGconfConfig.getConfig().getProperties("address.properties");
             String key;
