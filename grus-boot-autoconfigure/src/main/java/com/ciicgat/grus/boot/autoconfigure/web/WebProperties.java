@@ -38,7 +38,6 @@ public class WebProperties {
     private Http2 http2 = new Http2();
 
 
-
     public int getErrorCodePrefix() {
         return errorCodePrefix;
     }
@@ -88,7 +87,7 @@ public class WebProperties {
         /**
          * 是否启用clientAuth，即mtls
          */
-        private boolean clientAuth = true;
+        private boolean clientAuth;
 
         /**
          * http2端口号
