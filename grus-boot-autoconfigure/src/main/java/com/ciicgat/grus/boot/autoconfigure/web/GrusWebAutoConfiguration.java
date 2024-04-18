@@ -71,7 +71,7 @@ public class GrusWebAutoConfiguration {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @ConditionalOnProperty(name = "grus.web.http2.enable", havingValue = "true")
+    @ConditionalOnProperty(name = "grus.web.http2.enabled", havingValue = "true")
     public static class Http2AutoConfiguration {
 
         @Bean
