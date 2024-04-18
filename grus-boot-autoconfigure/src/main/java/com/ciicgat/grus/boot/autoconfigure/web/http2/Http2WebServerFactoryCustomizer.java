@@ -12,6 +12,8 @@ import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http2.Http2Protocol;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.util.ResourceUtils;
@@ -22,11 +24,13 @@ import java.io.FileNotFoundException;
  * Created by August.Zhou on 2024/4/3 10:52
  */
 public class Http2WebServerFactoryCustomizer implements WebServerFactoryCustomizer<TomcatServletWebServerFactory> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Http2WebServerFactoryCustomizer.class);
 
     private final WebProperties.Http2 http2;
 
     public Http2WebServerFactoryCustomizer(WebProperties.Http2 http2) {
         this.http2 = http2;
+        LOGGER.info("http2 enabled, port {}, clientAuth {}", http2.getPort(), http2.isClientAuth());
     }
 
     @Override
