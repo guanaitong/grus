@@ -17,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
         classes = FeignApplication.class,
-        properties = {"spring.application.name=grus-demo", "grus.feign.enable-sentinel=true"})
+        properties = {"spring.application.name=grus-demo"})
 public class SentinelAutoConfigurationTests {
 
     @FeignService

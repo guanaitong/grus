@@ -24,11 +24,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * 客户端限流管理
  * @author August
  * @date 3/15/2024 4:09 PM
  */
-public class ServiceRuleManager {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRuleManager.class);
+public class ClientRuleManager {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClientRuleManager.class);
 
     //    优先使用外部传来的RuleOptions，然后使用注解上的RuleOptions
 //    具体优先级从高到低：1、外部传来的方法上的RuleOptions 2、方法注解上的RuleOptions 3、外部传来的类上的RuleOptions 4、类注解上的RuleOptions 5、全局的RuleOptions
@@ -36,18 +37,18 @@ public class ServiceRuleManager {
         Set<AbstractRule> toAddFlowClassRules = new HashSet<>();
         Set<AbstractRule> toAddDegradeClassRules = new HashSet<>();
         if (classRules != null && !classRules.isEmpty()) {
-            ServiceRuleManager.addClassRule(serviceClazz, classRules, toAddFlowClassRules, toAddDegradeClassRules);
+            ClientRuleManager.addClassRule(serviceClazz, classRules, toAddFlowClassRules, toAddDegradeClassRules);
         }
         if (toAddFlowClassRules.isEmpty()) {
             if (serviceClazz.getAnnotation(SimpleFlowRule.class) != null) {
                 FlowRuleOptions flowRuleOptions = toFlowRuleOptions(serviceClazz.getAnnotation(SimpleFlowRule.class));
-                ServiceRuleManager.addClassRule(serviceClazz, Set.of(flowRuleOptions), toAddFlowClassRules, toAddDegradeClassRules);
+                ClientRuleManager.addClassRule(serviceClazz, Set.of(flowRuleOptions), toAddFlowClassRules, toAddDegradeClassRules);
             }
         }
         if (toAddDegradeClassRules.isEmpty()) {
             if (serviceClazz.getAnnotation(SimpleDegradeRule.class) != null) {
                 DegradeRuleOptions degradeRuleOptions = toDegradeRuleOptions(serviceClazz.getAnnotation(SimpleDegradeRule.class));
-                ServiceRuleManager.addClassRule(serviceClazz, Set.of(degradeRuleOptions), toAddFlowClassRules, toAddDegradeClassRules);
+                ClientRuleManager.addClassRule(serviceClazz, Set.of(degradeRuleOptions), toAddFlowClassRules, toAddDegradeClassRules);
             }
         }
         Set<AbstractRule> toAddFlowMethodRules = new HashSet<>();
@@ -56,7 +57,7 @@ public class ServiceRuleManager {
             try {
                 for (Map.Entry<String, Set<RuleOptions<?>>> entry : methodRules.entrySet()) {
                     Method method = serviceClazz.getMethod(entry.getKey());
-                    ServiceRuleManager.addMethodRule(method, entry.getValue(), toAddFlowMethodRules, toAddDegradeMethodRules);
+                    ClientRuleManager.addMethodRule(method, entry.getValue(), toAddFlowMethodRules, toAddDegradeMethodRules);
                 }
             } catch (NoSuchMethodException e) {
                 LOGGER.error("create bean error,serviceName {} class {}", Services.getServiceName(serviceClazz).value(), serviceClazz);
@@ -71,7 +72,7 @@ public class ServiceRuleManager {
                 }
                 SimpleFlowRule simpleFlowRule = method.getAnnotation(SimpleFlowRule.class);
                 if (simpleFlowRule != null) {
-                    ServiceRuleManager.addMethodRule(method, Set.of(toFlowRuleOptions(simpleFlowRule)), toAddFlowMethodRules, toAddDegradeMethodRules);
+                    ClientRuleManager.addMethodRule(method, Set.of(toFlowRuleOptions(simpleFlowRule)), toAddFlowMethodRules, toAddDegradeMethodRules);
                 }
             }
         }
@@ -83,7 +84,7 @@ public class ServiceRuleManager {
                 }
                 SimpleDegradeRule simpleDegradeRule = method.getAnnotation(SimpleDegradeRule.class);
                 if (simpleDegradeRule != null) {
-                    ServiceRuleManager.addMethodRule(method, Set.of(toDegradeRuleOptions(simpleDegradeRule)), toAddFlowMethodRules, toAddDegradeMethodRules);
+                    ClientRuleManager.addMethodRule(method, Set.of(toDegradeRuleOptions(simpleDegradeRule)), toAddFlowMethodRules, toAddDegradeMethodRules);
                 }
             }
         }
@@ -102,7 +103,7 @@ public class ServiceRuleManager {
             flowRuleOptions.setCount(sentinelDefaultConfig.getClientMaxConcurrency())
                     .setGrade(RuleConstant.FLOW_GRADE_THREAD)
                     .setControlBehavior(RuleConstant.CONTROL_BEHAVIOR_DEFAULT);
-            ServiceRuleManager.addClassRule(serviceClazz, Set.of(flowRuleOptions), toAddFlowClassRules, toAddDegradeClassRules);
+            ClientRuleManager.addClassRule(serviceClazz, Set.of(flowRuleOptions), toAddFlowClassRules, toAddDegradeClassRules);
             addRule(toAddFlowClassRules);
         }
         hasDefined = true;
@@ -122,7 +123,7 @@ public class ServiceRuleManager {
                     .setStatIntervalMs(1000)
                     .setMinRequestAmount(sentinelDefaultConfig.getClientMinRequestAmount())
                     .setSlowRatioThreshold(sentinelDefaultConfig.getClientSlowRatioThreshold());
-            ServiceRuleManager.addClassRule(serviceClazz, Set.of(degradeRuleOptions), toAddFlowClassRules, toAddDegradeClassRules);
+            ClientRuleManager.addClassRule(serviceClazz, Set.of(degradeRuleOptions), toAddFlowClassRules, toAddDegradeClassRules);
             addRule(toAddFlowClassRules);
         }
 

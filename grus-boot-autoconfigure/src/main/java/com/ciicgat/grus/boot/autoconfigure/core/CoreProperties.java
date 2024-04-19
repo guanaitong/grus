@@ -28,9 +28,15 @@ public class CoreProperties {
     @NotNull
     private String groupBotKey;
 
+    /**
+     * 是否统计业务异常
+     */
 
     private boolean metricBusinessException = true;
 
+    /**
+     * 是否统计系统异常
+     */
     private boolean metricSystemException = true;
 
     @PostConstruct

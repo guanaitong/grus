@@ -8,8 +8,8 @@ package com.ciicgat.api.core;
 import com.ciicgat.api.core.annotation.ServiceName;
 import com.ciicgat.api.core.contants.TimeOutConstants;
 import com.ciicgat.api.core.form.FormEncoder;
+import com.ciicgat.grus.sentinel.ClientRuleManager;
 import com.ciicgat.grus.sentinel.RuleOptions;
-import com.ciicgat.grus.sentinel.ServiceRuleManager;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeManager;
 import com.ciicgat.grus.service.GrusServiceStatus;
@@ -220,7 +220,7 @@ public class FeignServiceBuilder {
             client = new OkHttpClientWrapper(okHttpClient);
         }
 
-        ServiceRuleManager.registerRule(serviceClazz, classRules, methodRules);
+        ClientRuleManager.registerRule(serviceClazz, classRules, methodRules);
 
         GrusRuntimeManager grusRuntimeManager = GrusFramework.getGrusRuntimeManager();
 

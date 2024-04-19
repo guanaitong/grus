@@ -11,8 +11,8 @@ import com.ciicgat.api.core.contants.VersionConstants;
 import com.ciicgat.api.core.model.TestBean;
 import com.ciicgat.api.core.service.DegradeService;
 import com.ciicgat.grus.json.JSON;
+import com.ciicgat.grus.sentinel.ClientRuleManager;
 import com.ciicgat.grus.sentinel.DegradeRuleOptions;
-import com.ciicgat.grus.sentinel.ServiceRuleManager;
 import com.ciicgat.sdk.lang.convert.ErrorCode;
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
 import feign.Request;
@@ -183,7 +183,7 @@ public class TestSentinelDegrade {
                 .setMinRequestAmount(5)
                 .setStatIntervalMs(1000)
                 .setSlowRatioThreshold(0.5d);
-        ServiceRuleManager.addAppServiceRule("degrade-test", Set.of(grusDegradeRule));
+        ClientRuleManager.addAppServiceRule("degrade-test", Set.of(grusDegradeRule));
         Pair<DegradeService, MockWebServer> pair = TestUtil.newInstance("degrade-test", new Supplier<DegradeService>() {
             @Override
             public DegradeService get() {

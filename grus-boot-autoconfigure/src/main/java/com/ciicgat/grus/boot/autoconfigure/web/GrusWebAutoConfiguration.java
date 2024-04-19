@@ -9,8 +9,8 @@ import com.ciicgat.grus.boot.autoconfigure.web.http2.Http2WebServerFactoryCustom
 import com.ciicgat.grus.boot.autoconfigure.web.live.DefaultGrusHealthChecker;
 import com.ciicgat.grus.boot.autoconfigure.web.live.GrusHealthCheckController;
 import com.ciicgat.grus.boot.autoconfigure.web.live.GrusHealthChecker;
+import com.ciicgat.grus.sentinel.ServerRuleManager;
 import com.ciicgat.sdk.servlet.GrusFilter;
-import com.ciicgat.sdk.servlet.HandlerCurrencyLimitInterceptor;
 import com.ciicgat.sdk.servlet.RequestIdProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -38,6 +38,10 @@ public class GrusWebAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public GrusFilter grusFilter(WebProperties webProperties, RequestIdProvider requestIdProvider) {
+        WebProperties.SystemRule systemRule = webProperties.getSystemRule();
+        if (systemRule.isEnabled()) {
+            ServerRuleManager.loadSystemRule(systemRule.getMaxThread(), systemRule.getAvgRt());
+        }
         return new GrusFilter(webProperties.isDisableOldSslProtocol(), requestIdProvider);
     }
 
@@ -49,7 +53,7 @@ public class GrusWebAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public FilterRegistrationBean grusFilterRegistrationBean(GrusFilter grusFilter) {
+    public FilterRegistrationBean<?> grusFilterRegistrationBean(GrusFilter grusFilter) {
         FilterRegistrationBean<GrusFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(grusFilter);
         registration.addUrlPatterns("/*");
@@ -64,11 +68,6 @@ public class GrusWebAutoConfiguration {
         return new DefaultGrusHealthChecker();
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    public HandlerCurrencyLimitInterceptor handlerCurrencyLimitInterceptor() {
-        return new HandlerCurrencyLimitInterceptor();
-    }
 
     @Configuration(proxyBeanMethods = false)
     @ConditionalOnProperty(name = "grus.web.http2.enabled", havingValue = "true")

@@ -32,11 +32,16 @@ public class WebProperties {
      */
     private boolean printBusinessErrorStack = false;
 
+
     /**
      * http2配置
      */
     private Http2 http2 = new Http2();
 
+    /**
+     * 系统降级配置
+     */
+    private SystemRule systemRule = new SystemRule();
 
     public int getErrorCodePrefix() {
         return errorCodePrefix;
@@ -78,6 +83,14 @@ public class WebProperties {
         this.http2 = http2;
     }
 
+    public SystemRule getSystemRule() {
+        return systemRule;
+    }
+
+    public void setSystemRule(SystemRule systemRule) {
+        this.systemRule = systemRule;
+    }
+
     public static class Http2 {
         /**
          * 是否启用http2
@@ -117,6 +130,46 @@ public class WebProperties {
 
         public void setClientAuth(boolean clientAuth) {
             this.clientAuth = clientAuth;
+        }
+    }
+
+    public static class SystemRule {
+        /**
+         * 是否默认启用sentinel的系统规则
+         */
+        private boolean enabled = true;
+        /**
+         * tomcat默认的为200，我们设置降级的最大线程设置为180，在线程跑满之前，直接拒绝后续请求
+         */
+        private int maxThread = 180;
+
+        /**
+         * 降级的最大平均响应时间，单位毫秒
+         */
+        private int avgRt = 2000;
+
+        public int getMaxThread() {
+            return maxThread;
+        }
+
+        public void setMaxThread(int maxThread) {
+            this.maxThread = maxThread;
+        }
+
+        public int getAvgRt() {
+            return avgRt;
+        }
+
+        public void setAvgRt(int avgRt) {
+            this.avgRt = avgRt;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
     }
 }
