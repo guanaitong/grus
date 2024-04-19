@@ -139,14 +139,14 @@ public class WebProperties {
          */
         private boolean enabled = true;
         /**
-         * tomcat默认的为200，我们设置降级的最大线程设置为180，在线程跑满之前，直接拒绝后续请求
+         * tomcat默认的为200，我们设置降级的最大线程设置为160，在线程跑满之前，直接拒绝后续请求
          */
-        private int maxThread = 180;
+        private int maxThread = 160;
 
         /**
          * 降级的最大平均响应时间，单位毫秒
          */
-        private int avgRt = 2000;
+        private int avgRt = 500;
 
         public int getMaxThread() {
             return maxThread;

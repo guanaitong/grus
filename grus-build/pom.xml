@@ -378,10 +378,6 @@
                     </exclusion>
                     <exclusion>
                         <groupId>com.alibaba.csp</groupId>
-                        <artifactId>sentinel-spring-webmvc-adapter</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.alibaba.csp</groupId>
                         <artifactId>sentinel-parameter-flow-control</artifactId>
                     </exclusion>
                     <exclusion>
@@ -427,11 +423,6 @@
             <dependency>
                 <groupId>com.alibaba.csp</groupId>
                 <artifactId>sentinel-spring-webflux-adapter</artifactId>
-                <version>${sentinel.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.csp</groupId>
-                <artifactId>sentinel-spring-webmvc-adapter</artifactId>
                 <version>${sentinel.version}</version>
             </dependency>
             <dependency>
