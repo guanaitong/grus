@@ -11,17 +11,10 @@ import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
 import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
 import com.alibaba.csp.sentinel.slots.system.SystemRule;
 import com.alibaba.csp.sentinel.slots.system.SystemRuleManager;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-
-import static org.springframework.core.annotation.AnnotatedElementUtils.findMergedAnnotation;
 
 /**
  * 服务端限流
@@ -30,62 +23,7 @@ import static org.springframework.core.annotation.AnnotatedElementUtils.findMerg
 public class ServerRuleManager {
 
     /**
-     * 对controller下，所有的方法（不包含非requestMapping）增加规则
-     *
-     * @param withMethod，默认否
-     * @param controllerClazz
-     * @param rules
-     */
-    public static void addClassRule(boolean withMethod, Class<?> controllerClazz, Set<RuleOptions<?>> rules) {
-        RequestMapping requestMapping = findMergedAnnotation(controllerClazz,
-                RequestMapping.class);
-        if (requestMapping == null || requestMapping.value().length == 0) {
-            return;
-        }
-        if (withMethod) {
-            for (String path : requestMapping.value()) {
-                for (RequestMethod requestMethod : requestMapping.method()) {
-                    addRule(requestMethod + ":" + path, rules);
-                }
-            }
-        } else {
-            for (String path : requestMapping.value()) {
-                addRule(path, rules);
-            }
-        }
-    }
-
-    /**
-     * 对controller的某一个方法增加规则，方法无requestMapping修饰是无用
-     *
-     * @param controllerClazz
-     * @param method
-     * @param rules
-     */
-    public static void addMethodRule(boolean withMethod, Class<?> controllerClazz, String method, Set<RuleOptions<?>> rules) {
-        Optional<Method> any = Arrays.stream(controllerClazz.getDeclaredMethods()).filter(m -> method.equals(m.getName())).findAny();
-        any.ifPresent(m -> {
-            RequestMapping requestMapping = findMergedAnnotation(m,
-                    RequestMapping.class);
-            if (requestMapping == null || requestMapping.value().length == 0) {
-                return;
-            }
-            if (withMethod) {
-                for (String path : requestMapping.value()) {
-                    for (RequestMethod requestMethod : requestMapping.method()) {
-                        addRule(requestMethod + ":" + path, rules);
-                    }
-                }
-            } else {
-                for (String path : requestMapping.value()) {
-                    addRule(path, rules);
-                }
-            }
-        });
-    }
-
-    /**
-     * 增加资源规则
+     * 增加资源规则,需要大家根据server端规则来生成resource
      *
      * @param rules
      */

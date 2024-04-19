@@ -42,17 +42,6 @@ public class DegradeRuleOptions implements RuleOptions<DegradeRule> {
      */
     private double slowRatioThreshold = 0.5;
 
-    public static DegradeRule DEFAULT = new DegradeRule();
-
-    static {
-        DEFAULT.setGrade(0)
-                .setCount(200.0d)
-                .setTimeWindow(30)
-                .setStatIntervalMs(1000)
-                .setMinRequestAmount(5)
-                .setSlowRatioThreshold(0.5d);
-    }
-
     public DegradeRuleOptions setGrade(int grade) {
         this.grade = grade;
         return this;
@@ -122,12 +111,12 @@ public class DegradeRuleOptions implements RuleOptions<DegradeRule> {
     @Override
     public DegradeRule toSentinelRule(String resource) {
         DegradeRule degradeRule = new DegradeRule(resource);
-        degradeRule.setGrade(this.grade)
-                .setCount(this.count)
-                .setTimeWindow(this.timeWindow)
-                .setMinRequestAmount(this.minRequestAmount)
-                .setSlowRatioThreshold(this.slowRatioThreshold)
-                .setStatIntervalMs(this.statIntervalMs);
+        degradeRule.setGrade(this.getGrade())
+                .setCount(this.getCount())
+                .setTimeWindow(this.getTimeWindow())
+                .setMinRequestAmount(this.getMinRequestAmount())
+                .setSlowRatioThreshold(this.getSlowRatioThreshold())
+                .setStatIntervalMs(this.getStatIntervalMs());
         return degradeRule;
     }
 

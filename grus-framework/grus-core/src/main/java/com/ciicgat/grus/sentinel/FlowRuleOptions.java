@@ -119,13 +119,13 @@ public class FlowRuleOptions implements RuleOptions<FlowRule> {
     @Override
     public FlowRule toSentinelRule(String resource) {
         FlowRule flowRule = new FlowRule(resource);
-        flowRule.setGrade(this.grade)
-                .setCount(this.count)
-                .setStrategy(this.strategy)
-                .setRefResource(this.refResource)
-                .setControlBehavior(this.controlBehavior)
-                .setWarmUpPeriodSec(this.warmUpPeriodSec)
-                .setMaxQueueingTimeMs(this.maxQueueingTimeMs)
+        flowRule.setGrade(this.getGrade())
+                .setCount(this.getCount())
+                .setStrategy(this.getStrategy())
+                .setRefResource(this.getRefResource())
+                .setControlBehavior(this.getControlBehavior())
+                .setWarmUpPeriodSec(this.getWarmUpPeriodSec())
+                .setMaxQueueingTimeMs(this.getMaxQueueingTimeMs())
                 .setClusterMode(false);
         return flowRule;
     }
