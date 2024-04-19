@@ -24,9 +24,13 @@ class NamingServiceTest {
         String s = namingService.resolveBaseUrl(serviceName, false);
         assertEquals("http://test-1.services.dev.ofc", s);
 
+        String s3 = namingService.resolveBaseUrl(serviceName, true);
+        assertEquals("http://test-1.services.dev.ofc", s3);
+
         EndPointConfigs.addEndPointConfig("test-1", "http://xxxx");
         String s2 = namingService.resolveBaseUrl(serviceName, false);
         assertEquals("http://xxxx", s2);
+
 
     }
 }

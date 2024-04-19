@@ -136,25 +136,15 @@ public class FlowRuleOptions implements RuleOptions<FlowRule> {
         if (o == null || getClass() != o.getClass()) return false;
 
         FlowRuleOptions that = (FlowRuleOptions) o;
-
-        if (grade != that.grade) return false;
-        if (Double.compare(count, that.count) != 0) return false;
-        if (strategy != that.strategy) return false;
-        if (controlBehavior != that.controlBehavior) return false;
-        if (warmUpPeriodSec != that.warmUpPeriodSec) return false;
-        if (maxQueueingTimeMs != that.maxQueueingTimeMs) return false;
-        return Objects.equals(refResource, that.refResource);
+        return grade == that.grade && Double.compare(count, that.count) == 0 && strategy == that.strategy && controlBehavior == that.controlBehavior && warmUpPeriodSec == that.warmUpPeriodSec && maxQueueingTimeMs == that.maxQueueingTimeMs && Objects.equals(refResource, that.refResource);
     }
 
     @Override
     public int hashCode() {
-        int result;
-        long temp;
-        result = grade;
-        temp = Double.doubleToLongBits(count);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        int result = grade;
+        result = 31 * result + Double.hashCode(count);
         result = 31 * result + strategy;
-        result = 31 * result + (refResource != null ? refResource.hashCode() : 0);
+        result = 31 * result + Objects.hashCode(refResource);
         result = 31 * result + controlBehavior;
         result = 31 * result + warmUpPeriodSec;
         result = 31 * result + maxQueueingTimeMs;

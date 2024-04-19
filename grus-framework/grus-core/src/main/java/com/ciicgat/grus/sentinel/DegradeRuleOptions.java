@@ -97,18 +97,6 @@ public class DegradeRuleOptions implements RuleOptions<DegradeRule> {
     }
 
     @Override
-    public String toString() {
-        return "DegradeRuleOptions{" +
-                "grade=" + grade +
-                ", count=" + count +
-                ", timeWindow=" + timeWindow +
-                ", statIntervalMs=" + statIntervalMs +
-                ", minRequestAmount=" + minRequestAmount +
-                ", slowRatioThreshold=" + slowRatioThreshold +
-                '}';
-    }
-
-    @Override
     public DegradeRule toSentinelRule(String resource) {
         DegradeRule degradeRule = new DegradeRule(resource);
         degradeRule.setGrade(this.getGrade())
@@ -126,27 +114,17 @@ public class DegradeRuleOptions implements RuleOptions<DegradeRule> {
         if (o == null || getClass() != o.getClass()) return false;
 
         DegradeRuleOptions that = (DegradeRuleOptions) o;
-
-        if (grade != that.grade) return false;
-        if (Double.compare(count, that.count) != 0) return false;
-        if (timeWindow != that.timeWindow) return false;
-        if (statIntervalMs != that.statIntervalMs) return false;
-        if (minRequestAmount != that.minRequestAmount) return false;
-        return Double.compare(slowRatioThreshold, that.slowRatioThreshold) == 0;
+        return grade == that.grade && Double.compare(count, that.count) == 0 && timeWindow == that.timeWindow && statIntervalMs == that.statIntervalMs && minRequestAmount == that.minRequestAmount && Double.compare(slowRatioThreshold, that.slowRatioThreshold) == 0;
     }
 
     @Override
     public int hashCode() {
-        int result;
-        long temp;
-        result = grade;
-        temp = Double.doubleToLongBits(count);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        int result = grade;
+        result = 31 * result + Double.hashCode(count);
         result = 31 * result + timeWindow;
         result = 31 * result + statIntervalMs;
         result = 31 * result + minRequestAmount;
-        temp = Double.doubleToLongBits(slowRatioThreshold);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + Double.hashCode(slowRatioThreshold);
         return result;
     }
 }
