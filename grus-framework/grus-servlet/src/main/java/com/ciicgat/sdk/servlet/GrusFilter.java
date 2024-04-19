@@ -165,7 +165,7 @@ public class GrusFilter implements Filter, MeterBinder {
             requestId = TraceUtil.getRequestIdId(context);
         }
         Span span =
-                tracer.spanBuilder(request.getMethod() + " " + uri).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
+                tracer.spanBuilder(request.getMethod() + ":" + uri).setParent(context).setSpanKind(SpanKind.SERVER).startSpan();
         request.setAttribute(SERVER_SPAN_CONTEXT, TAG_VALUE);
 
         // 两个makeCurrent的效果，就是其他地方可以随时获取当前span。同时开启子的span时，无需显示的调用setParent
