@@ -196,11 +196,10 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
             try (Entry ignored = SphU.entry(resourceName, EntryType.OUT, 1)) {
                 // 注入调用方appName，需要在SphU.entry方法之前执行才生效，并且需要放到try代码块，故无法使用try resources写法
                 return methodMeta.getMethodHandler().invoke(args);
+            } catch (BlockException e) {
+                LOGGER.error("BLOCKED, rule {} ", e.getRule(), e);
+                throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, null, HTTP_STATUS_TOO_MANY_REQUESTS);
             } catch (Throwable ex) {
-                if (BlockException.isBlockException(ex)) {
-                    LOGGER.error("SENTINEL BLOCKED WITH MSG ", ex);
-                    throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, null, HTTP_STATUS_TOO_MANY_REQUESTS);
-                }
                 if (!(ex instanceof BusinessFeignException)) {
                     LOGGER.error("error", ex);
                 }

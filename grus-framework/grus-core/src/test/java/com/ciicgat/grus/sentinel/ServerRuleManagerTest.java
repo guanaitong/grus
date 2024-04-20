@@ -26,7 +26,8 @@ class ServerRuleManagerTest {
                 .setMaxQueueingTimeMs(10)
                 .setGrade(RuleConstant.FLOW_GRADE_THREAD)
                 .setControlBehavior(RuleConstant.CONTROL_BEHAVIOR_DEFAULT);
-        ServerRuleManager.addRule("/user/get", Set.of(flowRuleOptions));
+        ServerRuleManager.addRule("/user/get", false, Set.of(flowRuleOptions));
+        ServerRuleManager.addRule("/user/get", true, Set.of(flowRuleOptions));
     }
 
     @Test

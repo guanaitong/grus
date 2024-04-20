@@ -2,6 +2,7 @@ com.ciicgat.grus.boot.autoconfigure.core.GrusCoreAutoConfiguration
 com.ciicgat.grus.boot.autoconfigure.gconf.GconfAutoConfiguration
 com.ciicgat.grus.boot.autoconfigure.meter.MeterAutoConfiguration
 com.ciicgat.grus.boot.autoconfigure.opentelemetry.OpenTelemetryAutoConfiguration
+com.ciicgat.grus.boot.autoconfigure.sentinel.GrusSentinelWebAutoConfiguration
 com.ciicgat.grus.boot.autoconfigure.feign.FeignAutoConfiguration
 com.ciicgat.grus.boot.autoconfigure.web.GrusWebAutoConfiguration
 com.ciicgat.grus.boot.autoconfigure.data.GrusDataAutoConfiguration

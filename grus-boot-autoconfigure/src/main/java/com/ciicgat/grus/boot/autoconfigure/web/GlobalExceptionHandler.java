@@ -54,13 +54,13 @@ import java.util.Set;
 @Order
 public class GlobalExceptionHandler {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    private MeterRegistry registry;
+    private final MeterRegistry registry;
 
-    private WebProperties webProperties;
+    private final WebProperties webProperties;
 
-    private CoreProperties coreProperties;
+    private final CoreProperties coreProperties;
 
     public GlobalExceptionHandler(MeterRegistry registry, WebProperties webProperties, CoreProperties coreProperties) {
         this.registry = registry;

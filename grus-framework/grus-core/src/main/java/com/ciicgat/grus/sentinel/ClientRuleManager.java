@@ -25,6 +25,7 @@ import java.util.Set;
 
 /**
  * 客户端限流管理
+ *
  * @author August
  * @date 3/15/2024 4:09 PM
  */
@@ -88,7 +89,6 @@ public class ClientRuleManager {
                 }
             }
         }
-        SentinelDefaultConfig sentinelDefaultConfig = SentinelDefaultConfig.getInstance();
         boolean hasDefined = true;
         if (!toAddFlowMethodRules.isEmpty()) {
             addRule(toAddFlowMethodRules);
@@ -97,11 +97,13 @@ public class ClientRuleManager {
         } else {
             hasDefined = false;
         }
+        SentinelDefaultConfig.Flow clientDefaultFlow = SentinelDefaultConfig.CLIENT_DEFAULT_FLOW;
         //无自定义时，增加全局默认流控规则，使用类级别的
-        if (!hasDefined) {
+        if (!hasDefined && clientDefaultFlow.isEnabled()) {
+            LOGGER.info("添加客户端全局默认流控规则");
             FlowRuleOptions flowRuleOptions = new FlowRuleOptions();
-            flowRuleOptions.setCount(sentinelDefaultConfig.getClientMaxConcurrency())
-                    .setGrade(RuleConstant.FLOW_GRADE_THREAD)
+            flowRuleOptions.setCount(clientDefaultFlow.getCount())
+                    .setGrade(clientDefaultFlow.getGrade())
                     .setControlBehavior(RuleConstant.CONTROL_BEHAVIOR_DEFAULT);
             ClientRuleManager.addClassRule(serviceClazz, Set.of(flowRuleOptions), toAddFlowClassRules, toAddDegradeClassRules);
             addRule(toAddFlowClassRules);
@@ -114,15 +116,17 @@ public class ClientRuleManager {
         } else {
             hasDefined = false;
         }
+        SentinelDefaultConfig.Degrade clientDefaultDegrade = SentinelDefaultConfig.CLIENT_DEFAULT_DEGRADE;
         //无自定义时，增加全局默认降级规则
-        if (!hasDefined) {
+        if (!hasDefined && clientDefaultDegrade.isEnabled()) {
+            LOGGER.info("添加客户端全局默认降级规则");
             DegradeRuleOptions degradeRuleOptions = new DegradeRuleOptions();
-            degradeRuleOptions.setGrade(0)
-                    .setCount(sentinelDefaultConfig.getClientSlowThresholdMs())
-                    .setTimeWindow(30)
+            degradeRuleOptions.setGrade(clientDefaultDegrade.getGrade())
+                    .setCount(clientDefaultDegrade.getCount())
+                    .setTimeWindow(clientDefaultDegrade.getTimeWindow())
                     .setStatIntervalMs(1000)
-                    .setMinRequestAmount(sentinelDefaultConfig.getClientMinRequestAmount())
-                    .setSlowRatioThreshold(sentinelDefaultConfig.getClientSlowRatioThreshold());
+                    .setMinRequestAmount(clientDefaultDegrade.getMinRequestAmount())
+                    .setSlowRatioThreshold(clientDefaultDegrade.getSlowRatioThreshold());
             ClientRuleManager.addClassRule(serviceClazz, Set.of(degradeRuleOptions), toAddFlowClassRules, toAddDegradeClassRules);
             addRule(toAddFlowClassRules);
         }
@@ -224,10 +228,12 @@ public class ClientRuleManager {
             }
         }
         if (!degradeRules.isEmpty()) {
+            LOGGER.info("addDegradeRule: {}", degradeRules);
             DegradeRuleManager.loadRules(degradeRules);
         }
 
         if (!flowRules.isEmpty()) {
+            LOGGER.info("addFlowRule: {}", flowRules);
             FlowRuleManager.loadRules(flowRules);
         }
     }

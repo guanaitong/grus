@@ -9,7 +9,6 @@ import com.ciicgat.grus.boot.autoconfigure.web.http2.Http2WebServerFactoryCustom
 import com.ciicgat.grus.boot.autoconfigure.web.live.DefaultGrusHealthChecker;
 import com.ciicgat.grus.boot.autoconfigure.web.live.GrusHealthCheckController;
 import com.ciicgat.grus.boot.autoconfigure.web.live.GrusHealthChecker;
-import com.ciicgat.grus.sentinel.ServerRuleManager;
 import com.ciicgat.sdk.servlet.GrusFilter;
 import com.ciicgat.sdk.servlet.RequestIdProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -38,10 +37,6 @@ public class GrusWebAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public GrusFilter grusFilter(WebProperties webProperties, RequestIdProvider requestIdProvider) {
-        WebProperties.SystemRule systemRule = webProperties.getSystemRule();
-        if (systemRule.isEnabled()) {
-            ServerRuleManager.loadSystemRule(systemRule.getMaxThread(), systemRule.getAvgRt());
-        }
         return new GrusFilter(webProperties.isDisableOldSslProtocol(), requestIdProvider);
     }
 

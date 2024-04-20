@@ -5,8 +5,7 @@
 
 package com.ciicgat.grus.sentinel;
 
-import com.ciicgat.sdk.gconf.GlobalGconfConfig;
-import com.ciicgat.sdk.gconf.annotation.BeanFieldKey;
+import com.alibaba.csp.sentinel.slots.block.RuleConstant;
 
 /**
  * Created by August.Zhou on 2022/10/20 17:49
@@ -14,64 +13,130 @@ import com.ciicgat.sdk.gconf.annotation.BeanFieldKey;
 public class SentinelDefaultConfig {
     public static final String SENTINEL_JOB_CONTEXT_NAME = "sentinel_job_context";
     public static final String SENTINEL_CONSUMER_CONTEXT_NAME = "sentinel_consumer_context";
-    @BeanFieldKey("client.maxconcurrency")
-    private int clientMaxConcurrency = 16;
 
-    @BeanFieldKey("client.slowRatioThreshold")
-    private double clientSlowRatioThreshold = 0.5;
+    public static Degrade CLIENT_DEFAULT_DEGRADE = new Degrade();
 
-    @BeanFieldKey("client.slowThresholdMs")
-    private int clientSlowThresholdMs = 2000;
-
-    @BeanFieldKey("client.minRequestAmount")
-    private int clientMinRequestAmount = 5;
+    public static Flow CLIENT_DEFAULT_FLOW = new Flow();
 
 
-    @BeanFieldKey("web.maxconcurrency")
-    private int webMaxConcurrency = 16;
+    public static class Degrade {
+        /**
+         * 是否默认启用
+         */
+        private boolean enabled = true;
+        /**
+         * 熔断策略(0: average RT, 1: exception ratio, 2: exception count). 由于
+         */
+        private int grade = 0;
 
-    public int getClientMaxConcurrency() {
-        return clientMaxConcurrency;
+        /**
+         * 慢调用比例模式下为慢调用临界 RT（单位ms,超出该值计为慢调用）；异常比例/异常数模式下为对应的阈值
+         */
+        private double count = 2000;
+
+        /**
+         * 慢调用比例阈值，仅慢调用比例模式有效
+         */
+        private double slowRatioThreshold = 0.5;
+
+        /**
+         * 熔断触发的最小请求数
+         */
+        private int minRequestAmount = 5;
+
+        /**
+         * 熔断时长，单位为 s
+         */
+        private int timeWindow = 30;
+
+        public int getGrade() {
+            return grade;
+        }
+
+        public void setGrade(int grade) {
+            this.grade = grade;
+        }
+
+        public double getCount() {
+            return count;
+        }
+
+        public void setCount(double count) {
+            this.count = count;
+        }
+
+        public double getSlowRatioThreshold() {
+            return slowRatioThreshold;
+        }
+
+        public void setSlowRatioThreshold(double slowRatioThreshold) {
+            this.slowRatioThreshold = slowRatioThreshold;
+        }
+
+        public int getMinRequestAmount() {
+            return minRequestAmount;
+        }
+
+        public void setMinRequestAmount(int minRequestAmount) {
+            this.minRequestAmount = minRequestAmount;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public int getTimeWindow() {
+            return timeWindow;
+        }
+
+        public void setTimeWindow(int timeWindow) {
+            this.timeWindow = timeWindow;
+        }
     }
 
-    public void setClientMaxConcurrency(int clientMaxConcurrency) {
-        this.clientMaxConcurrency = clientMaxConcurrency;
-    }
+    public static class Flow {
+        /**
+         * 是否默认启用
+         */
+        private boolean enabled = true;
+        /**
+         * 限流阈值类型，线程数模式或QPS  (0: thread count, 1: QPS). 由于
+         */
+        private int grade = RuleConstant.FLOW_GRADE_THREAD;
 
-    public int getWebMaxConcurrency() {
-        return webMaxConcurrency;
-    }
+        /**
+         * Flow control threshold count.
+         * 如果grade为qps，那么为resource能成熟的最大qps
+         * 如果grade为thread，那么为resource能成熟的最大并发
+         */
+        private double count = 32;
 
-    public void setWebMaxConcurrency(int webMaxConcurrency) {
-        this.webMaxConcurrency = webMaxConcurrency;
-    }
+        public int getGrade() {
+            return grade;
+        }
 
-    public double getClientSlowRatioThreshold() {
-        return clientSlowRatioThreshold;
-    }
+        public void setGrade(int grade) {
+            this.grade = grade;
+        }
 
-    public void setClientSlowRatioThreshold(double clientSlowRatioThreshold) {
-        this.clientSlowRatioThreshold = clientSlowRatioThreshold;
-    }
+        public double getCount() {
+            return count;
+        }
 
-    public int getClientSlowThresholdMs() {
-        return clientSlowThresholdMs;
-    }
+        public void setCount(double count) {
+            this.count = count;
+        }
 
-    public void setClientSlowThresholdMs(int clientSlowThresholdMs) {
-        this.clientSlowThresholdMs = clientSlowThresholdMs;
-    }
+        public boolean isEnabled() {
+            return enabled;
+        }
 
-    public int getClientMinRequestAmount() {
-        return clientMinRequestAmount;
-    }
-
-    public void setClientMinRequestAmount(int clientMinRequestAmount) {
-        this.clientMinRequestAmount = clientMinRequestAmount;
-    }
-
-    public static SentinelDefaultConfig getInstance() {
-        return GlobalGconfConfig.getConfig().getBean("sentinel.properties",
-                SentinelDefaultConfig.class);
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
     }
 }
