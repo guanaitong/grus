@@ -29,16 +29,19 @@ public class TraceRunnable implements Runnable {
 
     @Override
     public void run() {
-        ContextUtil.runOnContext(sentinelContext, new Runnable() {
-            @Override
-            public void run() {
-                try (Scope ignored = context.makeCurrent()) {
-                    if (contextMap != null) {
-                        MDC.setContextMap(contextMap);
-                    }
-                    runnable.run();
-                }
+        if (sentinelContext == null) {
+            runWithTrace();
+        } else {
+            ContextUtil.runOnContext(sentinelContext, this::runWithTrace);
+        }
+    }
+
+    private void runWithTrace() {
+        try (Scope ignored = context.makeCurrent()) {
+            if (contextMap != null) {
+                MDC.setContextMap(contextMap);
             }
-        });
+            runnable.run();
+        }
     }
 }
