@@ -5,11 +5,13 @@
 
 package com.ciicgat.grus.rabbitmq;
 
+import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.ciicgat.grus.core.Module;
 import com.ciicgat.grus.json.JSONException;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.rabbitmq.processor.MsgProcessor;
+import com.ciicgat.grus.sentinel.SentinelDefaultConfig;
 import com.ciicgat.sdk.trace.TraceUtil;
 import com.ciicgat.sdk.util.system.Systems;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -88,6 +90,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
     }
 
     protected void _handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+        ContextUtil.enter(SentinelDefaultConfig.SENTINEL_CONSUMER_CONTEXT_NAME);
         Tracer tracer = OpenTelemetrys.getTracer();
         Context context = OpenTelemetrys.getTextMapPropagator().extract(Context.current(), properties.getHeaders(), getter);
 
@@ -138,6 +141,7 @@ public class GrusDefaultConsumer extends DefaultConsumer {
             } finally {
                 span.end();
                 SLOW_LOGGER.mayLog(span, Map.of("queue", queue), "");
+                ContextUtil.exit();
             }
         }
     }

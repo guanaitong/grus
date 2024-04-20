@@ -5,7 +5,9 @@
 
 package com.ciicgat.grus.job;
 
+import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
+import com.ciicgat.grus.sentinel.SentinelDefaultConfig;
 import com.ciicgat.sdk.trace.TraceUtil;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
@@ -30,12 +32,12 @@ public class TraceableJob implements SimpleJob {
 
     @Override
     public void execute(ShardingContext shardingContext) {
+        ContextUtil.enter(SentinelDefaultConfig.SENTINEL_JOB_CONTEXT_NAME);
         Tracer tracer = OpenTelemetrys.getTracer();
         Span span = tracer.spanBuilder("handleJob").setSpanKind(SpanKind.SERVER).startSpan();
         if (span != Span.getInvalid()) {
             TraceUtil.putMdcForTrace(span);
         }
-
         try (Scope scope = span.makeCurrent()) {
             OpenTelemetrys.configSystemTags(span);
             LOGGER.info("JOB_START :{}", shardingContext.getJobName());
@@ -46,6 +48,7 @@ public class TraceableJob implements SimpleJob {
         } finally {
             span.end();
             LOGGER.info("JOB_FINISH :{}", shardingContext.getJobName());
+            ContextUtil.exit();
         }
     }
 }

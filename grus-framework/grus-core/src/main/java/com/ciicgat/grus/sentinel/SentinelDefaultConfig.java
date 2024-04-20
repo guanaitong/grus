@@ -12,6 +12,8 @@ import com.ciicgat.sdk.gconf.annotation.BeanFieldKey;
  * Created by August.Zhou on 2022/10/20 17:49
  */
 public class SentinelDefaultConfig {
+    public static final String SENTINEL_JOB_CONTEXT_NAME = "sentinel_job_context";
+    public static final String SENTINEL_CONSUMER_CONTEXT_NAME = "sentinel_consumer_context";
     @BeanFieldKey("client.maxconcurrency")
     private int clientMaxConcurrency = 16;
 
