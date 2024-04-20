@@ -5,6 +5,7 @@
 
 package com.ciicgat.sdk.trace;
 
+import com.alibaba.csp.sentinel.context.ContextUtil;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import org.slf4j.MDC;
@@ -19,6 +20,8 @@ public class TraceRunnable implements Runnable {
     private final Map<String, String> contextMap = MDC.getCopyOfContextMap();
     private final Runnable runnable;
     private final Context context = Context.current();
+    private final com.alibaba.csp.sentinel.context.Context sentinelContext = ContextUtil.getContext();
+
 
     public TraceRunnable(Runnable runnable) {
         this.runnable = runnable;
@@ -26,11 +29,16 @@ public class TraceRunnable implements Runnable {
 
     @Override
     public void run() {
-        try (Scope ignored = context.makeCurrent()) {
-            if (contextMap != null) {
-                MDC.setContextMap(contextMap);
+        ContextUtil.runOnContext(sentinelContext, new Runnable() {
+            @Override
+            public void run() {
+                try (Scope ignored = context.makeCurrent()) {
+                    if (contextMap != null) {
+                        MDC.setContextMap(contextMap);
+                    }
+                    runnable.run();
+                }
             }
-            this.runnable.run();
-        }
+        });
     }
 }
