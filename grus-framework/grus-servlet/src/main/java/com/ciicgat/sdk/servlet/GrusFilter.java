@@ -7,6 +7,7 @@ package com.ciicgat.sdk.servlet;
 
 import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.language.LanguageThreadLocal;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.service.GrusFramework;
@@ -39,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -155,6 +157,12 @@ public class GrusFilter implements Filter, MeterBinder {
             GrusRuntimeManager grusRuntimeManager = GrusFramework.getGrusRuntimeManager();
             grusServiceStatus = grusRuntimeManager.registerUpstreamService(reqAppName, "");
         }
+        String langTag = request.getHeader(GrusServiceHttpHeader.LANG_HEADER);
+        if (StringUtils.isNotEmpty(langTag)) {
+//            即使传递非法的字符串，forLanguageTag不会抛出异常。
+            Locale locale = Locale.forLanguageTag(langTag);
+            LanguageThreadLocal.setLocale(locale);
+        }
 
         Tracer tracer = OpenTelemetrys.getTracer();
         Context context = OpenTelemetrys.getTextMapPropagator().extract(Context.current(), request, getter);
@@ -204,6 +212,8 @@ public class GrusFilter implements Filter, MeterBinder {
                 MDC.clear();
                 concurrency.decrementAndGet();
             }
+        } finally {
+            LanguageThreadLocal.remove();
         }
     }
 

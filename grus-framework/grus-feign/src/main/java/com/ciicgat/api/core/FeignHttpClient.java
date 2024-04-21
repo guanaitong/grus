@@ -5,12 +5,7 @@
 
 package com.ciicgat.api.core;
 
-import com.ciicgat.api.core.language.FeignLanguageInterceptor;
 import com.ciicgat.api.core.trace.FeignTracingInterceptor;
-import com.ciicgat.grus.language.LanguageConstant;
-import com.ciicgat.sdk.gconf.ConfigCollection;
-import com.ciicgat.sdk.gconf.ConfigCollectionFactory;
-import com.ciicgat.sdk.gconf.remote.RemoteConfigCollectionFactoryBuilder;
 import com.ciicgat.sdk.util.http.CacheDnsResolver;
 import com.ciicgat.sdk.util.http.SSL;
 import com.ciicgat.sdk.util.http.metrics.DelegateEventListener;
@@ -18,7 +13,6 @@ import okhttp3.ConnectionPool;
 import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import okhttp3.internal.Util;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,17 +65,6 @@ class FeignHttpClient {
                 .sslSocketFactory(SSL.sslSocketFactory, SSL.x509TrustManager)
                 .hostnameVerifier(SSL.hostnameVerifier);
         clientBuilder.addInterceptor(new FeignTracingInterceptor());
-        try {
-            ConfigCollectionFactory configCollectionFactory = RemoteConfigCollectionFactoryBuilder.getInstance();
-            ConfigCollection configCollection = configCollectionFactory.getConfigCollection();
-
-            if (configCollection != null
-                    && StringUtils.isNotEmpty(configCollection.getConfig(LanguageConstant.LANG_PROPERTIES))) {
-                clientBuilder.addInterceptor(new FeignLanguageInterceptor());
-            }
-        } catch (Exception e) {
-            // do nothing
-        }
 
         OK_HTTP_CLIENT = clientBuilder.build();
     }

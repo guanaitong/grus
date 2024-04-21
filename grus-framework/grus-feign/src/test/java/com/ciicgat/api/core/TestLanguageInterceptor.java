@@ -10,8 +10,8 @@ import com.ciicgat.api.core.contants.VersionConstants;
 import com.ciicgat.api.core.model.TestBean;
 import com.ciicgat.api.core.service.HeaderService;
 import com.ciicgat.grus.json.JSON;
-import com.ciicgat.grus.language.LanguageConstant;
 import com.ciicgat.grus.language.LanguageThreadLocal;
+import com.ciicgat.grus.service.GrusServiceHttpHeader;
 import com.ciicgat.sdk.lang.url.UrlCoder;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -49,7 +49,8 @@ public class TestLanguageInterceptor {
 
     @Test
     public synchronized void testEnglish() {
-        LanguageThreadLocal.setLocale(Locale.ENGLISH);
+        Locale locale = Locale.ENGLISH;
+        LanguageThreadLocal.setLocale(locale);
 
         TestBean bean1 = new TestBean("jasdlfj", 91823);
         MockResponse mockResponse = new MockResponse()
@@ -77,7 +78,9 @@ public class TestLanguageInterceptor {
         String bodyString = recordedRequest.getBody().readUtf8();
         Assertions.assertEquals("", bodyString);
 
+        String header = recordedRequest.getHeader(GrusServiceHttpHeader.LANG_HEADER);
+        Locale locale2 = Locale.forLanguageTag(header);
         // gconf开关未打开，无header
-        Assertions.assertNull(recordedRequest.getHeader(LanguageConstant.LANG_HEADER));
+        Assertions.assertEquals(locale, locale2);
     }
 }

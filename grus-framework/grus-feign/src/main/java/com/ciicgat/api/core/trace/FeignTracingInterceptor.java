@@ -6,6 +6,7 @@
 package com.ciicgat.api.core.trace;
 
 import com.ciicgat.grus.core.Module;
+import com.ciicgat.grus.language.LanguageThreadLocal;
 import com.ciicgat.grus.opentelemetry.OpenTelemetrys;
 import com.ciicgat.grus.performance.SlowLogger;
 import com.ciicgat.grus.service.GrusServiceHttpHeader;
@@ -23,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -42,6 +44,11 @@ public class FeignTracingInterceptor implements Interceptor {
         requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_NAME, Systems.APP_NAME);
         requestBuilder.addHeader(GrusServiceHttpHeader.REQ_APP_INSTANCE, Systems.APP_INSTANCE);
         requestBuilder.addHeader(GrusServiceHttpHeader.HTTP_UA_HEADER, "Grus service client");
+        //传递locale信息
+        Locale locale = LanguageThreadLocal.getLocale();
+        if (locale != null) {
+            requestBuilder.addHeader(GrusServiceHttpHeader.LANG_HEADER, locale.toLanguageTag());
+        }
         if (!OpenTelemetrys.isPropagateWithNew()) {
             OpenTelemetrys.getTextMapPropagator().inject(Context.current(), requestBuilder, setter);
             long start = System.nanoTime();
