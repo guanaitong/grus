@@ -56,3 +56,14 @@ maven-deploy:
     - mvn $MAVEN_CLI_OPTS -f tmp/.flattened-pom.xml  deploy -DskipTests
   only:
     - 2024.0.x
+
+git-tag:
+  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
+  stage: deploy
+  dependencies:
+    - maven-deploy
+  script:
+    - sh tag.sh
+  only:
+    - 2022.2.x
+  when: manual
