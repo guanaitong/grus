@@ -134,14 +134,6 @@ public class GrusFilter implements Filter, MeterBinder {
 
         String uri = request.getRequestURI();
 
-        //是否满足排除条件
-        if (isExclude(uri)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        //流量计数
-        TrafficCounter.trafficIncrement();
 
         int con = concurrency.incrementAndGet(); //并发数
         if (con > 64) {
@@ -209,16 +201,12 @@ public class GrusFilter implements Filter, MeterBinder {
                 span.end();
                 SLOW_LOGGER.mayLog(span, Map.of("method", request.getMethod(), "url", request.getRequestURI()), request);
                 //结束清理
-                MDC.clear();
-                concurrency.decrementAndGet();
             }
         } finally {
             LanguageThreadLocal.remove();
+            MDC.clear();
+            concurrency.decrementAndGet();
         }
-    }
-
-    private static boolean isExclude(String uri) {
-        return uri.contains("isLive") || uri.endsWith(".css") || uri.endsWith(".js") || uri.endsWith(".ico") || uri.endsWith(".png") || uri.endsWith(".jpg");
     }
 
 }

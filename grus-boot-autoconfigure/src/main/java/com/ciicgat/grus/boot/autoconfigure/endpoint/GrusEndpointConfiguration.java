@@ -24,12 +24,6 @@ public class GrusEndpointConfiguration {
         return new GrusServiceDependencyEndpoint();
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    @ConditionalOnAvailableEndpoint
-    public GrusTrafficEndpoint grusTrafficEndpoint() {
-        return new GrusTrafficEndpoint();
-    }
 
     @Bean
     @ConditionalOnMissingBean
