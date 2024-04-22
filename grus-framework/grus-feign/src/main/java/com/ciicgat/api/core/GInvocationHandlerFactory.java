@@ -114,8 +114,8 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 LogExclude logExclude = Services.getLogExclude(method);
                 String resourceName = Resources.buildMethodResource(serviceName, method);
                 MethodMeta methodMeta = new MethodMeta(method, entry.getValue(), getApiCache(method), resourceName,
-                        logReq && LogUtil.checkPrintReq(logExclude),
-                        logResp && LogUtil.checkPrintResp(logExclude),
+                        logReq && (logExclude == null || !logExclude.excludeReq()),
+                        logResp && (logExclude == null || !logExclude.excludeResp()),
                         ignoreErrorMethods.contains(method.getName()));
                 methodMetaMap.put(method, methodMeta);
             }

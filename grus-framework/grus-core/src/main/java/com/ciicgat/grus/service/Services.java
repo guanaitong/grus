@@ -9,6 +9,7 @@ import com.ciicgat.api.core.annotation.ApiSecurity;
 import com.ciicgat.api.core.annotation.ServiceName;
 import com.ciicgat.grus.logger.LogExclude;
 import com.ciicgat.sdk.util.system.Systems;
+import com.google.common.annotations.VisibleForTesting;
 
 import java.lang.reflect.Method;
 
@@ -16,6 +17,8 @@ import java.lang.reflect.Method;
  * Created by August.Zhou on 2023/10/31 14:56
  */
 public class Services {
+    @VisibleForTesting
+    public static boolean isTest = false; //NOSONAR
 
     public static ServiceName getServiceName(Class<?> serviceType) {
         ServiceName serviceEndPoint = serviceType.getAnnotation(ServiceName.class);
@@ -32,7 +35,7 @@ public class Services {
 
 
     public static boolean isSecure(Class<?> serviceClazz) {
-        if (Systems.IN_K8S) {
+        if (Systems.IN_K8S || isTest) {
             ApiSecurity annotation = serviceClazz.getAnnotation(ApiSecurity.class);
             if (annotation != null) {
                 return true;

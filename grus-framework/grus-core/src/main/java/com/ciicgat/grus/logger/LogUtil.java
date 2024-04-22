@@ -10,11 +10,7 @@ package com.ciicgat.grus.logger;
  * @author Wei Jiaju
  * @date 2020/4/26 17:49
  */
-public class LogUtil {
-
-    private LogUtil() {
-        // hide construct
-    }
+public abstract class LogUtil {
 
     private static final Integer MAX_LENGTH = 2000;
 
@@ -27,14 +23,6 @@ public class LogUtil {
         }
 
         return text.substring(0, MAX_LENGTH);
-    }
-
-    public static boolean checkPrintReq(LogExclude logExclude) {
-        return logExclude == null || !logExclude.excludeReq();
-    }
-
-    public static boolean checkPrintResp(LogExclude logExclude) {
-        return logExclude == null || !logExclude.excludeResp();
     }
 
 }

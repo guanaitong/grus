@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Created by August.Zhou on 2023/12/1 14:15
  */
-public class Util {
+class Util {
 
     static String getFileContent(final String filePath) {
         String file = filePath;
@@ -23,7 +23,7 @@ public class Util {
         }
         try (InputStream in = Util.class.getResourceAsStream(file)) {
             return IOUtils.toString(in, StandardCharsets.UTF_8);
-        } catch (IOException e) {
+        } catch (RuntimeException | IOException e) {
             throw new EsDataException(e);
         }
     }
