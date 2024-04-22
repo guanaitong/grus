@@ -8,7 +8,6 @@ package com.ciicgat.api.core;
 import com.ciicgat.sdk.lang.convert.BaseErrorCode;
 import com.ciicgat.sdk.lang.exception.BusinessException;
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 
@@ -28,8 +27,8 @@ public class BusinessExceptionTest {
             throw new BusinessException(BASE_ERROR_CODE);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            Assert.assertNotNull(e.toString());
-            Assert.assertEquals(MESSAGE, e.getMessage());
+            Assertions.assertNotNull(e.toString());
+            Assertions.assertEquals(MESSAGE, e.getMessage());
         }
     }
 
@@ -49,7 +48,7 @@ public class BusinessExceptionTest {
             throw new BusinessRuntimeException(BASE_ERROR_CODE);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            Assert.assertEquals(MESSAGE, e.getMessage());
+            Assertions.assertEquals(MESSAGE, e.getMessage());
         }
     }
 
@@ -59,7 +58,7 @@ public class BusinessExceptionTest {
             throw new BusinessFeignException(20, CODE, MSG);
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            Assert.assertEquals(MESSAGE, e.getMessage());
+            Assertions.assertEquals(MESSAGE, e.getMessage());
         }
     }
 }

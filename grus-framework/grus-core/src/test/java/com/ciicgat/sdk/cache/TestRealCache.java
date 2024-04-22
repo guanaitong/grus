@@ -6,7 +6,7 @@
 package com.ciicgat.sdk.cache;
 
 import com.ciicgat.sdk.lang.exception.CacheDataException;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +33,7 @@ public class TestRealCache {
 
         var j = primaryCache.get("123", Person::new);
 
-        Assert.assertSame(i, j);
+        Assertions.assertSame(i, j);
     }
 
 }
