@@ -113,7 +113,7 @@ public class SentinelDefaultConfig {
          * 如果grade为qps，那么为resource能成熟的最大qps
          * 如果grade为thread，那么为resource能成熟的最大并发
          */
-        private double count = 32;
+        private double count = 64;
 
         public int getGrade() {
             return grade;
