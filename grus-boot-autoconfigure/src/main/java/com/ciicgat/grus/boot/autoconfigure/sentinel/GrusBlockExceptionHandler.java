@@ -26,8 +26,9 @@ public class GrusBlockExceptionHandler implements BlockExceptionHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, BlockException e) throws Exception {
         LOGGER.error("BLOCKED, rule {} ", e.getRule(), e);
         response.setStatus(429);
+        response.setHeader("Content-Type", "application/json;charset=utf-8");
         PrintWriter out = response.getWriter();
-        out.print(ApiResponse.fail(ErrorCode.REQUEST_BLOCK).toString());
+        out.write(ApiResponse.fail(ErrorCode.REQUEST_BLOCK).toString());
         out.flush();
         out.close();
     }

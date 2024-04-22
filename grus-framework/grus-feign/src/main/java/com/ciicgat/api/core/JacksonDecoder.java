@@ -8,6 +8,8 @@ package com.ciicgat.api.core;
 import com.ciicgat.api.core.contants.HeaderConstants;
 import com.ciicgat.api.core.contants.VersionConstants;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
+import com.ciicgat.sdk.lang.convert.ErrorCode;
+import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
 import com.ciicgat.sdk.lang.url.UrlCoder;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JavaType;
@@ -59,6 +61,11 @@ class JacksonDecoder implements Decoder {
     public Object decode(final Response response, final Type type) throws IOException {
         if (response.status() == 404 || response.status() == 204) {
             return Util.emptyValueOf(type);
+        }
+//      如果服务器返回的是429，那么代表被限流了。
+        if (response.status() == 429) {
+            LOGGER.error("remote server blocked");
+            throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, null, 429);
         }
         if (response.status() > 300) {
             throw FeignException.errorStatus("request", response);
