@@ -39,6 +39,9 @@ public class StandaloneChecker {
         }
         Map<String, List<String>> whiteList = GlobalGconfConfig.getConfig().getBean("allow_standalone_redis.json", content -> JSON.parse(content, new TypeReference<>() {
         }));
+        if (!whiteList.containsKey(Systems.APP_NAME)) {
+            return;
+        }
         if (whiteList.get(Systems.APP_NAME).contains(redisSetting.getName())) {
             return;
         }
