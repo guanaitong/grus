@@ -11,6 +11,7 @@ import com.alibaba.csp.sentinel.SphU;
 import com.alibaba.csp.sentinel.Tracer;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.ciicgat.api.core.annotation.ApiCache;
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.logger.LogExclude;
 import com.ciicgat.grus.logger.LogUtil;
@@ -197,7 +198,8 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 // 注入调用方appName，需要在SphU.entry方法之前执行才生效，并且需要放到try代码块，故无法使用try resources写法
                 return methodMeta.getMethodHandler().invoke(args);
             } catch (BlockException e) {
-                LOGGER.error("BLOCKED, rule {} ", e.getRule(), e);
+                LOGGER.error("clientside blocked, resourceName {} rule {} ", resourceName, e.getRule(), e);
+                Alert.send(String.format("clientside blocked, resourceName %s rule %s ", resourceName, e.getRule()));
                 throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, null, HTTP_STATUS_TOO_MANY_REQUESTS);
             } catch (Throwable ex) {
                 if (!(ex instanceof BusinessFeignException)) {

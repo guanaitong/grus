@@ -7,6 +7,7 @@ package com.ciicgat.grus.boot.autoconfigure.sentinel;
 
 import com.alibaba.csp.sentinel.adapter.spring.webmvc.callback.BlockExceptionHandler;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
 import com.ciicgat.sdk.lang.convert.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +25,8 @@ public class GrusBlockExceptionHandler implements BlockExceptionHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, BlockException e) throws Exception {
-        LOGGER.error("BLOCKED, rule {} ", e.getRule(), e);
+        LOGGER.error("serverside blocked, url {} rule {} ", request.getRequestURI(), e.getRule(), e);
+        Alert.send(String.format("serverside blocked, url %s rule %s", request.getRequestURI(), e.getRule()));
         response.setStatus(429);
         response.setHeader("Content-Type", "application/json;charset=utf-8");
         PrintWriter out = response.getWriter();

@@ -7,6 +7,7 @@ package com.ciicgat.api.core;
 
 import com.ciicgat.api.core.contants.HeaderConstants;
 import com.ciicgat.api.core.contants.VersionConstants;
+import com.ciicgat.grus.alert.Alert;
 import com.ciicgat.sdk.lang.convert.ApiResponse;
 import com.ciicgat.sdk.lang.convert.ErrorCode;
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
@@ -64,7 +65,8 @@ class JacksonDecoder implements Decoder {
         }
 //      如果服务器返回的是429，那么代表被限流了。
         if (response.status() == 429) {
-            LOGGER.error("remote server blocked");
+            LOGGER.error("blocked by remote server, url {}", response.request().url());
+            Alert.send(String.format("blocked by remote server, url %s", response.request().url()));
             throw new BusinessRuntimeException(ErrorCode.REQUEST_BLOCK, null, 429);
         }
         if (response.status() > 300) {
