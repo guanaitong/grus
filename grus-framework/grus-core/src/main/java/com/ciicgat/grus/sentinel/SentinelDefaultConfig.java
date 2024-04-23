@@ -11,6 +11,7 @@ import com.alibaba.csp.sentinel.slots.block.RuleConstant;
  * Created by August.Zhou on 2022/10/20 17:49
  */
 public class SentinelDefaultConfig {
+    public static final String SENTINEL_FEIGN_CONTEXT_NAME = "sentinel_feign_context";
     public static final String SENTINEL_JOB_CONTEXT_NAME = "sentinel_job_context";
     public static final String SENTINEL_CONSUMER_CONTEXT_NAME = "sentinel_consumer_context";
 

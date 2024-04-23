@@ -9,6 +9,7 @@ import com.alibaba.csp.sentinel.Entry;
 import com.alibaba.csp.sentinel.EntryType;
 import com.alibaba.csp.sentinel.SphU;
 import com.alibaba.csp.sentinel.Tracer;
+import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.ciicgat.api.core.annotation.ApiCache;
 import com.ciicgat.grus.alert.Alert;
@@ -16,6 +17,7 @@ import com.ciicgat.grus.json.JSON;
 import com.ciicgat.grus.logger.LogExclude;
 import com.ciicgat.grus.logger.LogUtil;
 import com.ciicgat.grus.sentinel.Resources;
+import com.ciicgat.grus.sentinel.SentinelDefaultConfig;
 import com.ciicgat.grus.service.GrusFramework;
 import com.ciicgat.grus.service.GrusRuntimeConfig;
 import com.ciicgat.grus.service.GrusService;
@@ -193,8 +195,11 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
         private Object invokeWithoutCache(MethodMeta methodMeta, Object[] args) throws Throwable {
             Method method = methodMeta.getMethod();
             String resourceName = methodMeta.getResourceName();
+            Entry entry = null;
             // sentinel处理
-            try (Entry ignored = SphU.entry(resourceName, EntryType.OUT, 1)) {
+            try {
+                ContextUtil.enter(SentinelDefaultConfig.SENTINEL_FEIGN_CONTEXT_NAME);
+                entry = SphU.entry(resourceName, EntryType.OUT, 1);
                 // 注入调用方appName，需要在SphU.entry方法之前执行才生效，并且需要放到try代码块，故无法使用try resources写法
                 return methodMeta.getMethodHandler().invoke(args);
             } catch (BlockException e) {
@@ -208,6 +213,11 @@ class GInvocationHandlerFactory implements InvocationHandlerFactory {
                 // 降级跟踪必备代码
                 Tracer.trace(ex);
                 throw ex;
+            } finally {
+                if (entry != null) {
+                    entry.exit(1);
+                }
+                ContextUtil.exit();
             }
         }
 
