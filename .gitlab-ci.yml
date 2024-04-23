@@ -6,6 +6,7 @@ stages:
   - test
   - visualize
   - deploy
+  - tag
 
 
 unit-test-java21:
@@ -59,11 +60,11 @@ maven-deploy:
 
 git-tag:
   image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
-  stage: deploy
+  stage: tag
   dependencies:
     - maven-deploy
   script:
     - sh tag.sh
   only:
-    - 2022.2.x
+    - 2024.0.x
   when: manual
