@@ -38,12 +38,12 @@ public class SentinelDefaultConfig {
         /**
          * 慢调用比例阈值，仅慢调用比例模式有效
          */
-        private double slowRatioThreshold = 0.5;
+        private double slowRatioThreshold = 0.6;
 
         /**
          * 熔断触发的最小请求数
          */
-        private int minRequestAmount = 5;
+        private int minRequestAmount = 20;
 
         /**
          * 熔断时长，单位为 s
