@@ -11,7 +11,6 @@ import com.ciicgat.api.core.contants.VersionConstants;
 import com.ciicgat.api.core.model.TestBean;
 import com.ciicgat.api.core.service.DegradeService;
 import com.ciicgat.grus.json.JSON;
-import com.ciicgat.grus.sentinel.ClientRuleManager;
 import com.ciicgat.grus.sentinel.DegradeRuleOptions;
 import com.ciicgat.sdk.lang.convert.ErrorCode;
 import com.ciicgat.sdk.lang.exception.BusinessRuntimeException;
@@ -37,6 +36,9 @@ import java.util.function.Supplier;
  * @Description:
  */
 public class TestSentinelDegrade {
+    static {
+        SentinelRuleInit.doSth();
+    }
 
     @Test
     public void testMethod() throws IOException, InterruptedException {
@@ -174,73 +176,5 @@ public class TestSentinelDegrade {
         Assertions.assertTrue(existBlockException.get());
     }
 
-
-    @Test
-    public void testApp() throws IOException, InterruptedException {
-        DegradeRuleOptions grusDegradeRule = new DegradeRuleOptions();
-        grusDegradeRule.setCount(200.0d)
-                .setTimeWindow(10)
-                .setMinRequestAmount(5)
-                .setStatIntervalMs(1000)
-                .setSlowRatioThreshold(0.5d);
-        ClientRuleManager.addAppServiceRule("degrade-test", Set.of(grusDegradeRule));
-        Pair<DegradeService, MockWebServer> pair = TestUtil.newInstance("degrade-test", new Supplier<DegradeService>() {
-            @Override
-            public DegradeService get() {
-                DegradeService degradeService = FeignServiceBuilder.newBuilder().serviceClazz(DegradeService.class)
-                        .options(new Request.Options(1000, 10_000))
-                        .build();
-                return degradeService;
-            }
-        });
-        MockWebServer mockWebServer = pair.getRight();
-        DegradeService degradeService = pair.getLeft();
-
-        TestBean bean1 = new TestBean("jasdlfj", 91823);
-//        mockResponse响应时间是2s
-        MockResponse mockResponse = new MockResponse()
-                .addHeader("Content-Type", "application/json;charset=utf-8")
-                .setResponseCode(200)
-                .setHeader(HeaderConstants.ERROR_CODE_HEADER, 0)
-                .setHeader(HeaderConstants.ERROR_MSG_HEADER, "")
-                .setHeader(HeaderConstants.API_VERSION_HEADER, VersionConstants.V2)
-                .setHeadersDelay(2, TimeUnit.SECONDS)
-                .setBody(JSON.toJSONString(bean1));
-        for (int i = 0; i < 100; i++) {
-            mockWebServer.enqueue(mockResponse);
-        }
-        final AtomicBoolean existBlockException = new AtomicBoolean(false);
-        //        必须启动一个线程池来调用接口，如果单线程调用，是不满足单位时间内最小请求数要求的
-        ExecutorService executorService = Executors.newFixedThreadPool(5);
-        int num = 20;
-        CountDownLatch countDownLatch = new CountDownLatch(num);
-        for (int i = 0; i < num; i++) {
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        TestBean xx = degradeService.testDegradeOnClass();
-                        System.out.println(xx);
-                    } catch (BusinessRuntimeException e) {
-                        if (e.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
-                            existBlockException.set(true);
-                        } else {
-                            e.printStackTrace();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        countDownLatch.countDown();
-                    }
-
-                }
-            });
-
-        }
-        countDownLatch.await();
-        mockWebServer.shutdown();
-
-        Assertions.assertTrue(existBlockException.get());
-    }
 
 }

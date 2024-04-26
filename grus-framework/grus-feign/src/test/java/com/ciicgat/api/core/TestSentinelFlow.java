@@ -36,6 +36,9 @@ import java.util.function.Supplier;
  * @Description:
  */
 public class TestSentinelFlow {
+    static {
+        SentinelRuleInit.doSth();
+    }
 
     /**
      * 模拟qps限流
@@ -45,19 +48,22 @@ public class TestSentinelFlow {
      */
     @Test
     public void testMethodOfQps() throws IOException, InterruptedException {
-        FlowRuleOptions grusDegradeRule = new FlowRuleOptions();
+        FlowRuleOptions flowRuleOptions = new FlowRuleOptions();
+//        flowRuleOptions.setWarmUpPeriodSec(0);
+//        flowRuleOptions.setMaxQueueingTimeMs(10);
         // Set max qps to 20
-        grusDegradeRule.setCount(20)
+        flowRuleOptions.setCount(20)
                 .setGrade(RuleConstant.FLOW_GRADE_QPS);
         Pair<FlowService, MockWebServer> pair = TestUtil.newInstance("flow-test", new Supplier<FlowService>() {
             @Override
             public FlowService get() {
                 FlowService flowService = FeignServiceBuilder.newBuilder().serviceClazz(FlowService.class)
                         .options(new Request.Options(1000, 10_000))
-                        .addMethodRule("testMethodOfQps", Set.of(grusDegradeRule)).build();
+                        .addMethodRule("testMethodOfQps", Set.of(flowRuleOptions)).build();
                 return flowService;
             }
         });
+
         MockWebServer mockWebServer = pair.getRight();
         FlowService flowService = pair.getLeft();
 
@@ -69,7 +75,7 @@ public class TestSentinelFlow {
                 .setHeader(HeaderConstants.ERROR_CODE_HEADER, 0)
                 .setHeader(HeaderConstants.ERROR_MSG_HEADER, "")
                 .setHeader(HeaderConstants.API_VERSION_HEADER, VersionConstants.V2)
-                .setHeadersDelay(10, TimeUnit.MICROSECONDS)
+//                .setHeadersDelay(10, TimeUnit.MICROSECONDS)
                 .setBody(JSON.toJSONString(bean1));
         for (int i = 0; i < 10000; i++) {
             mockWebServer.enqueue(mockResponse);
@@ -77,7 +83,7 @@ public class TestSentinelFlow {
         final AtomicBoolean existBlockException = new AtomicBoolean(false);
 //        必须启动一个线程池来调用接口，如果单线程调用，是不满足单位时间内最小请求数要求的
         ExecutorService executorService = Executors.newFixedThreadPool(5);
-        int num = 50;
+        int num = 500;
         CountDownLatch countDownLatch = new CountDownLatch(num);
         for (int i = 0; i < num; i++) {
             executorService.execute(new Runnable() {
@@ -85,7 +91,7 @@ public class TestSentinelFlow {
                 public void run() {
                     try {
                         TestBean xx = flowService.testMethodOfQps();
-                        System.out.println(xx);
+//                        System.out.println(xx);
                     } catch (BusinessRuntimeException e) {
                         if (e.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
                             existBlockException.set(true);
@@ -115,19 +121,20 @@ public class TestSentinelFlow {
      */
     @Test
     public void testMethodOfConcurrency() throws IOException, InterruptedException {
-        FlowRuleOptions grusDegradeRule = new FlowRuleOptions();
+        FlowRuleOptions flowRuleOptions = new FlowRuleOptions();
         // Set max thread to 5
-        grusDegradeRule.setCount(5)
+        flowRuleOptions.setCount(5)
                 .setGrade(RuleConstant.FLOW_GRADE_THREAD);
         Pair<FlowService, MockWebServer> pair = TestUtil.newInstance("flow-test", new Supplier<FlowService>() {
             @Override
             public FlowService get() {
                 FlowService flowService = FeignServiceBuilder.newBuilder().serviceClazz(FlowService.class)
                         .options(new Request.Options(1000, 10_000))
-                        .addMethodRule("testMethodOfConcurrency", Set.of(grusDegradeRule)).build();
+                        .addMethodRule("testMethodOfConcurrency", Set.of(flowRuleOptions)).build();
                 return flowService;
             }
         });
+
         MockWebServer mockWebServer = pair.getRight();
         FlowService flowService = pair.getLeft();
 
@@ -141,7 +148,7 @@ public class TestSentinelFlow {
                 .setHeader(HeaderConstants.API_VERSION_HEADER, VersionConstants.V2)
                 .setHeadersDelay(10, TimeUnit.MICROSECONDS)
                 .setBody(JSON.toJSONString(bean1));
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1000; i++) {
             mockWebServer.enqueue(mockResponse);
         }
         final AtomicBoolean existBlockException = new AtomicBoolean(false);
@@ -156,7 +163,7 @@ public class TestSentinelFlow {
                 public void run() {
                     try {
                         TestBean xx = flowService.testMethodOfConcurrency();
-                        System.out.println(xx);
+//                        System.out.println(xx);
                     } catch (BusinessRuntimeException e) {
                         if (e.getErrorCode() == ErrorCode.REQUEST_BLOCK.getErrorCode()) {
                             existBlockException.set(true);

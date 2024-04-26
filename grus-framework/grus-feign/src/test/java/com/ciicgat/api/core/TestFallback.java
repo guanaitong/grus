@@ -37,6 +37,7 @@ public class TestFallback {
 
     @BeforeEach
     public void init() throws IOException {
+        SentinelRuleInit.doSth();
         mockClient = Mockito.mock(Client.class);
 
         Request request = Request.create(Request.HttpMethod.GET, "", Collections.emptyMap(), (byte[]) null, null);
@@ -56,7 +57,7 @@ public class TestFallback {
     }
 
     @Test
-    public void testFallback() throws IOException {
+    public synchronized void testFallback() throws IOException {
         TestFallBackFactory fallback = new TestFallBackFactory();
         fallbackService = FeignServiceFactory.newInstance(FallbackService.class, mockClient, fallback);
         TestBean testBean = fallbackService.getWithOutFallback();

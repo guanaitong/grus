@@ -5,16 +5,14 @@
 
 package com.ciicgat.grus.sentinel;
 
-import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
-import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRuleManager;
-import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
-import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
+import com.alibaba.csp.sentinel.slots.block.AbstractRule;
 import com.alibaba.csp.sentinel.slots.system.SystemRule;
 import com.alibaba.csp.sentinel.slots.system.SystemRuleManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,32 +30,15 @@ public class ServerRuleManager {
      * @param rules
      */
     public static void addRule(String urlPatternSource, boolean regex, Set<RuleOptions<?>> rules) {
-        List<DegradeRule> degradeRules = new ArrayList<>();
-        List<FlowRule> flowRules = new ArrayList<>();
+        Set<AbstractRule> abstractRules = new HashSet<>();
         for (RuleOptions<?> rule : rules) {
-            if (rule instanceof DegradeRuleOptions) {
-                DegradeRule sentinelRule = ((DegradeRuleOptions) rule).toSentinelRule(urlPatternSource);
-                if (regex) {
-                    sentinelRule.setRegex(true);
-                }
-                degradeRules.add(sentinelRule);
-            } else if (rule instanceof FlowRuleOptions) {
-                FlowRule sentinelRule = ((FlowRuleOptions) rule).toSentinelRule(urlPatternSource);
-                if (regex) {
-                    sentinelRule.setRegex(true);
-                }
-                flowRules.add(sentinelRule);
+            AbstractRule abstractRule = rule.toSentinelRule(urlPatternSource);
+            if (regex) {
+                abstractRule.setRegex(true);
             }
+            abstractRules.add(abstractRule);
         }
-        if (!degradeRules.isEmpty()) {
-            LOGGER.info("addDegradeRule: {}", degradeRules);
-            DegradeRuleManager.loadRules(degradeRules);
-        }
-
-        if (!flowRules.isEmpty()) {
-            LOGGER.info("addFlowRule: {}", flowRules);
-            FlowRuleManager.loadRules(flowRules);
-        }
+        RuleContainer.addRule(abstractRules);
     }
 
     public static void loadSystemRule(int maxThread, int avgRt) {

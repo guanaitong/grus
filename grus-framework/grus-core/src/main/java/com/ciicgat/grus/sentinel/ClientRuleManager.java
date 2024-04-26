@@ -7,8 +7,6 @@ package com.ciicgat.grus.sentinel;
 
 import com.alibaba.csp.sentinel.slots.block.AbstractRule;
 import com.alibaba.csp.sentinel.slots.block.RuleConstant;
-import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRuleManager;
-import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
 import com.ciicgat.api.core.annotation.ServiceName;
 import com.ciicgat.grus.sentinel.annotation.SimpleDegradeRule;
 import com.ciicgat.grus.sentinel.annotation.SimpleFlowRule;
@@ -17,11 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.ciicgat.grus.sentinel.RuleContainer.addRule;
 
 /**
  * 客户端限流管理
@@ -100,7 +98,6 @@ public class ClientRuleManager {
         SentinelDefaultConfig.Flow clientDefaultFlow = SentinelDefaultConfig.CLIENT_DEFAULT_FLOW;
         //无自定义时，增加全局默认流控规则，使用类级别的
         if (!hasDefined && clientDefaultFlow.isEnabled()) {
-            LOGGER.info("添加客户端全局默认流控规则");
             FlowRuleOptions flowRuleOptions = new FlowRuleOptions();
             flowRuleOptions.setCount(clientDefaultFlow.getCount())
                     .setGrade(clientDefaultFlow.getGrade())
@@ -119,7 +116,6 @@ public class ClientRuleManager {
         SentinelDefaultConfig.Degrade clientDefaultDegrade = SentinelDefaultConfig.CLIENT_DEFAULT_DEGRADE;
         //无自定义时，增加全局默认降级规则
         if (!hasDefined && clientDefaultDegrade.isEnabled()) {
-            LOGGER.info("添加客户端全局默认降级规则");
             DegradeRuleOptions degradeRuleOptions = new DegradeRuleOptions();
             degradeRuleOptions.setGrade(clientDefaultDegrade.getGrade())
                     .setCount(clientDefaultDegrade.getCount())
@@ -128,7 +124,7 @@ public class ClientRuleManager {
                     .setMinRequestAmount(clientDefaultDegrade.getMinRequestAmount())
                     .setSlowRatioThreshold(clientDefaultDegrade.getSlowRatioThreshold());
             ClientRuleManager.addClassRule(serviceClazz, Set.of(degradeRuleOptions), toAddFlowClassRules, toAddDegradeClassRules);
-            addRule(toAddFlowClassRules);
+            addRule(toAddDegradeClassRules);
         }
 
     }
@@ -174,7 +170,7 @@ public class ClientRuleManager {
      * @param apiClass
      * @param rules
      */
-    public static void addClassRule(Class<?> apiClass, Set<RuleOptions<?>> rules, Set<AbstractRule> toAddFlowClassRules, Set<AbstractRule> toAddDegradeClassRules) {
+    private static void addClassRule(Class<?> apiClass, Set<RuleOptions<?>> rules, Set<AbstractRule> toAddFlowClassRules, Set<AbstractRule> toAddDegradeClassRules) {
         ServiceName serviceName = Services.getServiceName(apiClass);
         String resource = Resources.buildClassResource(serviceName.value(), apiClass.getSimpleName());
         for (RuleOptions<?> ruleOptions : rules) {
@@ -194,7 +190,7 @@ public class ClientRuleManager {
      * @param method
      * @param rules
      */
-    public static void addMethodRule(Method method, Set<RuleOptions<?>> rules, Set<AbstractRule> toAddFlowMethodRules, Set<AbstractRule> toAddDegradeMethodRules) {
+    private static void addMethodRule(Method method, Set<RuleOptions<?>> rules, Set<AbstractRule> toAddFlowMethodRules, Set<AbstractRule> toAddDegradeMethodRules) {
         Class<?> apiClass = method.getDeclaringClass();
         ServiceName serviceName = Services.getServiceName(apiClass);
         String resource = Resources.buildMethodResource(serviceName.value(), method);
@@ -208,34 +204,5 @@ public class ClientRuleManager {
         }
     }
 
-//    public static void addMethodRule(Class<?> serviceClass, String methodName, Set<RuleOptions<?>> rules) {
-//        try {
-//            Method method = serviceClass.getMethod(methodName);
-//            addMethodRule(method, rules);
-//        } catch (NoSuchMethodException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
-    private static void addRule(Set<AbstractRule> rules) {
-        List<com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule> degradeRules = new ArrayList<>();
-        List<com.alibaba.csp.sentinel.slots.block.flow.FlowRule> flowRules = new ArrayList<>();
-        for (AbstractRule rule : rules) {
-            if (rule instanceof com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule) {
-                degradeRules.add((com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule) rule);
-            } else if (rule instanceof com.alibaba.csp.sentinel.slots.block.flow.FlowRule) {
-                flowRules.add((com.alibaba.csp.sentinel.slots.block.flow.FlowRule) rule);
-            }
-        }
-        if (!degradeRules.isEmpty()) {
-            LOGGER.info("addDegradeRule: {}", degradeRules);
-            DegradeRuleManager.loadRules(degradeRules);
-        }
-
-        if (!flowRules.isEmpty()) {
-            LOGGER.info("addFlowRule: {}", flowRules);
-            FlowRuleManager.loadRules(flowRules);
-        }
-    }
 
 }
