@@ -42,7 +42,7 @@ public class ServerRuleManager {
     }
 
     public static void loadSystemRule(int maxThread, int avgRt) {
-        LOGGER.info("添加系统规则, maxThread={} ,avgRt={} ms", maxThread, avgRt);
+        LOGGER.info("添加系统规则, maxThread={} , avgRt={} ms", maxThread, avgRt);
         List<SystemRule> rules = new ArrayList<>();
         SystemRule rule = new SystemRule();
 //        由于使用了容器技术，所以cpu和load的统计都有问题。默认关掉它们

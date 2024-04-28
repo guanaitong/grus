@@ -81,7 +81,7 @@ public class GrusSentinelProperties {
         /**
          * 降级的最大平均响应时间，单位毫秒
          */
-        private int avgRt = 3000;
+        private int avgRt = -1;
 
         public int getMaxThread() {
             return maxThread;
