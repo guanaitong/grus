@@ -19,6 +19,7 @@ import io.opentelemetry.sdk.resources.Resource;
 import io.opentelemetry.sdk.trace.SdkTracerProvider;
 import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
+import io.opentelemetry.sdk.trace.samplers.Sampler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -50,6 +51,7 @@ public class OpenTelemetryAutoConfiguration {
             OtlpGrpcSpanExporter grpcSpanExporter = OtlpGrpcSpanExporter.builder()
                     .setEndpoint(collector.getEndpoint())
                     .build();
+            sdkTracerProviderBuilder.setSampler(Sampler.parentBased(Sampler.traceIdRatioBased(collector.getRatio())));
             sdkTracerProviderBuilder.addSpanProcessor(BatchSpanProcessor.builder(grpcSpanExporter).build());
         }
         return sdkTracerProviderBuilder.build();

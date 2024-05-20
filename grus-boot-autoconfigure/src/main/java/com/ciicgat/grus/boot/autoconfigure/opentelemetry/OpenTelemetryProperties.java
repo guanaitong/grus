@@ -54,7 +54,15 @@ public class OpenTelemetryProperties {
          */
         private boolean enable = false;
 
+        /**
+         * grpc远程地址
+         */
         private String endpoint;
+
+        /**
+         * 采样百分比
+         */
+        private double ratio = 0.1;
 
         public boolean isEnable() {
             return enable;
@@ -70,6 +78,15 @@ public class OpenTelemetryProperties {
 
         public void setEndpoint(String endpoint) {
             this.endpoint = endpoint;
+        }
+
+        public double getRatio() {
+            return ratio;
+        }
+
+        public Collector setRatio(double ratio) {
+            this.ratio = ratio;
+            return this;
         }
     }
 }
