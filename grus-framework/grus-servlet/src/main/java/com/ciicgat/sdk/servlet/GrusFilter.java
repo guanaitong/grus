@@ -132,17 +132,18 @@ public class GrusFilter implements Filter, MeterBinder {
         response.addHeader("x-app-name", Systems.APP_NAME);
         response.addHeader("x-app-instance", Systems.APP_INSTANCE);
 
-        String uri = request.getRequestURI();
-
-
-        int con = concurrency.incrementAndGet(); //并发数
-        if (con > 64) {
-            String logMsg = "服务并发有点高,并发数:" + con;
-            LOGGER.warn(logMsg);
-            Alert.send(logMsg);
-            highConcurrencyEvents.increment();
+        try {
+            int con = concurrency.incrementAndGet(); //并发数
+            doFilter0(request, response, filterChain, con);
+        } finally {
+            concurrency.decrementAndGet();
+            LanguageThreadLocal.remove();
+            MDC.clear();
         }
+    }
 
+    private void doFilter0(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, int con) throws IOException, ServletException {
+        String uri = request.getRequestURI();
         GrusServiceStatus grusServiceStatus = null;
         String reqAppName = request.getHeader(GrusServiceHttpHeader.REQ_APP_NAME);
         if (StringUtils.isNotEmpty(reqAppName)) {
@@ -187,6 +188,12 @@ public class GrusFilter implements Filter, MeterBinder {
                 span.setAttribute("http.method", request.getMethod());
                 span.setAttribute("http.scheme", request.getScheme());
                 span.setAttribute("http.target", uri);
+                if (con > 64) {
+                    String logMsg = "服务并发有点高,并发数 = " + con + ", uri = " + uri;
+                    LOGGER.warn(logMsg);
+                    Alert.send(logMsg);
+                    highConcurrencyEvents.increment();
+                }
                 filterChain.doFilter(request, response);
 
                 if (grusServiceStatus != null) {
@@ -202,11 +209,6 @@ public class GrusFilter implements Filter, MeterBinder {
                 SLOW_LOGGER.mayLog(span, Map.of("method", request.getMethod(), "url", request.getRequestURI()), request);
                 //结束清理
             }
-        } finally {
-            LanguageThreadLocal.remove();
-            MDC.clear();
-            concurrency.decrementAndGet();
         }
     }
-
 }
