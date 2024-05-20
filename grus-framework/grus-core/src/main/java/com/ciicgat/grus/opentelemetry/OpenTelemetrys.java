@@ -6,6 +6,7 @@
 package com.ciicgat.grus.opentelemetry;
 
 import com.ciicgat.sdk.util.system.Systems;
+import com.ciicgat.sdk.util.system.WorkRegion;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.api.trace.Span;
@@ -65,7 +66,7 @@ public class OpenTelemetrys {
 
     public static void configSystemTags(Span span) {
         span.setAttribute("app_name", Systems.APP_NAME);
-        span.setAttribute("app_instance", Systems.APP_NAME);
-        span.setAttribute("env", Systems.APP_INSTANCE);
+        span.setAttribute("app_instance", Systems.APP_INSTANCE);
+        span.setAttribute("env", WorkRegion.getCurrentWorkRegion().getName());
     }
 }
