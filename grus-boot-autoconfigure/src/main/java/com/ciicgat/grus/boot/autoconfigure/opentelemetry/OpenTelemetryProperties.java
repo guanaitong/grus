@@ -84,9 +84,8 @@ public class OpenTelemetryProperties {
             return ratio;
         }
 
-        public Collector setRatio(double ratio) {
+        public void setRatio(double ratio) {
             this.ratio = ratio;
-            return this;
         }
     }
 }
