@@ -68,7 +68,6 @@ git-tag:
     - git config --global user.email "${GITLAB_USER_EMAIL}"
     - export GRUS_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=revision -q -DforceStdout)
     - echo "tag is $GRUS_VERSION"
-    - git tag -d $GRUS_VERSION
     - git tag -a $GRUS_VERSION -m "Version created by GitLab CI Build"
     - git push https://root:${P_TOKEN}@${CI_SERVER_HOST}/$CI_PROJECT_PATH.git $GRUS_VERSION -f
   only:
