@@ -277,7 +277,9 @@ public class GlobalExceptionHandler {
             tags.add(Tag.of("error_code", "" + ((ErrorCode) throwable).getErrorCode()));
         }
         tags.add(Tag.of("error_type", throwable.getClass().toString()));
-        tags.add(Tag.of("error_msg", throwable.getMessage()));
+        if (throwable.getMessage() != null) {
+            tags.add(Tag.of("error_msg", throwable.getMessage()));
+        }
         this.registry.counter(isBusinessException ? "grus_business_exception" : "grus_system_exception", tags).increment();
     }
 
