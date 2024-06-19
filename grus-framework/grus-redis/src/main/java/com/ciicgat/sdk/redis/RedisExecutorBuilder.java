@@ -22,8 +22,6 @@ import redis.clients.jedis.util.Pool;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.ciicgat.sdk.redis.config.RedisConstants.DEFAULT_MAX_ATTEMPTS;
-
 
 /**
  * @author August.Zhou
@@ -55,7 +53,7 @@ public class RedisExecutorBuilder {
         GenericObjectPoolConfig<Connection> poolConfig = new GenericObjectPoolConfig<>();
         setting.configPool(poolConfig);
         return new JedisCluster(jedisClusterNode,
-                setting.getConnectTimeoutMillis(), setting.getTimeoutMillis(), DEFAULT_MAX_ATTEMPTS, setting.getFinalPassword(), poolConfig);
+                setting.getConnectTimeoutMillis(), setting.getTimeoutMillis(), 5, setting.getFinalPassword(), poolConfig);
     }
 
     public Pool<Jedis> newPool() {
