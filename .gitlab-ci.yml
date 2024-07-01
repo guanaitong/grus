@@ -6,7 +6,7 @@ stages:
   - test
   - visualize
   - deploy
-  - tag
+  - release
 
 
 unit-test-java21:
@@ -58,18 +58,15 @@ maven-deploy:
   only:
     - 2024.0.x
 
-git-tag:
-  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-17
-  stage: tag
+release-job:
+  image: registry.wuxingdev.cn/build/maven:3-eclipse-temurin-21
+  stage: release
   dependencies:
     - maven-deploy
   script:
-    - git config --global user.name "${GITLAB_USER_NAME}"
-    - git config --global user.email "${GITLAB_USER_EMAIL}"
+    - curl -o /usr/local/bin/release-cli https://filestorage.wuxingdev.cn/gitlab-ci/release-cli-linux-amd64 && chmod +x /usr/local/bin/release-cli
     - export GRUS_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=revision -q -DforceStdout)
-    - echo "tag is $GRUS_VERSION"
-    - git tag -a $GRUS_VERSION -m "Version created by GitLab CI Build"
-    - git push https://root:${P_TOKEN}@${CI_SERVER_HOST}/$CI_PROJECT_PATH.git $GRUS_VERSION -f
+    - release-cli create --name release-$GRUS_VERSION --tag-name $GRUS_VERSION
   only:
     - 2024.0.x
   when: manual
