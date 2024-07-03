@@ -13,7 +13,7 @@ package com.ciicgat.grus.zk;
 public interface ZKConstants {
     Integer RETRY_MAX_MS = 1000;
     Integer RETRY_INTERVAL_MS = 5;
-    Integer CONNECT_TIMEOUT_MS = 10000;
+    Integer CONNECT_TIMEOUT_MS = 20000;
     Integer SESSION_TIMEOUT_MS = 6000;
 
     String LOCK_PATH = "LOCK";
