@@ -14,7 +14,7 @@ unit-test-java21:
   stage: test
   script:
     - mvn $MAVEN_CLI_OPTS install -Djacoco.skip=false
-    - mvn sonar:sonar -Dsonar.projectKey=grus-2024 -Dsonar.projectName=grus-2024
+    - mvn sonar:sonar -Dsonar.projectKey=grus-2.0 -Dsonar.projectName=grus-2.0
   artifacts:
     expire_in: 14 days
     when: always
