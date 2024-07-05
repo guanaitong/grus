@@ -68,5 +68,5 @@ release-job:
     - export GRUS_VERSION=$(mvn org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=revision -q -DforceStdout)
     - release-cli create --name release-$GRUS_VERSION --tag-name $GRUS_VERSION
   only:
-    - 2024.0.x
+    - 2.0.x
   when: manual
