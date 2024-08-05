@@ -10,7 +10,9 @@ import com.ciicgat.grus.zk.ZKUtils;
 import com.ciicgat.sdk.lang.threads.Threads;
 import com.ciicgat.sdk.lang.tool.SessionIdGenerator;
 import org.apache.curator.framework.CuratorFramework;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CountDownLatch;
@@ -21,10 +23,22 @@ import java.util.concurrent.atomic.LongAdder;
  * Created by August.Zhou on 2019-08-01 12:51.
  */
 public class ZkLockTest {
+    private static CuratorFramework curatorClient;
+
+    @BeforeAll
+    static void init() {
+        curatorClient = ZKUtils.init(TestZkConfig.ZK);
+    }
+
+    @AfterAll
+    static void close() {
+        if (curatorClient != null) {
+            curatorClient.close();
+        }
+    }
     @Test
     public void test() throws InterruptedException {
-        CuratorFramework curator = ZKUtils.init(TestZkConfig.ZK);
-        ZKDistLock redisLock = new ZKDistLock(curator);
+        ZKDistLock redisLock = new ZKDistLock(curatorClient);
         LongAdder longAdder = new LongAdder();
         SessionIdGenerator sessionIdGenerator = new SessionIdGenerator();
         String key = sessionIdGenerator.generateSessionId();
@@ -55,7 +69,7 @@ public class ZkLockTest {
 
     @Test
     public void testTimeout() throws InterruptedException {
-        ZKDistLock zkLock1 = new ZKDistLock(ZKUtils.init(TestZkConfig.ZK));
+        ZKDistLock zkLock1 = new ZKDistLock(curatorClient);
         SessionIdGenerator sessionIdGenerator = new SessionIdGenerator();
         String key = sessionIdGenerator.generateSessionId();
         CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -83,7 +97,7 @@ public class ZkLockTest {
         });
         Assertions.assertEquals(false, r1);
 
-        ZKDistLock redislock2 = new ZKDistLock(ZKUtils.init(TestZkConfig.ZK));
+        ZKDistLock redislock2 = new ZKDistLock(curatorClient);
         boolean r2 = redislock2.tryExecute(key, 3, TimeUnit.SECONDS, new Runnable() {
             @Override
             public void run() {
