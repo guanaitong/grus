@@ -61,16 +61,18 @@ public class ExcelResolver<T> {
         List<T> list = new ArrayList<>(rows);
         for (int i = 1; i < rows; i++) {
             Row row = sheet.getRow(i);
-            T readResult = clazz.getDeclaredConstructor().newInstance();
-            for (CellResolver cellResolver : cellResolvers) {
-                Cell cell = row.getCell(cellResolver.column);
-                if (Objects.nonNull(cell)) {
-                    Object val = cellResolver.converter.read(cell);
-                    Field field = cellResolver.field;
-                    field.set(readResult, val);
+            if (row != null) {
+                T readResult = clazz.getDeclaredConstructor().newInstance();
+                for (CellResolver cellResolver : cellResolvers) {
+                    Cell cell = row.getCell(cellResolver.column);
+                    if (Objects.nonNull(cell)) {
+                        Object val = cellResolver.converter.read(cell);
+                        Field field = cellResolver.field;
+                        field.set(readResult, val);
+                    }
                 }
+                list.add(readResult);
             }
-            list.add(readResult);
         }
         return list;
     }
