@@ -20,11 +20,9 @@ import static com.ciicgat.grus.zk.ZKConstants.SESSION_TIMEOUT_MS;
  * @Description:
  */
 public class ZKUtils {
-    public static void setting() {
-        System.setProperty("zookeeper.sasl.client", "false");
-    }
+
     public static CuratorFramework init(String connectionString) {
-        setting();
+        System.setProperty("zookeeper.sasl.client", "false");
         CuratorFramework curator = CuratorFrameworkFactory.builder().connectString(connectionString)
                 .retryPolicy(new RetryUntilElapsed(RETRY_MAX_MS, RETRY_INTERVAL_MS))
                 .connectionTimeoutMs(CONNECT_TIMEOUT_MS)

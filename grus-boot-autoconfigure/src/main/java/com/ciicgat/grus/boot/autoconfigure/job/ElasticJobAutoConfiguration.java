@@ -9,7 +9,6 @@ import com.ciicgat.grus.boot.autoconfigure.condition.ConditionalOnWorkEnv;
 import com.ciicgat.grus.boot.autoconfigure.gconf.GconfAutoConfiguration;
 import com.ciicgat.grus.boot.autoconfigure.zk.ZKProperties;
 import com.ciicgat.grus.job.TraceableJob;
-import com.ciicgat.grus.zk.ZKUtils;
 import com.ciicgat.sdk.util.system.WorkEnv;
 import org.apache.shardingsphere.elasticjob.lite.internal.schedule.JobScheduler;
 import org.apache.shardingsphere.elasticjob.reg.zookeeper.ZookeeperConfiguration;
@@ -47,7 +46,7 @@ public class ElasticJobAutoConfiguration {
         LOGGER.info("use serverLists {},namespace {}", serverLists, namespace);
         Objects.requireNonNull(serverLists);
         Objects.requireNonNull(namespace);
-        ZKUtils.setting();
+        System.setProperty("zookeeper.sasl.client", "false");
         var zookeeperRegistryCenter = new ZookeeperRegistryCenter(new ZookeeperConfiguration(serverLists, namespace));
         return zookeeperRegistryCenter;
     }
