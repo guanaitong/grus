@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConfiguration;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceClusterConnection;
 import org.springframework.data.redis.connection.lettuce.LettuceConnection;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
@@ -33,7 +34,9 @@ class LettuceConnectionFactoryWrapper extends LettuceConnectionFactory {
     @Override
     public RedisConnection getConnection() {
         RedisConnection connection = super.getConnection();
-        if (connection instanceof LettuceConnection) {
+        if (connection instanceof LettuceClusterConnection) {
+            return connection;
+        } else if (connection instanceof LettuceConnection) {
             return new TracingRedisConnection(connection, redisSetting);
         } else {
             return connection;
